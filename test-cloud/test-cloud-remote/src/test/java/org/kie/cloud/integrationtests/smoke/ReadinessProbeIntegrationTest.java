@@ -99,8 +99,7 @@ public class ReadinessProbeIntegrationTest {
 
     @Test
     public void testWorkbenchReadinessProbe() {
-        logger.debug("Check that workbench login screen is available");
-        Assertions.assertThat(isBCLoginScreenAvailable()).isTrue();
+        checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
         Collection<OrganizationalUnit> organizationalUnits = workbenchClientProvider.getWorkbenchClient().getOrganizationalUnits();
         Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_NAME))).isTrue();
@@ -112,8 +111,7 @@ public class ReadinessProbeIntegrationTest {
         workbenchWithKieServerScenario.getWorkbenchDeployment().scale(1);
         workbenchWithKieServerScenario.getWorkbenchDeployment().waitForScale();
 
-        logger.debug("Check that workbench login screen is available");
-        Assertions.assertThat(isBCLoginScreenAvailable()).isTrue();
+        checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
         workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
         organizationalUnits = workbenchClientProvider.getWorkbenchClient().getOrganizationalUnits();
@@ -149,32 +147,26 @@ public class ReadinessProbeIntegrationTest {
         Assertions.fail("Timeout while waiting for OpenShift router to establish connection to Kie server.");
     }
 
-    private boolean isBCLoginScreenAvailable() {
+    private void checkBCLoginScreenAvailable() {
+        logger.debug("Check that workbench login screen is available");
         URL url = workbenchWithKieServerScenario.getWorkbenchDeployment().getUrl();
         HttpURLConnection httpURLConnection;
         try {
             httpURLConnection = (HttpURLConnection) url.openConnection();
-            logger.debug("Connecting to business central login screen");
+            logger.debug("Connecting to workbench login screen");
             httpURLConnection.connect();
             logger.debug("Http response code is {}", httpURLConnection.getResponseCode());
-            if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                logger.debug("Connection to business central login screen failed with code {}", httpURLConnection.getResponseCode());
-                return false;
-            }
+            Assertions.assertThat(httpURLConnection.getResponseCode()).isEqualTo(HttpURLConnection.HTTP_OK);
 
             logger.debug("Reading login page content");
-            String responseContent = IOUtils.toString(httpURLConnection.getInputStream());
+            String responseContent = IOUtils.toString(httpURLConnection.getInputStream(), "UTF-8");
             logger.debug("Login page content contains {} characters", responseContent.length());
             httpURLConnection.disconnect();
 
-            if (!responseContent.contains(WORKBENCH_LOGIN_SCREEN_TEXT)) {
-                logger.debug("Wrong content of workbench login screen");
-                return false;
-            }
+            Assertions.assertThat(responseContent.contains(WORKBENCH_LOGIN_SCREEN_TEXT)).isTrue();
 
-            return true;
         } catch (IOException e) {
-            return false;
+            Assertions.fail("Unable to load workbench login screen");
         }
     }
 }
