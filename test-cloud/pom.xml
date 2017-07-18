@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.cloud</groupId>
+    <artifactId>kie-cloud-tests</artifactId>
+    <version>7.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>test-cloud</artifactId>
+  <packaging>pom</packaging>
+
+  <name>KIE :: Cloud :: Tests</name>
+  <description>Test suite collecting various tests for BxMS in cloud.</description>
+
+  <properties>
+    <openshift.master.url/> <!-- Needs to be defined for proper test run on OpenShift. -->
+    <openshift.username>user</openshift.username>
+    <openshift.password>redhat</openshift.password>
+
+    <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
+    <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
+    <kie.app.template>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql.json</kie.app.template>
+
+    <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
+    <gitlab.url/>
+    <gitlab.username/>
+    <gitlab.password/>
+    <github.username/>
+    <github.password/>
+  </properties>
+
+  <modules>
+    <module>test-cloud-remote</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <systemProperties>
+              <openshift.master.url>${openshift.master.url}</openshift.master.url>
+              <openshift.username>${openshift.username}</openshift.username>
+              <openshift.password>${openshift.password}</openshift.password>
+              <kie.app.secret>${kie.app.secret}</kie.app.secret>
+              <kie.image.streams>${kie.image.streams}</kie.image.streams>
+              <kie.app.template>${kie.app.template}</kie.app.template>
+              <git.provider>${git.provider}</git.provider>
+              <gitlab.url>${gitlab.url}</gitlab.url>
+              <gitlab.username>${gitlab.username}</gitlab.username>
+              <gitlab.password>${gitlab.password}</gitlab.password>
+              <github.username>${github.username}</github.username>
+              <github.password>${github.password}</github.password>
+            </systemProperties>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
