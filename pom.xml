@@ -19,6 +19,7 @@
 
   <modules>
     <module>framework-cloud</module>
+    <module>test-cloud</module>
   </modules>
 
   <properties>
