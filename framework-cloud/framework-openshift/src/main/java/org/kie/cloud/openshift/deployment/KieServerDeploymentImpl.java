@@ -84,6 +84,9 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
 
     @Override public void waitForScale() {
         openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().waitUntilAllPodsAreReady();
+        if (openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().podsNumber() > 0) {
+            RouterUtil.waitForRouter(getUrl());
+        }
     }
 
     @Override public boolean ready() {

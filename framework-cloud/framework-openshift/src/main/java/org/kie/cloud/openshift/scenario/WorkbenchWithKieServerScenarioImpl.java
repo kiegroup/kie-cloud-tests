@@ -73,8 +73,6 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplate(), envVariables);
 
-        waitUntilAllPodsAreReady(project);
-
         workbenchDeployment = new WorkbenchDeploymentImpl();
         workbenchDeployment.setOpenShiftController(openshiftController);
         workbenchDeployment.setNamespace(projectName);
@@ -90,6 +88,8 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             throw new RuntimeException("Malformed URL for workbench", e);
         }
 
+        workbenchDeployment.waitForScale();
+
         kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);
         kieServerDeployment.setNamespace(projectName);
@@ -104,20 +104,13 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed URL for kie server", e);
         }
+
+        kieServerDeployment.waitForScale();
     }
 
     @Override public void undeploy() {
         Project project = openshiftController.getProject(projectName);
         project.delete();
-    }
-
-    private void waitUntilAllPodsAreReady(Project project) {
-        for (Service service : project.getServices()) {
-            if (service.getDeploymentConfig() != null) {
-                logger.info("Waiting for pods in deployment config to become ready: " + service.getName());
-                service.getDeploymentConfig().waitUntilAllPodsAreReady();
-            }
-        }
     }
 
     public OpenShiftController getOpenshiftController() {
