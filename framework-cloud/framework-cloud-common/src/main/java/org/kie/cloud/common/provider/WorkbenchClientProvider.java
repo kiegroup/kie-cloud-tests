@@ -49,5 +49,9 @@ public class WorkbenchClientProvider {
     public void deployProject(String repoName, String projectName) {
         workbenchClient.deployProject(repoName, projectName);
     }
+
+    public WorkbenchClient getWorkbenchClient() {
+        return workbenchClient;
+    }
 }
 
