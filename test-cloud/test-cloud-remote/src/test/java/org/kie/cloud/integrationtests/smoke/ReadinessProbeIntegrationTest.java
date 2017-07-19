@@ -163,7 +163,7 @@ public class ReadinessProbeIntegrationTest {
             logger.debug("Login page content contains {} characters", responseContent.length());
             httpURLConnection.disconnect();
 
-            Assertions.assertThat(responseContent.contains(WORKBENCH_LOGIN_SCREEN_TEXT)).isTrue();
+            Assertions.assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
 
         } catch (IOException e) {
             Assertions.fail("Unable to load workbench login screen");
