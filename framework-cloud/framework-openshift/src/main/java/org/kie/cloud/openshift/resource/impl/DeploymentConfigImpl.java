@@ -41,6 +41,10 @@ public class DeploymentConfigImpl implements DeploymentConfig {
         return deploymentConfigName;
     }
 
+    @Override public int podsNumber() {
+        return client.deploymentConfigs().inNamespace(projectName).withName(deploymentConfigName).get().getSpec().getReplicas().intValue();
+    }
+
     @Override
     public void delete() {
         client.deploymentConfigs().inNamespace(projectName).withName(deploymentConfigName).delete();

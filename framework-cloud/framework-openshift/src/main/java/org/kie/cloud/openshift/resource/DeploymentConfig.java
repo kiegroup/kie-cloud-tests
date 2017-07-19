@@ -26,6 +26,13 @@ public interface DeploymentConfig {
     public String getName();
 
     /**
+     * Return number of pods available for the deployment.
+     *
+     * @return Number of pods available for the deployment.
+     */
+    public int podsNumber();
+
+    /**
      * Change number of pods available for the deployment.
      *
      * @param numberOfPods Number of pods to be available.

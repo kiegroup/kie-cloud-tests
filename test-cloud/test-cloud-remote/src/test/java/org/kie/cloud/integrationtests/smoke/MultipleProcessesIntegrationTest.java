@@ -30,8 +30,6 @@ public class MultipleProcessesIntegrationTest {
     private static final String CONTAINER_ID = "cont-id";
     private static final String CONTAINER_ALIAS = "cont-alias";
 
-    private static final String GIT_REPOSITORY_NAME = "myGitRepo";
-
     private static final String USERTASK_PROCESS_ID = "definition-project.usertask";
     private static final String SIGNALTASK_PROCESS_ID = "definition-project.signaltask";
 
@@ -52,11 +50,11 @@ public class MultipleProcessesIntegrationTest {
         workbenchWithKieServerScenario.deploy();
 
         gitProvider = GitProviderFactory.getGitProvider();
-        gitProvider.createGitRepository(GIT_REPOSITORY_NAME, ClassLoader.class.getResource("/kjars-sources").getFile());
+        gitProvider.createGitRepository(workbenchWithKieServerScenario.getNamespace(), ClassLoader.class.getResource("/kjars-sources").getFile());
 
         workbenchClientProvider = new WorkbenchClientProvider(workbenchWithKieServerScenario.getWorkbenchDeployment());
         workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
-        workbenchClientProvider.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(GIT_REPOSITORY_NAME));
+        workbenchClientProvider.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(workbenchWithKieServerScenario.getNamespace()));
         workbenchClientProvider.deployProject(REPOSITORY_NAME, PROJECT_NAME);
 
         kieServerClientProvider = new KieServerClientProvider(workbenchWithKieServerScenario.getKieServerDeployment());
@@ -67,7 +65,7 @@ public class MultipleProcessesIntegrationTest {
     @After
     public void tearDown() {
         workbenchWithKieServerScenario.undeploy();
-        gitProvider.deleteGitRepository(GIT_REPOSITORY_NAME);
+        gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
     }
 
     @Test

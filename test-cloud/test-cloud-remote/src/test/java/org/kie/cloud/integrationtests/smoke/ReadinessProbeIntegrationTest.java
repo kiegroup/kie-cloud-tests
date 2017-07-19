@@ -48,8 +48,6 @@ public class ReadinessProbeIntegrationTest {
     private static final String CONTAINER_ID = "cont-id";
     private static final String CONTAINER_ALIAS = "cont-alias";
 
-    private static final String GIT_REPOSITORY_NAME = "myGitRepo";
-
     private static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
     private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactory.getInstance();
@@ -72,10 +70,10 @@ public class ReadinessProbeIntegrationTest {
         kieServerClientProvider = new KieServerClientProvider(workbenchWithKieServerScenario.getKieServerDeployment());
 
         gitProvider = GitProviderFactory.getGitProvider();
-        gitProvider.createGitRepository(GIT_REPOSITORY_NAME, ClassLoader.class.getResource("/kjars-sources").getFile());
+        gitProvider.createGitRepository(workbenchWithKieServerScenario.getNamespace(), ClassLoader.class.getResource("/kjars-sources").getFile());
 
         workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
-        workbenchClientProvider.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(GIT_REPOSITORY_NAME));
+        workbenchClientProvider.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(workbenchWithKieServerScenario.getNamespace()));
         workbenchClientProvider.deployProject(REPOSITORY_NAME, PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClientProvider.getKieServerClient().getServerInfo().getResult();
@@ -93,7 +91,7 @@ public class ReadinessProbeIntegrationTest {
 
     @After
     public void tearDown() {
-        gitProvider.deleteGitRepository(GIT_REPOSITORY_NAME);
+        gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
         workbenchWithKieServerScenario.undeploy();
     }
 
