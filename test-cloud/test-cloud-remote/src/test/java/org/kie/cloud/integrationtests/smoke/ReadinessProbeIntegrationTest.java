@@ -166,7 +166,7 @@ public class ReadinessProbeIntegrationTest {
             Assertions.assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
 
         } catch (IOException e) {
-            Assertions.fail("Unable to load workbench login screen");
+            Assertions.fail("Unable to load workbench login screen", e);
         }
     }
 }
