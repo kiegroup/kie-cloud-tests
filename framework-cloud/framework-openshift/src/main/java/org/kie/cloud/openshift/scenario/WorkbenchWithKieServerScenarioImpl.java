@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -74,35 +75,35 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
         waitUntilAllPodsAreReady(project);
 
-        String routeHostWorkbench = project.getService(OpenShiftConstants.getWorkbenchServiceName()).getRoute().getRouteHost();
-        String urlWorkbench = "http://" + routeHostWorkbench;
-
         workbenchDeployment = new WorkbenchDeploymentImpl();
         workbenchDeployment.setOpenShiftController(openshiftController);
         workbenchDeployment.setNamespace(projectName);
+        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
+        workbenchDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
+
+        String routeHostWorkbench = project.getService(workbenchDeployment.getServiceName()).getRoute().getRouteHost();
+        String urlWorkbench = "http://" + routeHostWorkbench;
         try {
             workbenchDeployment.setUrl(new URL(urlWorkbench));
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed URL for workbench", e);
         }
-        workbenchDeployment.setUsername(OpenShiftConstants.getWorkbenchUser());
-        workbenchDeployment.setPassword(OpenShiftConstants.getWorkbenchPassword());
-        workbenchDeployment.setServiceName(OpenShiftConstants.getWorkbenchServiceName());
-
-        String routeHostKieServer = project.getService(OpenShiftConstants.getKieServerServiceName()).getRoute().getRouteHost();
-        String urlKieServer = "http://" + routeHostKieServer;
 
         kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);
         kieServerDeployment.setNamespace(projectName);
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
+        kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
+
+        String routeHostKieServer = project.getService(kieServerDeployment.getServiceName()).getRoute().getRouteHost();
+        String urlKieServer = "http://" + routeHostKieServer;
         try {
             kieServerDeployment.setUrl(new URL(urlKieServer));
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed URL for kie server", e);
         }
-        kieServerDeployment.setUsername(OpenShiftConstants.getKieServerUser());
-        kieServerDeployment.setPassword(OpenShiftConstants.getKieServerPassword());
-        kieServerDeployment.setServiceName(OpenShiftConstants.getKieServerServiceName());
     }
 
     @Override public void undeploy() {

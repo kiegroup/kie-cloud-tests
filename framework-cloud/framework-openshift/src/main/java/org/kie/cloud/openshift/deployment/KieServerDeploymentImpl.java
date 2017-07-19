@@ -74,8 +74,8 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
         return serviceName;
     }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public void setServiceName(String applicationName) {
+        this.serviceName = applicationName + "-execserv";
     }
 
     @Override public void scale(int instances) {

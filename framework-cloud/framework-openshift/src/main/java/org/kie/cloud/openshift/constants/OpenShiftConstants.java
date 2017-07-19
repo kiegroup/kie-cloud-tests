@@ -15,159 +15,45 @@
 
 package org.kie.cloud.openshift.constants;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.TreeMap;
+import org.kie.cloud.api.constants.Constants;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class OpenShiftConstants implements Constants {
 
-public class OpenShiftConstants {
+    public static final String OPENSHIFT_URL = "openshift.master.url";
+    public static final String OPENSHIFT_USER = "openshift.username";
+    public static final String OPENSHIFT_PASSWORD = "openshift.password";
 
-    // Service constants
-    public static final String EAP_DEFAULT_PROTOCOL = "TCP";
-    public static final int EAP_DEFAULT_HTTP_PORT = 8080;
+    public static final String KIE_APP_SECRET = "kie.app.secret";
+    public static final String KIE_IMAGE_STREAMS = "kie.image.streams";
+    public static final String KIE_APP_TEMPLATE = "kie.app.template";
 
-    // Deployment config constants
-    public static final String DEPLOYMENT_TRIGGER_CONFIG_CHANGE = "ConfigChange";
-    public static final long DEPLOYMENT_CONFIG_CREATION_TIMEOUT = 60 * 1000L; // 1 minute
-    public static final String DEPLOYMENT_CONFIG_LABEL = "deploymentConfig";
-
-    // Route constants
-    public static final String CENTRAL_CI_ROUTE_SUFFIX = ".project.openshiftdomain";
-    public static final String ROUTE_REDIRECT_COMPONENT_TYPE = "Service";
-    public static final int ROUTE_REDIRECT_DEFAULT_WEIGHT = 100;
-
-    // Pod constants
-    public static final long DEPLOYMENT_PODS_TERMINATION_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
-    public static final long PODS_START_TO_READY_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenShiftConstants.class);
-
-    static {
-        LOGGER.info("----- Initializing OpenshiftConstants -----");
-    }
-
-    // Default values for local tests
-    private static final StringTestParameter OPENSHIFT_URL = new StringTestParameter("openshift.master.url");
-    private static final StringTestParameter OPENSHIFT_USER = new StringTestParameter("openshift.username");
-    private static final StringTestParameter OPENSHIFT_PASSWORD = new StringTestParameter("openshift.password");
-
-    private static final StringTestParameter KIE_APP_SECRET = new StringTestParameter("kie.app.secret");
-    private static final StringTestParameter KIE_IMAGE_STREAMS = new StringTestParameter("kie.image.streams");
-    private static final StringTestParameter KIE_APP_TEMPLATE = new StringTestParameter("kie.app.template");
-
-    private static final StringTestParameter KIE_SERVER_USER = new StringTestParameter("org.kie.server.user", "yoda");
-    private static final StringTestParameter KIE_SERVER_PASSWORD = new StringTestParameter("org.kie.server.pwd", "usetheforce123@");
-    private static final StringTestParameter KIE_SERVER_SERVICE_NAME = new StringTestParameter("org.kie.server.service.name", "myapp-execserv");
-
-    private static final StringTestParameter WORKBENCH_USER = new StringTestParameter("org.kie.workbench.user", "adminUser");
-    private static final StringTestParameter WORKBENCH_PASSWORD = new StringTestParameter("org.kie.workbench.pwd", "adminUser1!");
-    private static final StringTestParameter WORKBENCH_SERVICE_NAME = new StringTestParameter("org.kie.workbench.service.name", "myapp-buscentr");
+    public static final String KIE_APP_NAME = "kie.app.name";
 
     public static String getOpenShiftUrl() {
-        return OPENSHIFT_URL.getParameterValue();
+        return System.getProperty(OPENSHIFT_URL);
     }
 
     public static String getOpenShiftUserName() {
-        return OPENSHIFT_USER.getParameterValue();
+        return System.getProperty(OPENSHIFT_USER);
     }
 
     public static String getOpenShiftPassword() {
-        return OPENSHIFT_PASSWORD.getParameterValue();
+        return System.getProperty(OPENSHIFT_PASSWORD);
     }
 
     public static String getKieAppSecret() {
-        return KIE_APP_SECRET.getParameterValue();
+        return System.getProperty(KIE_APP_SECRET);
     }
 
     public static String getKieImageStreams() {
-        return KIE_IMAGE_STREAMS.getParameterValue();
+        return System.getProperty(KIE_IMAGE_STREAMS);
     }
 
     public static String getKieAppTemplate() {
-        return KIE_APP_TEMPLATE.getParameterValue();
+        return System.getProperty(KIE_APP_TEMPLATE);
     }
 
-    public static String getKieServerUser() {
-        return KIE_SERVER_USER.getParameterValue();
-    }
-
-    public static String getKieServerPassword() {
-        return KIE_SERVER_PASSWORD.getParameterValue();
-    }
-
-    public static String getKieServerServiceName() {
-        return KIE_SERVER_SERVICE_NAME.getParameterValue();
-    }
-
-    public static String getWorkbenchUser() {
-        return WORKBENCH_USER.getParameterValue();
-    }
-
-    public static String getWorkbenchPassword() {
-        return WORKBENCH_PASSWORD.getParameterValue();
-    }
-
-    public static String getWorkbenchServiceName() {
-        return WORKBENCH_SERVICE_NAME.getParameterValue();
-    }
-
-    // Used for printing all configuration values at the beginning of first test run.
-    static {
-        TreeMap<String, String> params = new TreeMap<String, String>();
-        int maxKeyLength = 0;
-        for (Field f : OpenShiftConstants.class.getDeclaredFields()) {
-            if (StringTestParameter.class.isAssignableFrom(f.getType())) {
-                try {
-                    String paramName = f.getName();
-                    StringTestParameter paramValue = (StringTestParameter) f.get(null);
-                    maxKeyLength = Math.max(maxKeyLength, paramName.length());
-                    params.put(paramName, paramValue.getParameterValue().toString());
-                } catch (IllegalAccessException ex) {
-                    LOGGER.error("Cannot read field '{}'.", f.getName(), ex);
-                }
-            }
-        }
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            String paramName = entry.getKey();
-            String value = entry.getValue();
-
-            LOGGER.info("{} = {}",
-                    String.format("%" + maxKeyLength + "s", paramName),
-                    value
-            );
-        }
-    }
-
-    private static class StringTestParameter {
-
-        private String key;
-        private String defaultValue;
-
-        private StringTestParameter(String key) {
-            this.key = key;
-        }
-
-        private StringTestParameter(String key, String defaultValue) {
-            this.key = key;
-            this.defaultValue = defaultValue;
-        }
-
-        /**
-         * @return Parameter value.
-         */
-        public String getParameterValue() {
-            String parameterValue = convert(key);
-            return parameterValue != null ? parameterValue : defaultValue;
-        }
-
-        private String convert(String key) {
-            String systemPropertyValue = System.getProperty(key);
-            if (systemPropertyValue == null || systemPropertyValue.isEmpty()) {
-                return null;
-            }
-            return systemPropertyValue;
-        }
+    public static String getKieApplicationName() {
+        return System.getProperty(KIE_APP_NAME);
     }
 }

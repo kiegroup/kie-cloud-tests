@@ -18,10 +18,10 @@ package org.kie.cloud.openshift.scenario.builder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 import org.kie.cloud.openshift.OpenShiftController;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.WorkbenchWithKieServerScenarioImpl;
 
@@ -34,14 +34,14 @@ public class WorkbenchWithKieServerScenarioBuilderImpl implements WorkbenchWithK
         this.openshiftController = openShiftController;
 
         this.envVariables = new HashMap<String, String>();
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, OpenShiftConstants.getKieServerUser());
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, OpenShiftConstants.getKieServerPassword());
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, OpenShiftConstants.getWorkbenchUser());
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, OpenShiftConstants.getWorkbenchPassword());
+        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
+        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
+        this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
+        this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
 
         // By default use Workbench as maven repo, repo URL is derived from Workbench automatically if not defined
-        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, OpenShiftConstants.getWorkbenchUser());
-        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, OpenShiftConstants.getWorkbenchPassword());
+        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
+        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
     }
 
     @Override

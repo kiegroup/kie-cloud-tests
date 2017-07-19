@@ -24,6 +24,7 @@
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
     <kie.app.template>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql.json</kie.app.template>
+    <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
     <gitlab.url/>
@@ -31,6 +32,11 @@
     <gitlab.password/>
     <github.username/>
     <github.password/>
+
+    <org.kie.server.user>yoda</org.kie.server.user>
+    <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
+    <org.kie.workbench.user>adminUser</org.kie.workbench.user>
+    <org.kie.workbench.pwd>adminUser1!</org.kie.workbench.pwd>
   </properties>
 
   <modules>
@@ -51,12 +57,17 @@
               <kie.app.secret>${kie.app.secret}</kie.app.secret>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <kie.app.template>${kie.app.template}</kie.app.template>
+              <kie.app.name>${kie.app.name}</kie.app.name>
               <git.provider>${git.provider}</git.provider>
               <gitlab.url>${gitlab.url}</gitlab.url>
               <gitlab.username>${gitlab.username}</gitlab.username>
               <gitlab.password>${gitlab.password}</gitlab.password>
               <github.username>${github.username}</github.username>
               <github.password>${github.password}</github.password>
+              <org.kie.server.user>${org.kie.server.user}</org.kie.server.user>
+              <org.kie.server.pwd>${org.kie.server.pwd}</org.kie.server.pwd>
+              <org.kie.workbench.user>${org.kie.workbench.user}</org.kie.workbench.user>
+              <org.kie.workbench.pwd>${org.kie.workbench.pwd}</org.kie.workbench.pwd>
             </systemProperties>
           </configuration>
         </plugin>

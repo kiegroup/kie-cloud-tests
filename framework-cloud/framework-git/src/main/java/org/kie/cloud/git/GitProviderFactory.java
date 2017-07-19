@@ -18,6 +18,7 @@ package org.kie.cloud.git;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProvider;
 import org.kie.cloud.git.gitlab.GitLabGitProvider;
 
@@ -33,10 +34,10 @@ public class GitProviderFactory {
     private GitProviderFactory() {}
 
     public static GitProvider getGitProvider() {
-        String gitProviderName = System.getProperty(GitProperties.GIT_PROVIDER);
+        String gitProviderName = GitConstants.getGitProvider();
 
         if(gitProviderName == null) {
-            throw new RuntimeException("No GIT provider defined. Please define provider using " + GitProperties.GIT_PROVIDER + " system property.");
+            throw new RuntimeException("No GIT provider defined. Please define provider using " + GitConstants.GIT_PROVIDER + " system property.");
         }
 
         if(!gitProviders.containsKey(gitProviderName)) {

@@ -31,7 +31,7 @@ import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.openshift.client.OpenShiftClient;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.Service;
 
@@ -57,7 +57,7 @@ public class ProjectImpl implements Project {
 
     @Override
     public Service createService(String service) {
-        return createService(service, OpenShiftConstants.EAP_DEFAULT_PROTOCOL, OpenShiftConstants.EAP_DEFAULT_HTTP_PORT);
+        return createService(service, OpenShiftResourceConstants.EAP_DEFAULT_PROTOCOL, OpenShiftResourceConstants.EAP_DEFAULT_HTTP_PORT);
     }
 
     @Override
