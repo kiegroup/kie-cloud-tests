@@ -13,10 +13,11 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.git;
+package org.kie.cloud.git.constants;
 
+import org.kie.cloud.api.constants.Constants;
 
-public class GitProperties {
+public class GitConstants implements Constants {
 
     public static final String GIT_PROVIDER = "git.provider";
 
@@ -26,4 +27,28 @@ public class GitProperties {
 
     public static final String GITHUB_USER = "github.username";
     public static final String GITHUB_PASSWORD = "github.password";
+
+    public static String getGitProvider() {
+        return System.getProperty(GIT_PROVIDER);
+    }
+
+    public static String getGitLabUrl() {
+        return System.getProperty(GITLAB_URL);
+    }
+
+    public static String getGitLabUser() {
+        return System.getProperty(GITLAB_USER);
+    }
+
+    public static String getGitLabPassword() {
+        return System.getProperty(GITLAB_PASSWORD);
+    }
+
+    public static String getGitHubUser() {
+        return System.getProperty(GITHUB_USER);
+    }
+
+    public static String getGitHubPassword() {
+        return System.getProperty(GITHUB_PASSWORD);
+    }
 }

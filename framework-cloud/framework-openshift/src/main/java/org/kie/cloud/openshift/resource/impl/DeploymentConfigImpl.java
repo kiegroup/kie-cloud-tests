@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.openshift.client.OpenShiftClient;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.DeploymentConfig;
+import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 
 public class DeploymentConfigImpl implements DeploymentConfig {
 
@@ -60,11 +60,11 @@ public class DeploymentConfigImpl implements DeploymentConfig {
     }
 
     private void waitUntilAllPodsAreStarted() {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + OpenShiftConstants.DEPLOYMENT_PODS_TERMINATION_TIMEOUT;
+        long timeoutTime = Calendar.getInstance().getTimeInMillis() + OpenShiftResourceConstants.DEPLOYMENT_PODS_TERMINATION_TIMEOUT;
         int expectedPods = client.deploymentConfigs().inNamespace(projectName).withName(deploymentConfigName).get().getSpec().getReplicas().intValue();
 
         while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            if(client.pods().inNamespace(projectName).withLabel(OpenShiftConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems().size() == expectedPods) {
+            if(client.pods().inNamespace(projectName).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems().size() == expectedPods) {
                 return;
             }
 
@@ -79,10 +79,10 @@ public class DeploymentConfigImpl implements DeploymentConfig {
     }
 
     private void waitUntilAllPodsAreRunning() {
-        List<Pod> pods = client.pods().inNamespace(projectName).withLabel(OpenShiftConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
+        List<Pod> pods = client.pods().inNamespace(projectName).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
         for(Pod pod : pods) {
             try {
-                client.pods().inNamespace(projectName).withName(pod.getMetadata().getName()).waitUntilReady(OpenShiftConstants.PODS_START_TO_READY_TIMEOUT, TimeUnit.MILLISECONDS);
+                client.pods().inNamespace(projectName).withName(pod.getMetadata().getName()).waitUntilReady(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Interrupted while waiting for pod to be ready.", e);

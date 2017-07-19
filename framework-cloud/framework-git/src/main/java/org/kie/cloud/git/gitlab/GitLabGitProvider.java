@@ -26,14 +26,10 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabSession;
-import org.kie.cloud.git.GitProperties;
 import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.git.constants.GitConstants;
 
 public class GitLabGitProvider implements GitProvider {
-
-    private static final String GITLAB_URL = System.getProperty(GitProperties.GITLAB_URL);
-    private static final String GITLAB_USER = System.getProperty(GitProperties.GITLAB_USER);
-    private static final String GITLAB_PASSWORD = System.getProperty(GitProperties.GITLAB_PASSWORD);
 
     private GitlabAPI gitLabApi;
 
@@ -51,7 +47,7 @@ public class GitLabGitProvider implements GitProvider {
             git.add().addFilepattern(".").call();
             git.commit().setMessage("Initial commit").call();
 
-            CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(GITLAB_USER, GITLAB_PASSWORD);
+            CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(GitConstants.getGitLabUser(), GitConstants.getGitLabPassword());
             git.push().setCredentialsProvider(credentialsProvider).setRemote("origin").setPushAll().call();
         } catch (Exception e) {
             throw new RuntimeException("Error while preparing GitLab project" + repositoryName, e);
@@ -88,9 +84,9 @@ public class GitLabGitProvider implements GitProvider {
     @Override
     public void init() {
         try {
-            GitlabSession session = GitlabAPI.connect(GITLAB_URL, GITLAB_USER, GITLAB_PASSWORD);
+            GitlabSession session = GitlabAPI.connect(GitConstants.getGitLabUrl(), GitConstants.getGitLabUser(), GitConstants.getGitLabPassword());
             String privateToken = session.getPrivateToken();
-            gitLabApi = GitlabAPI.connect(GITLAB_URL, privateToken);
+            gitLabApi = GitlabAPI.connect(GitConstants.getGitLabUrl(), privateToken);
         } catch (IOException e) {
             throw new RuntimeException("Error while initializing GitLab.", e);
         }

@@ -28,7 +28,7 @@ import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.DeploymentTriggerPolicyBuilder;
 import io.fabric8.openshift.api.model.RouteBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Service;
 
 public class ServiceImpl implements Service {
@@ -90,14 +90,14 @@ public class ServiceImpl implements Service {
                     .endTemplate()
                     .withTriggers(
                             new DeploymentTriggerPolicyBuilder()
-                            .withType(OpenShiftConstants.DEPLOYMENT_TRIGGER_CONFIG_CHANGE)
+                            .withType(OpenShiftResourceConstants.DEPLOYMENT_TRIGGER_CONFIG_CHANGE)
                             .build())
                     .withSelector(selector)
                 .endSpec()
                 .build());
 
         try {
-            client.deploymentConfigs().inNamespace(projectName).withName(serviceName).waitUntilReady(OpenShiftConstants.DEPLOYMENT_CONFIG_CREATION_TIMEOUT, TimeUnit.MILLISECONDS);
+            client.deploymentConfigs().inNamespace(projectName).withName(serviceName).waitUntilReady(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_CREATION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while waiting for deployment to become ready.", e);
@@ -126,7 +126,7 @@ public class ServiceImpl implements Service {
 
     @Override
     public RouteImpl createRoute() {
-        String route = serviceName + OpenShiftConstants.CENTRAL_CI_ROUTE_SUFFIX;
+        String route = serviceName + OpenShiftResourceConstants.CENTRAL_CI_ROUTE_SUFFIX;
         return createRoute(route);
     }
 
@@ -140,9 +140,9 @@ public class ServiceImpl implements Service {
                 .endMetadata()
                 .withNewSpec()
                     .withNewTo()
-                        .withKind(OpenShiftConstants.ROUTE_REDIRECT_COMPONENT_TYPE)
+                        .withKind(OpenShiftResourceConstants.ROUTE_REDIRECT_COMPONENT_TYPE)
                         .withName(serviceName)
-                        .withWeight(OpenShiftConstants.ROUTE_REDIRECT_DEFAULT_WEIGHT)
+                        .withWeight(OpenShiftResourceConstants.ROUTE_REDIRECT_DEFAULT_WEIGHT)
                     .endTo()
                     .withHost(route)
                 .endSpec()

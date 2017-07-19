@@ -14,4 +14,12 @@
 
   <name>KIE :: Cloud :: API</name>
   <description>Cloud API for Kie integration tests</description>
+
+  <dependencies>
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+  </dependencies>
 </project>

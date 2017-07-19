@@ -74,8 +74,8 @@ public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
         return serviceName;
     }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public void setServiceName(String applicationName) {
+        this.serviceName = applicationName + "-buscentr";
     }
 
     @Override public void scale(int instances) {

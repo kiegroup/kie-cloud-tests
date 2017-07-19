@@ -26,13 +26,10 @@ import org.eclipse.jgit.api.RemoteAddCommand;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.kie.cloud.git.GitProperties;
 import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.git.constants.GitConstants;
 
 public class GitHubGitProvider implements GitProvider {
-
-    private static final String GITHUB_USER = System.getProperty(GitProperties.GITHUB_USER);
-    private static final String GITHUB_PASSWORD = System.getProperty(GitProperties.GITHUB_PASSWORD);
 
     private GitHubClient client;
 
@@ -55,7 +52,7 @@ public class GitHubGitProvider implements GitProvider {
             git.add().addFilepattern(".").call();
             git.commit().setMessage("Initial commit").call();
 
-            CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(GITHUB_USER, GITHUB_PASSWORD);
+            CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(GitConstants.getGitHubUser(), GitConstants.getGitHubPassword());
             git.push().setCredentialsProvider(credentialsProvider).setRemote("origin").setPushAll().call();
         } catch (Exception e) {
             throw new RuntimeException("Error while preparing GitHub project " + repositoryName, e);
@@ -65,7 +62,7 @@ public class GitHubGitProvider implements GitProvider {
     @Override
     public void deleteGitRepository(String repositoryName) {
         try {
-            client.delete("/repos/" + GITHUB_USER + "/" + repositoryName);
+            client.delete("/repos/" + GitConstants.getGitHubUser() + "/" + repositoryName);
         } catch (IOException e) {
             throw new RuntimeException("Error while deleting GitHub project " + repositoryName, e);
         }
@@ -75,7 +72,7 @@ public class GitHubGitProvider implements GitProvider {
     public String getRepositoryUrl(String repositoryName) {
         try {
             RepositoryService service = new RepositoryService(client);
-            Repository repository = service.getRepository(GITHUB_USER, repositoryName);
+            Repository repository = service.getRepository(GitConstants.getGitHubUser(), repositoryName);
             return repository.getSvnUrl();
         } catch (IOException e) {
             throw new RuntimeException("Error while retrieving GitHub project URL from " + repositoryName, e);
@@ -85,6 +82,6 @@ public class GitHubGitProvider implements GitProvider {
     @Override
     public void init() {
         client = new GitHubClient();
-        client.setCredentials(GITHUB_USER, GITHUB_PASSWORD);
+        client.setCredentials(GitConstants.getGitHubUser(), GitConstants.getGitHubPassword());
     }
 }

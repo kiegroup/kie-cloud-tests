@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 import org.junit.Test;
+import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProvider;
 
 public class GitProviderFactoryTest {
@@ -31,24 +32,24 @@ public class GitProviderFactoryTest {
 
     @Test
     public void testGetNotFoundGitProvider() {
-        System.setProperty(GitProperties.GIT_PROVIDER, "not-existing-provider");
+        System.setProperty(GitConstants.GIT_PROVIDER, "not-existing-provider");
 
         try {
             Throwable thrown = catchThrowable(() -> GitProviderFactory.getGitProvider());
             assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("GIT provider with name not-existing-provider not found");
         } finally {
-            System.clearProperty(GitProperties.GIT_PROVIDER);
+            System.clearProperty(GitConstants.GIT_PROVIDER);
         }
     }
 
     @Test
     public void testGetGitHubGitProvider() {
-        System.setProperty(GitProperties.GIT_PROVIDER, "GitHub");
+        System.setProperty(GitConstants.GIT_PROVIDER, "GitHub");
 
         try {
             assertThat(GitProviderFactory.getGitProvider()).isInstanceOf(GitHubGitProvider.class);
         } finally {
-            System.clearProperty(GitProperties.GIT_PROVIDER);
+            System.clearProperty(GitConstants.GIT_PROVIDER);
         }
     }
 }
