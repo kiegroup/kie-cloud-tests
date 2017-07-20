@@ -33,6 +33,10 @@
     <github.username/>
     <github.password/>
 
+    <maven.repo.url/>
+    <maven.repo.username/>
+    <maven.repo.password/>
+
     <org.kie.server.user>yoda</org.kie.server.user>
     <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
     <org.kie.workbench.user>adminUser</org.kie.workbench.user>
@@ -50,7 +54,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <systemProperties>
+            <systemProperties combine.children="append">
               <openshift.master.url>${openshift.master.url}</openshift.master.url>
               <openshift.username>${openshift.username}</openshift.username>
               <openshift.password>${openshift.password}</openshift.password>
@@ -64,6 +68,9 @@
               <gitlab.password>${gitlab.password}</gitlab.password>
               <github.username>${github.username}</github.username>
               <github.password>${github.password}</github.password>
+              <maven.repo.url>${maven.repo.url}</maven.repo.url>
+              <maven.repo.username>${maven.repo.username}</maven.repo.username>
+              <maven.repo.password>${maven.repo.password}</maven.repo.password>
               <org.kie.server.user>${org.kie.server.user}</org.kie.server.user>
               <org.kie.server.pwd>${org.kie.server.pwd}</org.kie.server.pwd>
               <org.kie.workbench.user>${org.kie.workbench.user}</org.kie.workbench.user>

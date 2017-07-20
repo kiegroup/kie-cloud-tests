@@ -17,6 +17,7 @@
 
   <properties>
     <skipTests>true</skipTests>
+    <kjars.build.settings.xml>${project.build.testOutputDirectory}/settings.xml</kjars.build.settings.xml>
   </properties>
 
   <dependencies>
@@ -35,6 +36,11 @@
       <artifactId>framework-git</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-maven</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
@@ -48,6 +54,32 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <systemProperties>
+              <kjars.build.settings.xml>${kjars.build.settings.xml}</kjars.build.settings.xml>
+            </systemProperties>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <profiles>
     <profile>
