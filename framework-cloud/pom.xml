@@ -21,6 +21,7 @@
     <module>framework-cloud-common</module>
     <module>cloud-deployment-plugin</module>
     <module>framework-git</module>
+    <module>framework-maven</module>
     <module>framework-openshift</module>
   </modules>
 </project>

@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.cloud</groupId>
+    <artifactId>framework-cloud</artifactId>
+    <version>7.2.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>framework-maven</artifactId>
+
+  <name>KIE :: Cloud :: Maven tools</name>
+  <description>Tools for testing using Maven</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-cloud-api</artifactId>
+    </dependency>
+
+    <!-- Maven dependencies -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-embedder</artifactId>
+    </dependency>
+
+     <!-- Logging -->
+     <dependency>
+       <groupId>org.slf4j</groupId>
+       <artifactId>slf4j-api</artifactId>
+     </dependency>
+  </dependencies>
+</project>

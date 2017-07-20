@@ -79,6 +79,11 @@
         <artifactId>framework-git</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
+     <dependency>
+        <groupId>org.kie.cloud</groupId>
+        <artifactId>framework-maven</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
       <dependency>
         <groupId>org.kie.cloud</groupId>
         <artifactId>framework-openshift</artifactId>
