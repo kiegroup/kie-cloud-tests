@@ -15,21 +15,19 @@
 
 package org.kie.cloud.git.gitlab;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.RemoteAddCommand;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.URIish;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabSession;
-import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.git.AbstractGitProvider;
 import org.kie.cloud.git.constants.GitConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GitLabGitProvider implements GitProvider {
+public class GitLabGitProvider extends AbstractGitProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(GitLabGitProvider.class);
 
     private GitlabAPI gitLabApi;
 
@@ -39,18 +37,10 @@ public class GitLabGitProvider implements GitProvider {
             GitlabProject gitLabProject = gitLabApi.createUserProject(gitLabApi.getUser().getId(), repositoryName, null, null, null, null, null, null, null, true, null, null);
             String httpUrl = gitLabProject.getHttpUrl();
 
-            Git git = Git.init().setDirectory(new File(repositoryPath)).call();
-            RemoteAddCommand remoteAdd = git.remoteAdd();
-            remoteAdd.setName("origin");
-            remoteAdd.setUri(new URIish(httpUrl));
-            remoteAdd.call();
-            git.add().addFilepattern(".").call();
-            git.commit().setMessage("Initial commit").call();
-
-            CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(GitConstants.getGitLabUser(), GitConstants.getGitLabPassword());
-            git.push().setCredentialsProvider(credentialsProvider).setRemote("origin").setPushAll().call();
+            pushToGitRepository(httpUrl, repositoryPath);
         } catch (Exception e) {
-            throw new RuntimeException("Error while preparing GitLab project" + repositoryName, e);
+            logger.error("Error while preparing GitLab project " + repositoryName, e);
+            throw new RuntimeException("Error while preparing GitLab project " + repositoryName, e);
         }
     }
 
@@ -63,6 +53,7 @@ public class GitLabGitProvider implements GitProvider {
                 }
             }
         } catch (IOException e) {
+            logger.error("Error while deleting GitLab project " + repositoryName, e);
             throw new RuntimeException("Error while deleting GitLab project " + repositoryName, e);
         }
     }
@@ -76,6 +67,7 @@ public class GitLabGitProvider implements GitProvider {
                 }
             }
         } catch (IOException e) {
+            logger.error("Error while retrieving GitLab projects from " + repositoryName, e);
             throw new RuntimeException("Error while retrieving GitLab projects from " + repositoryName, e);
         }
         throw new RuntimeException("URL of repository " + repositoryName + " not found");
@@ -88,6 +80,7 @@ public class GitLabGitProvider implements GitProvider {
             String privateToken = session.getPrivateToken();
             gitLabApi = GitlabAPI.connect(GitConstants.getGitLabUrl(), privateToken);
         } catch (IOException e) {
+            logger.error("Error while initializing GitLab.", e);
             throw new RuntimeException("Error while initializing GitLab.", e);
         }
     }

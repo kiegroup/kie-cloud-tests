@@ -15,21 +15,20 @@
 
 package org.kie.cloud.git.github;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.RemoteAddCommand;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.URIish;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.git.AbstractGitProvider;
 import org.kie.cloud.git.constants.GitConstants;
+import org.kie.cloud.git.gitlab.GitLabGitProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GitHubGitProvider implements GitProvider {
+public class GitHubGitProvider extends AbstractGitProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(GitHubGitProvider.class);
 
     private GitHubClient client;
 
@@ -44,17 +43,9 @@ public class GitHubGitProvider implements GitProvider {
             repository = service.createRepository(repository);
             String httpUrl = repository.getSshUrl();
 
-            Git git = Git.init().setDirectory(new File(repositoryPath)).call();
-            RemoteAddCommand remoteAdd = git.remoteAdd();
-            remoteAdd.setName("origin");
-            remoteAdd.setUri(new URIish(httpUrl));
-            remoteAdd.call();
-            git.add().addFilepattern(".").call();
-            git.commit().setMessage("Initial commit").call();
-
-            CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(GitConstants.getGitHubUser(), GitConstants.getGitHubPassword());
-            git.push().setCredentialsProvider(credentialsProvider).setRemote("origin").setPushAll().call();
+            pushToGitRepository(httpUrl, repositoryPath);
         } catch (Exception e) {
+            logger.error("Error while preparing GitHub project " + repositoryName, e);
             throw new RuntimeException("Error while preparing GitHub project " + repositoryName, e);
         }
     }
@@ -64,6 +55,7 @@ public class GitHubGitProvider implements GitProvider {
         try {
             client.delete("/repos/" + GitConstants.getGitHubUser() + "/" + repositoryName);
         } catch (IOException e) {
+            logger.error("Error while deleting GitHub project " + repositoryName, e);
             throw new RuntimeException("Error while deleting GitHub project " + repositoryName, e);
         }
     }
@@ -75,6 +67,7 @@ public class GitHubGitProvider implements GitProvider {
             Repository repository = service.getRepository(GitConstants.getGitHubUser(), repositoryName);
             return repository.getSvnUrl();
         } catch (IOException e) {
+            logger.error("Error while retrieving GitHub project URL from " + repositoryName, e);
             throw new RuntimeException("Error while retrieving GitHub project URL from " + repositoryName, e);
         }
     }
