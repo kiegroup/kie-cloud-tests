@@ -74,6 +74,7 @@
           <configuration>
             <systemProperties>
               <kjars.build.settings.xml>${kjars.build.settings.xml}</kjars.build.settings.xml>
+              <instance.logs>${project.build.directory}/instances</instance.logs>
             </systemProperties>
           </configuration>
         </plugin>

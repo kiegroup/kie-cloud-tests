@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -61,6 +62,8 @@ public class ExternalMavenRepoIntegrationTest {
 
     @After
     public void tearDown() {
+        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
+        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
         workbenchWithKieServerScenario.undeploy();
     }
 

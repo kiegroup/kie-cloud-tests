@@ -16,9 +16,15 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import io.fabric8.kubernetes.api.model.Pod;
+import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.WorkbenchInstance;
 import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 
 public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
 
@@ -64,6 +70,24 @@ public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
 
     @Override public String getPassword() {
         return password;
+    }
+
+    @Override public List<Instance> getInstances() {
+        String deploymentConfigName = openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().getName();
+        List<Pod> pods =
+                openShiftController.getClient().pods().inNamespace(namespace).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
+
+        List<Instance> workbenchInstances = new ArrayList<>();
+        for (Pod pod : pods) {
+            WorkbenchInstanceImpl workbenchInstance = new WorkbenchInstanceImpl();
+            workbenchInstance.setOpenShiftController(openShiftController);
+            workbenchInstance.setPodName(pod.getMetadata().getName());
+            workbenchInstance.setWorkbenchDeployment(this);
+
+            workbenchInstances.add(workbenchInstance);
+        }
+
+        return workbenchInstances;
     }
 
     public void setPassword(String password) {

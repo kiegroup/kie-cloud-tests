@@ -44,6 +44,11 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
     <!-- Workbench client -->
     <dependency>
       <groupId>org.kie</groupId>
