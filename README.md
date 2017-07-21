@@ -48,6 +48,16 @@ Can be found in framework-git, class org.kie.cloud.git.constants.GitConstants
 | github.username     |        | Username for logging into GitHub      |
 | github.password     |        | Password for logging into GitHub      |
 
+### Maven properties
+
+Can be found in framework-maven, class org.kie.cloud.maven.constants.MavenConstants
+
+| \<specific-params\>  | Default value  |  Meaning                                                             |
+| -------------------- | -------------- | -------------------------------------------------------------------- |
+| maven.repo.url       |                | URL pointing to remote Maven repository accepting snapshot artifacts |
+| maven.repo.username  |                | Username for remote Maven repository                                 |
+| maven.repo.password  |                | Password for remote Maven repository                                 |
+
 ### Deployment properties
 
 Properties required for configuration of specific deployments.
