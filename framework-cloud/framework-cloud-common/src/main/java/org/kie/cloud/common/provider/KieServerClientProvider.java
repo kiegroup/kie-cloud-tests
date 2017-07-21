@@ -22,6 +22,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
@@ -29,12 +30,14 @@ import org.kie.server.client.UserTaskServicesClient;
 
 public class KieServerClientProvider {
 
+    private static final long KIE_SERVER_TIMEOUT = 300_000L;
+
     private KieServicesClient kieServerClient;
 
     public KieServerClientProvider(KieServerDeployment kieServerDeployment) {
-        kieServerClient =
-                KieServicesFactory.newKieServicesRestClient(kieServerDeployment.getUrl().toString() + "/services/rest/server",
-                kieServerDeployment.getUsername(), kieServerDeployment.getPassword());
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieServerDeployment.getUrl().toString() + "/services/rest/server",
+                kieServerDeployment.getUsername(), kieServerDeployment.getPassword(), KIE_SERVER_TIMEOUT);
+        kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
     }
 
     public KieServicesClient getKieServerClient() {
