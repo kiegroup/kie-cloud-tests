@@ -15,12 +15,12 @@
 
 package org.kie.cloud.git;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-
 import org.junit.Test;
 import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProvider;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class GitProviderFactoryTest {
 

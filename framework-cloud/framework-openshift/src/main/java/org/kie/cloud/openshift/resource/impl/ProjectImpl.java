@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.resource.impl;
 
-import static java.util.stream.Collectors.toList;
-
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,6 +32,8 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.Service;
+
+import static java.util.stream.Collectors.toList;
 
 public class ProjectImpl implements Project {
 
