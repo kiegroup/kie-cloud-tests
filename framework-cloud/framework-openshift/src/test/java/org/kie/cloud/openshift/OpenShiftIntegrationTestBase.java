@@ -20,7 +20,6 @@ import java.util.UUID;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
