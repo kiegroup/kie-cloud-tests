@@ -82,7 +82,7 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
             KieServerInstanceImpl kieServerInstance = new KieServerInstanceImpl();
             kieServerInstance.setOpenShiftController(openShiftController);
             kieServerInstance.setPodName(pod.getMetadata().getName());
-            kieServerInstance.setKieServerDeployment(this);
+            kieServerInstance.setNamespace(namespace);
 
             kieServerInstances.add(kieServerInstance);
         }

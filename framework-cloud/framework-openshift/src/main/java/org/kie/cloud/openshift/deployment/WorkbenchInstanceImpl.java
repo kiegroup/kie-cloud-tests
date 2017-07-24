@@ -25,23 +25,23 @@ import org.kie.cloud.openshift.OpenShiftController;
 public class WorkbenchInstanceImpl implements WorkbenchInstance {
 
     private OpenShiftController openShiftController;
-    private WorkbenchDeployment workbenchDeployment;
+    private String namespace;
     private String podName;
 
     public OpenShiftController getOpenShiftController() {
         return openShiftController;
     }
 
+    @Override public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
     public void setOpenShiftController(OpenShiftController openShiftController) {
         this.openShiftController = openShiftController;
-    }
-
-    public WorkbenchDeployment getWorkbenchDeployment() {
-        return workbenchDeployment;
-    }
-
-    public void setWorkbenchDeployment(WorkbenchDeployment workbenchDeployment) {
-        this.workbenchDeployment = workbenchDeployment;
     }
 
     public String getPodName() {
@@ -57,6 +57,6 @@ public class WorkbenchInstanceImpl implements WorkbenchInstance {
     }
 
     @Override public String getLogs() {
-        return openShiftController.getClient().pods().inNamespace(workbenchDeployment.getNamespace()).withName(podName).getLog();
+        return openShiftController.getClient().pods().inNamespace(namespace).withName(podName).getLog();
     }
 }

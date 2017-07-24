@@ -82,7 +82,7 @@ public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
             WorkbenchInstanceImpl workbenchInstance = new WorkbenchInstanceImpl();
             workbenchInstance.setOpenShiftController(openShiftController);
             workbenchInstance.setPodName(pod.getMetadata().getName());
-            workbenchInstance.setWorkbenchDeployment(this);
+            workbenchInstance.setNamespace(namespace);
 
             workbenchInstances.add(workbenchInstance);
         }

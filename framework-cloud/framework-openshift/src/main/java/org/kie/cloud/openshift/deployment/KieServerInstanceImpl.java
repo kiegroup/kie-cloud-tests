@@ -22,8 +22,17 @@ import org.kie.cloud.openshift.OpenShiftController;
 public class KieServerInstanceImpl implements KieServerInstance {
 
     private OpenShiftController openShiftController;
-    private KieServerDeployment kieServerDeployment;
+
+    private String namespace;
     private String podName;
+
+    @Override public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
 
     public OpenShiftController getOpenShiftController() {
         return openShiftController;
@@ -31,14 +40,6 @@ public class KieServerInstanceImpl implements KieServerInstance {
 
     public void setOpenShiftController(OpenShiftController openShiftController) {
         this.openShiftController = openShiftController;
-    }
-
-    public KieServerDeployment getKieServerDeployment() {
-        return kieServerDeployment;
-    }
-
-    public void setKieServerDeployment(KieServerDeployment kieServerDeployment) {
-        this.kieServerDeployment = kieServerDeployment;
     }
 
     public String getPodName() {
@@ -54,6 +55,6 @@ public class KieServerInstanceImpl implements KieServerInstance {
     }
 
     @Override public String getLogs() {
-        return openShiftController.getClient().pods().inNamespace(kieServerDeployment.getNamespace()).withName(podName).getLog();
+        return openShiftController.getClient().pods().inNamespace(namespace).withName(podName).getLog();
     }
 }

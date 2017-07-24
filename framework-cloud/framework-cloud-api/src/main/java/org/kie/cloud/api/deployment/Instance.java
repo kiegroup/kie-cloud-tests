@@ -17,5 +17,6 @@ package org.kie.cloud.api.deployment;
 
 public interface Instance {
     String getName();
+    String getNamespace();
     String getLogs();
 }
