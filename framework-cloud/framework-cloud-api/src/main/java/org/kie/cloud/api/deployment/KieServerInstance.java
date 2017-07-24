@@ -15,12 +15,5 @@
 
 package org.kie.cloud.api.deployment;
 
-import java.util.List;
-
-public interface Deployment {
-    String getNamespace();
-    void scale(int instances);
-    void waitForScale();
-    List<Instance> getInstances();
-    boolean ready();
+public interface KieServerInstance extends Instance {
 }

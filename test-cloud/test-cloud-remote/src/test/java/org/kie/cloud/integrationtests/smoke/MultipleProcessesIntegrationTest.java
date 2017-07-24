@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.git.GitProvider;
@@ -64,6 +65,8 @@ public class MultipleProcessesIntegrationTest {
 
     @After
     public void tearDown() {
+        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
+        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
         workbenchWithKieServerScenario.undeploy();
         gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
     }
