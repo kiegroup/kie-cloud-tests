@@ -34,8 +34,12 @@ public class InstanceLogUtil {
         if (!outputDirectory.isDirectory()) {
             outputDirectory.mkdir();
         }
+        outputDirectory = new File(outputDirectory, instance.getNamespace());
+        if (!outputDirectory.isDirectory()) {
+            outputDirectory.mkdir();
+        }
 
-        File logFile = new File(outputDirectory, instance.getNamespace() + "-" + instance.getName() + LOG_SUFFIX);
+        File logFile = new File(outputDirectory, instance.getName() + LOG_SUFFIX);
         try {
             FileUtils.write(logFile, instance.getLogs(), "UTF-8");
         } catch (IOException e) {
