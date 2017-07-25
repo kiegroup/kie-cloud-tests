@@ -10,7 +10,7 @@
 
   <artifactId>framework-openshift</artifactId>
 
-  <name>KIE :: Cloud :: OpenShift</name>
+  <name>KIE :: Cloud :: Framework :: OpenShift</name>
   <description>Tools for OpenShift testing</description>
 
   <dependencies>

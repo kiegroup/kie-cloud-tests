@@ -10,7 +10,7 @@
 
   <artifactId>framework-maven</artifactId>
 
-  <name>KIE :: Cloud :: Maven tools</name>
+  <name>KIE :: Cloud :: Framework :: Maven tools</name>
   <description>Tools for testing using Maven</description>
 
   <dependencies>

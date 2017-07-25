@@ -10,7 +10,7 @@
 
   <artifactId>framework-git</artifactId>
 
-  <name>KIE :: Cloud :: GIT tools</name>
+  <name>KIE :: Cloud :: Framework :: GIT tools</name>
   <description>Various tools for controlling GIT repository</description>
 
   <dependencies>
