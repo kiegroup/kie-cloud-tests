@@ -12,7 +12,7 @@
 
   <artifactId>framework-cloud-common</artifactId>
 
-  <name>KIE :: Cloud :: Common</name>
+  <name>KIE :: Cloud :: Framework :: Common</name>
   <description>Common tools for Kie integration tests</description>
 
   <dependencies>

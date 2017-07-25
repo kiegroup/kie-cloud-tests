@@ -12,7 +12,7 @@
 
   <artifactId>framework-cloud-api</artifactId>
 
-  <name>KIE :: Cloud :: API</name>
+  <name>KIE :: Cloud :: Framework :: API</name>
   <description>Cloud API for Kie integration tests</description>
 
   <dependencies>
