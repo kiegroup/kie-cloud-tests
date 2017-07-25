@@ -70,3 +70,21 @@ Can be found in framework-cloud-api, class org.kie.cloud.api.deployment.constant
 | org.kie.server.pwd     | usetheforce123@ | Kie server password  |
 | org.kie.workbench.user | adminUser       | Workbench user       |
 | org.kie.workbench.pwd  | adminUser1!     | Workbench password   |
+
+## Manual template installation
+
+Here you can find how to install and initialize Kie template to any OpenShift instance.
+
+1. Install oc tool (OpenShift client).
+1. ```oc login https://localhost:8443 --username=user --password=redhat```
+Used to log into OpenShift instance (in this case running locally).
+1. ```oc new-project my-project```
+Create a new project where all resources and deployments will be placed.
+1. ```oc create -f https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json -n my-project```
+Create application secrets.
+1. ```oc create -f <Image streams URL> -n my-project```
+Create image streams in your project. Replace "Image stream URL" with URL or file path to image streams file.
+1. ```oc process -n my-project -f https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json -v IMAGE_STREAM_NAMESPACE=my-project -v KIE_ADMIN_USER=adminUser -v KIE_ADMIN_PWD=admin1! -v KIE_SERVER_CONTROLLER_USER=controllerUser -v KIE_SERVER_CONTROLLER_PWD=controller1! -v KIE_SERVER_USER=executionUser -v KIE_SERVER_PWD=execution1! > myapp.json```
+Process the template, replacing parameters with specific values.
+1. ```oc create -n my-project -f myapp.json```
+Apply the template, creating all resoucres defined there in OpenShift project.
