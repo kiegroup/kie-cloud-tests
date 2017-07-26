@@ -24,7 +24,7 @@
 
   <properties>
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
 
     <version.io.fabric8.client>2.2.7</version.io.fabric8.client>
