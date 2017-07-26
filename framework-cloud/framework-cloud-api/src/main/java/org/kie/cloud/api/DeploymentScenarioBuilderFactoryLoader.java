@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 public class DeploymentScenarioBuilderFactoryLoader {
     public static DeploymentScenarioBuilderFactory getInstance() {
@@ -30,10 +31,8 @@ public class DeploymentScenarioBuilderFactoryLoader {
         } else if (deploymentScenarioBuilderFactories.size() == 0) {
             throw new RuntimeException("No cloud API implementation was found");
         } else {
-            StringBuilder cloudImplementations = new StringBuilder();
-            deploymentScenarioBuilderFactories.stream().forEach(x -> cloudImplementations.append(x.getCloudEnvironmentName() + ", "));
-
-            throw new RuntimeException("Multiple cloud API implementations detected - please select one from: " + cloudImplementations.toString());
+            String cloudImplementations = deploymentScenarioBuilderFactories.stream().map(x -> x.getCloudEnvironmentName()).collect(Collectors.joining(", "));
+            throw new RuntimeException("Multiple cloud API implementations detected - please select one from: " + cloudImplementations);
         }
     }
 
