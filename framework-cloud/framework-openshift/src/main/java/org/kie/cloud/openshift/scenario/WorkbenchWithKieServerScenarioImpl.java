@@ -24,13 +24,13 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.resource.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +88,7 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             throw new RuntimeException("Malformed URL for workbench", e);
         }
 
+        logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
 
         kieServerDeployment = new KieServerDeploymentImpl();
@@ -105,7 +106,12 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             throw new RuntimeException("Malformed URL for kie server", e);
         }
 
+        logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
+
+        logger.info("Waiting for Kie server to register itself to the Workbench.");
+        KieServerControllerClientProvider kieServerControllerClientProvider = new KieServerControllerClientProvider(workbenchDeployment);
+        kieServerControllerClientProvider.waitForServerTemplateCreation();
     }
 
     @Override public void undeploy() {

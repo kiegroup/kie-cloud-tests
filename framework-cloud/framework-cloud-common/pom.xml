@@ -34,6 +34,10 @@
     <!-- Kie controller client -->
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-integ-tests-common</artifactId>
       <exclusions>
         <exclusion>
