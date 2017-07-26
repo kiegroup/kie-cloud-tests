@@ -38,5 +38,10 @@
       <artifactId>maven-plugin-annotations</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-openshift</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -23,12 +23,18 @@ import org.kie.cloud.openshift.scenario.builder.WorkbenchWithKieServerScenarioBu
 
 public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
 
+    private static final String CLOUD_API_IMPLEMENTATION_NAME = "openshift";
+
     OpenShiftController controller;
 
     public DeploymentBuilderFactory() {
         controller = new OpenShiftController(OpenShiftConstants.getOpenShiftUrl(),
                 OpenShiftConstants.getOpenShiftUserName(),
                 OpenShiftConstants.getOpenShiftPassword());
+    }
+
+    @Override public String getCloudEnvironmentName() {
+        return CLOUD_API_IMPLEMENTATION_NAME;
     }
 
     @Override

@@ -16,7 +16,8 @@
 package org.kie.cloud.plugin;
 
 public class Constants {
-    public static final String PROPERTY_FILE_PATH = "openshift-urls.properties";
+    public static final String PROPERTY_FILE_PATH = "cloud-urls.properties";
+    public static final String CLOUD_API_IMPLEMENTATION_PROPERTY = "cloud.api.implementation";
     public static final String NAMESPACE_PROPERTY = "namespace";
     public static final String WORKBENCH_URL_PROPERTY = "url";
     public static final String WORKBENCH_USERNAME_PROPERTY = "bcentral.openshift.username";

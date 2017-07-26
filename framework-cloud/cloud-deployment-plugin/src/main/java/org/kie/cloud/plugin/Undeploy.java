@@ -27,7 +27,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 
+import static org.kie.cloud.plugin.Constants.CLOUD_API_IMPLEMENTATION_PROPERTY;
 import static org.kie.cloud.plugin.Constants.NAMESPACE_PROPERTY;
 import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
 
@@ -38,11 +40,12 @@ public class Undeploy extends AbstractMojo {
     private MavenProject mavenProject;
 
     @Override public void execute() throws MojoExecutionException, MojoFailureException {
-        DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = DeploymentScenarioBuilderFactory.getInstance();
-        deploymentScenarioBuilderFactory.deleteNamespace(getNamespace());
+        DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = DeploymentScenarioBuilderFactoryLoader
+                .getInstance(loadCloudProperties().getProperty(CLOUD_API_IMPLEMENTATION_PROPERTY));
+        deploymentScenarioBuilderFactory.deleteNamespace(loadCloudProperties().getProperty(NAMESPACE_PROPERTY));
     }
 
-    private String getNamespace() {
+    private Properties loadCloudProperties() {
         Properties properties = new Properties();
         try (InputStream inputStream = new FileInputStream(mavenProject.getModel().getBuild().getOutputDirectory() + PROPERTY_FILE_PATH)) {
             properties.load(inputStream);
@@ -50,6 +53,6 @@ public class Undeploy extends AbstractMojo {
             throw new RuntimeException("Error loading Openshift properties", e);
         }
 
-        return properties.getProperty(NAMESPACE_PROPERTY);
+        return properties;
     }
 }

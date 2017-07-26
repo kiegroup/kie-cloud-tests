@@ -16,22 +16,13 @@
 package org.kie.cloud.api;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 
 public interface DeploymentScenarioBuilderFactory {
+    String getCloudEnvironmentName();
     WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder();
     void deleteNamespace(String namespace);
-
-    static DeploymentScenarioBuilderFactory getInstance() {
-        ServiceLoader<DeploymentScenarioBuilderFactory> serviceLoader = ServiceLoader.load(DeploymentScenarioBuilderFactory.class);
-        Iterator<DeploymentScenarioBuilderFactory> deploymentBuilderFactoryIterator = serviceLoader.iterator();
-        if (!deploymentBuilderFactoryIterator.hasNext()) {
-            throw new RuntimeException("Can not find DeploymentBuilderFactory implementation");
-        }
-        DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = serviceLoader.iterator().next();
-
-        return deploymentScenarioBuilderFactory;
-    }
 }
