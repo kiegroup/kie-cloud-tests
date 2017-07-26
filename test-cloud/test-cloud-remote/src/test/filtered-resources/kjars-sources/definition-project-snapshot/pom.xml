@@ -4,9 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.kie.server.testing</groupId>
-  <artifactId>definition-project</artifactId>
+  <artifactId>definition-project-snapshot</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>definition-project</name>
+  <name>definition-project-snapshot</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

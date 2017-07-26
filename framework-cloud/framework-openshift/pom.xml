@@ -18,6 +18,10 @@
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-cloud-common</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>io.fabric8</groupId>

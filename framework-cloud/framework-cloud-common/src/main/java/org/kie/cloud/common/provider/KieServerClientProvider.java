@@ -15,7 +15,7 @@
 
 package org.kie.cloud.common.provider;
 
-import java.util.Calendar;
+import java.time.Instant;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.server.api.model.KieContainerResource;
@@ -57,8 +57,8 @@ public class KieServerClientProvider {
     }
 
     public void waitForContainerStart(String containerId) {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + 30000L;
-        while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
+        Instant timeoutTime = Instant.now().plusSeconds(30);
+        while (Instant.now().isBefore(timeoutTime)) {
 
             ServiceResponse<KieContainerResource> containerInfo = kieServerClient.getContainerInfo(containerId);
             boolean responseSuccess = containerInfo.getType().equals(ServiceResponse.ResponseType.SUCCESS);
