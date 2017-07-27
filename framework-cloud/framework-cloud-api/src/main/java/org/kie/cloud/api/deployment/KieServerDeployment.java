@@ -17,8 +17,31 @@ package org.kie.cloud.api.deployment;
 
 import java.net.URL;
 
+/**
+ * Kie Server deplyoment representation in cloud.
+ */
 public interface KieServerDeployment extends Deployment {
+
+    /**
+     * Get URL for Kie Server service (deployment).
+     *
+     * @return Kie Server URL
+     */
     URL getUrl();
+
+    /**
+     * Get Kie Server user name. Kie Server username is set by property
+     * org.kie.server.user
+     *
+     * @return Kie Server user name
+     */
     String getUsername();
+
+    /**
+     * Get Kie Server user password. Kie Server password is set by property
+     * org.kie.server.pwd
+     *
+     * @return Kie Server user password
+     */
     String getPassword();
 }

@@ -15,5 +15,8 @@
 
 package org.kie.cloud.api.deployment;
 
+/**
+ * Kie Server instance representation in cloud.
+ */
 public interface KieServerInstance extends Instance {
 }
