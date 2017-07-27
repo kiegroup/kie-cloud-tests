@@ -37,7 +37,7 @@ public class ExternalMavenRepoIntegrationTest {
     private static final String CONTAINER_ID = "cont-id";
 
     private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "definition-project";
+    private static final String PROJECT_NAME = "definition-project-snapshot";
     private static final String PROJECT_VERSION = "1.0.0-SNAPSHOT";
 
     private static final String USERTASK_PROCESS_ID = "definition-project.usertask";

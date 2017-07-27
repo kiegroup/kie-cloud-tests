@@ -48,9 +48,11 @@ public class InstanceLogUtil {
     }
 
     public static void writeDeploymentLogs(Deployment deployment) {
-        List<Instance> instances = deployment.getInstances();
-        for (Instance instance : instances) {
-            writeInstanceLogs(instance);
+        if (deployment != null) {
+            List<Instance> instances = deployment.getInstances();
+            for (Instance instance : instances) {
+                writeInstanceLogs(instance);
+            }
         }
     }
 }
