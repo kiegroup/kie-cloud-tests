@@ -15,10 +15,6 @@
 
 package org.kie.cloud.openshift.deployment;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -62,6 +58,7 @@ public class RouterUtil {
 
                 Thread.sleep(ROUTER_WAIT_ITERATION_TIME);
             } catch (Exception e) {
+                logger.error("Error waiting for router", e);
                 throw new RuntimeException("Error waiting for router", e);
             }
         }
