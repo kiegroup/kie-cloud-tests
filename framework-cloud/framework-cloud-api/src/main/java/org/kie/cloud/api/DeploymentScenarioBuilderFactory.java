@@ -22,7 +22,7 @@ import java.util.ServiceLoader;
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 
 public interface DeploymentScenarioBuilderFactory {
-    String getCloudEnvironmentName();
+    String getCloudAPIImplementationName();
     WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder();
     void deleteNamespace(String namespace);
 }

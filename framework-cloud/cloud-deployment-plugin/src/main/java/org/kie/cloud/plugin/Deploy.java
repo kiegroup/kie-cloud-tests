@@ -68,19 +68,11 @@ public class Deploy extends AbstractMojo {
     }
 
     private void writeOpenshiftProperties(WorkbenchDeployment workbenchDeployment) {
-        Properties properties = new Properties();
+        CloudDeploymentPluginConfiguration cloudDeploymentPluginConfiguration = new CloudDeploymentPluginConfiguration();
+        cloudDeploymentPluginConfiguration.setNamespace(workbenchDeployment.getNamespace());
+        cloudDeploymentPluginConfiguration.setCloudAPIImplementation(implementation);
 
-        properties.put(CLOUD_API_IMPLEMENTATION_PROPERTY, implementation);
-        properties.put(NAMESPACE_PROPERTY, workbenchDeployment.getNamespace());
-        properties.put(WORKBENCH_URL_PROPERTY, workbenchDeployment.getUrl().toString());
-        properties.put(WORKBENCH_USERNAME_PROPERTY, workbenchDeployment.getUsername());
-        properties.put(WORKBENCH_PASSWORD_PROPERTY, workbenchDeployment.getPassword());
-
-        try (OutputStream outputStream = new FileOutputStream(mavenProject.getModel().getBuild().getOutputDirectory() + PROPERTY_FILE_PATH)) {
-            properties.store(outputStream, null);
-        } catch (IOException e) {
-            throw new RuntimeException("Error saving properties", e);
-        }
+        cloudDeploymentPluginConfiguration.saveAsProperties(new File(PROPERTY_FILE_PATH));
     }
 
     private void writeBuildProperties(WorkbenchDeployment workbenchDeployment) {

@@ -33,7 +33,7 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
                 OpenShiftConstants.getOpenShiftPassword());
     }
 
-    @Override public String getCloudEnvironmentName() {
+    @Override public String getCloudAPIImplementationName() {
         return CLOUD_API_IMPLEMENTATION_NAME;
     }
 

@@ -31,7 +31,7 @@ public class DeploymentScenarioBuilderFactoryLoader {
         } else if (deploymentScenarioBuilderFactories.size() == 0) {
             throw new RuntimeException("No cloud API implementation was found");
         } else {
-            String cloudImplementations = deploymentScenarioBuilderFactories.stream().map(x -> x.getCloudEnvironmentName()).collect(Collectors.joining(", "));
+            String cloudImplementations = deploymentScenarioBuilderFactories.stream().map(x -> x.getCloudAPIImplementationName()).collect(Collectors.joining(", "));
             throw new RuntimeException("Multiple cloud API implementations detected - please select one from: " + cloudImplementations);
         }
     }
@@ -39,12 +39,13 @@ public class DeploymentScenarioBuilderFactoryLoader {
     public static DeploymentScenarioBuilderFactory getInstance(String environmentName) {
         List<DeploymentScenarioBuilderFactory> deploymentScenarioBuilderFactories = getFactories();
         Map<String, DeploymentScenarioBuilderFactory> factoryMap = new HashMap<>();
-        deploymentScenarioBuilderFactories.forEach(x -> factoryMap.put(x.getCloudEnvironmentName(), x));
+        deploymentScenarioBuilderFactories.forEach(x -> factoryMap.put(x.getCloudAPIImplementationName(), x));
 
         if (factoryMap.containsKey(environmentName)) {
             return factoryMap.get(environmentName);
         } else {
-            throw new RuntimeException("No implementantion of cloud API with name " + environmentName + " was found");
+            String cloudImplementations = deploymentScenarioBuilderFactories.stream().map(x -> x.getCloudAPIImplementationName()).collect(Collectors.joining(", "));
+            throw new RuntimeException("No implementantion of cloud API with name " + environmentName + " was found. Possible options are: " + cloudImplementations);
         }
     }
 
