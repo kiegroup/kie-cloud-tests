@@ -15,6 +15,20 @@
 
 package org.kie.cloud.api.scenario.builder;
 
+/**
+ * Cloud deployment scenario builder. Create setup for Deployment scenario.
+ *
+ * @see org.kie.cloud.api.scenario.DeploymentScenario
+ *
+ * @param <T> Setup to be built e.g. WorkbenchWithKieServerScenario
+ * @see org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario
+ */
 public interface DeploymentScenarioBuilder<T> {
+
+    /**
+     * Return built cloud deployment scenario.
+     *
+     * @return Returns configured scenario.
+     */
     T build();
 }

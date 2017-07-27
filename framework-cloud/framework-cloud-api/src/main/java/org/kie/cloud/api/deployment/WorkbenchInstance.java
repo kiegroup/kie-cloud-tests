@@ -15,5 +15,8 @@
 
 package org.kie.cloud.api.deployment;
 
+/**
+ * Kie Workbench instance representation in cloud.
+ */
 public interface WorkbenchInstance extends Instance {
 }

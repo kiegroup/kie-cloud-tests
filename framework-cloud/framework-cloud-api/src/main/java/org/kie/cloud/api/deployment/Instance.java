@@ -15,8 +15,34 @@
 
 package org.kie.cloud.api.deployment;
 
+/**
+ * Running instance of deployment representation in cloud environment. One
+ * instance of deployed application. Application is configured in
+ *
+ * @see Deployment
+ */
 public interface Instance {
+
+    /**
+     * Return cloud instance name.
+     *
+     * @return instance name
+     */
     String getName();
+
+    /**
+     * Return instance namespace. Namespace is same for instance and Deployment.
+     *
+     * @see Deployment#getNamespace()
+     *
+     * @return Instance namespace
+     */
     String getNamespace();
+
+    /**
+     * Return cloud instance logs.
+     *
+     * @return instance logs
+     */
     String getLogs();
 }

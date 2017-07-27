@@ -15,8 +15,25 @@
 
 package org.kie.cloud.api.scenario;
 
+/**
+ * Cloud deployment scenario representation.
+ */
 public interface DeploymentScenario {
+
+    /**
+     * Return deployment scenario namespace.
+     *
+     * @return deployment scenario name.
+     */
     String getNamespace();
+
+    /**
+     * Create and deploy deployment scenario.
+     */
     void deploy();
+
+    /**
+     * Undeploy and delete deployment scenario.
+     */
     void undeploy();
 }

@@ -17,10 +17,41 @@ package org.kie.cloud.api.deployment;
 
 import java.util.List;
 
+/**
+ * Deployment representation in cloud environment.
+ */
 public interface Deployment {
+
+    /**
+     * Return deployment namespace. It is an identifier grouping (one or
+     * several) deployments into logical group.
+     *
+     * @return Deployment namespace
+     */
     String getNamespace();
+
+    /**
+     * Change number of instances available for the deployment.
+     *
+     * @param instances Number of deployment instances to be available..
+     */
     void scale(int instances);
+
+    /**
+     * Wait until Deployment is ready to use. This method waits until all
+     * instances of deployment are initialized and ready and for router to
+     * expose url.
+     */
     void waitForScale();
+
+    /**
+     * Return list of all already running instances of the deployment.
+     *
+     * @return List of Instances
+     * @see Instance
+     */
     List<Instance> getInstances();
+
     boolean ready();
+
 }
