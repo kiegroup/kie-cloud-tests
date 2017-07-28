@@ -30,11 +30,13 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 
 import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_BUSINESS_CENTRAL_IP;
 import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_BUSINESS_CENTRAL_PORT;
+import static org.kie.cloud.plugin.Constants.CLOUD_API_IMPLEMENTATION_PROPERTY;
 import static org.kie.cloud.plugin.Constants.NAMESPACE_PROPERTY;
 import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
 import static org.kie.cloud.plugin.Constants.WORKBENCH_PASSWORD_PROPERTY;
@@ -47,12 +49,15 @@ public class Deploy extends AbstractMojo {
     private String BUILD_PROPERTIES_FILENAME = "build.properties";
     private int MAX_LEVEL_BUILD_PROPERTIES = 10;
 
+    @Parameter(property = "cloud-api-implementation", required = true)
+    private String implementation;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject mavenProject;
 
     @Override public void execute() throws MojoExecutionException, MojoFailureException {
 
-        DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = DeploymentScenarioBuilderFactory.getInstance();
+        DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = DeploymentScenarioBuilderFactoryLoader.getInstance(implementation);
 
         WorkbenchWithKieServerScenario scenario = deploymentScenarioBuilderFactory.getWorkbenchWithKieServerScenarioBuilder().build();
         scenario.deploy();
@@ -63,18 +68,11 @@ public class Deploy extends AbstractMojo {
     }
 
     private void writeOpenshiftProperties(WorkbenchDeployment workbenchDeployment) {
-        Properties properties = new Properties();
+        CloudDeploymentPluginConfiguration cloudDeploymentPluginConfiguration = new CloudDeploymentPluginConfiguration();
+        cloudDeploymentPluginConfiguration.setNamespace(workbenchDeployment.getNamespace());
+        cloudDeploymentPluginConfiguration.setCloudAPIImplementation(implementation);
 
-        properties.put(NAMESPACE_PROPERTY, workbenchDeployment.getNamespace());
-        properties.put(WORKBENCH_URL_PROPERTY, workbenchDeployment.getUrl().toString());
-        properties.put(WORKBENCH_USERNAME_PROPERTY, workbenchDeployment.getUsername());
-        properties.put(WORKBENCH_PASSWORD_PROPERTY, workbenchDeployment.getPassword());
-
-        try (OutputStream outputStream = new FileOutputStream(mavenProject.getModel().getBuild().getOutputDirectory() + PROPERTY_FILE_PATH)) {
-            properties.store(outputStream, null);
-        } catch (IOException e) {
-            throw new RuntimeException("Error saving properties", e);
-        }
+        cloudDeploymentPluginConfiguration.saveAsProperties(new File(PROPERTY_FILE_PATH));
     }
 
     private void writeBuildProperties(WorkbenchDeployment workbenchDeployment) {

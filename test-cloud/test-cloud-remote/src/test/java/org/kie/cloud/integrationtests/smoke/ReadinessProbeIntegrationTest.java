@@ -19,6 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerClientProvider;
@@ -51,7 +52,7 @@ public class ReadinessProbeIntegrationTest {
 
     private static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
-    private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactory.getInstance();
+    private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
     private WorkbenchWithKieServerScenario workbenchWithKieServerScenario;
     private Client httpKieServerClient;
     private WorkbenchClientProvider workbenchClientProvider;

@@ -15,6 +15,7 @@
 
 package org.kie.cloud.plugin;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +28,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 
+import static org.kie.cloud.plugin.Constants.CLOUD_API_IMPLEMENTATION_PROPERTY;
 import static org.kie.cloud.plugin.Constants.NAMESPACE_PROPERTY;
 import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
 
@@ -38,18 +41,11 @@ public class Undeploy extends AbstractMojo {
     private MavenProject mavenProject;
 
     @Override public void execute() throws MojoExecutionException, MojoFailureException {
-        DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = DeploymentScenarioBuilderFactory.getInstance();
-        deploymentScenarioBuilderFactory.deleteNamespace(getNamespace());
-    }
+        CloudDeploymentPluginConfiguration cloudDeploymentPluginConfiguration = new CloudDeploymentPluginConfiguration();
+        cloudDeploymentPluginConfiguration.loadFromProperties(new File(PROPERTY_FILE_PATH));
 
-    private String getNamespace() {
-        Properties properties = new Properties();
-        try (InputStream inputStream = new FileInputStream(mavenProject.getModel().getBuild().getOutputDirectory() + PROPERTY_FILE_PATH)) {
-            properties.load(inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException("Error loading Openshift properties", e);
-        }
-
-        return properties.getProperty(NAMESPACE_PROPERTY);
+        DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = DeploymentScenarioBuilderFactoryLoader
+                .getInstance(cloudDeploymentPluginConfiguration.getCloudAPIImplementation());
+        deploymentScenarioBuilderFactory.deleteNamespace(cloudDeploymentPluginConfiguration.getNamespace());
     }
 }
