@@ -53,7 +53,7 @@ public class TestInfoPrinter {
             String value = entry.getValue();
 
             logger.info("{} = {}",
-                    String.format("%" + maxKeyLength + "s", paramName),
+                    String.format("%-" + maxKeyLength + "s", paramName),
                     value
             );
         }

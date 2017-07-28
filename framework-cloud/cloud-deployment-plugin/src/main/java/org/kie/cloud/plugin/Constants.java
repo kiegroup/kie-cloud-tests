@@ -16,13 +16,16 @@
 package org.kie.cloud.plugin;
 
 public class Constants {
-    public static final String PROPERTY_FILE_PATH = "cloud-urls.properties";
-    public static final String CLOUD_API_IMPLEMENTATION_PROPERTY = "cloud.api.implementation";
-    public static final String NAMESPACE_PROPERTY = "namespace";
-    public static final String WORKBENCH_URL_PROPERTY = "url";
-    public static final String WORKBENCH_USERNAME_PROPERTY = "bcentral.openshift.username";
-    public static final String WORKBENCH_PASSWORD_PROPERTY = "bcentral.openshift.password";
 
-    public static final String BUILD_PROPERTIES_BUSINESS_CENTRAL_IP = "as.ip";
-    public static final String BUILD_PROPERTIES_BUSINESS_CENTRAL_PORT = "as.port";
+    public static final String
+            PROPERTY_FILE_PATH = "cloud-urls.properties",
+            CLOUD_API_IMPLEMENTATION_PROPERTY = "cloud.api.implementation",
+            NAMESPACE_PROPERTY = "namespace",
+
+            // properties required by UI tests to be able to connect to workbench via browser
+            BUILD_PROPERTIES_WORKBENCH_IP = "as.ip",
+            BUILD_PROPERTIES_WORKBENCH_PORT = "as.port",
+            BUILD_PROPERTIES_WORKBENCH_CONTEXT_ROOT = "web.context-root",
+            BUILD_PROPERTIES_WORKBENCH_USERNAME = "workbench.openshift.username",
+            BUILD_PROPERTIES_WORKBENCH_PASSWORD = "workbench.openshift.password";
 }

@@ -15,11 +15,9 @@
 
 package org.kie.cloud.plugin;
 
+import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,10 +27,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-
-import static org.kie.cloud.plugin.Constants.CLOUD_API_IMPLEMENTATION_PROPERTY;
-import static org.kie.cloud.plugin.Constants.NAMESPACE_PROPERTY;
-import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
 
 @Mojo( name = "undeploy" )
 public class Undeploy extends AbstractMojo {
