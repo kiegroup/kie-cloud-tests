@@ -42,6 +42,7 @@ public class ReadinessProbeIntegrationTest {
 
     private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
     private static final String REPOSITORY_NAME = "myRepo";
+    private static final String ORGANIZATION_UNIT_SECOND_NAME = "myOrgUnitTwo";
 
     private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
     private static final String PROJECT_NAME = "definition-project";
@@ -93,10 +94,14 @@ public class ReadinessProbeIntegrationTest {
 
     @After
     public void tearDown() {
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
-        gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
-        workbenchWithKieServerScenario.undeploy();
+        if (workbenchWithKieServerScenario != null) {
+            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
+            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
+            workbenchWithKieServerScenario.undeploy();
+            if (gitProvider != null) {
+                gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
+            }
+        }
     }
 
     @Test
@@ -115,9 +120,9 @@ public class ReadinessProbeIntegrationTest {
 
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
-        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
+        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_SECOND_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
         organizationalUnits = workbenchClientProvider.getWorkbenchClient().getOrganizationalUnits();
-        Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_NAME))).isTrue();
+        Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_SECOND_NAME))).isTrue();
     }
 
     @Test

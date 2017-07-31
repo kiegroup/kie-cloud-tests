@@ -63,9 +63,11 @@ public class ExternalMavenRepoIntegrationTest {
 
     @After
     public void tearDown() {
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
-        workbenchWithKieServerScenario.undeploy();
+        if (workbenchWithKieServerScenario != null) {
+            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
+            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
+            workbenchWithKieServerScenario.undeploy();
+        }
     }
 
     @Test
