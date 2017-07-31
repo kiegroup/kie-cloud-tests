@@ -66,10 +66,14 @@ public class MultipleProcessesIntegrationTest {
 
     @After
     public void tearDown() {
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
-        workbenchWithKieServerScenario.undeploy();
-        gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
+        if (workbenchWithKieServerScenario != null) {
+            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
+            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
+            workbenchWithKieServerScenario.undeploy();
+            if (gitProvider != null) {
+                gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
+            }
+        }
     }
 
     @Test
