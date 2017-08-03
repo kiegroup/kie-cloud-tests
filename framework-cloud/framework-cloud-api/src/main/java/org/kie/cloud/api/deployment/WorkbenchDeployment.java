@@ -30,6 +30,13 @@ public interface WorkbenchDeployment extends Deployment {
     URL getUrl();
 
     /**
+     * Get HTTPS URL for Kie Workbench service (deployment).
+     *
+     * @return Workbench URL
+     */
+    URL getSecureUrl();
+
+    /**
      * Get Kie Workbench user name. Workbench username is set by env. variable
      * org.kie.workbench.user
      *
