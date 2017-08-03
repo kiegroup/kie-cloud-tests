@@ -89,7 +89,7 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             throw new RuntimeException("Malformed URL for workbench", e);
         }
         String secureRouteHostWorkbench = project.getService(workbenchDeployment.getSecureServiceName()).getRoute().getRouteHost();
-        String secureUrlWorkbench = "https://" + secureRouteHostWorkbench + "/kie-wb.jsp";
+        String secureUrlWorkbench = "https://" + secureRouteHostWorkbench;
         try {
             workbenchDeployment.setSecureUrl(new URL(secureUrlWorkbench));
         } catch (MalformedURLException e) {
