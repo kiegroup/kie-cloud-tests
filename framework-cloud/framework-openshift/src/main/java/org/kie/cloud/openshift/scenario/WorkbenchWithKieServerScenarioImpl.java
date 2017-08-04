@@ -24,6 +24,7 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -123,6 +124,9 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
     }
 
     @Override public void undeploy() {
+        InstanceLogUtil.writeDeploymentLogs(workbenchDeployment);
+        InstanceLogUtil.writeDeploymentLogs(kieServerDeployment);
+
         Project project = openshiftController.getProject(projectName);
         project.delete();
     }

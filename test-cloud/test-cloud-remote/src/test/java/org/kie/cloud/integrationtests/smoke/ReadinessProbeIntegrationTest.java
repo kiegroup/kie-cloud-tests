@@ -19,13 +19,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
-import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderFactory;
+import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -38,10 +36,9 @@ import org.kie.server.integrationtests.shared.filter.Authenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReadinessProbeIntegrationTest {
+public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
     private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
-    private static final String REPOSITORY_NAME = "myRepo";
     private static final String ORGANIZATION_UNIT_SECOND_NAME = "myOrgUnitTwo";
 
     private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
@@ -53,88 +50,73 @@ public class ReadinessProbeIntegrationTest {
 
     private static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
-    private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-    private WorkbenchWithKieServerScenario workbenchWithKieServerScenario;
     private Client httpKieServerClient;
-    private WorkbenchClientProvider workbenchClientProvider;
-    private KieServerClientProvider kieServerClientProvider;
-    private KieServerMgmtControllerClient kieControllerClient;
-
-    private GitProvider gitProvider;
 
     private static final Logger logger = LoggerFactory.getLogger(ReadinessProbeIntegrationTest.class);
 
+    @Override
+    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
+    }
+
     @Before
     public void setUp() {
-        workbenchWithKieServerScenario = deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
-        workbenchWithKieServerScenario.deploy();
-
-        workbenchClientProvider = new WorkbenchClientProvider(workbenchWithKieServerScenario.getWorkbenchDeployment());
-        kieServerClientProvider = new KieServerClientProvider(workbenchWithKieServerScenario.getKieServerDeployment());
-
-        gitProvider = GitProviderFactory.getGitProvider();
-        gitProvider.createGitRepository(workbenchWithKieServerScenario.getNamespace(), ClassLoader.class.getResource("/kjars-sources").getFile());
-
-        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
-        workbenchClientProvider.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(workbenchWithKieServerScenario.getNamespace()));
-        workbenchClientProvider.deployProject(REPOSITORY_NAME, PROJECT_NAME);
-
-        KieServerInfo serverInfo = kieServerClientProvider.getKieServerClient().getServerInfo().getResult();
-        kieControllerClient = new KieServerMgmtControllerClient(workbenchWithKieServerScenario.getWorkbenchDeployment().getUrl().toString() + "/rest/controller",
-                workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername(), workbenchWithKieServerScenario.getWorkbenchDeployment().getPassword());
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
-
         httpKieServerClient = new ResteasyClientBuilder()
                 .establishConnectionTimeout(10, TimeUnit.SECONDS)
                 .socketTimeout(10, TimeUnit.SECONDS)
-                .register(new Authenticator(workbenchWithKieServerScenario.getKieServerDeployment().getUsername(),
-                        workbenchWithKieServerScenario.getKieServerDeployment().getPassword()))
+                .register(new Authenticator(deploymentScenario.getKieServerDeployment().getUsername(),
+                        deploymentScenario.getKieServerDeployment().getPassword()))
                 .build();
     }
 
     @After
     public void tearDown() {
-        if (workbenchWithKieServerScenario != null) {
-            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
-            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
-            workbenchWithKieServerScenario.undeploy();
-            if (gitProvider != null) {
-                gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
-            }
+        if (httpKieServerClient != null) {
+            httpKieServerClient.close();
         }
     }
 
     @Test
     public void testWorkbenchReadinessProbe() {
+        WorkbenchClientProvider workbenchClientProvider = new WorkbenchClientProvider(deploymentScenario.getWorkbenchDeployment());
+
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
+        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
         Collection<OrganizationalUnit> organizationalUnits = workbenchClientProvider.getWorkbenchClient().getOrganizationalUnits();
         Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_NAME))).isTrue();
 
         logger.debug("Scale workbench to 0");
-        workbenchWithKieServerScenario.getWorkbenchDeployment().scale(0);
-        workbenchWithKieServerScenario.getWorkbenchDeployment().waitForScale();
+        deploymentScenario.getWorkbenchDeployment().scale(0);
+        deploymentScenario.getWorkbenchDeployment().waitForScale();
         logger.debug("Scale workbench to 1");
-        workbenchWithKieServerScenario.getWorkbenchDeployment().scale(1);
-        workbenchWithKieServerScenario.getWorkbenchDeployment().waitForScale();
+        deploymentScenario.getWorkbenchDeployment().scale(1);
+        deploymentScenario.getWorkbenchDeployment().waitForScale();
 
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
-        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_SECOND_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
+        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_SECOND_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
         organizationalUnits = workbenchClientProvider.getWorkbenchClient().getOrganizationalUnits();
         Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_SECOND_NAME))).isTrue();
     }
 
     @Test
     public void testKieServerReadinessProbe() {
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
+
+        KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
+        KieServerMgmtControllerClient kieControllerClient = new KieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment().getUrl().toString() + "/rest/controller",
+                deploymentScenario.getWorkbenchDeployment().getUsername(), deploymentScenario.getWorkbenchDeployment().getPassword());
+        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
+
         Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JAXB, this.getClass().getClassLoader());
 
-        workbenchWithKieServerScenario.getKieServerDeployment().scale(0);
-        workbenchWithKieServerScenario.getKieServerDeployment().waitForScale();
-        workbenchWithKieServerScenario.getKieServerDeployment().scale(1);
-        workbenchWithKieServerScenario.getKieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerDeployment().scale(0);
+        deploymentScenario.getKieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerDeployment().scale(1);
+        deploymentScenario.getKieServerDeployment().waitForScale();
 
-        WebTarget target = httpKieServerClient.target(workbenchWithKieServerScenario.getKieServerDeployment().getUrl().toString() + "/services/rest/server/containers");
+        WebTarget target = httpKieServerClient.target(deploymentScenario.getKieServerDeployment().getUrl().toString() + "/services/rest/server/containers");
 
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + 1000L;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
@@ -156,7 +138,7 @@ public class ReadinessProbeIntegrationTest {
 
     private void checkBCLoginScreenAvailable() {
         logger.debug("Check that workbench login screen is available");
-        URL url = workbenchWithKieServerScenario.getWorkbenchDeployment().getUrl();
+        URL url = deploymentScenario.getWorkbenchDeployment().getUrl();
         HttpURLConnection httpURLConnection;
         try {
             httpURLConnection = (HttpURLConnection) url.openConnection();

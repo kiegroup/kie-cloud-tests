@@ -32,31 +32,28 @@ public class KieServerClientProvider {
 
     private static final long KIE_SERVER_TIMEOUT = 300_000L;
 
-    private KieServicesClient kieServerClient;
-
-    public KieServerClientProvider(KieServerDeployment kieServerDeployment) {
+    public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment) {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieServerDeployment.getUrl().toString() + "/services/rest/server",
                 kieServerDeployment.getUsername(), kieServerDeployment.getPassword(), KIE_SERVER_TIMEOUT);
-        kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
-    }
-
-    public KieServicesClient getKieServerClient() {
+        KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
         return kieServerClient;
     }
 
-    public ProcessServicesClient getProcessClient() {
-        return kieServerClient.getServicesClient(ProcessServicesClient.class);
+    public static ProcessServicesClient getProcessClient(KieServerDeployment kieServerDeployment) {
+        return getKieServerClient(kieServerDeployment).getServicesClient(ProcessServicesClient.class);
     }
 
-    public UserTaskServicesClient getTaskClient() {
-        return kieServerClient.getServicesClient(UserTaskServicesClient.class);
+    public static UserTaskServicesClient getTaskClient(KieServerDeployment kieServerDeployment) {
+        return getKieServerClient(kieServerDeployment).getServicesClient(UserTaskServicesClient.class);
     }
 
-    public QueryServicesClient getQueryClient() {
-        return kieServerClient.getServicesClient(QueryServicesClient.class);
+    public static QueryServicesClient getQueryClient(KieServerDeployment kieServerDeployment) {
+        return getKieServerClient(kieServerDeployment).getServicesClient(QueryServicesClient.class);
     }
 
-    public void waitForContainerStart(String containerId) {
+    public static void waitForContainerStart(KieServerDeployment kieServerDeployment, String containerId) {
+        KieServicesClient kieServerClient = getKieServerClient(kieServerDeployment);
+
         Instant timeoutTime = Instant.now().plusSeconds(30);
         while (Instant.now().isBefore(timeoutTime)) {
 
@@ -75,4 +72,3 @@ public class KieServerClientProvider {
         }
     }
 }
-
