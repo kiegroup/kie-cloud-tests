@@ -39,7 +39,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.assertj.core.api.Assertions;
-import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -116,37 +115,15 @@ public class WorkbenchHttpsIntegrationTest {
     }
 
     private boolean createOrganizationalUnit(String name, CloseableHttpClient httpClient) {
-        final HttpPost createOrgUnitRequest;
-        try {
-            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
-            createOrgUnitRequest = new HttpPost(url.toString());
-            createOrgUnitRequest.setHeader("Content-Type", "application/json");
-            createOrgUnitRequest.setEntity(new StringEntity(createOrganizationalUnitJson(name)));
-        } catch (Exception e) {
-            throw new RuntimeException("Error in creating rest request for new organizational unit", e);
-        }
-
-        try (CloseableHttpResponse response = httpClient.execute(createOrgUnitRequest)) {
-            if (response.getStatusLine().getStatusCode() == HttpsURLConnection.HTTP_ACCEPTED) {
-                return true;
-            } else {
-                return false;
-            }
+        try (CloseableHttpResponse response = httpClient.execute(organizationalUnitCreateRequest(name))) {
+            return (response.getStatusLine().getStatusCode() == HttpsURLConnection.HTTP_ACCEPTED);
         } catch (Exception e) {
             throw new RuntimeException("Error creating new organizational unit", e);
         }
     }
 
     private boolean organizationalUnitExists(String name, CloseableHttpClient httpClient) {
-        final HttpGet getOrgUnitRequest;
-        try {
-            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
-            getOrgUnitRequest = new HttpGet(url.toString());
-            getOrgUnitRequest.setHeader("Content-Type", "application/json");
-        } catch (Exception e) {
-            throw new RuntimeException("Error in creating request for list of organizational units", e);
-        }
-        try (final CloseableHttpResponse response = httpClient.execute(getOrgUnitRequest)) {
+        try (final CloseableHttpResponse response = httpClient.execute(organizationalUnitsListRequest(name))) {
             Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
             try (final InputStream inputStream = response.getEntity().getContent()) {
                 String responseContent = IOUtils.toString(inputStream, "UTF-8");
@@ -161,6 +138,31 @@ public class WorkbenchHttpsIntegrationTest {
             }
         } catch (Exception e) {
             throw new RuntimeException("Can not obtain list of organizational units", e);
+        }
+    }
+
+    private HttpPost organizationalUnitCreateRequest(String name) {
+        try {
+            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            final HttpPost request = new HttpPost(url.toString());
+            request.setHeader("Content-Type", "application/json");
+            request.setEntity(new StringEntity(createOrganizationalUnitJson(name)));
+
+            return request;
+        } catch (Exception e) {
+            throw new RuntimeException("Error in creating rest request for new organizational unit", e);
+        }
+    }
+
+    private HttpGet organizationalUnitsListRequest(String name) {
+        try {
+            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            final HttpGet request = new HttpGet(url.toString());
+            request.setHeader("Content-Type", "application/json");
+
+            return request;
+        } catch (Exception e) {
+            throw new RuntimeException("Error in creating request for list of organizational units", e);
         }
     }
 
