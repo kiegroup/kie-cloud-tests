@@ -39,46 +39,29 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
-import org.kie.cloud.common.logs.InstanceLogUtil;
-import org.kie.cloud.maven.constants.MavenConstants;
+import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchHttpsIntegrationTest {
+public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
     private static final String organizationalUnitRestRequest = "rest/organizationalunits";
     private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
     private static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
-    private static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-    private WorkbenchWithKieServerScenario workbenchWithKieServerScenario;
-
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
 
-    @Before
-    public void setUp() {
-        workbenchWithKieServerScenario = deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-        workbenchWithKieServerScenario.deploy();
-    }
-
-    @After
-    public void tearDown() {
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
-        InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
-        workbenchWithKieServerScenario.undeploy();
+    @Override
+    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
     }
 
     @Test
     public void testLoginScreen() throws InterruptedException {
-        final URL url = workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl();
+        final URL url = deploymentScenario.getWorkbenchDeployment().getSecureUrl();
         logger.debug("Test login screen on url {}", url.toString());
         final SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory();
 
@@ -143,7 +126,7 @@ public class WorkbenchHttpsIntegrationTest {
 
     private HttpPost organizationalUnitCreateRequest(String name) {
         try {
-            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
             final HttpPost request = new HttpPost(url.toString());
             request.setHeader("Content-Type", "application/json");
             request.setEntity(new StringEntity(createOrganizationalUnitJson(name)));
@@ -156,7 +139,7 @@ public class WorkbenchHttpsIntegrationTest {
 
     private HttpGet organizationalUnitsListRequest(String name) {
         try {
-            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
             final HttpGet request = new HttpGet(url.toString());
             request.setHeader("Content-Type", "application/json");
 
@@ -175,8 +158,8 @@ public class WorkbenchHttpsIntegrationTest {
     }
 
     private CredentialsProvider getWorkbenchCredentialsProvider() {
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername(),
-                workbenchWithKieServerScenario.getWorkbenchDeployment().getPassword());
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(deploymentScenario.getWorkbenchDeployment().getUsername(),
+                deploymentScenario.getWorkbenchDeployment().getPassword());
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(AuthScope.ANY, credentials);
 
@@ -186,7 +169,7 @@ public class WorkbenchHttpsIntegrationTest {
     private String createOrganizationalUnitJson(String name) {
         JsonObject organizationalUnit = new JsonObject();
         organizationalUnit.addProperty("name", ORGANIZATION_UNIT_NAME);
-        organizationalUnit.addProperty("owner", workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
+        organizationalUnit.addProperty("owner", deploymentScenario.getWorkbenchDeployment().getUsername());
 
         Gson gson = new Gson();
         return gson.toJson(organizationalUnit);

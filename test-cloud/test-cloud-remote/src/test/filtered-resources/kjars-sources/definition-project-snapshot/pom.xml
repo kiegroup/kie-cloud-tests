@@ -13,6 +13,11 @@
   </properties>
 
   <distributionManagement>
+    <snapshotRepository>
+      <id>remote-testing-repo</id>
+      <name>Maven test repository</name>
+      <url>${maven.repo.url}</url>
+    </snapshotRepository>
     <repository>
       <id>remote-testing-repo</id>
       <name>Maven test repository</name>

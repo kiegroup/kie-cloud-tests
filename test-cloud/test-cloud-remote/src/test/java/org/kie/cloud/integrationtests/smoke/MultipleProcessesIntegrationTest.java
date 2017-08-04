@@ -3,27 +3,23 @@ package org.kie.cloud.integrationtests.smoke;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
-import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderFactory;
+import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.ProcessServicesClient;
+import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 
-public class MultipleProcessesIntegrationTest {
-
-    private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
-    private static final String REPOSITORY_NAME = "myRepo";
+public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
     private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
     private static final String PROJECT_NAME = "definition-project";
@@ -39,79 +35,65 @@ public class MultipleProcessesIntegrationTest {
 
     private static final String SIGNAL_NAME = "signal1";
 
-    private static DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-    private WorkbenchWithKieServerScenario workbenchWithKieServerScenario;
-    private WorkbenchClientProvider workbenchClientProvider;
-    private KieServerClientProvider kieServerClientProvider;
     private KieServerMgmtControllerClient kieControllerClient;
-    private GitProvider gitProvider;
+
+    private KieServicesClient kieServerClient;
+    private ProcessServicesClient processClient;
+    private UserTaskServicesClient taskClient;
+
+    @Override
+    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
+    }
 
     @Before
     public void setUp() {
-        workbenchWithKieServerScenario = deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
-        workbenchWithKieServerScenario.deploy();
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
 
-        gitProvider = GitProviderFactory.getGitProvider();
-        gitProvider.createGitRepository(workbenchWithKieServerScenario.getNamespace(), ClassLoader.class.getResource("/kjars-sources").getFile());
+        kieControllerClient = new KieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment().getUrl().toString() + "/rest/controller",
+                deploymentScenario.getWorkbenchDeployment().getUsername(), deploymentScenario.getWorkbenchDeployment().getPassword());
 
-        workbenchClientProvider = new WorkbenchClientProvider(workbenchWithKieServerScenario.getWorkbenchDeployment());
-        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername());
-        workbenchClientProvider.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(workbenchWithKieServerScenario.getNamespace()));
-        workbenchClientProvider.deployProject(REPOSITORY_NAME, PROJECT_NAME);
-
-        kieServerClientProvider = new KieServerClientProvider(workbenchWithKieServerScenario.getKieServerDeployment());
-        kieControllerClient = new KieServerMgmtControllerClient(workbenchWithKieServerScenario.getWorkbenchDeployment().getUrl().toString() + "/rest/controller",
-                workbenchWithKieServerScenario.getWorkbenchDeployment().getUsername(), workbenchWithKieServerScenario.getWorkbenchDeployment().getPassword());
-    }
-
-    @After
-    public void tearDown() {
-        if (workbenchWithKieServerScenario != null) {
-            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getWorkbenchDeployment());
-            InstanceLogUtil.writeDeploymentLogs(workbenchWithKieServerScenario.getKieServerDeployment());
-            workbenchWithKieServerScenario.undeploy();
-            if (gitProvider != null) {
-                gitProvider.deleteGitRepository(workbenchWithKieServerScenario.getNamespace());
-            }
-        }
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
+        taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testMultipleDifferentProcessesOnSameKieServer() {
-        KieServerInfo serverInfo = kieServerClientProvider.getKieServerClient().getServerInfo().getResult();
+        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
 
-        kieServerClientProvider.waitForContainerStart(CONTAINER_ID);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
-        Long userTaskPid = kieServerClientProvider.getProcessClient().startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
+        Long userTaskPid = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
         Assertions.assertThat(userTaskPid).isNotNull();
-        Long signalTaskPid = kieServerClientProvider.getProcessClient().startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+        Long signalTaskPid = processClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
         Assertions.assertThat(signalTaskPid).isNotNull();
 
         finishUserTaskProcess();
         finishSignalTaskProcess(signalTaskPid);
 
-        ProcessInstance userTaskPi = kieServerClientProvider.getProcessClient().getProcessInstance(CONTAINER_ID, userTaskPid);
+        ProcessInstance userTaskPi = processClient.getProcessInstance(CONTAINER_ID, userTaskPid);
         Assertions.assertThat(userTaskPi).isNotNull();
         Assertions.assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
 
-        ProcessInstance signalTaskPi = kieServerClientProvider.getProcessClient().getProcessInstance(CONTAINER_ID, signalTaskPid);
+        ProcessInstance signalTaskPi = processClient.getProcessInstance(CONTAINER_ID, signalTaskPid);
         Assertions.assertThat(signalTaskPi).isNotNull();
         Assertions.assertThat(signalTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
     }
 
     private void finishUserTaskProcess() {
-        List<TaskSummary> tasks = kieServerClientProvider.getTaskClient().findTasks(USER_YODA, 0, 10);
+        List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 10);
         Assertions.assertThat(tasks).isNotNull().hasSize(1);
 
-        kieServerClientProvider.getTaskClient().completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
+        taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
     }
 
     private void finishSignalTaskProcess(Long pid) {
-        List<String> signals = kieServerClientProvider.getProcessClient().getAvailableSignals(CONTAINER_ID, pid);
+        List<String> signals = processClient.getAvailableSignals(CONTAINER_ID, pid);
         Assertions.assertThat(signals).isNotNull().hasSize(1);
         Assertions.assertThat(signals.get(0)).isEqualTo(SIGNAL_NAME);
 
-        kieServerClientProvider.getProcessClient().signal(CONTAINER_ID, SIGNAL_NAME, null);
+        processClient.signal(CONTAINER_ID, SIGNAL_NAME, null);
     }
 }
