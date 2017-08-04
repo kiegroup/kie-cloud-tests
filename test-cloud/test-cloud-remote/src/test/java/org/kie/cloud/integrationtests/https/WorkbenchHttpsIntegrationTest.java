@@ -19,12 +19,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
+import java.util.stream.StreamSupport;
 import javax.net.ssl.HttpsURLConnection;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.auth.AuthScope;
@@ -58,7 +56,7 @@ public class WorkbenchHttpsIntegrationTest {
     private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
     private static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
-    private static DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+    private static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
     private WorkbenchWithKieServerScenario workbenchWithKieServerScenario;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
@@ -80,17 +78,17 @@ public class WorkbenchHttpsIntegrationTest {
 
     @Test
     public void testLoginScreen() throws InterruptedException {
-        URL url = workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl();
+        final URL url = workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl();
         logger.debug("Test login screen on url {}", url.toString());
-        SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory();
+        final SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory();
 
         try (CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build()) {
-            HttpGet httpGet = new HttpGet(url.toString());
+            final HttpGet httpGet = new HttpGet(url.toString());
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 // Test that login screen is available
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
                 try (InputStream inputStream = response.getEntity().getContent()) {
-                    String responseContent = IOUtils.toString(inputStream, "UTF-8");
+                    final String responseContent = IOUtils.toString(inputStream, "UTF-8");
                     Assertions.assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
                 }
             }
@@ -102,48 +100,59 @@ public class WorkbenchHttpsIntegrationTest {
     @Test
     public void testSecureRest() {
         try {
-            URL url = workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl();
-            logger.debug("Test REST API for workbench on url {}", url.toString());
-            url = new URL(url, organizationalUnitRestRequest);
             SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory();
-
             CredentialsProvider credentialsProvider = getWorkbenchCredentialsProvider();
             try (CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).setDefaultCredentialsProvider(credentialsProvider).build()) {
                 // Create organizational unit using REST API
-                HttpPost createOrgUnitRequest = new HttpPost(url.toString());
-                createOrgUnitRequest.setHeader("Content-Type", "application/json");
-                createOrgUnitRequest.setEntity(new StringEntity(createOrganizationalUnitJson(ORGANIZATION_UNIT_NAME)));
-                try (CloseableHttpResponse response = httpClient.execute(createOrgUnitRequest)) {
-                    Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_ACCEPTED);
-                }
+                createOrganizationalUnit(ORGANIZATION_UNIT_NAME, httpClient);
 
                 // Check that organizational unit exists
-                HttpGet getOrgUnitRequest = new HttpGet(url.toString());
-                getOrgUnitRequest.setHeader("Content-Type", "application/json");
-                try (CloseableHttpResponse response = httpClient.execute(getOrgUnitRequest)) {
-                    Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
-                    try (InputStream inputStream = response.getEntity().getContent()) {
-                        String responseContent = IOUtils.toString(inputStream, "UTF-8");
-                        Assertions.assertThat(responseContent).isNotEmpty();
-
-                        Gson gson = new Gson();
-                        JsonArray organizationalUnits = gson.fromJson(responseContent, JsonArray.class);
-                        boolean found = false;
-                        for (JsonElement item : organizationalUnits) {
-                            if (item.isJsonObject()) {
-                                JsonObject organizationalUnit = item.getAsJsonObject();
-                                if (organizationalUnit.get("name").getAsString().equals(ORGANIZATION_UNIT_NAME)) {
-                                    found = true;
-                                }
-                            }
-                        }
-
-                        Assertions.assertThat(found).isTrue();
-                    }
-                }
+                Assertions.assertThat(organizationalUnitExists(ORGANIZATION_UNIT_NAME, httpClient)).isTrue();
             }
         } catch (Exception e) {
             Assertions.fail("Unable to connect to workbench REST API", e);
+        }
+    }
+
+    private void createOrganizationalUnit(String name, CloseableHttpClient httpClient) {
+        final HttpPost createOrgUnitRequest;
+        try {
+            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            createOrgUnitRequest = new HttpPost(url.toString());
+            createOrgUnitRequest.setHeader("Content-Type", "application/json");
+            createOrgUnitRequest.setEntity(new StringEntity(createOrganizationalUnitJson(name)));
+        } catch (Exception e) {
+            throw new RuntimeException("Error in creating rest request for new organizational unit", e);
+        }
+
+        try (CloseableHttpResponse response = httpClient.execute(createOrgUnitRequest)) {
+            Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_ACCEPTED);
+        } catch (Exception e) {
+            Assertions.fail("Error creating new organizational unit", e);
+        }
+    }
+
+    private boolean organizationalUnitExists(String name, CloseableHttpClient httpClient) {
+        final HttpGet getOrgUnitRequest;
+        try {
+            final URL url = new URL(workbenchWithKieServerScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            getOrgUnitRequest = new HttpGet(url.toString());
+            getOrgUnitRequest.setHeader("Content-Type", "application/json");
+        } catch (Exception e) {
+            throw new RuntimeException("Error in creating request for list of organizational units", e);
+        }
+        try (CloseableHttpResponse response = httpClient.execute(getOrgUnitRequest)) {
+            Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
+            try (InputStream inputStream = response.getEntity().getContent()) {
+                String responseContent = IOUtils.toString(inputStream, "UTF-8");
+                Assertions.assertThat(responseContent).isNotEmpty();
+
+                Gson gson = new Gson();
+                return StreamSupport.stream(gson.fromJson(responseContent, JsonArray.class).spliterator(), false)
+                        .anyMatch(x -> x.getAsJsonObject().get("name").getAsString().equals(name));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Can not obtain list of organizational units", e);
         }
     }
 
@@ -180,10 +189,10 @@ public class WorkbenchHttpsIntegrationTest {
             builder.loadTrustMaterial(null, new TrustAllStrategy());
             sslsf = new SSLConnectionSocketFactory(
                     builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        } catch (Exception e) {
-            Assertions.fail("Error in SSL setup", e);
-        }
 
-        return sslsf;
+            return sslsf;
+        } catch (Exception e) {
+            throw new RuntimeException("Error in SSL setup", e);
+        }
     }
 }
