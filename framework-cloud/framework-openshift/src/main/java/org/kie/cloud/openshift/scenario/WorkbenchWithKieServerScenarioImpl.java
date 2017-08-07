@@ -106,6 +106,7 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
+        kieServerDeployment.setSecureServiceName(OpenShiftConstants.getKieApplicationName());
 
         String routeHostKieServer = project.getService(kieServerDeployment.getServiceName()).getRoute().getRouteHost();
         String urlKieServer = "http://" + routeHostKieServer;
@@ -113,6 +114,13 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             kieServerDeployment.setUrl(new URL(urlKieServer));
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed URL for kie server", e);
+        }
+        String secureRouteHostKieServer = project.getService(kieServerDeployment.getSecureServiceName()).getRoute().getRouteHost();
+        String secureUrlKieServer = "https://" + secureRouteHostKieServer;
+        try {
+            kieServerDeployment.setSecureUrl(new URL(secureUrlKieServer));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed secure URL for kie server", e);
         }
 
         logger.info("Waiting for Kie server deployment to become ready.");

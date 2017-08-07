@@ -31,10 +31,12 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
     private OpenShiftController openShiftController;
     private String namespace;
     private URL url;
+    private URL secureUrl;
     private String username;
     private String password;
 
     private String serviceName;
+    private String secureServiceName;
 
     public OpenShiftController getOpenShiftController() {
         return openShiftController;
@@ -58,6 +60,14 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
 
     public void setUrl(URL url) {
         this.url = url;
+    }
+
+    @Override public URL getSecureUrl() {
+        return secureUrl;
+    }
+
+    public void setSecureUrl(URL secureUrl) {
+        this.secureUrl = secureUrl;
     }
 
     @Override public String getUsername() {
@@ -100,6 +110,14 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
 
     public void setServiceName(String applicationName) {
         this.serviceName = applicationName + "-execserv";
+    }
+
+    public String getSecureServiceName() {
+        return secureServiceName;
+    }
+
+    public void setSecureServiceName(String applicationName) {
+        this.secureServiceName = "secure-" + applicationName + "-execserv";
     }
 
     @Override public void scale(int instances) {

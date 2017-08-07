@@ -15,29 +15,19 @@
 
 package org.kie.cloud.integrationtests.https;
 
-import java.io.InputStream;
 import java.net.URL;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.stream.StreamSupport;
 import javax.net.ssl.HttpsURLConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -63,17 +53,15 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     public void testLoginScreen() throws InterruptedException {
         final URL url = deploymentScenario.getWorkbenchDeployment().getSecureUrl();
         logger.debug("Test login screen on url {}", url.toString());
-        final SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory();
 
-        try (CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build()) {
+        try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient()) {
             final HttpGet httpGet = new HttpGet(url.toString());
             try (final CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 // Test that login screen is available
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
-                try (final InputStream inputStream = response.getEntity().getContent()) {
-                    final String responseContent = IOUtils.toString(inputStream, "UTF-8");
-                    Assertions.assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
-                }
+
+                String responseContent = HttpsUtils.readResonseContent(response);
+                Assertions.assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
             }
         } catch (Exception e) {
             Assertions.fail("Error in downloading workbench login screen using secure connection", e);
@@ -83,9 +71,9 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     @Test
     public void testSecureRest() {
         try {
-            SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory();
-            CredentialsProvider credentialsProvider = getWorkbenchCredentialsProvider();
-            try (CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).setDefaultCredentialsProvider(credentialsProvider).build()) {
+            CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(deploymentScenario.getWorkbenchDeployment().getUsername(),
+                    deploymentScenario.getWorkbenchDeployment().getPassword());
+            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
                 // Create organizational unit using REST API
                 Assertions.assertThat(createOrganizationalUnit(ORGANIZATION_UNIT_NAME, httpClient)).isTrue();
 
@@ -108,17 +96,15 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     private boolean organizationalUnitExists(String name, CloseableHttpClient httpClient) {
         try (final CloseableHttpResponse response = httpClient.execute(organizationalUnitsListRequest(name))) {
             Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
-            try (final InputStream inputStream = response.getEntity().getContent()) {
-                String responseContent = IOUtils.toString(inputStream, "UTF-8");
-                Assertions.assertThat(responseContent).isNotEmpty();
 
-                Gson gson = new Gson();
-                JsonArray orgUnitsJson = gson.fromJson(responseContent, JsonArray.class);
-                return StreamSupport.stream(orgUnitsJson.spliterator(), false)
-                        .map(x -> x.getAsJsonObject())
-                        .map(o -> o.get("name").getAsString())
-                        .anyMatch(s -> s.equals(name));
-            }
+            String responseContent = HttpsUtils.readResonseContent(response);
+            Assertions.assertThat(responseContent).isNotEmpty();
+            Gson gson = new Gson();
+            JsonArray orgUnitsJson = gson.fromJson(responseContent, JsonArray.class);
+            return StreamSupport.stream(orgUnitsJson.spliterator(), false)
+                    .map(x -> x.getAsJsonObject())
+                    .map(o -> o.get("name").getAsString())
+                    .anyMatch(s -> s.equals(name));
         } catch (Exception e) {
             throw new RuntimeException("Can not obtain list of organizational units", e);
         }
@@ -149,23 +135,6 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
         }
     }
 
-    private class TrustAllStrategy implements TrustStrategy {
-        @Override
-        public boolean isTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-            return true;
-        }
-    }
-
-    private CredentialsProvider getWorkbenchCredentialsProvider() {
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(deploymentScenario.getWorkbenchDeployment().getUsername(),
-                deploymentScenario.getWorkbenchDeployment().getPassword());
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        provider.setCredentials(AuthScope.ANY, credentials);
-
-        return provider;
-    }
-
     private String createOrganizationalUnitJson(String name) {
         JsonObject organizationalUnit = new JsonObject();
         organizationalUnit.addProperty("name", ORGANIZATION_UNIT_NAME);
@@ -173,19 +142,5 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
 
         Gson gson = new Gson();
         return gson.toJson(organizationalUnit);
-    }
-
-    private SSLConnectionSocketFactory getSSLConnectionSocketFactory() {
-        SSLConnectionSocketFactory sslsf = null;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustAllStrategy());
-            sslsf = new SSLConnectionSocketFactory(
-                    builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-            return sslsf;
-        } catch (Exception e) {
-            throw new RuntimeException("Error in SSL setup", e);
-        }
     }
 }
