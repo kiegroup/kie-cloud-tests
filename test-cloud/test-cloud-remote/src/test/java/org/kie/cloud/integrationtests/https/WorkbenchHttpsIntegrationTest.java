@@ -15,13 +15,13 @@
 
 package org.kie.cloud.integrationtests.https;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.stream.StreamSupport;
 import javax.net.ssl.HttpsURLConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -60,10 +60,10 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 // Test that login screen is available
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
-                String responseContent = HttpsUtils.readResonseContent(response);
+                String responseContent = HttpsUtils.readResponseContent(response);
                 Assertions.assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             Assertions.fail("Error in downloading workbench login screen using secure connection", e);
         }
     }
@@ -80,7 +80,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 // Check that organizational unit exists
                 Assertions.assertThat(organizationalUnitExists(ORGANIZATION_UNIT_NAME, httpClient)).isTrue();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("Unable to connect to workbench REST API", e);
         }
     }
@@ -97,7 +97,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
         try (final CloseableHttpResponse response = httpClient.execute(organizationalUnitsListRequest(name))) {
             Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
-            String responseContent = HttpsUtils.readResonseContent(response);
+            String responseContent = HttpsUtils.readResponseContent(response);
             Assertions.assertThat(responseContent).isNotEmpty();
             Gson gson = new Gson();
             JsonArray orgUnitsJson = gson.fromJson(responseContent, JsonArray.class);
