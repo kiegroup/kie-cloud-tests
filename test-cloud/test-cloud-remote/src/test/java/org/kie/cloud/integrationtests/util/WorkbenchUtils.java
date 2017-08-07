@@ -16,8 +16,8 @@
 package org.kie.cloud.integrationtests.util;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.git.GitProvider;
-import org.kie.wb.test.rest.client.RestWorkbenchClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchUtils {
@@ -31,7 +31,7 @@ public class WorkbenchUtils {
     public static void deployProjectToWorkbench(GitProvider gitProvider, WorkbenchDeployment workbenchDeployment, String projectName) {
         gitProvider.createGitRepository(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
-        WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(), workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
+        WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
         workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchDeployment.getUsername());
         workbenchClient.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(workbenchDeployment.getNamespace()));
         workbenchClient.deployProject(REPOSITORY_NAME, projectName);

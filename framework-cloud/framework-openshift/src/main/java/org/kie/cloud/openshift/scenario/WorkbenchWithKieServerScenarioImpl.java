@@ -119,8 +119,7 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         kieServerDeployment.waitForScale();
 
         logger.info("Waiting for Kie server to register itself to the Workbench.");
-        KieServerControllerClientProvider kieServerControllerClientProvider = new KieServerControllerClientProvider(workbenchDeployment);
-        kieServerControllerClientProvider.waitForServerTemplateCreation();
+        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment);
     }
 
     @Override public void undeploy() {

@@ -24,25 +24,20 @@ import org.kie.server.integrationtests.controller.client.KieServerMgmtController
 
 public class KieServerControllerClientProvider {
 
-    private KieServerMgmtControllerClient kieServerMgmtControllerClient;
-
-    public KieServerControllerClientProvider(WorkbenchDeployment workbenchDeployment) {
-        kieServerMgmtControllerClient = new KieServerMgmtControllerClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
+    public static KieServerMgmtControllerClient getKieServerMgmtControllerClient(WorkbenchDeployment workbenchDeployment) {
+        KieServerMgmtControllerClient kieServerMgmtControllerClient = new KieServerMgmtControllerClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
                 workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
-    }
-
-    public KieServerMgmtControllerClient getKieServerMgmtControllerClient() {
         return kieServerMgmtControllerClient;
     }
 
     /**
      * Wait until any server template is created in controller.
      */
-    public void waitForServerTemplateCreation() {
+    public static void waitForServerTemplateCreation(WorkbenchDeployment workbenchDeployment) {
         Instant timeoutTime = Instant.now().plusSeconds(30);
         while (Instant.now().isBefore(timeoutTime)) {
 
-            Collection<ServerTemplate> serverTemplates = kieServerMgmtControllerClient.listServerTemplates();
+            Collection<ServerTemplate> serverTemplates = getKieServerMgmtControllerClient(workbenchDeployment).listServerTemplates();
             if(!serverTemplates.isEmpty()) {
                 return;
             }

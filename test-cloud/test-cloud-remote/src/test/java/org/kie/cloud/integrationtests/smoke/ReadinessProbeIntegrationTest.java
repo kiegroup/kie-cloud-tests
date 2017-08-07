@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -33,6 +34,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 import org.kie.server.integrationtests.shared.filter.Authenticator;
+import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,12 +80,12 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
 
     @Test
     public void testWorkbenchReadinessProbe() {
-        WorkbenchClientProvider workbenchClientProvider = new WorkbenchClientProvider(deploymentScenario.getWorkbenchDeployment());
+        WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
 
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
-        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
-        Collection<OrganizationalUnit> organizationalUnits = workbenchClientProvider.getWorkbenchClient().getOrganizationalUnits();
+        workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+        Collection<OrganizationalUnit> organizationalUnits = workbenchClient.getOrganizationalUnits();
         Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_NAME))).isTrue();
 
         logger.debug("Scale workbench to 0");
@@ -95,8 +97,8 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
 
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
-        workbenchClientProvider.createOrganizationalUnit(ORGANIZATION_UNIT_SECOND_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
-        organizationalUnits = workbenchClientProvider.getWorkbenchClient().getOrganizationalUnits();
+        workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_SECOND_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+        organizationalUnits = workbenchClient.getOrganizationalUnits();
         Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_SECOND_NAME))).isTrue();
     }
 
@@ -105,8 +107,7 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
         WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
-        KieServerMgmtControllerClient kieControllerClient = new KieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment().getUrl().toString() + "/rest/controller",
-                deploymentScenario.getWorkbenchDeployment().getUsername(), deploymentScenario.getWorkbenchDeployment().getPassword());
+        KieServerMgmtControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
         kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
 
         Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JAXB, this.getClass().getClassLoader());
