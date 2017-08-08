@@ -23,7 +23,7 @@
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
-    <kie.app.template>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql.json</kie.app.template>
+    <kie.app.template>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json</kie.app.template>
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
