@@ -30,6 +30,13 @@ public interface KieServerDeployment extends Deployment {
     URL getUrl();
 
     /**
+     * Get HTTPS URL for Kie Server service (deployment).
+     *
+     * @return Kie Server secure URL
+     */
+    URL getSecureUrl();
+
+    /**
      * Get Kie Server user name. Kie Server username is set by property
      * org.kie.server.user
      *
