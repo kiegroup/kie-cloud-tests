@@ -15,32 +15,18 @@
 
 package org.kie.cloud.integrationtests.https;
 
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -48,11 +34,18 @@ import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
@@ -63,7 +56,9 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
 
     private static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
     private static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
-    private static final String KIE_SERVER_INFO_TEXT = "<kie-server-info>";
+
+    private static final Marshaller marshaller =
+            MarshallerFactory.getMarshaller(new HashSet<Class<?>>(), MarshallingFormat.JAXB, KieServerHttpsIntegrationTest.class.getClassLoader());
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerHttpsIntegrationTest.class);
 
@@ -82,7 +77,9 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
                 final String responseContent = HttpsUtils.readResponseContent(response);
-                Assertions.assertThat(responseContent).contains(KIE_SERVER_INFO_TEXT);
+                ServiceResponse<KieServerInfo> kieServerInfoServiceResponse = marshaller.unmarshall(responseContent, ServiceResponse.class);
+                KieServerInfo kieServerInfo = kieServerInfoServiceResponse.getResult();
+                Assertions.assertThat(kieServerInfo.getCapabilities()).contains(KieServerConstants.CAPABILITY_BRM);
             }
         } catch (Exception e) {
             throw new RuntimeException("Unable to connect to KIE server REST API", e);
@@ -148,57 +145,19 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     }
 
     private List<String> parseListContainersResponse(String response) {
-        try {
-            final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder builder = factory.newDocumentBuilder();
-            final Document doc = builder.parse(new StringInputStream(response));
-            final XPathFactory xPathfactory = XPathFactory.newInstance();
-            final XPath xpath = xPathfactory.newXPath();
-            final XPathExpression expr = xpath.compile("/response/kie-containers/kie-container[@status='STARTED']/@container-id");
-
-            final NodeList nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-            final List<String> containers = IntStream.range(0, nodeList.getLength())
-                    .mapToObj(nodeList::item)
-                    .map(t -> t.getTextContent())
-                    .collect(Collectors.toList());
-            return containers;
-        } catch (Exception e) {
-            throw new RuntimeException("Error parsing list of containers", e);
-        }
+        ServiceResponse<KieContainerResourceList> serviceResponse = marshaller.unmarshall(response, ServiceResponse.class);
+        List<KieContainerResource> kieContainerResourceList = serviceResponse.getResult().getContainers();
+        return kieContainerResourceList.stream()
+                .filter(c -> c.getStatus() == KieContainerStatus.STARTED)
+                .map(c -> c.getContainerId())
+                .collect(Collectors.toList());
     }
 
     private String createContainerRequestContent(String containerName, String groupId, String artifactId, String version) {
-        try {
-            final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            final Element rootElement = document.createElement("kie-container");
-            rootElement.setAttribute("container-id", containerName);
-            document.appendChild(rootElement);
+        KieContainerResource kieContainerResource = new KieContainerResource();
+        kieContainerResource.setReleaseId(new ReleaseId(PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION));
+        String requestContent = marshaller.marshall(kieContainerResource);
 
-            final Element kieContainerElement = document.createElement("release-id");
-            rootElement.appendChild(kieContainerElement);
-
-            final Element artifactIdElement = document.createElement("artifact-id");
-            artifactIdElement.setTextContent(artifactId);
-            kieContainerElement.appendChild(artifactIdElement);
-
-            final Element groupIdElement = document.createElement("group-id");
-            groupIdElement.setTextContent(groupId);
-            kieContainerElement.appendChild(groupIdElement);
-
-            final Element versionElement = document.createElement("version");
-            versionElement.setTextContent(version);
-            kieContainerElement.appendChild(versionElement);
-
-            final TransformerFactory tf = TransformerFactory.newInstance();
-            final Transformer transformer = tf.newTransformer();
-
-            final StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(document), new StreamResult(writer));
-
-            final String requestContent = writer.getBuffer().toString();
-            return requestContent;
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating request content", e);
-        }
+        return requestContent;
     }
 }
