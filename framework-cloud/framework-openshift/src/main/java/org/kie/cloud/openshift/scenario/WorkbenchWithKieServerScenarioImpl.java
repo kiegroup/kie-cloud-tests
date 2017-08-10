@@ -134,6 +134,10 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         InstanceLogUtil.writeDeploymentLogs(workbenchDeployment);
         InstanceLogUtil.writeDeploymentLogs(kieServerDeployment);
 
+        // TODO: Quick fix for deleting persistence volume content. Should be managed by database deployment in the future.
+        openshiftController.getProject(projectName).getService("myapp-mysql").getDeploymentConfig().scalePods(0);
+        openshiftController.getProject(projectName).getService("myapp-mysql").getDeploymentConfig().waitUntilAllPodsAreReady();
+
         Project project = openshiftController.getProject(projectName);
         project.delete();
     }
