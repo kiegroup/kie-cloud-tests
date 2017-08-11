@@ -18,8 +18,8 @@ package org.kie.cloud.openshift.scenario;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -57,7 +57,8 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
     @Override public void deploy() {
         // OpenShift restriction: Hostname must be shorter than 63 characters
-        projectName = UUID.randomUUID().toString().substring(0, 10);
+        projectName = UUID.randomUUID().toString().substring(0, 4);
+        OpenShiftConstants.getNamespacePrefix().ifPresent(p -> projectName = p + "-" + projectName);
 
         logger.info("Generated project name is " + projectName);
 

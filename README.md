@@ -16,15 +16,16 @@ The following table lists all currently required and supported parameters:
 
 Can be found in framework-openshift, class org.kie.cloud.openshift.constants.OpenShiftConstants
 
-| \<specific-params\>  | Default value  |  Meaning                                                      |
-| -------------------- | -------------- | ------------------------------------------------------------- |
-| openshift.master.url |                | URL pointing to OpenShift, for example https://127.0.0.1:8443 |
-| openshift.username   | user           | Username for logging into OpenShift                           |
-| openshift.password   | redhat         | Password for logging into OpenShift                           |
-| kie.image.streams    |                | URL pointing to file with image stream definitions            |
-| kie.app.secret       | \<GitHub URL\> | URL pointing to file with secrets                             |
-| kie.app.template     | \<GitHub URL\> | URL pointing to file with Kie deployments template            |
-| kie.app.name         | myapp          | Application name used as prefix for Kie deployments           |
+| \<specific-params\>        | Default value  |  Meaning                                                      |
+| -------------------------- | -------------- | ------------------------------------------------------------- |
+| openshift.master.url       |                | URL pointing to OpenShift, for example https://127.0.0.1:8443 |
+| openshift.username         | user           | Username for logging into OpenShift                           |
+| openshift.password         | redhat         | Password for logging into OpenShift                           |
+| openshift.namespace.prefix |                | Prefix of Openshift project name                              |
+| kie.image.streams          |                | URL pointing to file with image stream definitions            |
+| kie.app.secret             | \<GitHub URL\> | URL pointing to file with secrets                             |
+| kie.app.template           | \<GitHub URL\> | URL pointing to file with Kie deployments template            |
+| kie.app.name               | myapp          | Application name used as prefix for Kie deployments           |
 
 ### GIT provider properties
 

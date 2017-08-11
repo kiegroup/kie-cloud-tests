@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.constants;
 
+import java.util.Optional;
+
 import org.kie.cloud.api.constants.Constants;
 
 public class OpenShiftConstants implements Constants {
@@ -22,6 +24,8 @@ public class OpenShiftConstants implements Constants {
     public static final String OPENSHIFT_URL = "openshift.master.url";
     public static final String OPENSHIFT_USER = "openshift.username";
     public static final String OPENSHIFT_PASSWORD = "openshift.password";
+
+    public static final String NAMESPACE_PREFIX = "openshift.namespace.prefix";
 
     public static final String KIE_APP_SECRET = "kie.app.secret";
     public static final String KIE_IMAGE_STREAMS = "kie.image.streams";
@@ -39,6 +43,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getOpenShiftPassword() {
         return System.getProperty(OPENSHIFT_PASSWORD);
+    }
+
+    public static Optional<String> getNamespacePrefix() {
+        return Optional.ofNullable(System.getProperty(NAMESPACE_PREFIX));
     }
 
     public static String getKieAppSecret() {
