@@ -15,6 +15,7 @@
 
 package org.kie.cloud.api.scenario;
 
+import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
@@ -38,4 +39,12 @@ public interface WorkbenchWithKieServerScenario extends DeploymentScenario {
      * @see KieServerDeployment
      */
     KieServerDeployment getKieServerDeployment();
+
+    /**
+     * Return Db server deployment.
+     *
+     * @return DatabaseDeployment
+     * @see DatabaseDeployment
+     */
+    DatabaseDeployment getDatabaseDeployment();
 }

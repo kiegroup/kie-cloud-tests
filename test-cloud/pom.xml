@@ -41,6 +41,8 @@
     <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
     <org.kie.workbench.user>adminUser</org.kie.workbench.user>
     <org.kie.workbench.pwd>adminUser1!</org.kie.workbench.pwd>
+
+    <database.name>mysql</database.name>
   </properties>
 
   <modules>
@@ -75,6 +77,7 @@
               <org.kie.server.pwd>${org.kie.server.pwd}</org.kie.server.pwd>
               <org.kie.workbench.user>${org.kie.workbench.user}</org.kie.workbench.user>
               <org.kie.workbench.pwd>${org.kie.workbench.pwd}</org.kie.workbench.pwd>
+              <database.name>${database.name}</database.name>
             </systemProperties>
           </configuration>
         </plugin>
