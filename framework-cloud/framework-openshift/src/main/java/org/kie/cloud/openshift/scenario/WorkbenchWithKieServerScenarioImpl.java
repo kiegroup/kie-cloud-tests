@@ -18,8 +18,9 @@ package org.kie.cloud.openshift.scenario;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
+
+import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -29,6 +30,7 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
@@ -41,6 +43,7 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
     private String projectName;
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
+    private DatabaseDeploymentImpl databaseDeployment;
 
     private Map<String, String> envVariables;
 
@@ -51,11 +54,13 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         this.envVariables = envVariables;
     }
 
-    @Override public String getNamespace() {
+    @Override
+    public String getNamespace() {
         return projectName;
     }
 
-    @Override public void deploy() {
+    @Override
+    public void deploy() {
         // OpenShift restriction: Hostname must be shorter than 63 characters
         projectName = UUID.randomUUID().toString().substring(0, 4);
         OpenShiftConstants.getNamespacePrefix().ifPresent(p -> projectName = p + "-" + projectName);
@@ -129,15 +134,25 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
         logger.info("Waiting for Kie server to register itself to the Workbench.");
         KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment);
+
+        databaseDeployment = new DatabaseDeploymentImpl();
+        databaseDeployment.setOpenShiftController(openshiftController);
+        databaseDeployment.setNamespace(projectName);
+        databaseDeployment.setDatabaseName(DeploymentConstants.getDatabaseName());
+        databaseDeployment.setApplicationName(OpenShiftConstants.getKieApplicationName());
+
+        logger.info("Waiting for Database deployment to become ready.");
+        databaseDeployment.waitForScale();
     }
 
-    @Override public void undeploy() {
+    @Override
+    public void undeploy() {
         InstanceLogUtil.writeDeploymentLogs(workbenchDeployment);
         InstanceLogUtil.writeDeploymentLogs(kieServerDeployment);
+        InstanceLogUtil.writeDeploymentLogs(databaseDeployment);
 
-        // TODO: Quick fix for deleting persistence volume content. Should be managed by database deployment in the future.
-        openshiftController.getProject(projectName).getService("myapp-mysql").getDeploymentConfig().scalePods(0);
-        openshiftController.getProject(projectName).getService("myapp-mysql").getDeploymentConfig().waitUntilAllPodsAreReady();
+        databaseDeployment.scale(0);
+        databaseDeployment.waitForScale();
 
         Project project = openshiftController.getProject(projectName);
         project.delete();
@@ -147,11 +162,18 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         return openshiftController;
     }
 
-    @Override public WorkbenchDeployment getWorkbenchDeployment() {
+    @Override
+    public WorkbenchDeployment getWorkbenchDeployment() {
         return workbenchDeployment;
     }
 
-    @Override public KieServerDeployment getKieServerDeployment() {
+    @Override
+    public KieServerDeployment getKieServerDeployment() {
         return kieServerDeployment;
+    }
+
+    @Override
+    public DatabaseDeployment getDatabaseDeployment() {
+        return databaseDeployment;
     }
 }
