@@ -43,16 +43,6 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
-    private static final String REPOSITORY_NAME = "myRepo";
-
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "definition-project";
-    private static final String PROJECT_VERSION = "1.0.0.Final";
-
-    private static final String CONTAINER_ID = "cont-id";
-    private static final String CONTAINER_ALIAS = "cont-alias";
-
     private WorkbenchClient workbenchClient;
     private KieServerMgmtControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -71,11 +61,11 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         String kieServerLocation = serverInfo.getLocation();
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
+        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
 
         verifyOneServerTemplateWithContainer(kieServerLocation, CONTAINER_ID);
 
@@ -88,19 +78,19 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
     public void testWorkbenchProjectPersistence() {
         workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
         workbenchClient.createRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME);
-        workbenchClient.createProject(REPOSITORY_NAME, PROJECT_NAME, PROJECT_GROUP_ID, PROJECT_VERSION);
+        workbenchClient.createProject(REPOSITORY_NAME, DEFINITION_PROJECT_NAME, PROJECT_GROUP_ID, DEFINITION_PROJECT_VERSION);
 
-        assertRepositoryAndProjectExists(REPOSITORY_NAME, PROJECT_NAME);
+        assertRepositoryAndProjectExists(REPOSITORY_NAME, DEFINITION_PROJECT_NAME);
 
         scaleToZeroAndToOne(deploymentScenario.getWorkbenchDeployment());
 
-        assertRepositoryAndProjectExists(REPOSITORY_NAME, PROJECT_NAME);
-        workbenchClient.deployProject(REPOSITORY_NAME, PROJECT_NAME);
+        assertRepositoryAndProjectExists(REPOSITORY_NAME, DEFINITION_PROJECT_NAME);
+        workbenchClient.deployProject(REPOSITORY_NAME, DEFINITION_PROJECT_NAME);
 
         scaleToZeroAndToOne(deploymentScenario.getWorkbenchDeployment());
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
+        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
 
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 

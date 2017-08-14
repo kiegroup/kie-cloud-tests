@@ -49,14 +49,6 @@ import org.slf4j.LoggerFactory;
 
 public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String CONTAINER_ID = "cont-id";
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "definition-project-snapshot";
-    private static final String PROJECT_VERSION = "1.0.0-SNAPSHOT";
-
-    private static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
-    private static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
-
     private static final Marshaller marshaller =
             MarshallerFactory.getMarshaller(new HashSet<Class<?>>(), MarshallingFormat.JAXB, KieServerHttpsIntegrationTest.class.getClassLoader());
 
@@ -93,7 +85,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
         final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(deploymentScenario.getKieServerDeployment().getUsername(),
                 deploymentScenario.getKieServerDeployment().getPassword());
         try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-            try (CloseableHttpResponse response = httpClient.execute(createContainerRequest(CONTAINER_ID, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION))) {
+            try (CloseableHttpResponse response = httpClient.execute(createContainerRequest(CONTAINER_ID, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION))) {
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
             }
 
@@ -155,7 +147,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
 
     private String createContainerRequestContent(String containerName, String groupId, String artifactId, String version) {
         KieContainerResource kieContainerResource = new KieContainerResource();
-        kieContainerResource.setReleaseId(new ReleaseId(PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION));
+        kieContainerResource.setReleaseId(new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION));
         String requestContent = marshaller.marshall(kieContainerResource);
 
         return requestContent;

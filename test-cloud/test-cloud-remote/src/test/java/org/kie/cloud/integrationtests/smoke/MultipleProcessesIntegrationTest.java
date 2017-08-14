@@ -22,20 +22,6 @@ import org.kie.server.integrationtests.controller.client.KieServerMgmtController
 
 public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "definition-project";
-    private static final String PROJECT_VERSION = "1.0.0.Final";
-
-    private static final String CONTAINER_ID = "cont-id";
-    private static final String CONTAINER_ALIAS = "cont-alias";
-
-    private static final String USERTASK_PROCESS_ID = "definition-project.usertask";
-    private static final String SIGNALTASK_PROCESS_ID = "definition-project.signaltask";
-
-    private static final String USER_YODA = "yoda";
-
-    private static final String SIGNAL_NAME = "signal1";
-
     private KieServerMgmtControllerClient kieControllerClient;
 
     private KieServicesClient kieServerClient;
@@ -49,7 +35,7 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
 
     @Before
     public void setUp() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
@@ -60,7 +46,7 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
     @Test
     public void testMultipleDifferentProcessesOnSameKieServer() {
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
+        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
 
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 

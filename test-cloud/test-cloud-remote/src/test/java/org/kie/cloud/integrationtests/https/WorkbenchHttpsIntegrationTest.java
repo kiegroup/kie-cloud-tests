@@ -38,10 +38,6 @@ import org.slf4j.LoggerFactory;
 
 public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String organizationalUnitRestRequest = "rest/organizationalunits";
-    private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
-    private static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
-
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
 
     @Override
@@ -112,7 +108,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
 
     private HttpPost organizationalUnitCreateRequest(String name) {
         try {
-            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), ORGANIZATIONAL_UNIT_REST_REQUEST);
             final HttpPost request = new HttpPost(url.toString());
             request.setHeader("Content-Type", "application/json");
             request.setEntity(new StringEntity(createOrganizationalUnitJson(name)));
@@ -125,7 +121,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
 
     private HttpGet organizationalUnitsListRequest(String name) {
         try {
-            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), organizationalUnitRestRequest);
+            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), ORGANIZATIONAL_UNIT_REST_REQUEST);
             final HttpGet request = new HttpGet(url.toString());
             request.setHeader("Content-Type", "application/json");
 

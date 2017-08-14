@@ -25,6 +25,36 @@ import org.kie.cloud.git.GitProviderFactory;
 
 public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario> {
 
+    protected static final String PROJECT_GROUP_ID = "org.kie.server.testing";
+    protected static final String DEFINITION_PROJECT_NAME = "definition-project";
+    protected static final String DEFINITION_PROJECT_VERSION = "1.0.0.Final";
+
+    protected static final String DEFINITION_PROJECT_SNAPSHOT_NAME = "definition-project-snapshot";
+    protected static final String DEFINITION_PROJECT_SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
+
+    protected static final String TIMER_PROJECT_NAME = "timer-project";
+    protected static final String TIMER_PROJECT_VERSION = "1.0.0.Final";
+
+    protected static final String CONTAINER_ID = "cont-id";
+    protected static final String CONTAINER_ALIAS = "cont-alias";
+
+    protected static final String USER_YODA = "yoda";
+
+    protected static final String USERTASK_PROCESS_ID = "definition-project.usertask";
+    protected static final String SIGNALTASK_PROCESS_ID = "definition-project.signaltask";
+
+    protected static final String SIGNAL_NAME = "signal1";
+
+    protected static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
+
+    protected static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
+    protected static final String ORGANIZATION_UNIT_SECOND_NAME = "myOrgUnitTwo";
+    protected static final String REPOSITORY_NAME = "myRepo";
+
+    protected static final String ORGANIZATIONAL_UNIT_REST_REQUEST = "rest/organizationalunits";
+    protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
+    protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
+
     private final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
     protected final GitProvider gitProvider = GitProviderFactory.getGitProvider();
