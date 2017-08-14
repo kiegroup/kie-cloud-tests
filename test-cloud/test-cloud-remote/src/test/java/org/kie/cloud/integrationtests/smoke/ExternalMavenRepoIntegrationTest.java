@@ -36,16 +36,6 @@ import org.kie.server.client.UserTaskServicesClient;
 
 public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String CONTAINER_ID = "cont-id";
-
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "definition-project-snapshot";
-    private static final String PROJECT_VERSION = "1.0.0-SNAPSHOT";
-
-    private static final String USERTASK_PROCESS_ID = "definition-project.usertask";
-
-    private static final String USER_YODA = "yoda";
-
     @Override
     protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder()
@@ -64,7 +54,7 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
         ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
 
-        kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION)));
+        kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION)));
 
         Long userTaskPid = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
         Assertions.assertThat(userTaskPid).isNotNull();

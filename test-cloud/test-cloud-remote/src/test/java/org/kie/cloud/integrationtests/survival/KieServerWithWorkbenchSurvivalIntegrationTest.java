@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -45,17 +46,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "definition-project";
-    private static final String PROJECT_VERSION = "1.0.0.Final";
-
-    private static final String CONTAINER_ID = "cont-id";
-    private static final String CONTAINER_ALIAS = "cont-alias";
-
-    private static final String SIGNALTASK_PROCESS_ID = "definition-project.signaltask";
-
-    private static final String GET_CONTAINERS_REST_ENDPOINT = "/services/rest/server/containers";
-
     private KieServerMgmtControllerClient kieServerMgmtControllerClient;
 
     protected KieServicesClient kieServicesClient;
@@ -71,7 +61,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
 
     @Before
     public void setUp() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
         kieServerMgmtControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
 
@@ -92,7 +82,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
         checkServerTemplateInstanceCount(serverInfo.getServerId(), 1);
 
         logger.debug("Register Kie Container to Kie Server");
-        kieServerMgmtControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
+        kieServerMgmtControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
         logger.debug("Start process instance");
@@ -148,10 +138,20 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
                                 deploymentScenario.getKieServerDeployment().getPassword()))
                 .build();
 
-        WebTarget target = httpKieServerClient.target(deploymentScenario.getKieServerDeployment().getUrl().toString() + GET_CONTAINERS_REST_ENDPOINT);
-        Response response = target.request().get();
-        response.close();
-        assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        Response response = null;
+
+        try {
+            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl(), KIE_CONTAINER_REQUEST_URL);
+            WebTarget target = httpKieServerClient.target(url.toString());
+            response = target.request().get();
+            assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating list container request.", e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
     }
 
 }

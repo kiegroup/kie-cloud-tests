@@ -40,18 +40,6 @@ import org.slf4j.LoggerFactory;
 
 public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
-    private static final String ORGANIZATION_UNIT_SECOND_NAME = "myOrgUnitTwo";
-
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "definition-project";
-    private static final String PROJECT_VERSION = "1.0.0.Final";
-
-    private static final String CONTAINER_ID = "cont-id";
-    private static final String CONTAINER_ALIAS = "cont-alias";
-
-    private static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
-
     private Client httpKieServerClient;
 
     private static final Logger logger = LoggerFactory.getLogger(ReadinessProbeIntegrationTest.class);
@@ -104,11 +92,11 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
 
     @Test
     public void testKieServerReadinessProbe() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
         KieServerMgmtControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
+        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
 
         Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JAXB, this.getClass().getClassLoader());
 
@@ -117,8 +105,13 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
         deploymentScenario.getKieServerDeployment().scale(1);
         deploymentScenario.getKieServerDeployment().waitForScale();
 
-        WebTarget target = httpKieServerClient.target(deploymentScenario.getKieServerDeployment().getUrl().toString() + "/services/rest/server/containers");
-
+        WebTarget target;
+        try {
+            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl(), KIE_CONTAINER_REQUEST_URL);
+            target = httpKieServerClient.target(url.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating list container request.", e);
+        }
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + 1000L;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
             Response response = target.request().get();

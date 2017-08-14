@@ -37,13 +37,6 @@ import org.kie.server.integrationtests.controller.client.KieServerMgmtController
 
 public class TimerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String PROJECT_NAME = "timer-project";
-    private static final String PROJECT_VERSION = "1.0.0.Final";
-
-    private static final String CONTAINER_ID = "cont-id";
-    private static final String CONTAINER_ALIAS = "cont-alias";
-
     private KieServerMgmtControllerClient kieControllerClient;
 
     @Override
@@ -53,7 +46,7 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
 
     @Before
     public void setUp() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), TIMER_PROJECT_NAME);
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
     }
@@ -67,7 +60,7 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
         deploymentScenario.getKieServerDeployment().waitForScale();
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, PROJECT_NAME, PROJECT_VERSION, KieContainerStatus.STARTED);
+        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, TIMER_PROJECT_NAME, TIMER_PROJECT_VERSION, KieContainerStatus.STARTED);
 
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
         List<Integer> completedOnly = Arrays.asList(org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED);
