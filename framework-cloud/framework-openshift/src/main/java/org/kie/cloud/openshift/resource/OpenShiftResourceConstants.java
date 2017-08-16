@@ -17,6 +17,9 @@ package org.kie.cloud.openshift.resource;
 
 public class OpenShiftResourceConstants {
 
+    // Project constants
+    public static final long PROJECT_CREATION_TIMEOUT = 60 * 1000L; // 1 minute
+
     // Service constants
     public static final String EAP_DEFAULT_PROTOCOL = "TCP";
     public static final int EAP_DEFAULT_HTTP_PORT = 8080;
