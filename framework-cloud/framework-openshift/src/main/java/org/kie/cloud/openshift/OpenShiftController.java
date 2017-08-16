@@ -16,12 +16,15 @@
 package org.kie.cloud.openshift;
 
 import java.io.Closeable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
+import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 
@@ -66,6 +69,8 @@ public class OpenShiftController implements Closeable {
                 .withDisplayName(projectName)
             .done();
 
+        waitForProjectCreation(projectName);
+
         return new ProjectImpl(client, projectName);
     }
 
@@ -97,5 +102,29 @@ public class OpenShiftController implements Closeable {
         if (client != null) {
             client.close();
         }
+    }
+
+    /**
+     * Wait until project is created.
+     *
+     * @param projectName Project to be created
+     */
+    private void waitForProjectCreation(String projectName) {
+        Instant timeoutTime = Instant.now().plus(OpenShiftResourceConstants.PROJECT_CREATION_TIMEOUT, ChronoUnit.MILLIS);
+        while (Instant.now().isBefore(timeoutTime)) {
+            List<io.fabric8.openshift.api.model.Project> projectList = client.projects().list().getItems();
+            if (projectList.stream().anyMatch(p -> p.getMetadata().getName().equals(projectName))) {
+                return;
+            }
+
+            try {
+                Thread.sleep(200L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted while waiting for project " + projectName + " to be created.", e);
+            }
+        }
+
+        throw new RuntimeException("Timeout while waiting for project " + projectName + " to be created.");
     }
 }
