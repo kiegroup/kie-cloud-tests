@@ -103,9 +103,6 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             throw new RuntimeException("Malformed secure URL for workbench", e);
         }
 
-        logger.info("Waiting for Workbench deployment to become ready.");
-        workbenchDeployment.waitForScale();
-
         kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);
         kieServerDeployment.setNamespace(projectName);
@@ -129,17 +126,20 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             throw new RuntimeException("Malformed secure URL for kie server", e);
         }
 
-        logger.info("Waiting for Kie server deployment to become ready.");
-        kieServerDeployment.waitForScale();
-
-        logger.info("Waiting for Kie server to register itself to the Workbench.");
-        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment);
-
         databaseDeployment = new DatabaseDeploymentImpl();
         databaseDeployment.setOpenShiftController(openshiftController);
         databaseDeployment.setNamespace(projectName);
         databaseDeployment.setDatabaseName(DeploymentConstants.getDatabaseName());
         databaseDeployment.setApplicationName(OpenShiftConstants.getKieApplicationName());
+
+        logger.info("Waiting for Workbench deployment to become ready.");
+        workbenchDeployment.waitForScale();
+
+        logger.info("Waiting for Kie server deployment to become ready.");
+        kieServerDeployment.waitForScale();
+
+        logger.info("Waiting for Kie server to register itself to the Workbench.");
+        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment);
 
         logger.info("Waiting for Database deployment to become ready.");
         databaseDeployment.waitForScale();
@@ -151,8 +151,10 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         InstanceLogUtil.writeDeploymentLogs(kieServerDeployment);
         InstanceLogUtil.writeDeploymentLogs(databaseDeployment);
 
-        databaseDeployment.scale(0);
-        databaseDeployment.waitForScale();
+        if(databaseDeployment != null) {
+            databaseDeployment.scale(0);
+            databaseDeployment.waitForScale();
+        }
 
         Project project = openshiftController.getProject(projectName);
         project.delete();
