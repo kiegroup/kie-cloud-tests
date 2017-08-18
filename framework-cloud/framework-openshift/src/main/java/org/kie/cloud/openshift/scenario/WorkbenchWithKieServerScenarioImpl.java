@@ -17,10 +17,13 @@ package org.kie.cloud.openshift.scenario;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
+import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -147,13 +150,13 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
     @Override
     public void undeploy() {
-        InstanceLogUtil.writeDeploymentLogs(workbenchDeployment);
-        InstanceLogUtil.writeDeploymentLogs(kieServerDeployment);
-        InstanceLogUtil.writeDeploymentLogs(databaseDeployment);
+        InstanceLogUtil.writeDeploymentLogs(this);
 
-        if(databaseDeployment != null) {
-            databaseDeployment.scale(0);
-            databaseDeployment.waitForScale();
+        for(Deployment deployment : getDeployments()) {
+            if(deployment != null) {
+                deployment.scale(0);
+                deployment.waitForScale();
+            }
         }
 
         Project project = openshiftController.getProject(projectName);
@@ -177,5 +180,10 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
     @Override
     public DatabaseDeployment getDatabaseDeployment() {
         return databaseDeployment;
+    }
+
+    @Override
+    public List<Deployment> getDeployments() {
+        return Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment);
     }
 }
