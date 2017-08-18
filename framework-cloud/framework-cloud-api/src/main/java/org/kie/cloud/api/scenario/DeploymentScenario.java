@@ -15,6 +15,10 @@
 
 package org.kie.cloud.api.scenario;
 
+import java.util.List;
+
+import org.kie.cloud.api.deployment.Deployment;
+
 /**
  * Cloud deployment scenario representation.
  */
@@ -36,4 +40,11 @@ public interface DeploymentScenario {
      * Undeploy and delete deployment scenario.
      */
     void undeploy();
+
+    /**
+     * Return all available deployments.
+     *
+     * @return All available deployments.
+     */
+    List<Deployment> getDeployments();
 }

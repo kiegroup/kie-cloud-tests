@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 
 public class InstanceLogUtil {
 
@@ -47,11 +48,13 @@ public class InstanceLogUtil {
         }
     }
 
-    public static void writeDeploymentLogs(Deployment deployment) {
-        if (deployment != null) {
-            List<Instance> instances = deployment.getInstances();
-            for (Instance instance : instances) {
-                writeInstanceLogs(instance);
+    public static void writeDeploymentLogs(DeploymentScenario deploymentScenario) {
+        for(Deployment deployment : deploymentScenario.getDeployments()) {
+            if (deployment != null) {
+                List<Instance> instances = deployment.getInstances();
+                for (Instance instance : instances) {
+                    writeInstanceLogs(instance);
+                }
             }
         }
     }
