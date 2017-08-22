@@ -52,6 +52,23 @@ public interface Deployment {
      */
     List<Instance> getInstances();
 
+    /**
+     * This method delete given cloud instances. Cloud should automaticly start
+     * new instances. Number of available instance is same as before.
+     *
+     * @param instance Instances to be deleted
+     */
+    void deleteInstances(Instance... instance);
+
+    /**
+     * This method delete given list of the cloud instances. Cloud should
+     * automaticly start new instances. Number of available instance is same as
+     * before.
+     *
+     * @param instances List of instances to be deleted
+     */
+    void deleteInstances(List<Instance> instances);
+
     boolean ready();
 
 }

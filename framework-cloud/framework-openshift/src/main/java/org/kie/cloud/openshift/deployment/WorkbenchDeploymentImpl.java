@@ -22,14 +22,10 @@ import java.util.List;
 import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.api.deployment.WorkbenchInstance;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 
-public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
+public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements WorkbenchDeployment {
 
-    private OpenShiftController openShiftController;
-    private String namespace;
     private URL url;
     private URL secureUrl;
     private String username;
@@ -37,22 +33,6 @@ public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
 
     private String serviceName;
     private String secureServiceName;
-
-    public OpenShiftController getOpenShiftController() {
-        return openShiftController;
-    }
-
-    public void setOpenShiftController(OpenShiftController openShiftController) {
-        this.openShiftController = openShiftController;
-    }
-
-    @Override public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
 
     @Override public URL getUrl() {
         return url;
@@ -104,6 +84,7 @@ public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
         this.password = password;
     }
 
+    @Override
     public String getServiceName() {
         return serviceName;
     }
@@ -120,10 +101,6 @@ public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
         this.secureServiceName = "secure-" + applicationName + "-buscentr";
     }
 
-    @Override public void scale(int instances) {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().scalePods(instances);
-    }
-
     @Override public void waitForScale() {
         openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().waitUntilAllPodsAreReady();
         if (openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().podsNumber() > 0) {
@@ -134,4 +111,5 @@ public class WorkbenchDeploymentImpl implements WorkbenchDeployment {
     @Override public boolean ready() {
         throw new RuntimeException("Not implemented");
     }
+
 }

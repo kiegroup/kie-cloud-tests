@@ -24,25 +24,18 @@ import static java.util.stream.Collectors.toList;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.DatabaseInstance;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Service;
 
-public class DatabaseDeploymentImpl implements DatabaseDeployment {
+public class DatabaseDeploymentImpl extends OpenShiftDeployment implements DatabaseDeployment {
 
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
 
-    private OpenShiftController openShiftController;
     private String username;
     private String password;
-    private String namespace;
     private String databaseName;
     private URL url;
     private String applicationName;
-
-    public void setOpenShiftController(OpenShiftController openShiftController) {
-        this.openShiftController = openShiftController;
-    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -52,20 +45,12 @@ public class DatabaseDeploymentImpl implements DatabaseDeployment {
         this.password = password;
     }
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
     public void setDatabaseName(String database) {
         this.databaseName = database;
     }
 
     public void setUrl(URL url) {
         this.url = url;
-    }
-
-    public OpenShiftController getOpenShiftController() {
-        return openShiftController;
     }
 
     @Override
@@ -89,10 +74,6 @@ public class DatabaseDeploymentImpl implements DatabaseDeployment {
     }
 
     @Override
-    public String getNamespace() {
-        return namespace;
-    }
-
     public String getServiceName() {
         if (databaseName == null) {
             // Database name not set, try to guess it from all available services
@@ -113,11 +94,6 @@ public class DatabaseDeploymentImpl implements DatabaseDeployment {
 
     public String getApplicationName() {
         return applicationName;
-    }
-
-    @Override
-    public void scale(int instances) {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().scalePods(instances);
     }
 
     @Override
@@ -149,5 +125,4 @@ public class DatabaseDeploymentImpl implements DatabaseDeployment {
     public boolean ready() {
         return getInstances().size() > 0;
     }
-
 }
