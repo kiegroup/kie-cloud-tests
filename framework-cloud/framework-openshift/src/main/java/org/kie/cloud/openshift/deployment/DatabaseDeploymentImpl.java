@@ -17,6 +17,7 @@ package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import static java.util.stream.Collectors.toList;
@@ -25,8 +26,11 @@ import org.kie.cloud.api.deployment.DatabaseInstance;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
+import org.kie.cloud.openshift.resource.Service;
 
 public class DatabaseDeploymentImpl implements DatabaseDeployment {
+
+    private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
 
     private OpenShiftController openShiftController;
     private String username;
@@ -90,6 +94,16 @@ public class DatabaseDeploymentImpl implements DatabaseDeployment {
     }
 
     public String getServiceName() {
+        if (databaseName == null) {
+            // Database name not set, try to guess it from all available services
+            List<Service> services = openShiftController.getProject(namespace).getServices();
+            for (Service service : services) {
+                if (DATABASE_REGEXP.matcher(service.getName()).matches()) {
+                    return service.getName();
+                }
+            }
+            throw new RuntimeException("No available database found among services.");
+        }
         return applicationName + "-" + databaseName;
     }
 
