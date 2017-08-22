@@ -132,7 +132,6 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         databaseDeployment = new DatabaseDeploymentImpl();
         databaseDeployment.setOpenShiftController(openshiftController);
         databaseDeployment.setNamespace(projectName);
-        databaseDeployment.setDatabaseName(DeploymentConstants.getDatabaseName());
         databaseDeployment.setApplicationName(OpenShiftConstants.getKieApplicationName());
 
         logger.info("Waiting for Workbench deployment to become ready.");
