@@ -22,14 +22,10 @@ import java.util.List;
 import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.KieServerInstance;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 
-public class KieServerDeploymentImpl implements KieServerDeployment {
+public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieServerDeployment {
 
-    private OpenShiftController openShiftController;
-    private String namespace;
     private URL url;
     private URL secureUrl;
     private String username;
@@ -38,21 +34,6 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
     private String serviceName;
     private String secureServiceName;
 
-    public OpenShiftController getOpenShiftController() {
-        return openShiftController;
-    }
-
-    public void setOpenShiftController(OpenShiftController openShiftController) {
-        this.openShiftController = openShiftController;
-    }
-
-    @Override public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
 
     @Override public URL getUrl() {
         return url;
@@ -104,6 +85,7 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
         this.password = password;
     }
 
+    @Override
     public String getServiceName() {
         return serviceName;
     }
@@ -118,10 +100,6 @@ public class KieServerDeploymentImpl implements KieServerDeployment {
 
     public void setSecureServiceName(String applicationName) {
         this.secureServiceName = "secure-" + applicationName + "-execserv";
-    }
-
-    @Override public void scale(int instances) {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().scalePods(instances);
     }
 
     @Override public void waitForScale() {
