@@ -42,8 +42,10 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
 
     protected static final String USERTASK_PROCESS_ID = "definition-project.usertask";
     protected static final String SIGNALTASK_PROCESS_ID = "definition-project.signaltask";
+    protected static final String LONG_SCRIPT_PROCESS_ID = "definition-project.longScript";
 
     protected static final String SIGNAL_NAME = "signal1";
+    protected static final String SIGNAL_2_NAME = "signal2";
 
     protected static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
