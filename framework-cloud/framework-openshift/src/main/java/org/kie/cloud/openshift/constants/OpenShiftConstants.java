@@ -46,6 +46,18 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift template file containing Workbench, Kie server and database.
      */
     public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE = "kie.app.template.workbench.kie-server.database";
+    /**
+     * URL pointing to OpenShift template file containing just Kie server.
+     */
+    public static final String KIE_APP_TEMPLATE_KIE_SERVER = "kie.app.template.kie-server";
+    /**
+     * URL pointing to OpenShift template file containing Kie server and database.
+     */
+    public static final String KIE_APP_TEMPLATE_KIE_SERVER_DATABASE = "kie.app.template.kie-server.database";
+    /**
+     * URL pointing to OpenShift template file containing Workbench monitoring console and Smart router.
+     */
+    public static final String KIE_APP_TEMPLATE_CONSOLE_SMARTROUTER = "kie.app.template.workbench-monitoring.smartrouter";
 
     public static String getOpenShiftUrl() {
         return System.getProperty(OPENSHIFT_URL);
@@ -73,6 +85,18 @@ public class OpenShiftConstants implements Constants {
 
     public static String getKieAppTemplateWorkbenchKieServerDatabase() {
         return System.getProperty(KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE);
+    }
+
+    public static String getKieAppTemplateKieServer() {
+        return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER);
+    }
+
+    public static String getKieAppTemplateKieServerDatabase() {
+        return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER_DATABASE);
+    }
+
+    public static String getKieAppTemplateConsoleSmartRouter() {
+        return System.getProperty(KIE_APP_TEMPLATE_CONSOLE_SMARTROUTER);
     }
 
     public static String getKieApplicationName() {
