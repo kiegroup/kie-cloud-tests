@@ -25,13 +25,27 @@ public class OpenShiftConstants implements Constants {
     public static final String OPENSHIFT_USER = "openshift.username";
     public static final String OPENSHIFT_PASSWORD = "openshift.password";
 
+    /**
+     * Project name prefix - to simplify identification of projects created in OpenShift.
+     */
     public static final String NAMESPACE_PREFIX = "openshift.namespace.prefix";
-
-    public static final String KIE_APP_SECRET = "kie.app.secret";
-    public static final String KIE_IMAGE_STREAMS = "kie.image.streams";
-    public static final String KIE_APP_TEMPLATE = "kie.app.template";
-
+    /**
+     * Used Kie application name. Needed for identification of services within the project.
+     */
     public static final String KIE_APP_NAME = "kie.app.name";
+
+    /**
+     * URL pointing to OpenShift resource file containing keystore for HTTPS communication.
+     */
+    public static final String KIE_APP_SECRET = "kie.app.secret";
+    /**
+     * URL pointing to OpenShift resource file containing image streams with all available images.
+     */
+    public static final String KIE_IMAGE_STREAMS = "kie.image.streams";
+    /**
+     * URL pointing to OpenShift template file containing Workbench, Kie server and database.
+     */
+    public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE = "kie.app.template.workbench.kie-server.database";
 
     public static String getOpenShiftUrl() {
         return System.getProperty(OPENSHIFT_URL);
@@ -57,8 +71,8 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(KIE_IMAGE_STREAMS);
     }
 
-    public static String getKieAppTemplate() {
-        return System.getProperty(KIE_APP_TEMPLATE);
+    public static String getKieAppTemplateWorkbenchKieServerDatabase() {
+        return System.getProperty(KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE);
     }
 
     public static String getKieApplicationName() {
