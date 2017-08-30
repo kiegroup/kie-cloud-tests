@@ -23,12 +23,14 @@ import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.scenario.WorkbenchWithKieServerInDifferentNamespaceScenarioImpl;
 import org.kie.cloud.openshift.scenario.WorkbenchWithKieServerScenarioImpl;
 
 public class WorkbenchWithKieServerScenarioBuilderImpl implements WorkbenchWithKieServerScenarioBuilder {
 
     private OpenShiftController openshiftController;
     private Map<String, String> envVariables;
+    private boolean workbenchInSeparateNamespace = false;
 
     public WorkbenchWithKieServerScenarioBuilderImpl(OpenShiftController openShiftController) {
         this.openshiftController = openShiftController;
@@ -46,6 +48,9 @@ public class WorkbenchWithKieServerScenarioBuilderImpl implements WorkbenchWithK
 
     @Override
     public WorkbenchWithKieServerScenario build() {
+        if (workbenchInSeparateNamespace) {
+            return new WorkbenchWithKieServerInDifferentNamespaceScenarioImpl(openshiftController, envVariables);
+        }
         return new WorkbenchWithKieServerScenarioImpl(openshiftController, envVariables);
     }
 
@@ -54,6 +59,12 @@ public class WorkbenchWithKieServerScenarioBuilderImpl implements WorkbenchWithK
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+        return this;
+    }
+
+    @Override
+    public WorkbenchWithKieServerScenarioBuilder withWorkbenchInSeparateNamespace() {
+        workbenchInSeparateNamespace = true;
         return this;
     }
 }

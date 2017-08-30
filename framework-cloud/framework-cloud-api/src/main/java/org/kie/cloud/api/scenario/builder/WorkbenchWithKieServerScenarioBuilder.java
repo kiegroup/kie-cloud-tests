@@ -35,4 +35,11 @@ public interface WorkbenchWithKieServerScenarioBuilder extends DeploymentScenari
      * @return Builder with configured external maven repo.
      */
     WorkbenchWithKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    /**
+     * Return setup builder which will create Workbench in separate namespace.
+     *
+     * @return Builder which will create Workbench in separate namespace.
+     */
+    WorkbenchWithKieServerScenarioBuilder withWorkbenchInSeparateNamespace();
 }

@@ -23,7 +23,9 @@
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
-    <kie.app.template>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json</kie.app.template>
+    <kie.app.template.workbench.kie-server.database>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json</kie.app.template.workbench.kie-server.database>
+    <kie.app.template.workbench>https://raw.githubusercontent.com/rbarriuso/application-templates/CLOUD-1983/bpmsuite/bpmsuite70-businesscentral-ephemeral.json</kie.app.template.workbench>
+    <kie.app.template.kie-server.database>https://raw.githubusercontent.com/rbarriuso/application-templates/CLOUD-1983/bpmsuite/bpmsuite70-executionserver-postgresql-persistent.json</kie.app.template.kie-server.database>
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
@@ -60,7 +62,9 @@
               <openshift.password>${openshift.password}</openshift.password>
               <kie.app.secret>${kie.app.secret}</kie.app.secret>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
-              <kie.app.template>${kie.app.template}</kie.app.template>
+              <kie.app.template.workbench.kie-server.database>${kie.app.template.workbench.kie-server.database}</kie.app.template.workbench.kie-server.database>
+              <kie.app.template.workbench>${kie.app.template.workbench}</kie.app.template.workbench>
+              <kie.app.template.kie-server.database>${kie.app.template.kie-server.database}</kie.app.template.kie-server.database>
               <kie.app.name>${kie.app.name}</kie.app.name>
               <git.provider>${git.provider}</git.provider>
               <gitlab.url>${gitlab.url}</gitlab.url>
