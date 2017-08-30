@@ -25,7 +25,7 @@ import org.kie.cloud.api.deployment.Deployment;
 public interface DeploymentScenario {
 
     /**
-     * Return deployment scenario namespace.
+     * Return deployment scenario default namespace.
      *
      * @return deployment scenario name.
      */
