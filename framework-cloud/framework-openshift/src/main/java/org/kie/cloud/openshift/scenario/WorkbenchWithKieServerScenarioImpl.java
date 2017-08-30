@@ -79,9 +79,9 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
         project.createResources(OpenShiftConstants.getKieImageStreams());
 
-        logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplate());
+        logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateWorkbenchKieServerDatabase());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
-        project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplate(), envVariables);
+        project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateWorkbenchKieServerDatabase(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl();
         workbenchDeployment.setOpenShiftController(openshiftController);
