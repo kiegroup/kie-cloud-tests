@@ -13,16 +13,10 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.api;
+package org.kie.cloud.api.deployment;
 
-import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
-
-public interface DeploymentScenarioBuilderFactory {
-    String getCloudAPIImplementationName();
-
-    WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder();
-    WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder();
-
-    void deleteNamespace(String namespace);
+/**
+ * Smart router instance representation in cloud.
+ */
+public interface SmartRouterInstance extends Instance {
 }
