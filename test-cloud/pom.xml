@@ -23,10 +23,11 @@
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
-    <kie.app.template.workbench.kie-server.database>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json</kie.app.template.workbench.kie-server.database>
-    <kie.app.template.kie-server>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-executionserver.json</kie.app.template.kie-server>
-    <kie.app.template.kie-server.database>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-executionserver-postgresql-persistent.json</kie.app.template.kie-server.database>
-    <kie.app.template.workbench-monitoring.smartrouter>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-businesscentral-monitoring-ephemeral.json</kie.app.template.workbench-monitoring.smartrouter>
+    <!-- Templates are specified in specific properties files. Path is relative to submodules of this module. -->
+    <kie.app.templates.general>${project.parent.build.resources[0].directory}/templates-general.properties</kie.app.templates.general>
+    <kie.app.templates.mysql>${project.parent.build.resources[0].directory}/templates-mysql.properties</kie.app.templates.mysql>
+    <kie.app.templates.postgresql>${project.parent.build.resources[0].directory}/templates-postgresql.properties</kie.app.templates.postgresql>
+
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
@@ -54,6 +55,24 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>properties-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <executions>
+            <execution>
+              <phase>initialize</phase>
+              <goals>
+                <goal>read-project-properties</goal>
+              </goals>
+              <configuration>
+                <files combine.children="append">
+                  <file>${kie.app.templates.general}</file>
+                </files>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
@@ -63,6 +82,7 @@
               <openshift.password>${openshift.password}</openshift.password>
               <kie.app.secret>${kie.app.secret}</kie.app.secret>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
+              <!-- All templates have to be passed as properties to failsafe plugin. -->
               <kie.app.template.workbench.kie-server.database>${kie.app.template.workbench.kie-server.database}</kie.app.template.workbench.kie-server.database>
               <kie.app.template.kie-server>${kie.app.template.kie-server}</kie.app.template.kie-server>
               <kie.app.template.kie-server.database>${kie.app.template.kie-server.database}</kie.app.template.kie-server.database>
@@ -87,4 +107,43 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>mysql</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>properties-maven-plugin</artifactId>
+              <configuration>
+                <files>
+                  <file>${kie.app.templates.mysql}</file>
+                </files>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>postgresql</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>properties-maven-plugin</artifactId>
+              <configuration>
+                <files>
+                  <file>${kie.app.templates.postgresql}</file>
+                </files>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>
