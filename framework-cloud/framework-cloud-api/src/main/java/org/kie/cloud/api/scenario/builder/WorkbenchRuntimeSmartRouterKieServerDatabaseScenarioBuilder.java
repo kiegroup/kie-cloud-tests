@@ -13,16 +13,16 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.api;
+package org.kie.cloud.api.scenario.builder;
 
-import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
 
-public interface DeploymentScenarioBuilderFactory {
-    String getCloudAPIImplementationName();
+/**
+ * Cloud builder for Workbench runtime, Smart router and Kie Server with database in project. Built setup
+ * for WorkbenchRuntimeSmartRouterKieServerDatabaseScenario
+ *
+ * @see WorkbenchRuntimeSmartRouterKieServerDatabaseScenario
+ */
+public interface WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
 
-    WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder();
-    WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder();
-
-    void deleteNamespace(String namespace);
 }

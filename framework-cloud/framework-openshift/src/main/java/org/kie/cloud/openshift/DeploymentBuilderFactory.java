@@ -16,9 +16,11 @@
 package org.kie.cloud.openshift;
 
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchWithKieServerScenarioBuilderImpl;
 
 public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
@@ -40,6 +42,11 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     @Override
     public WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder() {
         return new WorkbenchWithKieServerScenarioBuilderImpl(controller);
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder() {
+        return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl(controller);
     }
 
     @Override
