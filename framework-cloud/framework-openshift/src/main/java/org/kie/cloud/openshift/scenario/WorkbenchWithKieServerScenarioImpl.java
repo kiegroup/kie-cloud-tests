@@ -81,6 +81,15 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
         logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateWorkbenchKieServerDatabase());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
+
+        if (System.getProperty("db.hostname") != null) {
+            /* Parameters for external database */
+            envVariables.put("DB_HOST", System.getProperty("db.hostname"));
+            envVariables.put("DB_DATABASE", System.getProperty("db.name"));
+            envVariables.put("DB_USERNAME", System.getProperty("db.username"));
+            envVariables.put("DB_PASSWORD", System.getProperty("db.password"));
+        }
+
         project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateWorkbenchKieServerDatabase(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl();
@@ -129,10 +138,16 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
             throw new RuntimeException("Malformed secure URL for kie server", e);
         }
 
-        databaseDeployment = new DatabaseDeploymentImpl();
-        databaseDeployment.setOpenShiftController(openshiftController);
-        databaseDeployment.setNamespace(projectName);
-        databaseDeployment.setApplicationName(OpenShiftConstants.getKieApplicationName());
+        if (System.getProperty("db.hostname") == null) {
+            /* Databese deployment in Openshift */
+            databaseDeployment = new DatabaseDeploymentImpl();
+            databaseDeployment.setOpenShiftController(openshiftController);
+            databaseDeployment.setNamespace(projectName);
+            databaseDeployment.setApplicationName(OpenShiftConstants.getKieApplicationName());
+
+            logger.info("Waiting for Database deployment to become ready.");
+            databaseDeployment.waitForScale();
+        }
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
@@ -142,9 +157,6 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
         logger.info("Waiting for Kie server to register itself to the Workbench.");
         KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment);
-
-        logger.info("Waiting for Database deployment to become ready.");
-        databaseDeployment.waitForScale();
     }
 
     @Override
