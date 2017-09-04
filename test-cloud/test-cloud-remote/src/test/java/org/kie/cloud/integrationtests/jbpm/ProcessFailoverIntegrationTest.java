@@ -29,6 +29,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -78,7 +79,7 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
         Instance kieServerInstance = deploymentScenario.getKieServerDeployment().getInstances().iterator().next();
 
         logger.debug("Start process instance");
-        Long longScriptPid = processServicesClient.startProcess(CONTAINER_ID, LONG_SCRIPT_PROCESS_ID, Collections.EMPTY_MAP);
+        Long longScriptPid = processServicesClient.startProcess(CONTAINER_ID, LONG_SCRIPT_PROCESS_ID, Collections.emptyMap());
         assertThat(longScriptPid).isNotNull().isGreaterThan(0L);
         assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
 
@@ -100,7 +101,7 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
         assertProcessVariable(longScriptPid, variableKey, variableValueOne);
 
         logger.debug("Send signal again to continue with process. It was rollbacked.");
-        signalStartLongScript(longScriptPid);
+        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, SIGNAL_NAME, null);
 
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
         assertProcessVariable(longScriptPid, variableKey, variableValueTwo);
@@ -113,7 +114,11 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
 
     private void signalStartLongScript(Long pid) {
         new Thread(() -> {
-            processServicesClient.signalProcessInstance(CONTAINER_ID, pid, SIGNAL_NAME, null);
+            try {
+                processServicesClient.signalProcessInstance(CONTAINER_ID, pid, SIGNAL_NAME, null);
+            } catch (KieServicesHttpException e) {
+                // Expected
+            }
         }).start();
     }
 
