@@ -15,20 +15,24 @@
 
 package org.kie.cloud.integrationtests.https;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.stream.StreamSupport;
+
 import javax.net.ssl.HttpsURLConnection;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
@@ -39,6 +43,13 @@ import org.slf4j.LoggerFactory;
 public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
+
+    private static final String SERVER_ID_PARAMETER = "server-id";
+    private static final String SERVER_NAME_PARAMETER = "server-name";
+    private static final String SERVER_TEMPLATE_PARAMETER = "server-template";
+
+    private static final String SERVER_ID = "KieServerId";
+    private static final String SERVER_NAME = "KieServer";
 
     @Override
     protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
@@ -54,13 +65,13 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
             final HttpGet httpGet = new HttpGet(url.toString());
             try (final CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 // Test that login screen is available
-                Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
                 String responseContent = HttpsUtils.readResponseContent(response);
-                Assertions.assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
+                assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
             }
         } catch (IOException e) {
-            Assertions.fail("Error in downloading workbench login screen using secure connection", e);
+            fail("Error in downloading workbench login screen using secure connection", e);
         }
     }
 
@@ -70,73 +81,74 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
             CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(deploymentScenario.getWorkbenchDeployment().getUsername(),
                     deploymentScenario.getWorkbenchDeployment().getPassword());
             try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-                // Create organizational unit using REST API
-                Assertions.assertThat(createOrganizationalUnit(ORGANIZATION_UNIT_NAME, httpClient)).isTrue();
+                // Create server template using REST API
+                assertThat(createServerTemplate(SERVER_ID, httpClient)).isTrue();
 
-                // Check that organizational unit exists
-                Assertions.assertThat(organizationalUnitExists(ORGANIZATION_UNIT_NAME, httpClient)).isTrue();
+                // Check that server template exists
+                assertThat(serverTemplateExists(SERVER_ID, httpClient)).isTrue();
             }
         } catch (IOException e) {
             throw new RuntimeException("Unable to connect to workbench REST API", e);
         }
     }
 
-    private boolean createOrganizationalUnit(String name, CloseableHttpClient httpClient) {
-        try (CloseableHttpResponse response = httpClient.execute(organizationalUnitCreateRequest(name))) {
-            return (response.getStatusLine().getStatusCode() == HttpsURLConnection.HTTP_ACCEPTED);
+    private boolean createServerTemplate(String name, CloseableHttpClient httpClient) {
+        try (CloseableHttpResponse response = httpClient.execute(serverTemplateCreateRequest(name))) {
+            return (response.getStatusLine().getStatusCode() == HttpsURLConnection.HTTP_CREATED);
         } catch (Exception e) {
-            throw new RuntimeException("Error creating new organizational unit", e);
+            throw new RuntimeException("Error creating new server template", e);
         }
     }
 
-    private boolean organizationalUnitExists(String name, CloseableHttpClient httpClient) {
-        try (final CloseableHttpResponse response = httpClient.execute(organizationalUnitsListRequest(name))) {
-            Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
+    private boolean serverTemplateExists(String name, CloseableHttpClient httpClient) {
+        try (final CloseableHttpResponse response = httpClient.execute(serverTemplatesListRequest(name))) {
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
             String responseContent = HttpsUtils.readResponseContent(response);
-            Assertions.assertThat(responseContent).isNotEmpty();
+            assertThat(responseContent).isNotEmpty();
             Gson gson = new Gson();
-            JsonArray orgUnitsJson = gson.fromJson(responseContent, JsonArray.class);
-            return StreamSupport.stream(orgUnitsJson.spliterator(), false)
+            JsonObject serverTemplatesJson = gson.fromJson(responseContent, JsonObject.class);
+            JsonArray serverTemplatesJsonArray = serverTemplatesJson.get(SERVER_TEMPLATE_PARAMETER).getAsJsonArray();
+            return StreamSupport.stream(serverTemplatesJsonArray.spliterator(), false)
                     .map(x -> x.getAsJsonObject())
-                    .map(o -> o.get("name").getAsString())
+                    .map(o -> o.get(SERVER_ID_PARAMETER).getAsString())
                     .anyMatch(s -> s.equals(name));
         } catch (Exception e) {
-            throw new RuntimeException("Can not obtain list of organizational units", e);
+            throw new RuntimeException("Can not obtain list of server templates", e);
         }
     }
 
-    private HttpPost organizationalUnitCreateRequest(String name) {
+    private HttpPut serverTemplateCreateRequest(String name) {
         try {
-            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), ORGANIZATIONAL_UNIT_REST_REQUEST);
-            final HttpPost request = new HttpPost(url.toString());
+            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), "rest/controller/management/servers/" + name);
+            final HttpPut request = new HttpPut(url.toString());
             request.setHeader("Content-Type", "application/json");
-            request.setEntity(new StringEntity(createOrganizationalUnitJson(name)));
+            request.setEntity(new StringEntity(createServerTemplateJson(name)));
 
             return request;
         } catch (Exception e) {
-            throw new RuntimeException("Error in creating rest request for new organizational unit", e);
+            throw new RuntimeException("Error in creating rest request for new server template", e);
         }
     }
 
-    private HttpGet organizationalUnitsListRequest(String name) {
+    private HttpGet serverTemplatesListRequest(String name) {
         try {
-            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), ORGANIZATIONAL_UNIT_REST_REQUEST);
+            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), "rest/controller/management/servers");
             final HttpGet request = new HttpGet(url.toString());
             request.setHeader("Content-Type", "application/json");
 
             return request;
         } catch (Exception e) {
-            throw new RuntimeException("Error in creating request for list of organizational units", e);
+            throw new RuntimeException("Error in creating request for list of server templates", e);
         }
     }
 
-    private String createOrganizationalUnitJson(String name) {
-        JsonObject organizationalUnit = new JsonObject();
-        organizationalUnit.addProperty("name", ORGANIZATION_UNIT_NAME);
-        organizationalUnit.addProperty("owner", deploymentScenario.getWorkbenchDeployment().getUsername());
+    private String createServerTemplateJson(String name) {
+        JsonObject serverTemplate = new JsonObject();
+        serverTemplate.addProperty(SERVER_ID_PARAMETER, name);
+        serverTemplate.addProperty(SERVER_NAME_PARAMETER, SERVER_NAME);
 
         Gson gson = new Gson();
-        return gson.toJson(organizationalUnit);
+        return gson.toJson(serverTemplate);
     }
 }
