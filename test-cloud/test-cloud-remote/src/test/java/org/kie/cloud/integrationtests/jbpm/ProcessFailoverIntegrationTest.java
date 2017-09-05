@@ -17,21 +17,33 @@ package org.kie.cloud.integrationtests.jbpm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.maven.MavenDeployer;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
@@ -43,92 +55,207 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
+@RunWith(Parameterized.class)
+public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
 
-    protected KieServerControllerClient kieServerControllerClient;
-    protected KieServicesClient kieServicesClient;
-    protected ProcessServicesClient processServicesClient;
-    protected QueryServicesClient queryServicesClient;
+    @Parameterized.Parameter(value = 0)
+    public String testScenarioName;
 
-    private String repositoryName;
+    @Parameterized.Parameter(value = 1)
+    public DeploymentScenario kieServerWithDatabaseDeploymentScenario;
+
+    private static final String CONTROLLER_APPLICATION_NAME = "standalone";
+    private static final String CONTROLLER_NAME_SUFFIX = "-controller";
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        DeploymentSettings controllerSettings = deploymentScenarioFactory.getControllerSettingsBuilder()
+                .withApplicationName(CONTROLLER_APPLICATION_NAME)
+                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                .withKieServerUser(DeploymentConstants.getKieServerUser(), DeploymentConstants.getKieServerPassword())
+                .build();
+
+        DeploymentSettings kieServerMySqlScenario = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
+                .withControllerConnection(CONTROLLER_APPLICATION_NAME + CONTROLLER_NAME_SUFFIX)
+                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        DeploymentSettings kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerPostgreSqlSettingsBuilder()
+                .withControllerConnection(CONTROLLER_APPLICATION_NAME + CONTROLLER_NAME_SUFFIX)
+                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        GenericScenario controllerKieServerMySqlScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withController(controllerSettings)
+                .withKieServer(kieServerMySqlScenario)
+                .build();
+
+        GenericScenario controllerKieServerPostgreSqlScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withController(controllerSettings)
+                .withKieServer(kieServerPostgreSqlScenario)
+                .build();
+
+        return Arrays.asList(new Object[][]{
+            {"Controller + KIE Server + MySql", controllerKieServerMySqlScenario},
+            {"Controller + KIE Server + PostgreSql", controllerKieServerPostgreSqlScenario}
+        });
+    }
+
+    @Override
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return kieServerWithDatabaseDeploymentScenario;
+    }
+
+    private KieServerControllerClient kieServerControllerClient;
+    private KieServicesClient kieServerClient;
+    private ProcessServicesClient processServicesClient;
+    private QueryServicesClient queryServicesClient;
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessFailoverIntegrationTest.class);
 
-    private static final String variableKey = "name";
-    private static final String variableValueOne = "ONE";
-    private static final String variableValueTwo = "TWO";
+    private static final String VARIABLE_KEY = "name";
+    private static final String VARIABLE_VALUE_ONE = "ONE";
+    private static final String VARIABLE_VALUE_TWO = "TWO";
 
-    @Override
-    protected WorkbenchKieServerPersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder().build();
+    @BeforeClass
+    public static void deployMavenProject() {
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before
     public void setUp() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        if (deploymentScenario.getControllerDeployments().isEmpty()) {
+            kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployments().get(0));
+        } else {
+            kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getControllerDeployments().get(0));
+        }
 
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
-
-        kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
-
-        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
-        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
-        queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
-    }
-
-    @After
-    public void tearDown() {
-        gitProvider.deleteGitRepository(repositoryName);
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
+        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
+        queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployments().get(0));
     }
 
     @Test
     public void processFailoverTest() {
-        logger.debug("Register Kie Container to Kie Server");
-        KieServerInfo serverInfo = kieServicesClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION, KieContainerStatus.STARTED);
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        registerKieContainer();
 
         logger.debug("Get Kie Server Instance");
-        Instance kieServerInstance = deploymentScenario.getKieServerDeployment().getInstances().iterator().next();
+        Instance kieServerInstance = deploymentScenario.getKieServerDeployments().get(0).getInstances().iterator().next();
 
-        logger.debug("Start process instance");
-        Long longScriptPid = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.LONG_SCRIPT, Collections.emptyMap());
-        assertThat(longScriptPid).isNotNull().isGreaterThan(0L);
-        assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
+        Long longScriptPid = startProcessInstance(Constants.ProcessId.LONG_SCRIPT);
 
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-        assertProcessVariable(longScriptPid, variableKey, variableValueOne);
+        assertProcessVariable(longScriptPid, VARIABLE_KEY, VARIABLE_VALUE_ONE);
 
         logger.debug("Send signal to continue with process.");
         signalStartLongScript(longScriptPid);
 
         logger.debug("Force delete (Kill) Kie server instance.");
-        deploymentScenario.getKieServerDeployment().deleteInstances(kieServerInstance);
+        deploymentScenario.getKieServerDeployments().get(0).deleteInstances(kieServerInstance);
         logger.debug("Wait for scale");
-        deploymentScenario.getKieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerDeployments().get(0).waitForScale();
 
         logger.debug("Send signal to try complete process. Not able yet.");
         processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_2_NAME, null);
 
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-        assertProcessVariable(longScriptPid, variableKey, variableValueOne);
+        assertProcessVariable(longScriptPid, VARIABLE_KEY, VARIABLE_VALUE_ONE);
 
         logger.debug("Send signal again to continue with process. It was rollbacked.");
         processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_NAME, null);
 
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-        assertProcessVariable(longScriptPid, variableKey, variableValueTwo);
+        assertProcessVariable(longScriptPid, VARIABLE_KEY, VARIABLE_VALUE_TWO);
 
         processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_2_NAME, null);
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
 
-        assertThat(deploymentScenario.getKieServerDeployment().getInstances().iterator().next()).isNotEqualTo(kieServerInstance);
+        assertThat(deploymentScenario.getKieServerDeployments().get(0).getInstances().iterator().next()).isNotEqualTo(kieServerInstance);
+    }
+
+    @Test
+    public void processFailoverRedirectionTest() {
+        registerKieContainer();
+
+        logger.debug("Get Kie Server Instance");
+        Instance kieServerInstance = deploymentScenario.getKieServerDeployments().get(0).getInstances().iterator().next();
+
+        Long longScriptPid = startProcessInstance(Constants.ProcessId.LONG_ASYNC_SCRIPT_PROCESS_ID);
+
+        assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        assertProcessVariable(longScriptPid, VARIABLE_KEY, VARIABLE_VALUE_ONE);
+
+        logger.debug("Send signal to continue with process.");
+        signalStartLongScript(longScriptPid);
+
+        logger.debug("Scale Kie Server to 2");
+        deploymentScenario.getKieServerDeployments().get(0).scale(2);
+        logger.debug("Wait for scale");
+        deploymentScenario.getKieServerDeployments().get(0).waitForScale();
+
+        logger.debug("Force delete (Kill) Kie server instance.");
+        deploymentScenario.getKieServerDeployments().get(0).deleteInstances(kieServerInstance);
+        logger.debug("Wait for scale");
+        deploymentScenario.getKieServerDeployments().get(0).waitForScale();
+
+        waitUntilProcessVariableIsChanged(longScriptPid);
+
+        assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        assertProcessVariable(longScriptPid, VARIABLE_KEY, VARIABLE_VALUE_TWO);
+        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_2_NAME, null);
+        assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
+
+        assertThat(deploymentScenario.getKieServerDeployments().get(0).getInstances()).doesNotContain(kieServerInstance);
+    }
+
+    private void waitUntilProcessVariableIsChanged(Long pid) {
+        LocalDateTime endTime = LocalDateTime.now().plusMinutes(3);
+
+        while (LocalDateTime.now().isBefore(endTime)) {
+            ProcessInstance pi = null;
+            try {
+                pi = processServicesClient.getProcessInstance(CONTAINER_ID, pid, true);
+                if (pi != null && pi.getVariables().containsValue(VARIABLE_VALUE_TWO)) {
+                    return;
+                }
+            } catch (KieServicesHttpException e) {
+                // Expected
+            }
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException ex) {
+                logger.error("Thread sleep error.", ex);
+            }
+        }
+        throw new RuntimeException("Process variable is not changed.");
+    }
+
+    private void registerKieContainer() {
+        logger.debug("Register Kie Container to Kie Server");
+        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
+        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployments().get(0), CONTAINER_ID);
+        WorkbenchUtils.waitForContainerRegistration(kieServerControllerClient, serverInfo.getServerId(), CONTAINER_ID);
+    }
+
+    private Long startProcessInstance(String processInstance) {
+        logger.debug("Start process instance " + processInstance);
+        Long pid = processServicesClient.startProcess(CONTAINER_ID, processInstance, Collections.emptyMap());
+        assertThat(pid).isNotNull().isGreaterThan(0L);
+        assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
+        return pid;
     }
 
     private void signalStartLongScript(Long pid) {
         new Thread(() -> {
             try {
-                ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
+                ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
                 processClient.signalProcessInstance(CONTAINER_ID, pid, Constants.Signal.SIGNAL_NAME, null);
             } catch (KieServicesHttpException e) {
                 // Expected

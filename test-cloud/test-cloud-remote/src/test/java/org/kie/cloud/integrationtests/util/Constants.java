@@ -22,6 +22,7 @@ public class Constants {
         public static final String SIGNALTASK = "definition-project.signaltask";
         public static final String SIGNALUSERTASK = "definition-project.signalusertask";
         public static final String LONG_SCRIPT = "definition-project.longScript";
+        public static final String LONG_ASYNC_SCRIPT_PROCESS_ID = "definition-project.longAsyncScript";
         public static final String SIMPLE_RULEFLOW = "simple-ruleflow";
         public static final String LOG = "definition-project.logProcess";
         public static final String TIMER = "timer-start";
