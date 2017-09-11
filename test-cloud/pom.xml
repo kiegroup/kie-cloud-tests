@@ -27,7 +27,6 @@
     <kie.app.templates.general>${project.parent.build.resources[0].directory}/templates-general.properties</kie.app.templates.general>
     <kie.app.templates.mysql>${project.parent.build.resources[0].directory}/templates-mysql.properties</kie.app.templates.mysql>
     <kie.app.templates.postgresql>${project.parent.build.resources[0].directory}/templates-postgresql.properties</kie.app.templates.postgresql>
-    <kie.qe.app.template.external.database>file:///home/jpetrlik/OpenshiftPlayground/bpmsuite70-full-customdb-persistent.json</kie.qe.app.template.external.database>
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
