@@ -70,8 +70,4 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
             RouterUtil.waitForRouter(getUrl());
         }
     }
-
-    @Override public boolean ready() {
-        return getInstances().size() > 0;
-    }
 }

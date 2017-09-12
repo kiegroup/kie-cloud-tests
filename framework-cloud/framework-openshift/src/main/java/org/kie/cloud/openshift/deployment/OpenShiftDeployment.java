@@ -66,6 +66,11 @@ public abstract class OpenShiftDeployment implements Deployment {
         openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().scalePods(instances);
     }
 
+    @Override
+    public boolean ready() {
+        return getInstances().size() > 0;
+    }
+
     protected URL getHttpRouteUrl(String serviceName) {
         return getRouteUrl("http", serviceName);
     }

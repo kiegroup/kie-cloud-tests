@@ -105,9 +105,4 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
             RouterUtil.waitForRouter(getUrl());
         }
     }
-
-    @Override public boolean ready() {
-        throw new RuntimeException("Not implemented");
-    }
-
 }
