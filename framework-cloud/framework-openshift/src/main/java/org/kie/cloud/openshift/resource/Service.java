@@ -59,8 +59,8 @@ public interface Service {
     public DeploymentConfig getDeploymentConfig();
 
     /**
-     * Create a route for the service placed in OpenShift Central CI.
-     * Route URL is created in specific format: &lt;service&gt;.project.openshiftdomain
+     * Create a route for the service placed in OpenShift.
+     * Route URL is created in specific format: &lt;service&gt;.&lt;route subdomain&gt;
      *
      * @return Created Route.
      */

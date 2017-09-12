@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift;
 
-import java.util.HashMap;
-
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +27,6 @@ import org.kie.cloud.openshift.resource.impl.RouteImpl;
 public class RouteIntegrationTest extends OpenShiftIntegrationTestBase {
 
     private static final String WILDFLY_SERVICE = "wildfly-service";
-    private static final String WILDFLY_IMAGE = "jboss/wildfly:10.1.0.Final";
 
     private Project project;
 
@@ -46,11 +43,10 @@ public class RouteIntegrationTest extends OpenShiftIntegrationTestBase {
     @Test
     public void testRetrieveRouteHost() {
         Service wildflyService = project.createService(WILDFLY_SERVICE);
-        wildflyService.createDeploymentConfig(WILDFLY_IMAGE, new HashMap<String, String>());
         Route wildflyRoute = wildflyService.createRoute();
 
         String wildflyHost = wildflyRoute.getRouteHost();
-        Assertions.assertThat(wildflyHost).isEqualTo("wildfly-service.project.openshiftdomain");
+        Assertions.assertThat(wildflyHost).startsWith("wildfly-service");
     }
 
     @Test
