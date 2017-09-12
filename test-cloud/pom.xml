@@ -27,7 +27,6 @@
     <kie.app.templates.general>${project.parent.build.resources[0].directory}/templates-general.properties</kie.app.templates.general>
     <kie.app.templates.mysql>${project.parent.build.resources[0].directory}/templates-mysql.properties</kie.app.templates.mysql>
     <kie.app.templates.postgresql>${project.parent.build.resources[0].directory}/templates-postgresql.properties</kie.app.templates.postgresql>
-
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
@@ -87,6 +86,10 @@
               <kie.app.template.kie-server>${kie.app.template.kie-server}</kie.app.template.kie-server>
               <kie.app.template.kie-server.database>${kie.app.template.kie-server.database}</kie.app.template.kie-server.database>
               <kie.app.template.workbench-monitoring.smartrouter>${kie.app.template.workbench-monitoring.smartrouter}</kie.app.template.workbench-monitoring.smartrouter>
+              <db.hostname>${db.hostname}</db.hostname>
+              <db.name>${db.name}</db.name>
+              <db.username>${db.username}</db.username>
+              <db.password>${db.password}</db.password>
               <kie.app.name>${kie.app.name}</kie.app.name>
               <git.provider>${git.provider}</git.provider>
               <gitlab.url>${gitlab.url}</gitlab.url>
@@ -138,6 +141,29 @@
               <configuration>
                 <files>
                   <file>${kie.app.templates.postgresql}</file>
+                </files>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>custom-parameters</id>
+      <activation>
+        <property>
+          <name>custom.parameters.file</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>properties-maven-plugin</artifactId>
+              <configuration>
+                <files>
+                  <file>${custom.parameters.file}</file>
                 </files>
               </configuration>
             </plugin>
