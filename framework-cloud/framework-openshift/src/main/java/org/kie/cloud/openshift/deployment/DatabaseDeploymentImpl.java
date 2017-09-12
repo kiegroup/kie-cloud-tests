@@ -120,9 +120,4 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
         databaseInstance.setName(pod.getMetadata().getName());
         return databaseInstance;
     }
-
-    @Override
-    public boolean ready() {
-        return getInstances().size() > 0;
-    }
 }

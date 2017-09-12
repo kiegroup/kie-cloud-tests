@@ -106,8 +106,4 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
             RouterUtil.waitForRouter(getUrl());
         }
     }
-
-    @Override public boolean ready() {
-        throw new RuntimeException("Not implemented");
-    }
 }
