@@ -126,8 +126,7 @@ public class ServiceImpl implements Service {
 
     @Override
     public RouteImpl createRoute() {
-        String route = serviceName + OpenShiftResourceConstants.CENTRAL_CI_ROUTE_SUFFIX;
-        return createRoute(route);
+        return createRoute(null);
     }
 
     @Override

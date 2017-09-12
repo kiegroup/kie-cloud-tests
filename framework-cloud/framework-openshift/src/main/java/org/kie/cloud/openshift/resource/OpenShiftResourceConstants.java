@@ -30,7 +30,6 @@ public class OpenShiftResourceConstants {
     public static final String DEPLOYMENT_CONFIG_LABEL = "deploymentConfig";
 
     // Route constants
-    public static final String CENTRAL_CI_ROUTE_SUFFIX = ".project.openshiftdomain";
     public static final String ROUTE_REDIRECT_COMPONENT_TYPE = "Service";
     public static final int ROUTE_REDIRECT_DEFAULT_WEIGHT = 100;
 
