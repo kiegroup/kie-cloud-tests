@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.scenario;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -91,21 +89,6 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         workbenchDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
         workbenchDeployment.setSecureServiceName(OpenShiftConstants.getKieApplicationName());
 
-        String routeHostWorkbench = project.getService(workbenchDeployment.getServiceName()).getRoute().getRouteHost();
-        String urlWorkbench = "http://" + routeHostWorkbench;
-        try {
-            workbenchDeployment.setUrl(new URL(urlWorkbench));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed URL for workbench", e);
-        }
-        String secureRouteHostWorkbench = project.getService(workbenchDeployment.getSecureServiceName()).getRoute().getRouteHost();
-        String secureUrlWorkbench = "https://" + secureRouteHostWorkbench;
-        try {
-            workbenchDeployment.setSecureUrl(new URL(secureUrlWorkbench));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed secure URL for workbench", e);
-        }
-
         kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);
         kieServerDeployment.setNamespace(projectName);
@@ -113,21 +96,6 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
         kieServerDeployment.setSecureServiceName(OpenShiftConstants.getKieApplicationName());
-
-        String routeHostKieServer = project.getService(kieServerDeployment.getServiceName()).getRoute().getRouteHost();
-        String urlKieServer = "http://" + routeHostKieServer;
-        try {
-            kieServerDeployment.setUrl(new URL(urlKieServer));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed URL for kie server", e);
-        }
-        String secureRouteHostKieServer = project.getService(kieServerDeployment.getSecureServiceName()).getRoute().getRouteHost();
-        String secureUrlKieServer = "https://" + secureRouteHostKieServer;
-        try {
-            kieServerDeployment.setSecureUrl(new URL(secureUrlKieServer));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed secure URL for kie server", e);
-        }
 
         databaseDeployment = new DatabaseDeploymentImpl();
         databaseDeployment.setOpenShiftController(openshiftController);

@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.resource.impl;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,14 +33,15 @@ import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.resource.Route;
 import org.kie.cloud.openshift.resource.Service;
-
-import static java.util.stream.Collectors.toList;
 
 public class ProjectImpl implements Project {
 
     private OpenShiftClient client;
     private String projectName;
+
+    private static String defaultRoutingSubdomain = null;
 
     public ProjectImpl(OpenShiftClient client, String projectName) {
         this.client = client;
@@ -132,5 +135,22 @@ public class ProjectImpl implements Project {
     public void createResources(InputStream inputStream) {
         KubernetesList resourceList = client.lists().inNamespace(projectName).load(inputStream).get();
         client.lists().inNamespace(projectName).create(resourceList);
+    }
+
+    @Override
+    public String getDefaultRoutingSubdomain() {
+        if (defaultRoutingSubdomain == null) {
+            final String tempServiceName = "temp-service";
+            Service tempService = createService(tempServiceName);
+            Route tempRoute = tempService.createRoute();
+
+            String tempRouteHost = tempRoute.getRouteHost();
+            // Remove service name and project from the route host, the rest is the subdomain
+            defaultRoutingSubdomain = tempRouteHost.replace(tempServiceName + "-" + projectName, "");
+
+            tempRoute.delete();
+            tempService.delete();
+        }
+        return defaultRoutingSubdomain;
     }
 }
