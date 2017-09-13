@@ -31,11 +31,10 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
     private String serviceName;
 
     @Override public URL getUrl() {
+        if (url == null) {
+            url = getHttpRouteUrl(serviceName);
+        }
         return url;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
     }
 
     @Override public List<Instance> getInstances() {

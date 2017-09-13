@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.scenario;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -86,8 +84,8 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateConsoleSmartRouter(), envVariables);
 
-        workbenchDeployment = createWorkbenchDeployment(project, projectName);
-        smartRouterDeployment = createSmartRouterDeployment(project, projectName);
+        workbenchDeployment = createWorkbenchDeployment(projectName);
+        smartRouterDeployment = createSmartRouterDeployment(projectName);
 
         logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateKieServerDatabase());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
@@ -95,7 +93,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PORT, Integer.toString(workbenchDeployment.getUrl().getPort()));
         project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateKieServerDatabase(), envVariables);
 
-        kieServerDeployment = createKieServerDeployment(project, projectName);
+        kieServerDeployment = createKieServerDeployment(projectName);
         databaseDeployment = createDatabaseDeployment(projectName);
 
         logger.info("Waiting for Workbench deployment to become ready.");
@@ -158,7 +156,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         return Arrays.asList(workbenchDeployment, smartRouterDeployment, kieServerDeployment, databaseDeployment);
     }
 
-    private WorkbenchDeploymentImpl createWorkbenchDeployment(Project workbenchProject, String namespace) {
+    private WorkbenchDeploymentImpl createWorkbenchDeployment(String namespace) {
         WorkbenchDeploymentImpl workbenchDeployment = new WorkbenchDeploymentImpl();
         workbenchDeployment.setOpenShiftController(openshiftController);
         workbenchDeployment.setNamespace(namespace);
@@ -166,49 +164,25 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
         workbenchDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
 
-        String routeHostWorkbench = workbenchProject.getService(workbenchDeployment.getServiceName()).getRoute().getRouteHost();
-        String urlWorkbench = "http://" + routeHostWorkbench;
-        try {
-            workbenchDeployment.setUrl(new URL(urlWorkbench));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed URL for workbench", e);
-        }
-
         return workbenchDeployment;
     }
 
-    private SmartRouterDeployment createSmartRouterDeployment(Project smartRouterProject, String namespace) {
+    private SmartRouterDeployment createSmartRouterDeployment(String namespace) {
         SmartRouterDeploymentImpl smartRouterDeployment = new SmartRouterDeploymentImpl();
         smartRouterDeployment.setOpenShiftController(openshiftController);
         smartRouterDeployment.setNamespace(namespace);
         smartRouterDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
 
-        String routeHostSmartRouter = smartRouterProject.getService(smartRouterDeployment.getServiceName()).getRoute().getRouteHost();
-        String urlSmartRouter = "http://" + routeHostSmartRouter;
-        try {
-            smartRouterDeployment.setUrl(new URL(urlSmartRouter));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed URL for workbench", e);
-        }
-
         return smartRouterDeployment;
     }
 
-    private KieServerDeploymentImpl createKieServerDeployment(Project kieServerProject, String namespace) {
+    private KieServerDeploymentImpl createKieServerDeployment(String namespace) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);
         kieServerDeployment.setNamespace(namespace);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
-
-        String routeHostKieServer = kieServerProject.getService(kieServerDeployment.getServiceName()).getRoute().getRouteHost();
-        String urlKieServer = "http://" + routeHostKieServer;
-        try {
-            kieServerDeployment.setUrl(new URL(urlKieServer));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed URL for kie server", e);
-        }
 
         return kieServerDeployment;
     }

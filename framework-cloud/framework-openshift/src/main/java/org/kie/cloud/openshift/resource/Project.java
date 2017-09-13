@@ -92,4 +92,12 @@ public interface Project {
      * @param inputStream Input stream with resource list to be created
      */
     public void createResources(InputStream inputStream);
+
+    /**
+     * Get default subdomain configured for OpenShift instance.
+     * This value is used for assuming route URL before the route is created.
+     *
+     * @return Default routing subdomain.
+     */
+    public String getDefaultRoutingSubdomain();
 }

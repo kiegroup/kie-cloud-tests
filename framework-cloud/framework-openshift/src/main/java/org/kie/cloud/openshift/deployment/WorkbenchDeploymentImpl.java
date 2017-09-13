@@ -35,19 +35,17 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
     private String secureServiceName;
 
     @Override public URL getUrl() {
+        if (url == null) {
+            url = getHttpRouteUrl(serviceName);
+        }
         return url;
     }
 
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
     @Override public URL getSecureUrl() {
+        if (secureUrl == null) {
+            secureUrl = getHttpsRouteUrl(secureServiceName);
+        }
         return secureUrl;
-    }
-
-    public void setSecureUrl(URL secureUrl) {
-        this.secureUrl = secureUrl;
     }
 
     @Override public String getUsername() {

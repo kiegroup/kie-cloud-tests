@@ -15,12 +15,15 @@
  */
 package org.kie.cloud.openshift.deployment;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.resource.Service;
 
 public abstract class OpenShiftDeployment implements Deployment {
 
@@ -63,4 +66,45 @@ public abstract class OpenShiftDeployment implements Deployment {
         openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().scalePods(instances);
     }
 
+    protected URL getHttpRouteUrl(String serviceName) {
+        return getRouteUrl("http", serviceName);
+    }
+
+    protected URL getHttpsRouteUrl(String serviceName) {
+        return getRouteUrl("https", serviceName);
+    }
+
+    private URL getRouteUrl(String protocol, String serviceName) {
+        URL url;
+        Service service = openShiftController.getProject(namespace).getService(serviceName);
+
+        String routeHost = null;
+        if(service == null) {
+            // Service doesn't exist, create URL using default subdomain
+            String defaultRoutingSubdomain = openShiftController.getProject(namespace).getDefaultRoutingSubdomain();
+            routeHost = getServiceName() + "-" + namespace + defaultRoutingSubdomain;
+        } else {
+            routeHost = service.getRoute().getRouteHost();
+        }
+        String urlValue = protocol + "://" + routeHost + ":" + retrievePort(protocol);
+
+        try {
+            url = new URL(urlValue.toString());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return url;
+    }
+
+    private String retrievePort(String protocol) {
+        switch (protocol) {
+            case "http":
+                return "80";
+            case "https":
+                return "443";
+            default:
+                throw new IllegalArgumentException("Unrecognized protocol '" + protocol + "'");
+        }
+    }
 }
