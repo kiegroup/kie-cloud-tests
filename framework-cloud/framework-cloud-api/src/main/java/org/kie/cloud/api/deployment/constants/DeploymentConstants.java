@@ -32,6 +32,7 @@ public class DeploymentConstants implements Constants {
 
     public static final String DATABASE_HOST = "db.hostname";
     public static final String DATABASE_NAME = "database.name";
+    public static final String EXTERNAL_DATABASE_NAME = "db.name";
     public static final String DATABASE_USERNAME = "db.username";
     public static final String DATABASE_PASSWORD = "db.password";
 
@@ -57,6 +58,10 @@ public class DeploymentConstants implements Constants {
 
     public static String getDatabaseName() {
         return System.getProperty(DATABASE_NAME);
+    }
+
+    public static String getExternalDatabaseName() {
+        return System.getProperty(EXTERNAL_DATABASE_NAME);
     }
 
     public static String getDatabaseUsername() {

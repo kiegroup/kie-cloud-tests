@@ -72,10 +72,10 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     public void cleanEnvironment() {
         if (deploymentScenario != null) {
             deploymentScenario.undeploy();
-        }
 
-        if (gitProvider == null) {
-            gitProvider.deleteGitRepository(deploymentScenario.getNamespace());
+            if (gitProvider != null) {
+                gitProvider.deleteGitRepository(deploymentScenario.getNamespace());
+            }
         }
     }
 
