@@ -40,6 +40,11 @@ public class OpenShiftTemplateConstants {
     public static final String IMAGE_STREAM_NAMESPACE = "IMAGE_STREAM_NAMESPACE";
     public static final String APPLICATION_NAME = "APPLICATION_NAME";
 
+    public static final String DB_HOST = "DB_HOST";
+    public static final String DB_DATABASE = "DB_DATABASE";
+    public static final String DB_USERNAME = "DB_USERNAME";
+    public static final String DB_PASSWORD = "DB_PASSWORD";
+
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTP = "BUSINESS_CENTRAL_HOSTNAME_HTTP";
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";
     public static final String EXECUTION_SERVER_HOSTNAME_HTTP = "EXECUTION_SERVER_HOSTNAME_HTTP";

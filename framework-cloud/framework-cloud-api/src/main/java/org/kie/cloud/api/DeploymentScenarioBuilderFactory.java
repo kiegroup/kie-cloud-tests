@@ -15,6 +15,8 @@
 
 package org.kie.cloud.api;
 
+import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
+import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 
@@ -23,6 +25,7 @@ public interface DeploymentScenarioBuilderFactory {
 
     WorkbenchWithKieServerScenarioBuilder getWorkbenchWithKieServerScenarioBuilder();
     WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder();
+    KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder();
 
     void deleteNamespace(String namespace);
 }
