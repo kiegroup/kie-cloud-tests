@@ -47,6 +47,10 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE = "kie.app.template.workbench.kie-server.database";
     /**
+     * URL pointing to OpenShift template file containing Kie server and external database.
+     */
+    public static final String KIE_APP_TEMPLATE_KIE_SERVER_DATABASE_EXTERNAL = "kie.app.template.kie-server.database.external";
+    /**
      * URL pointing to OpenShift template file containing just Kie server.
      */
     public static final String KIE_APP_TEMPLATE_KIE_SERVER = "kie.app.template.kie-server";
@@ -93,6 +97,9 @@ public class OpenShiftConstants implements Constants {
 
     public static String getKieAppTemplateKieServerDatabase() {
         return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER_DATABASE);
+    }
+    public static String getKieAppTemplateKieServerDatabaseExternal() {
+        return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER_DATABASE_EXTERNAL);
     }
 
     public static String getKieAppTemplateConsoleSmartRouter() {
