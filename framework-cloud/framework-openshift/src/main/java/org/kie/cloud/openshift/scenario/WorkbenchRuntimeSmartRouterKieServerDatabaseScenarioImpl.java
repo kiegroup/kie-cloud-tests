@@ -35,7 +35,7 @@ import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
-import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
 
     private OpenShiftController openshiftController;
     private String projectName;
-    private WorkbenchDeploymentImpl workbenchDeployment;
+    private WorkbenchDeployment workbenchRuntimeDeployment;
     private SmartRouterDeployment smartRouterDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
@@ -74,6 +74,11 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         logger.info("Creating project " + projectName);
         Project project = openshiftController.createProject(projectName);
 
+        workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(projectName);
+        smartRouterDeployment = createSmartRouterDeployment(projectName);
+        kieServerDeployment = createKieServerDeployment(projectName);
+        databaseDeployment = createDatabaseDeployment(projectName);
+
         logger.info("Creating secrets from " + OpenShiftConstants.getKieAppSecret());
         project.createResources(OpenShiftConstants.getKieAppSecret());
 
@@ -82,22 +87,22 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
 
         logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateConsoleSmartRouter());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_HOST, workbenchRuntimeDeployment.getUrl().getHost());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PORT, Integer.toString(workbenchRuntimeDeployment.getUrl().getPort()));
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, workbenchRuntimeDeployment.getUsername());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, workbenchRuntimeDeployment.getPassword());
         project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateConsoleSmartRouter(), envVariables);
-
-        workbenchDeployment = createWorkbenchDeployment(projectName);
-        smartRouterDeployment = createSmartRouterDeployment(projectName);
 
         logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateKieServerDatabase());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_HOST, workbenchDeployment.getUrl().getHost());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PORT, Integer.toString(workbenchDeployment.getUrl().getPort()));
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOST, kieServerDeployment.getUrl().getHost());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PORT, Integer.toString(kieServerDeployment.getUrl().getPort()));
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_HOST, smartRouterDeployment.getUrl().getHost());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_PORT, Integer.toString(smartRouterDeployment.getUrl().getPort()));
         project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateKieServerDatabase(), envVariables);
 
-        kieServerDeployment = createKieServerDeployment(projectName);
-        databaseDeployment = createDatabaseDeployment(projectName);
-
         logger.info("Waiting for Workbench deployment to become ready.");
-        workbenchDeployment.waitForScale();
+        workbenchRuntimeDeployment.waitForScale();
 
         logger.info("Waiting for Smart router deployment to become ready.");
         smartRouterDeployment.waitForScale();
@@ -106,7 +111,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         kieServerDeployment.waitForScale();
 
         logger.info("Waiting for Kie server to register itself to the Workbench.");
-        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment);
+        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment);
 
         logger.info("Waiting for Database deployment to become ready.");
         databaseDeployment.waitForScale();
@@ -132,8 +137,8 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
     }
 
     @Override
-    public WorkbenchDeployment getWorkbenchDeployment() {
-        return workbenchDeployment;
+    public WorkbenchDeployment getWorkbenchRuntimeDeployment() {
+        return workbenchRuntimeDeployment;
     }
 
     @Override
@@ -153,18 +158,18 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
 
     @Override
     public List<Deployment> getDeployments() {
-        return Arrays.asList(workbenchDeployment, smartRouterDeployment, kieServerDeployment, databaseDeployment);
+        return Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerDeployment, databaseDeployment);
     }
 
-    private WorkbenchDeploymentImpl createWorkbenchDeployment(String namespace) {
-        WorkbenchDeploymentImpl workbenchDeployment = new WorkbenchDeploymentImpl();
-        workbenchDeployment.setOpenShiftController(openshiftController);
-        workbenchDeployment.setNamespace(namespace);
-        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
-        workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
-        workbenchDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
+    private WorkbenchDeployment createWorkbenchRuntimeDeployment(String namespace) {
+        WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl();
+        workbenchRuntimeDeployment.setOpenShiftController(openshiftController);
+        workbenchRuntimeDeployment.setNamespace(namespace);
+        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
+        workbenchRuntimeDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
 
-        return workbenchDeployment;
+        return workbenchRuntimeDeployment;
     }
 
     private SmartRouterDeployment createSmartRouterDeployment(String namespace) {

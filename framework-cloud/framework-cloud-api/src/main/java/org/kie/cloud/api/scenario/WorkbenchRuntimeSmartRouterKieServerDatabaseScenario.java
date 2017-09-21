@@ -31,7 +31,7 @@ public interface WorkbenchRuntimeSmartRouterKieServerDatabaseScenario extends De
      * @return WorkbenchDeployment
      * @see WorkbenchDeployment
      */
-    WorkbenchDeployment getWorkbenchDeployment();
+    WorkbenchDeployment getWorkbenchRuntimeDeployment();
 
     /**
      * Return Smart router deployment.
