@@ -16,6 +16,7 @@
 package org.kie.cloud.git;
 
 import java.io.File;
+import java.util.UUID;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
@@ -26,6 +27,13 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.kie.cloud.git.constants.GitConstants;
 
 public abstract class AbstractGitProvider implements GitProvider {
+
+    @Override
+    public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
+        String repoName = repositoryPrefixName + "-" + UUID.randomUUID().toString().substring(0, 4);
+        createGitRepository(repoName, repositoryPath);
+        return repoName;
+    }
 
     protected void pushToGitRepository(String httpUrl, String repositoryPath) throws Exception {
         Git git = Git.init().setDirectory(new File(repositoryPath)).call();
