@@ -19,17 +19,23 @@ public class OpenShiftTemplateConstants {
 
     public static final String KIE_ADMIN_USER = "KIE_ADMIN_USER";
     public static final String KIE_ADMIN_PWD = "KIE_ADMIN_PWD";
+
     public static final String KIE_SERVER_USER = "KIE_SERVER_USER";
     public static final String KIE_SERVER_PWD = "KIE_SERVER_PWD";
+    public static final String KIE_SERVER_HOST = "KIE_SERVER_HOST";
+    public static final String KIE_SERVER_PORT = "KIE_SERVER_PORT";
 
     public static final String KIE_SERVER_PERSISTENCE_DIALECT = "KIE_SERVER_PERSISTENCE_DIALECT";
     public static final String KIE_SERVER_PERSISTENCE_DS = "KIE_SERVER_PERSISTENCE_DS";
     public static final String KIE_SERVER_PERSISTENCE_TM = "KIE_SERVER_PERSISTENCE_TM";
 
-    public static final String KIE_SERVER_HOST = "KIE_SERVER_HOST";
-    public static final String KIE_SERVER_PORT = "KIE_SERVER_PORT";
     public static final String KIE_SERVER_CONTROLLER_HOST = "KIE_SERVER_CONTROLLER_HOST";
     public static final String KIE_SERVER_CONTROLLER_PORT = "KIE_SERVER_CONTROLLER_PORT";
+    public static final String KIE_SERVER_CONTROLLER_USER = "KIE_SERVER_CONTROLLER_USER";
+    public static final String KIE_SERVER_CONTROLLER_PWD = "KIE_SERVER_CONTROLLER_PWD";
+
+    public static final String KIE_SERVER_ROUTER_HOST = "KIE_SERVER_ROUTER_HOST";
+    public static final String KIE_SERVER_ROUTER_PORT = "KIE_SERVER_ROUTER_PORT";
 
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
