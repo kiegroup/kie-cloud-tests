@@ -15,6 +15,10 @@
 
 package org.kie.cloud.openshift.deployment;
 
+import java.io.ByteArrayOutputStream;
+
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
+import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.WorkbenchInstance;
 import org.kie.cloud.openshift.OpenShiftController;
 
@@ -30,6 +34,22 @@ public class WorkbenchRuntimeInstanceImpl implements WorkbenchInstance {
 
     @Override public String getNamespace() {
         return namespace;
+    }
+
+    @Override public CommandExecutionResult runCommand(String... command) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ByteArrayOutputStream error = new ByteArrayOutputStream();
+
+        CommandExecutionResult commandExecutionResult = new CommandExecutionResult();
+        commandExecutionResult.setOutput(output);
+        commandExecutionResult.setError(error);
+
+        ExecWatch execWatch = openShiftController.getClient().pods().inNamespace(namespace).withName(podName)
+                .writingOutput(output)
+                .writingError(error)
+                .exec(command);
+
+        return commandExecutionResult;
     }
 
     public void setNamespace(String namespace) {

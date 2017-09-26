@@ -15,9 +15,13 @@
 
 package org.kie.cloud.openshift.deployment;
 
+import java.io.ByteArrayOutputStream;
+
 import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
+import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.WorkbenchInstance;
 import org.kie.cloud.openshift.OpenShiftController;
@@ -58,5 +62,21 @@ public class WorkbenchInstanceImpl implements WorkbenchInstance {
 
     @Override public String getLogs() {
         return openShiftController.getClient().pods().inNamespace(namespace).withName(podName).getLog();
+    }
+
+    @Override public CommandExecutionResult runCommand(String... command) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ByteArrayOutputStream error = new ByteArrayOutputStream();
+
+        CommandExecutionResult commandExecutionResult = new CommandExecutionResult();
+        commandExecutionResult.setOutput(output);
+        commandExecutionResult.setError(error);
+
+        ExecWatch execWatch = openShiftController.getClient().pods().inNamespace(namespace).withName(podName)
+                .writingOutput(output)
+                .writingError(error)
+                .exec(command);
+
+        return commandExecutionResult;
     }
 }

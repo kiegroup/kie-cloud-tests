@@ -1,4 +1,4 @@
-package org.kie.cloud.integrationtests.smoke;
+package org.kie.cloud.integrationtests.probe;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
