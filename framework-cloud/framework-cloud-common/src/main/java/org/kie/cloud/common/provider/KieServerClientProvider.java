@@ -16,8 +16,12 @@
 package org.kie.cloud.common.provider;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ServiceResponse;
@@ -35,6 +39,21 @@ public class KieServerClientProvider {
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment) {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieServerDeployment.getUrl().toString() + "/services/rest/server",
                 kieServerDeployment.getUsername(), kieServerDeployment.getPassword(), KIE_SERVER_TIMEOUT);
+        KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
+        return kieServerClient;
+    }
+
+    public static KieServicesClient getSmartRouterClient(SmartRouterDeployment smartRouterDeployment, String userName, String password) {
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(smartRouterDeployment.getUrl().toString(),
+                userName, password, KIE_SERVER_TIMEOUT);
+        List<String> capabilities = Arrays.asList(KieServerConstants.CAPABILITY_BPM,
+                KieServerConstants.CAPABILITY_BPM_QUERIES,
+                KieServerConstants.CAPABILITY_BPM_UI,
+                KieServerConstants.CAPABILITY_BRM,
+                KieServerConstants.CAPABILITY_BRP,
+                KieServerConstants.CAPABILITY_CASE,
+                KieServerConstants.CAPABILITY_DMN);
+        configuration.setCapabilities(capabilities);
         KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
         return kieServerClient;
     }
