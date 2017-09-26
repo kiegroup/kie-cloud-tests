@@ -31,14 +31,14 @@ public class KieServerControllerClientProvider {
     }
 
     /**
-     * Wait until any server template is created in controller.
+     * Wait until server templates are created in controller.
      */
-    public static void waitForServerTemplateCreation(WorkbenchDeployment workbenchDeployment) {
+    public static void waitForServerTemplateCreation(WorkbenchDeployment workbenchDeployment, int numberOfServerTemplates) {
         Instant timeoutTime = Instant.now().plusSeconds(30);
         while (Instant.now().isBefore(timeoutTime)) {
 
             Collection<ServerTemplate> serverTemplates = getKieServerMgmtControllerClient(workbenchDeployment).listServerTemplates();
-            if(!serverTemplates.isEmpty()) {
+            if(serverTemplates.size() == numberOfServerTemplates) {
                 return;
             }
 
