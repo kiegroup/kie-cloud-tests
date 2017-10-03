@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.server.api.model.KieContainerResource;
@@ -55,16 +56,21 @@ public class KieServerS2ISmokeIntegrationTest extends AbstractCloudIntegrationTe
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2ISmokeRepository", PROJECT_SOURCE_FOLDER);
 
+        DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                .build();
+
         return deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServerS2I(KIE_CONTAINER_DEPLOYMENT, gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                .withKieServer(kieServerS2Isettings)
                 .build();
     }
 
     @Before
     public void setUp() {
-        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
-        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
-        taskServicesClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
+        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
+        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
+        taskServicesClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployments().get(0));
     }
 
     @After

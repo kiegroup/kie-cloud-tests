@@ -16,50 +16,24 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 
 public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<GenericScenario> {
 
     /**
-     * Return setup builder with configuration for Kie Server S2I.
+     * Return scenario Builder with added Kie Server deployment into scenario.
      *
-     * @param kieContainerDeployment KIE Server Container deployment
-     * configuration in format:
-     * containerId=groupId:artifactId:version|c2=g2:a2:v2
-     * @param gitRepoUrl Git Repository URL.
-     * @param gitReference Git branch/tag reference.
-     * @param gitContextDir Path within Git project to build; empty for root
-     * project directory.
-     * @return Builder with configured Kie Server S2I.
+     * @param kieServerSettings deployment settinfs for Kie Server.
+     * @return Builder
      */
-    GenericScenarioBuilder withKieServerS2I(String kieContainerDeployment, String gitRepoUrl, String gitReference, String gitContextDir);
+    GenericScenarioBuilder withKieServer(DeploymentSettings kieServerSettings);
 
     /**
-     * Return setup builder with configuration for Kie Server S2I.
+     * Return scenario Builder with added Workbench deployment into scenario.
      *
-     * @param managedMode Set to true to connect Kie Server to Controller.
-     * @param connectToSmartRouter Set to true to connect Kie Server to Smart router,
-     * @param kieContainerDeployment KIE Server Container deployment
-     * configuration in format:
-     * containerId=groupId:artifactId:version|c2=g2:a2:v2
-     * @param gitRepoUrl Git Repository URL.
-     * @param gitReference Git branch/tag reference.
-     * @param gitContextDir Path within Git project to build; empty for root
-     * project directory.
-     * @return Builder with configured Kie Server S2I.
+     * @param workbenchSettings
+     * @return Builder
      */
-    GenericScenarioBuilder withKieServerS2I(boolean managedMode, boolean connectToSmartRouter, String kieContainerDeployment, String gitRepoUrl, String gitReference, String gitContextDir);
+    GenericScenarioBuilder withWorkbench(DeploymentSettings workbenchSettings);
 
-    /**
-     * Return setup builder with configured external datavase for Kie Server.
-     *
-     * @return Builder with configured external DB for the Kie server.
-     */
-    GenericScenarioBuilder withExternalDatabaseForKieServer();
-
-    /**
-     * Return setup builder with configuration for Workbench.
-     *
-     * @return Builder with configured Workbench,
-     */
-    GenericScenarioBuilder withWorkbench();
 }

@@ -31,7 +31,7 @@ public abstract class AbstractGitProvider implements GitProvider {
     @Override
     public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
         String repoName = repositoryPrefixName + "-" + UUID.randomUUID().toString().substring(0, 4);
-        createGitRepository(repoName, repositoryPath);
+        createGitRepository(repoName, ClassLoader.class.getResource(repositoryPath).getFile());
         return repoName;
     }
 

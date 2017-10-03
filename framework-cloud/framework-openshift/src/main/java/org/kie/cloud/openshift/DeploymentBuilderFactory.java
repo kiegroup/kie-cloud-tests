@@ -20,12 +20,16 @@ import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
+import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
+import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchWithKieServerScenarioBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.KieServerS2ISettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.WorkbenchSettingsBuilderImpl;
 
 public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
 
@@ -60,6 +64,16 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     @Override
     public GenericScenarioBuilder getGenericScenarioBuilder() {
         return new GenericScenarioBuilderImpl(controller);
+    }
+
+    @Override
+    public KieServerS2ISettingsBuilder getKieServerS2ISettingsBuilder() {
+        return new KieServerS2ISettingsBuilderImpl();
+    }
+
+    @Override
+    public WorkbenchSettingsBuilder getWorkbenchSettingsBuilder() {
+        return new WorkbenchSettingsBuilderImpl();
     }
 
     @Override

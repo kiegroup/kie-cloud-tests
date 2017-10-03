@@ -16,22 +16,21 @@
 package org.kie.cloud.openshift.scenario;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.kie.cloud.api.deployment.DatabaseDeployment;
+
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.constants.ScenarioConstants;
-import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
@@ -42,52 +41,32 @@ public class GenericScenarioImpl implements GenericScenario {
 
     private OpenShiftController openshiftController;
     private String projectName;
-    private WorkbenchDeploymentImpl workbenchDeployment;
-    private SmartRouterDeployment smartRouterDeployment;
-    private KieServerDeploymentImpl kieServerDeployment;
-    private DatabaseDeploymentImpl databaseDeployment;
 
-    private Map<String, String> envVariables;
-    private Map<ScenarioConstants, String> kieAppTemplates;
+    private List<WorkbenchDeployment> workbenchDeployments;
+    private List<KieServerDeployment> kieServerDeployments;
+
+    private List<DeploymentSettings> kieServerSettingsList;
+    private List<DeploymentSettings> workbenchSettingsList;
 
     private static final Logger logger = LoggerFactory.getLogger(GenericScenarioImpl.class);
 
-    public GenericScenarioImpl(OpenShiftController openShiftController, Map<String, String> envVariables, Map<ScenarioConstants, String> kieAppTemplates) {
-        this.openshiftController = openShiftController;
-        this.envVariables = envVariables;
-        this.kieAppTemplates = kieAppTemplates;
+    public GenericScenarioImpl(OpenShiftController openshiftController, List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList) {
+        this.openshiftController = openshiftController;
+        this.kieServerSettingsList = kieServerSettingsList;
+        this.workbenchSettingsList = workbenchSettingsList;
+
+        workbenchDeployments = new ArrayList<>();
+        kieServerDeployments = new ArrayList<>();
     }
 
     @Override
-    public WorkbenchDeployment getWorkbenchDeployment() {
-        if (isWorkbenchInScenario()) {
-            return workbenchDeployment;
-        }
-        throw new RuntimeException("Workbench or Kie controller deployment is not in this scenario");
+    public List<WorkbenchDeployment> getWorkbenchDeployments() {
+        return workbenchDeployments;
     }
 
     @Override
-    public SmartRouterDeployment getSmartRouterDeployment() {
-        if (isSmartRouterInScenario()) {
-            return smartRouterDeployment;
-        }
-        throw new RuntimeException("Smart router is not in this scenario");
-    }
-
-    @Override
-    public KieServerDeployment getKieServerDeployment() {
-        if (isKieServerInScenario()) {
-            return kieServerDeployment;
-        }
-        throw new RuntimeException("Kie server deployment is not in this scenario");
-    }
-
-    @Override
-    public DatabaseDeployment getDatabaseDeployment() {
-        if (isDatabaseInScenario()) {
-            return databaseDeployment;
-        }
-        throw new RuntimeException("Database is not in this scenario");
+    public List<KieServerDeployment> getKieServerDeployments() {
+        return kieServerDeployments;
     }
 
     @Override
@@ -112,34 +91,34 @@ public class GenericScenarioImpl implements GenericScenario {
         logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
         project.createResources(OpenShiftConstants.getKieImageStreams());
 
-        if (isWorkbenchInScenario()) {
-            String appTemplateWorkbench = kieAppTemplates.get(ScenarioConstants.WORKBENCH_TEMPLATE_KEY);
+        for (DeploymentSettings workbenchSettings : workbenchSettingsList) {
+            deployTemplateWithSettings(project, workbenchSettings);
 
-            logger.info("Processing template and creating resources from " + appTemplateWorkbench);
-            envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
-            project.processTemplateAndCreateResources(appTemplateWorkbench, envVariables);
-
-            workbenchDeployment = createWorkbenchDeployment(projectName);
+            workbenchDeployments.add(createWorkbenchDeployment(projectName, workbenchSettings));
         }
 
-        if (isKieServerInScenario()) {
-            String appTemplateKieServer = kieAppTemplates.get(ScenarioConstants.KIE_SERVER_TEMPLATE_KEY);
+        for (DeploymentSettings kieServerSettings : kieServerSettingsList) {
+            deployTemplateWithSettings(project, kieServerSettings);
 
-            logger.info("Processing template and creating resources from " + appTemplateKieServer);
-            envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
-            project.processTemplateAndCreateResources(appTemplateKieServer, envVariables);
-
-            kieServerDeployment = createKieServerDeployment(projectName);
+            kieServerDeployments.add(createKieServerDeployment(projectName, kieServerSettings));
         }
 
         logger.info("Waiting for Workbench deployment to become ready.");
-        if (isWorkbenchInScenario()) {
+        for (WorkbenchDeployment workbenchDeployment : workbenchDeployments) {
             workbenchDeployment.waitForScale();
         }
         logger.info("Waiting for Kie server deployment to become ready.");
-        if (isKieServerInScenario()) {
+        for (KieServerDeployment kieServerDeployment : kieServerDeployments) {
             kieServerDeployment.waitForScale();
         }
+    }
+
+    private void deployTemplateWithSettings(Project project, DeploymentSettings deploymentSettings) {
+        Map<String, String> envVariables = new HashMap<>(deploymentSettings.getEnvVariables());
+
+        logger.info("Processing template and creating resources from " + deploymentSettings.getDeploymentScriptUrl());
+        envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
+        project.processTemplateAndCreateResources(deploymentSettings.getDeploymentScriptUrl(), envVariables);
     }
 
     @Override
@@ -161,56 +140,29 @@ public class GenericScenarioImpl implements GenericScenario {
     @Override
     public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<>();
-        if (isWorkbenchInScenario()) {
-            deployments.add(workbenchDeployment);
-        }
-        if (isSmartRouterInScenario()) {
-            deployments.add(smartRouterDeployment);
-        }
-        if (isKieServerInScenario()) {
-            deployments.add(kieServerDeployment);
-        }
-        if (isDatabaseInScenario()) {
-            deployments.add(databaseDeployment);
-        }
-
+        deployments.addAll(workbenchDeployments);
+        deployments.addAll(kieServerDeployments);
         return deployments;
     }
 
-    private boolean isWorkbenchInScenario() {
-        return kieAppTemplates.containsKey(ScenarioConstants.WORKBENCH_TEMPLATE_KEY);
-    }
-
-    private boolean isSmartRouterInScenario() {
-        return kieAppTemplates.containsKey(ScenarioConstants.SMART_ROUTER_TEMPLATE_KEY);
-    }
-
-    private boolean isKieServerInScenario() {
-        return kieAppTemplates.containsKey(ScenarioConstants.KIE_SERVER_TEMPLATE_KEY);
-    }
-
-    private boolean isDatabaseInScenario() {
-        return kieAppTemplates.containsKey(ScenarioConstants.DATABASE_TEMPLATE_KEY) && kieAppTemplates.get(ScenarioConstants.DATABASE_TEMPLATE_KEY) != null;
-    }
-
-    private KieServerDeploymentImpl createKieServerDeployment(String namespace) {
+    private KieServerDeploymentImpl createKieServerDeployment(String namespace, DeploymentSettings deploymentSettings) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);
         kieServerDeployment.setNamespace(namespace);
-        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
-        kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
+        kieServerDeployment.setUsername(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
+        kieServerDeployment.setPassword(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword()));
+        kieServerDeployment.setServiceName(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.APPLICATION_NAME, OpenShiftConstants.getKieApplicationName()));
 
         return kieServerDeployment;
     }
 
-    private WorkbenchDeploymentImpl createWorkbenchDeployment(String namespace) {
+    private WorkbenchDeploymentImpl createWorkbenchDeployment(String namespace, DeploymentSettings deploymentSettings) {
         WorkbenchDeploymentImpl workbenchDeployment = new WorkbenchDeploymentImpl();
         workbenchDeployment.setOpenShiftController(openshiftController);
         workbenchDeployment.setNamespace(namespace);
-        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
-        workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
-        workbenchDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
+        workbenchDeployment.setUsername(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
+        workbenchDeployment.setPassword(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()));
+        workbenchDeployment.setServiceName(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.APPLICATION_NAME, OpenShiftConstants.getKieApplicationName()));
 
         return workbenchDeployment;
     }
