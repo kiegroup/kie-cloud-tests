@@ -13,8 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.openshift.constants;
+package org.kie.cloud.api.settings;
 
-public enum ScenarioConstants {
-    KIE_SERVER_TEMPLATE_KEY, SMART_ROUTER_TEMPLATE_KEY, WORKBENCH_TEMPLATE_KEY, DATABASE_TEMPLATE_KEY
+import java.util.Map;
+
+/**
+ * Cloud configuration for deployment.
+ */
+public interface DeploymentSettings {
+
+    /**
+     * Return environment variables for deployment.
+     *
+     * @return Map of environment variables.
+     */
+    Map<String, String> getEnvVariables();
+
+    /**
+     * Return script URL for deployment.
+     *
+     * @return URL of script for deployment.
+     */
+    String getDeploymentScriptUrl();
 }

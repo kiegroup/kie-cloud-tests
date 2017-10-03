@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.api.scenario;
+package org.kie.cloud.api.settings.builder;
 
-import java.util.List;
-import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.WorkbenchDeployment;
-
-public interface GenericScenario extends DeploymentScenario {
-
-    /**
-     * Return List of all Workbench deployments.
-     *
-     * @return WorkbenchDeployment
-     * @see WorkbenchDeployment
-     */
-    List<WorkbenchDeployment> getWorkbenchDeployments();
+/**
+ * Cloud settings builder. Create settings for Deployment scenario.
+ *
+ * @param <DeploymentSettings> Setup to be built e.g. DeploymentSettings
+ * @see org.kie.cloud.api.settings.DeploymentSettings
+ */
+public interface SettingsBuilder<DeploymentSettings> {
 
     /**
-     * Return List of all Kie Server deployments.
+     * Return built cloud settings.
      *
-     * @return KieServerDeployment
-     * @see KieServerDeployment
+     * @return Returns configured for deployment.
      */
-    List<KieServerDeployment> getKieServerDeployments();
+    DeploymentSettings build();
 }
