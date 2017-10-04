@@ -30,6 +30,7 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
+import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
 public class KieServerClientProvider {
@@ -37,15 +38,23 @@ public class KieServerClientProvider {
     private static final long KIE_SERVER_TIMEOUT = 300_000L;
 
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment) {
+        return getKieServerClient(kieServerDeployment, KIE_SERVER_TIMEOUT);
+    }
+
+    public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, long clientTimeout) {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieServerDeployment.getUrl().toString() + "/services/rest/server",
-                kieServerDeployment.getUsername(), kieServerDeployment.getPassword(), KIE_SERVER_TIMEOUT);
+                kieServerDeployment.getUsername(), kieServerDeployment.getPassword(), clientTimeout);
         KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
         return kieServerClient;
     }
 
     public static KieServicesClient getSmartRouterClient(SmartRouterDeployment smartRouterDeployment, String userName, String password) {
+        return getSmartRouterClient(smartRouterDeployment, userName, password, KIE_SERVER_TIMEOUT);
+    }
+
+    public static KieServicesClient getSmartRouterClient(SmartRouterDeployment smartRouterDeployment, String userName, String password, long clientTimeout) {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(smartRouterDeployment.getUrl().toString(),
-                userName, password, KIE_SERVER_TIMEOUT);
+                userName, password, clientTimeout);
         List<String> capabilities = Arrays.asList(KieServerConstants.CAPABILITY_BPM,
                 KieServerConstants.CAPABILITY_BPM_QUERIES,
                 KieServerConstants.CAPABILITY_BPM_UI,
@@ -68,6 +77,10 @@ public class KieServerClientProvider {
 
     public static QueryServicesClient getQueryClient(KieServerDeployment kieServerDeployment) {
         return getKieServerClient(kieServerDeployment).getServicesClient(QueryServicesClient.class);
+    }
+
+    public static RuleServicesClient getRuleClient(KieServerDeployment kieServerDeployment) {
+        return getKieServerClient(kieServerDeployment).getServicesClient(RuleServicesClient.class);
     }
 
     public static void waitForContainerStart(KieServerDeployment kieServerDeployment, String containerId) {

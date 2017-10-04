@@ -24,9 +24,11 @@ import java.util.Collections;
 import java.util.List;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import java.time.Duration;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Service;
 
@@ -95,6 +97,19 @@ public abstract class OpenShiftDeployment implements Deployment {
         }
 
         return Collections.emptyList();
+    }
+
+    @Override
+    public void setRouterTimeout(Duration timeoutValue) {
+        openShiftController.getClient()
+                .routes()
+                .inNamespace(getNamespace())
+                .withName(getServiceName())
+                .edit()
+                .editMetadata()
+                .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds()+"s")
+                .endMetadata()
+                .done();
     }
 
     private Instance createInstance(Pod pod) {
