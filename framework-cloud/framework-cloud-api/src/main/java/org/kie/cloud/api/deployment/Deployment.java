@@ -15,6 +15,7 @@
 
 package org.kie.cloud.api.deployment;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -75,4 +76,10 @@ public interface Deployment {
      */
     boolean isReady();
 
+    /**
+     * This method set a router timeout for the cloud deployment.
+     *
+     * @param timeoutValue Timeout value.
+     */
+    void setRouterTimeout(Duration timeoutValue);
 }
