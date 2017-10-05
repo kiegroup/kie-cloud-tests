@@ -33,9 +33,11 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_CONTROLLER_PORT = "KIE_SERVER_CONTROLLER_PORT";
     public static final String KIE_SERVER_CONTROLLER_USER = "KIE_SERVER_CONTROLLER_USER";
     public static final String KIE_SERVER_CONTROLLER_PWD = "KIE_SERVER_CONTROLLER_PWD";
+    public static final String KIE_SERVER_CONTROLLER_SERVICE = "KIE_SERVER_CONTROLLER_SERVICE";
 
     public static final String KIE_SERVER_ROUTER_HOST = "KIE_SERVER_ROUTER_HOST";
     public static final String KIE_SERVER_ROUTER_PORT = "KIE_SERVER_ROUTER_PORT";
+    public static final String KIE_SERVER_ROUTER_SERVICE = "KIE_SERVER_ROUTER_SERVICE";
 
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
@@ -55,4 +57,11 @@ public class OpenShiftTemplateConstants {
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";
     public static final String EXECUTION_SERVER_HOSTNAME_HTTP = "EXECUTION_SERVER_HOSTNAME_HTTP";
     public static final String EXECUTION_SERVER_HOSTNAME_HTTPS = "EXECUTION_SERVER_HOSTNAME_HTTPS";
+
+    public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "KIE_SERVER_CONTAINER_DEPLOYMENT";
+
+    public static final String SOURCE_REPOSITORY_URL = "SOURCE_REPOSITORY_URL";
+    public static final String SOURCE_REPOSITORY_REF = "SOURCE_REPOSITORY_REF";
+    public static final String CONTEXT_DIR = "CONTEXT_DIR";
+
 }

@@ -1,8 +1,9 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -11,19 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
+package org.kie.cloud.openshift.constants;
 
-package org.kie.cloud.git;
-
-public interface GitProvider {
-
-    String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath);
-
-    void createGitRepository(String repositoryName, String repositoryPath);
-
-    void deleteGitRepository(String repositoryName);
-
-    String getRepositoryUrl(String repositoryName);
-
-    void init();
+public enum ScenarioConstants {
+    KIE_SERVER_TEMPLATE_KEY, SMART_ROUTER_TEMPLATE_KEY, WORKBENCH_TEMPLATE_KEY, DATABASE_TEMPLATE_KEY
 }

@@ -30,6 +30,9 @@ public class DeploymentConstants implements Constants {
     public static final String WORKBENCH_USER = "org.kie.workbench.user";
     public static final String WORKBENCH_PASSWORD = "org.kie.workbench.pwd";
 
+    public static final String CONTROLLER_USER = "org.kie.server.controller.user";
+    public static final String CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
+
     public static final String DATABASE_HOST = "db.hostname";
     public static final String DATABASE_NAME = "database.name";
     public static final String EXTERNAL_DATABASE_NAME = "db.name";
@@ -50,6 +53,14 @@ public class DeploymentConstants implements Constants {
 
     public static String getWorkbenchPassword() {
         return System.getProperty(WORKBENCH_PASSWORD);
+    }
+
+    public static String getControllerUser() {
+        return System.getProperty(CONTROLLER_USER);
+    }
+
+    public static String getControllerPassword() {
+        return System.getProperty(CONTROLLER_PASSWORD);
     }
 
     public static String getDatabaseHost() {

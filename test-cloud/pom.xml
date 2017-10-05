@@ -45,6 +45,8 @@
     <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
     <org.kie.workbench.user>adminUser</org.kie.workbench.user>
     <org.kie.workbench.pwd>adminUser1!</org.kie.workbench.pwd>
+    <org.kie.server.controller.user>controllerUser</org.kie.server.controller.user>
+    <org.kie.server.controller.pwd>controllerUser1!</org.kie.server.controller.pwd>
   </properties>
 
   <modules>
@@ -83,8 +85,10 @@
               <kie.app.secret>${kie.app.secret}</kie.app.secret>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <!-- All templates have to be passed as properties to failsafe plugin. -->
+              <kie.app.template.workbench>${kie.app.template.workbench}</kie.app.template.workbench>
               <kie.app.template.workbench.kie-server.database>${kie.app.template.workbench.kie-server.database}</kie.app.template.workbench.kie-server.database>
               <kie.app.template.kie-server>${kie.app.template.kie-server}</kie.app.template.kie-server>
+              <kie.app.template.kie-server-s2i>${kie.app.template.kie-server-s2i}</kie.app.template.kie-server-s2i>
               <kie.app.template.kie-server.database>${kie.app.template.kie-server.database}</kie.app.template.kie-server.database>
               <kie.app.template.kie-server.database.external>${kie.app.template.kie-server.database.external}</kie.app.template.kie-server.database.external>
               <kie.app.template.workbench-monitoring.smartrouter>${kie.app.template.workbench-monitoring.smartrouter}</kie.app.template.workbench-monitoring.smartrouter>
@@ -106,6 +110,8 @@
               <org.kie.server.pwd>${org.kie.server.pwd}</org.kie.server.pwd>
               <org.kie.workbench.user>${org.kie.workbench.user}</org.kie.workbench.user>
               <org.kie.workbench.pwd>${org.kie.workbench.pwd}</org.kie.workbench.pwd>
+              <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
+              <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
             </systemProperties>
           </configuration>
         </plugin>
