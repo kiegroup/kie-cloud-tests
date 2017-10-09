@@ -16,12 +16,16 @@
 package org.kie.cloud.integrationtests;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.git.GitProvider;
 import org.kie.cloud.git.GitProviderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario> {
 
@@ -57,6 +61,8 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
     protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);
+
     private final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
     protected final GitProvider gitProvider = GitProviderFactory.getGitProvider();
@@ -65,7 +71,13 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     @Before
     public void initializeDeployment() {
         deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
-        deploymentScenario.deploy();
+
+        try {
+            deploymentScenario.deploy();
+        } catch (MissingResourceException e) {
+            logger.warn("Skipping test because of missing resource.", e);
+            Assume.assumeNoException(e);
+        }
     }
 
     @After
