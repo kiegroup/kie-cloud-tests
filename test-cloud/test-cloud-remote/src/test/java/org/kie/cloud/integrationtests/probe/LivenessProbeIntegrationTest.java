@@ -15,25 +15,27 @@
 
 package org.kie.cloud.integrationtests.probe;
 
-import static org.kie.cloud.integrationtests.util.TimeUtils.waitMilliseconds;
+import static org.kie.cloud.integrationtests.util.TimeUtils.wait;
+
+import java.time.Duration;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KieServerInstance;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.WorkbenchInstance;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
     private static final String UNDEPLOY_COMMAND = "/opt/eap/bin/jboss-cli.sh -c --command='undeploy ROOT.war'";
-    private static final long KILL_POD_TIME = 60000;
+    private static final Duration KILL_POD_TIME = Duration.ofSeconds(60);
     private static final Logger logger = LoggerFactory.getLogger(LivenessProbeIntegrationTest.class);
 
     @Test
@@ -45,7 +47,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
         workbenchInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
 
         logger.info("Waiting for liveness probe to kill workbench");
-        waitMilliseconds(KILL_POD_TIME,
+        TimeUtils.wait(KILL_POD_TIME,
                 () -> workbenchDeployment.getInstances().stream()
                 .noneMatch(instance -> instance.getName().equals(brokenPodName))
         );
@@ -66,7 +68,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
         kieServerInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
 
         logger.info("Waiting for liveness probe to kill kie server");
-        waitMilliseconds(KILL_POD_TIME,
+        TimeUtils.wait(KILL_POD_TIME,
                 () -> kieServerDeployment.getInstances().stream()
                 .noneMatch(instance -> instance.getName().equals(brokenPodName))
         );
