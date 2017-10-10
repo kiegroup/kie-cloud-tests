@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.deployment;
 
+import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,19 +68,7 @@ public class KieServerInstanceImpl implements KieServerInstance {
     }
 
     @Override public CommandExecutionResult runCommand(String... command) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ByteArrayOutputStream error = new ByteArrayOutputStream();
-
-        CommandExecutionResult commandExecutionResult = new CommandExecutionResult();
-        commandExecutionResult.setOutput(output);
-        commandExecutionResult.setError(error);
-
-        ExecWatch execWatch = openShiftController.getClient().pods().inNamespace(namespace).withName(podName)
-                .writingOutput(output)
-                .writingError(error)
-                .exec(command);
-
-        return commandExecutionResult;
+        return runCommandImpl(openShiftController.getClient().pods().inNamespace(namespace).withName(podName), command);
     }
 
     @Override public String getLogs() {

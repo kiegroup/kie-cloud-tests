@@ -45,7 +45,10 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
         workbenchInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
 
         logger.info("Waiting for liveness probe to kill workbench");
-        waitMilliseconds(KILL_POD_TIME);
+        waitMilliseconds(KILL_POD_TIME,
+                () -> workbenchDeployment.getInstances().stream()
+                .noneMatch(instance -> instance.getName().equals(brokenPodName))
+        );
         workbenchDeployment.waitForScale();
 
         workbenchInstance = (WorkbenchInstance) workbenchDeployment.getInstances().get(0);
@@ -63,7 +66,10 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
         kieServerInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
 
         logger.info("Waiting for liveness probe to kill kie server");
-        waitMilliseconds(KILL_POD_TIME);
+        waitMilliseconds(KILL_POD_TIME,
+                () -> kieServerDeployment.getInstances().stream()
+                .noneMatch(instance -> instance.getName().equals(brokenPodName))
+        );
         kieServerDeployment.waitForScale();
 
         kieServerInstance = (KieServerInstance) kieServerDeployment.getInstances().get(0);

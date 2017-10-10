@@ -25,6 +25,7 @@ import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.WorkbenchInstance;
 import org.kie.cloud.openshift.OpenShiftController;
+import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
 public class WorkbenchInstanceImpl implements WorkbenchInstance {
 
@@ -65,18 +66,6 @@ public class WorkbenchInstanceImpl implements WorkbenchInstance {
     }
 
     @Override public CommandExecutionResult runCommand(String... command) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ByteArrayOutputStream error = new ByteArrayOutputStream();
-
-        CommandExecutionResult commandExecutionResult = new CommandExecutionResult();
-        commandExecutionResult.setOutput(output);
-        commandExecutionResult.setError(error);
-
-        ExecWatch execWatch = openShiftController.getClient().pods().inNamespace(namespace).withName(podName)
-                .writingOutput(output)
-                .writingError(error)
-                .exec(command);
-
-        return commandExecutionResult;
+        return runCommandImpl(openShiftController.getClient().pods().inNamespace(namespace).withName(podName), command);
     }
 }

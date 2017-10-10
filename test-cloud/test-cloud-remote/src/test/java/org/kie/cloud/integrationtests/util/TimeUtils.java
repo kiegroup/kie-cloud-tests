@@ -15,12 +15,30 @@
 
 package org.kie.cloud.integrationtests.util;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.function.BooleanSupplier;
+
 public class TimeUtils {
+
+    private static final long DEFAULT_WAIT_STEP = 5000;
+
     public static void waitMilliseconds(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             throw new RuntimeException("Waiting was interrupted", e);
+        }
+    }
+
+    public static void waitMilliseconds(long milliseconds, BooleanSupplier booleanSupplier) {
+        waitMilliseconds(milliseconds, DEFAULT_WAIT_STEP, booleanSupplier);
+    }
+
+    public static void waitMilliseconds(long milliseconds, long stepMilliseconds, BooleanSupplier booleanSupplier) {
+        Instant startTime = Instant.now();
+        while (startTime.plus(milliseconds, ChronoUnit.MILLIS).isAfter(Instant.now()) && !booleanSupplier.getAsBoolean()) {
+            waitMilliseconds(stepMilliseconds);
         }
     }
 }

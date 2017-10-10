@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.openshift.deployment;
 
+import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
+
 import java.io.ByteArrayOutputStream;
 
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
@@ -55,19 +57,7 @@ public class DatabaseInstanceImpl implements DatabaseInstance {
     }
 
     @Override public CommandExecutionResult runCommand(String... command) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ByteArrayOutputStream error = new ByteArrayOutputStream();
-
-        CommandExecutionResult commandExecutionResult = new CommandExecutionResult();
-        commandExecutionResult.setOutput(output);
-        commandExecutionResult.setError(error);
-
-        ExecWatch execWatch = openShiftController.getClient().pods().inNamespace(namespace).withName(name)
-                .writingOutput(output)
-                .writingError(error)
-                .exec(command);
-
-        return commandExecutionResult;
+        return runCommandImpl(openShiftController.getClient().pods().inNamespace(namespace).withName(name), command);
     }
 
     @Override
