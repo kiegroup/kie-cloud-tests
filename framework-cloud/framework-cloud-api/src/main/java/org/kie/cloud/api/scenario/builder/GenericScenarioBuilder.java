@@ -36,4 +36,13 @@ public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<Generi
      */
     GenericScenarioBuilder withWorkbench(DeploymentSettings workbenchSettings);
 
+    /**
+     * Return scenario Builder with added Workbench monitoring deployment into
+     * scenario.
+     *
+     * @param workbenchSettings
+     * @return
+     */
+    GenericScenarioBuilder withMonitoring(DeploymentSettings workbenchSettings);
+
 }

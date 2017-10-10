@@ -91,6 +91,7 @@
               <kie.app.template.kie-server-s2i>${kie.app.template.kie-server-s2i}</kie.app.template.kie-server-s2i>
               <kie.app.template.kie-server.database>${kie.app.template.kie-server.database}</kie.app.template.kie-server.database>
               <kie.app.template.kie-server.database.external>${kie.app.template.kie-server.database.external}</kie.app.template.kie-server.database.external>
+              <kie.app.template.workbench-monitoring>${kie.app.template.workbench-monitoring}</kie.app.template.workbench-monitoring>
               <kie.app.template.workbench-monitoring.smartrouter>${kie.app.template.workbench-monitoring.smartrouter}</kie.app.template.workbench-monitoring.smartrouter>
               <db.hostname>${db.hostname}</db.hostname>
               <db.name>${db.name}</db.name>
