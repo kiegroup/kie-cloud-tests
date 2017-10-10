@@ -31,6 +31,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +60,9 @@ public class KieServerWithExternalDatabaseScenarioImpl implements KieServerWithE
     @Override public void deploy() {
         project = createProject(openshiftController);
 
-        logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateWorkbenchKieServerDatabase());
+        logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
-        project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateKieServerDatabaseExternal(), envVariables);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl(), envVariables);
 
         kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);

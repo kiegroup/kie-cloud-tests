@@ -15,21 +15,23 @@
  */
 package org.kie.cloud.openshift.settings;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 
 public class DeploymentSettingsImpl implements DeploymentSettings {
     private Map<String, String> envVariables;
-    private String appTemplateUrl;
+    private OpenShiftTemplate appTemplate;
 
     public DeploymentSettingsImpl() {
         envVariables = new HashMap<>();
     }
 
-    public DeploymentSettingsImpl(Map<String, String> envVariables, String appTemplateUrl) {
+    public DeploymentSettingsImpl(Map<String, String> envVariables, OpenShiftTemplate appTemplate) {
         this.envVariables = envVariables;
-        this.appTemplateUrl = appTemplateUrl;
+        this.appTemplate = appTemplate;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class DeploymentSettingsImpl implements DeploymentSettings {
     }
 
     @Override
-    public String getDeploymentScriptUrl() {
-        return appTemplateUrl;
+    public URL getDeploymentScriptUrl() {
+        return appTemplate.getTemplateUrl();
     }
 }

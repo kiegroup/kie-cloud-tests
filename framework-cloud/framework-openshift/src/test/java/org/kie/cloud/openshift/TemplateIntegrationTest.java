@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +85,7 @@ public class TemplateIntegrationTest extends OpenShiftIntegrationTestBase {
         return env.stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
     }
 
-    private String getTemplateUrl() {
-        return TemplateIntegrationTest.class.getClassLoader().getResource(BPMS_TEMPLATE_FILE).toString();
+    private URL getTemplateUrl() {
+        return TemplateIntegrationTest.class.getClassLoader().getResource(BPMS_TEMPLATE_FILE);
     }
 }

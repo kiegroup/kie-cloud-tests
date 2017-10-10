@@ -37,6 +37,7 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,21 +86,21 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
         project.createResources(OpenShiftConstants.getKieImageStreams());
 
-        logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateConsoleSmartRouter());
+        logger.info("Processing template and creating resources from " + OpenShiftTemplate.CONSOLE_SMARTROUTER.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_HOST, workbenchRuntimeDeployment.getUrl().getHost());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PORT, Integer.toString(workbenchRuntimeDeployment.getUrl().getPort()));
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, workbenchRuntimeDeployment.getUsername());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, workbenchRuntimeDeployment.getPassword());
-        project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateConsoleSmartRouter(), envVariables);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.CONSOLE_SMARTROUTER.getTemplateUrl(), envVariables);
 
-        logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateKieServerDatabase());
+        logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOST, kieServerDeployment.getUrl().getHost());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PORT, Integer.toString(kieServerDeployment.getUrl().getPort()));
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_HOST, smartRouterDeployment.getUrl().getHost());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_PORT, Integer.toString(smartRouterDeployment.getUrl().getPort()));
-        project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateKieServerDatabase(), envVariables);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_DATABASE.getTemplateUrl(), envVariables);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchRuntimeDeployment.waitForScale();

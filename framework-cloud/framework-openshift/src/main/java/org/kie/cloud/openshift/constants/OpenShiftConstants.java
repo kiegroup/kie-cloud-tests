@@ -95,34 +95,7 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(KIE_IMAGE_STREAMS);
     }
 
-    public static String getKieAppTemplateWorkbenchKieServerDatabase() {
-        return System.getProperty(KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE);
-    }
-
-    public static String getKieAppTemplateKieServer() {
-        return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER);
-    }
-
-    public static String getKieAppTemplateKieServerS2I() {
-        return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER_S2I);
-    }
-
-    public static String getKieAppTemplateKieServerDatabase() {
-        return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER_DATABASE);
-    }
-    public static String getKieAppTemplateKieServerDatabaseExternal() {
-        return System.getProperty(KIE_APP_TEMPLATE_KIE_SERVER_DATABASE_EXTERNAL);
-    }
-
-    public static String getKieAppTemplateConsoleSmartRouter() {
-        return System.getProperty(KIE_APP_TEMPLATE_CONSOLE_SMARTROUTER);
-    }
-
     public static String getKieApplicationName() {
         return System.getProperty(KIE_APP_NAME);
-    }
-
-    public static String getKieAppTemplateWorkbench() {
-        return System.getProperty(KIE_APP_TEMPLATE_WORKBENCH);
     }
 }

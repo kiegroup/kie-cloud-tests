@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.resource;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +70,7 @@ public interface Project {
      * @param templateUrl URL of template to be processed
      * @param envVariables Map of environment variables to override default values from the template
      */
-    public void processTemplateAndCreateResources(String templateUrl, Map<String, String> envVariables);
+    public void processTemplateAndCreateResources(URL templateUrl, Map<String, String> envVariables);
 
     /**
      * Process template and create all resources defined there.
