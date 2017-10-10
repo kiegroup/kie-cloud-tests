@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.api.settings;
 
+import java.net.URL;
 import java.util.Map;
 
 /**
@@ -34,5 +35,5 @@ public interface DeploymentSettings {
      *
      * @return URL of script for deployment.
      */
-    String getDeploymentScriptUrl();
+    URL getDeploymentScriptUrl();
 }

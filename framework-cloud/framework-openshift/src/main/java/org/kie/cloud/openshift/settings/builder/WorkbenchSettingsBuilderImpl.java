@@ -17,17 +17,18 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 
 public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
 
     private Map<String, String> envVariables;
-    private final String appTemplate = OpenShiftConstants.getKieAppTemplateWorkbench();
+    private final OpenShiftTemplate appTemplate = OpenShiftTemplate.WORKBENCH;
 
     public WorkbenchSettingsBuilderImpl() {
         envVariables = new HashMap<>();

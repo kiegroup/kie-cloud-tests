@@ -35,6 +35,7 @@ import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,9 +78,9 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
         logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
         project.createResources(OpenShiftConstants.getKieImageStreams());
 
-        logger.info("Processing template and creating resources from " + OpenShiftConstants.getKieAppTemplateWorkbenchKieServerDatabase());
+        logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER_DATABASE.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
-        project.processTemplateAndCreateResources(OpenShiftConstants.getKieAppTemplateWorkbenchKieServerDatabase(), envVariables);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER_DATABASE.getTemplateUrl(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl();
         workbenchDeployment.setOpenShiftController(openshiftController);

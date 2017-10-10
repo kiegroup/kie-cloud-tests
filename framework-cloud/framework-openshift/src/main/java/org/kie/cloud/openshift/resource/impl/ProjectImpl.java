@@ -106,13 +106,9 @@ public class ProjectImpl implements Project {
     }
 
     @Override
-    public void processTemplateAndCreateResources(String templateUrl, Map<String, String> envVariables) {
-        try {
-            KubernetesList resourceList = client.templates().inNamespace(projectName).load(new URL(templateUrl)).process(envVariables);
-            client.lists().inNamespace(projectName).create(resourceList);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed template URL", e);
-        }
+    public void processTemplateAndCreateResources(URL templateUrl, Map<String, String> envVariables) {
+        KubernetesList resourceList = client.templates().inNamespace(projectName).load(templateUrl).process(envVariables);
+        client.lists().inNamespace(projectName).create(resourceList);
     }
 
     @Override

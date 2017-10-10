@@ -33,8 +33,10 @@ public interface DeploymentScenario {
 
     /**
      * Create and deploy deployment scenario.
+     *
+     * @throws MissingResourceException If scenario is missing any required resource.
      */
-    void deploy();
+    void deploy() throws MissingResourceException;
 
     /**
      * Undeploy and delete deployment scenario.
