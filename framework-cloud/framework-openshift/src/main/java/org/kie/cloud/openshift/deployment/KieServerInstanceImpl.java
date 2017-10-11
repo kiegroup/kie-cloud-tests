@@ -15,7 +15,20 @@
 
 package org.kie.cloud.openshift.deployment;
 
-import org.kie.cloud.api.deployment.KieServerDeployment;
+import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
+import org.apache.commons.io.IOUtils;
+import org.apache.tools.ant.filters.StringInputStream;
+import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.KieServerInstance;
 import org.kie.cloud.openshift.OpenShiftController;
 
@@ -52,6 +65,10 @@ public class KieServerInstanceImpl implements KieServerInstance {
 
     @Override public String getName() {
         return podName;
+    }
+
+    @Override public CommandExecutionResult runCommand(String... command) {
+        return runCommandImpl(openShiftController.getClient().pods().inNamespace(namespace).withName(podName), command);
     }
 
     @Override public String getLogs() {

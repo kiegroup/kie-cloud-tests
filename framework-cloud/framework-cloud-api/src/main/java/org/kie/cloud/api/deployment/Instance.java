@@ -39,6 +39,8 @@ public interface Instance {
      */
     String getNamespace();
 
+    CommandExecutionResult runCommand(String... command);
+
     /**
      * Return cloud instance logs.
      *

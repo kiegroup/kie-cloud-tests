@@ -15,6 +15,12 @@
 
 package org.kie.cloud.openshift.deployment;
 
+import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
+
+import java.io.ByteArrayOutputStream;
+
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
+import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.SmartRouterInstance;
 import org.kie.cloud.openshift.OpenShiftController;
 
@@ -50,6 +56,10 @@ public class SmartRouterInstanceImpl implements SmartRouterInstance {
 
     @Override public String getName() {
         return podName;
+    }
+
+    @Override public CommandExecutionResult runCommand(String... command) {
+        return runCommandImpl(openShiftController.getClient().pods().inNamespace(namespace).withName(podName), command);
     }
 
     @Override public String getLogs() {
