@@ -69,6 +69,9 @@ public interface Deployment {
      */
     void deleteInstances(List<Instance> instances);
 
-    boolean ready();
+    /**
+     * @return True if deployment is deployed and ready to be used.
+     */
+    boolean isReady();
 
 }

@@ -72,13 +72,18 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
-    public boolean ready() {
-        return getInstances().size() > 0;
+    public boolean isReady() {
+        try {
+            Service service = openShiftController.getProject(namespace).getService(getServiceName());
+            return service != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public List<Instance> getInstances() {
-        if (isDeployed()) {
+        if (isReady()) {
             String deploymentConfigName = openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().getName();
             List<Pod> pods = openShiftController.getClient().pods().inNamespace(namespace).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
 
@@ -98,18 +103,6 @@ public abstract class OpenShiftDeployment implements Deployment {
         instance.setNamespace(namespace);
         instance.setName(pod.getMetadata().getName());
         return instance;
-    }
-
-    /**
-     * @return True if deployment is deployed in OpenShift
-     */
-    public boolean isDeployed() {
-        try {
-            Service service = openShiftController.getProject(namespace).getService(getServiceName());
-            return service != null;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     protected URL getHttpRouteUrl(String serviceName) {
