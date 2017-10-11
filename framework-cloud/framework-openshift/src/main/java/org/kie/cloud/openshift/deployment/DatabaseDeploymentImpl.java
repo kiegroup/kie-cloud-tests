@@ -15,16 +15,11 @@
  */
 package org.kie.cloud.openshift.deployment;
 
-import static java.util.stream.Collectors.toList;
-
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
-import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Service;
 
 public class DatabaseDeploymentImpl extends OpenShiftDeployment implements DatabaseDeployment {
@@ -99,25 +94,5 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     @Override
     public void waitForScale() {
         openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().waitUntilAllPodsAreReady();
-    }
-
-    @Override
-    public List<Instance> getInstances() {
-        String deploymentConfigName = openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().getName();
-        List<Pod> pods = openShiftController.getClient().pods().inNamespace(namespace).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
-
-        List<Instance> databaseInstances = pods.stream().map((pod) -> {
-            return createDatabaseInstance(pod);
-        }).collect(toList());
-
-        return databaseInstances;
-    }
-
-    private Instance createDatabaseInstance(Pod pod) {
-        OpenShiftInstance databaseInstance = new OpenShiftInstance();
-        databaseInstance.setOpenShiftController(openShiftController);
-        databaseInstance.setNamespace(namespace);
-        databaseInstance.setName(pod.getMetadata().getName());
-        return databaseInstance;
     }
 }

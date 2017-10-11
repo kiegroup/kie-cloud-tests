@@ -16,13 +16,8 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import io.fabric8.kubernetes.api.model.Pod;
-import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
-import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 
 public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements SmartRouterDeployment {
 
@@ -35,24 +30,6 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
             url = getHttpRouteUrl(serviceName);
         }
         return url;
-    }
-
-    @Override public List<Instance> getInstances() {
-        String deploymentConfigName = openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().getName();
-        List<Pod> pods =
-                openShiftController.getClient().pods().inNamespace(namespace).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
-
-        List<Instance> smartRouterInstances = new ArrayList<>();
-        for (Pod pod : pods) {
-            OpenShiftInstance smartRouterInstance = new OpenShiftInstance();
-            smartRouterInstance.setOpenShiftController(openShiftController);
-            smartRouterInstance.setName(pod.getMetadata().getName());
-            smartRouterInstance.setNamespace(namespace);
-
-            smartRouterInstances.add(smartRouterInstance);
-        }
-
-        return smartRouterInstances;
     }
 
     @Override
