@@ -15,17 +15,14 @@
 
 package org.kie.cloud.integrationtests.probe;
 
-import static org.kie.cloud.integrationtests.util.TimeUtils.wait;
-
 import java.time.Duration;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.KieServerInstance;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.api.deployment.WorkbenchInstance;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.TimeUtils;
@@ -41,7 +38,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
     @Test
     public void testWorkbenchLivenessProbe() {
         WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployment();
-        WorkbenchInstance workbenchInstance = (WorkbenchInstance) workbenchDeployment.getInstances().get(0);
+        Instance workbenchInstance = workbenchDeployment.getInstances().get(0);
         String brokenPodName = workbenchInstance.getName();
         logger.info("Running undepoloy command '{}' for workbench", UNDEPLOY_COMMAND);
         workbenchInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
@@ -53,7 +50,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
         );
         workbenchDeployment.waitForScale();
 
-        workbenchInstance = (WorkbenchInstance) workbenchDeployment.getInstances().get(0);
+        workbenchInstance = workbenchDeployment.getInstances().get(0);
         String newPodName = workbenchInstance.getName();
 
         Assertions.assertThat(newPodName).isNotEqualTo(brokenPodName);
@@ -62,7 +59,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
     @Test
     public void testKieServerLivenessProbe() {
         KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployment();
-        KieServerInstance kieServerInstance = (KieServerInstance) kieServerDeployment.getInstances().get(0);
+        Instance kieServerInstance = kieServerDeployment.getInstances().get(0);
         String brokenPodName = kieServerInstance.getName();
         logger.info("Running undepoloy command '{}' for workbench", UNDEPLOY_COMMAND);
         kieServerInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
@@ -74,7 +71,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
         );
         kieServerDeployment.waitForScale();
 
-        kieServerInstance = (KieServerInstance) kieServerDeployment.getInstances().get(0);
+        kieServerInstance = kieServerDeployment.getInstances().get(0);
         String newPodName = kieServerInstance.getName();
 
         Assertions.assertThat(newPodName).isNotEqualTo(brokenPodName);

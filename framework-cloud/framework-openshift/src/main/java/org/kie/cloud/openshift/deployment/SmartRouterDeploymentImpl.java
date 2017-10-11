@@ -44,9 +44,9 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
 
         List<Instance> smartRouterInstances = new ArrayList<>();
         for (Pod pod : pods) {
-            SmartRouterInstanceImpl smartRouterInstance = new SmartRouterInstanceImpl();
+            OpenShiftInstance smartRouterInstance = new OpenShiftInstance();
             smartRouterInstance.setOpenShiftController(openShiftController);
-            smartRouterInstance.setPodName(pod.getMetadata().getName());
+            smartRouterInstance.setName(pod.getMetadata().getName());
             smartRouterInstance.setNamespace(namespace);
 
             smartRouterInstances.add(smartRouterInstance);

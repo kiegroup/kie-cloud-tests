@@ -17,14 +17,11 @@ package org.kie.cloud.openshift.deployment;
 
 import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
-import java.io.ByteArrayOutputStream;
-
-import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
-import org.kie.cloud.api.deployment.DatabaseInstance;
+import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.OpenShiftController;
 
-public class DatabaseInstanceImpl implements DatabaseInstance {
+public class OpenShiftInstance implements Instance {
 
     private OpenShiftController openShiftController;
     private String name;
