@@ -80,7 +80,7 @@ public class KieServerWithExternalDatabaseScenarioImpl implements KieServerWithE
         InstanceLogUtil.writeDeploymentLogs(this);
 
         for(Deployment deployment : getDeployments()) {
-            if(deployment != null) {
+            if(deployment != null && deployment.isReady()) {
                 deployment.scale(0);
                 deployment.waitForScale();
             }

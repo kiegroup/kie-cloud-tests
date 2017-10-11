@@ -17,11 +17,16 @@ package org.kie.cloud.openshift.deployment;
 
 import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.OpenShiftController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OpenShiftInstance implements Instance {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenShiftInstance.class);
 
     private OpenShiftController openShiftController;
     private String name;
@@ -59,6 +64,11 @@ public class OpenShiftInstance implements Instance {
 
     @Override
     public String getLogs() {
-        return openShiftController.getClient().pods().inNamespace(namespace).withName(name).getLog();
+        try {
+            return openShiftController.getClient().pods().inNamespace(namespace).withName(name).getLog();
+        } catch (KubernetesClientException e) {
+            logger.info("Exception while retrieving OpenShift log for pod with name " + name, e);
+            return "";
+        }
     }
 }
