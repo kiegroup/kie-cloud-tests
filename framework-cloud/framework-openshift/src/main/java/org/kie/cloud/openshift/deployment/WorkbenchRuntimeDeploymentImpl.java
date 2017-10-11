@@ -67,9 +67,9 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
 
         List<Instance> workbenchRuntimeInstances = new ArrayList<>();
         for (Pod pod : pods) {
-            WorkbenchRuntimeInstanceImpl workbenchRuntimeInstance = new WorkbenchRuntimeInstanceImpl();
+            OpenShiftInstance workbenchRuntimeInstance = new OpenShiftInstance();
             workbenchRuntimeInstance.setOpenShiftController(openShiftController);
-            workbenchRuntimeInstance.setPodName(pod.getMetadata().getName());
+            workbenchRuntimeInstance.setName(pod.getMetadata().getName());
             workbenchRuntimeInstance.setNamespace(namespace);
 
             workbenchRuntimeInstances.add(workbenchRuntimeInstance);

@@ -68,9 +68,9 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
 
         List<Instance> kieServerInstances = new ArrayList<>();
         for (Pod pod : pods) {
-            KieServerInstanceImpl kieServerInstance = new KieServerInstanceImpl();
+            OpenShiftInstance kieServerInstance = new OpenShiftInstance();
             kieServerInstance.setOpenShiftController(openShiftController);
-            kieServerInstance.setPodName(pod.getMetadata().getName());
+            kieServerInstance.setName(pod.getMetadata().getName());
             kieServerInstance.setNamespace(namespace);
 
             kieServerInstances.add(kieServerInstance);

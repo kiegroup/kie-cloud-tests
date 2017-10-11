@@ -15,14 +15,14 @@
  */
 package org.kie.cloud.openshift.deployment;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import static java.util.stream.Collectors.toList;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
-import org.kie.cloud.api.deployment.DatabaseInstance;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Service;
@@ -113,8 +113,8 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
         return databaseInstances;
     }
 
-    private DatabaseInstance createDatabaseInstance(Pod pod) {
-        DatabaseInstanceImpl databaseInstance = new DatabaseInstanceImpl();
+    private Instance createDatabaseInstance(Pod pod) {
+        OpenShiftInstance databaseInstance = new OpenShiftInstance();
         databaseInstance.setOpenShiftController(openShiftController);
         databaseInstance.setNamespace(namespace);
         databaseInstance.setName(pod.getMetadata().getName());
