@@ -16,13 +16,8 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import io.fabric8.kubernetes.api.model.Pod;
-import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 
 public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieServerDeployment {
 
@@ -59,24 +54,6 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
 
     @Override public String getPassword() {
         return password;
-    }
-
-    @Override public List<Instance> getInstances() {
-        String deploymentConfigName = openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().getName();
-        List<Pod> pods =
-                openShiftController.getClient().pods().inNamespace(namespace).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
-
-        List<Instance> kieServerInstances = new ArrayList<>();
-        for (Pod pod : pods) {
-            OpenShiftInstance kieServerInstance = new OpenShiftInstance();
-            kieServerInstance.setOpenShiftController(openShiftController);
-            kieServerInstance.setName(pod.getMetadata().getName());
-            kieServerInstance.setNamespace(namespace);
-
-            kieServerInstances.add(kieServerInstance);
-        }
-
-        return kieServerInstances;
     }
 
     public void setPassword(String password) {

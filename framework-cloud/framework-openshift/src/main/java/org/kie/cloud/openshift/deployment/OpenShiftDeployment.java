@@ -15,14 +15,19 @@
  */
 package org.kie.cloud.openshift.deployment;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Service;
 
 public abstract class OpenShiftDeployment implements Deployment {
@@ -69,6 +74,42 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public boolean ready() {
         return getInstances().size() > 0;
+    }
+
+    @Override
+    public List<Instance> getInstances() {
+        if (isDeployed()) {
+            String deploymentConfigName = openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().getName();
+            List<Pod> pods = openShiftController.getClient().pods().inNamespace(namespace).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
+
+            List<Instance> instances = pods.stream().map((pod) -> {
+                return createInstance(pod);
+            }).collect(toList());
+
+            return instances;
+        }
+
+        return Collections.emptyList();
+    }
+
+    private Instance createInstance(Pod pod) {
+        OpenShiftInstance instance = new OpenShiftInstance();
+        instance.setOpenShiftController(openShiftController);
+        instance.setNamespace(namespace);
+        instance.setName(pod.getMetadata().getName());
+        return instance;
+    }
+
+    /**
+     * @return True if deployment is deployed in OpenShift
+     */
+    public boolean isDeployed() {
+        try {
+            Service service = openShiftController.getProject(namespace).getService(getServiceName());
+            return service != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     protected URL getHttpRouteUrl(String serviceName) {
