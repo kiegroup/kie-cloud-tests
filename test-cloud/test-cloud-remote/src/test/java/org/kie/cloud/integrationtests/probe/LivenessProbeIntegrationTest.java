@@ -18,6 +18,7 @@ package org.kie.cloud.integrationtests.probe;
 import java.time.Duration;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
@@ -36,6 +37,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
     private static final Logger logger = LoggerFactory.getLogger(LivenessProbeIntegrationTest.class);
 
     @Test
+    @Ignore
     public void testWorkbenchLivenessProbe() {
         WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployment();
         Instance workbenchInstance = workbenchDeployment.getInstances().get(0);
@@ -57,6 +59,7 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
     }
 
     @Test
+    @Ignore
     public void testKieServerLivenessProbe() {
         KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployment();
         Instance kieServerInstance = kieServerDeployment.getInstances().get(0);
