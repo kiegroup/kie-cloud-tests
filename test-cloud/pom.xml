@@ -94,9 +94,11 @@
               <kie.app.template.workbench-monitoring>${kie.app.template.workbench-monitoring}</kie.app.template.workbench-monitoring>
               <kie.app.template.workbench-monitoring.smartrouter>${kie.app.template.workbench-monitoring.smartrouter}</kie.app.template.workbench-monitoring.smartrouter>
               <db.hostname>${db.hostname}</db.hostname>
+              <db.port>${db.port}</db.port>
               <db.name>${db.name}</db.name>
               <db.username>${db.username}</db.username>
               <db.password>${db.password}</db.password>
+              <hibernate.dialect>${hibernate.dialect}</hibernate.dialect>
               <kie.app.name>${kie.app.name}</kie.app.name>
               <git.provider>${git.provider}</git.provider>
               <gitlab.url>${gitlab.url}</gitlab.url>
