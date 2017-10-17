@@ -26,6 +26,7 @@ public class DeploymentConstants implements Constants {
 
     public static final String KIE_SERVER_USER = "org.kie.server.user";
     public static final String KIE_SERVER_PASSWORD = "org.kie.server.pwd";
+    public static final String HIBERNATE_PERSISTENCE_DIALECT = "hibernate.dialect";
 
     public static final String WORKBENCH_USER = "org.kie.workbench.user";
     public static final String WORKBENCH_PASSWORD = "org.kie.workbench.pwd";
@@ -34,6 +35,8 @@ public class DeploymentConstants implements Constants {
     public static final String CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
 
     public static final String DATABASE_HOST = "db.hostname";
+    public static final String DATABASE_PORT = "db.port";
+    public static final String DATABASE_DRIVER = "db.driver";
     public static final String DATABASE_NAME = "database.name";
     public static final String EXTERNAL_DATABASE_NAME = "db.name";
     public static final String DATABASE_USERNAME = "db.username";
@@ -67,6 +70,14 @@ public class DeploymentConstants implements Constants {
         return System.getProperty(DATABASE_HOST);
     }
 
+    public static String getDatabasePort() {
+        return System.getProperty(DATABASE_PORT);
+    }
+
+    public static String getDatabaseDriver() {
+        return System.getProperty(DATABASE_DRIVER);
+    }
+
     public static String getDatabaseName() {
         return System.getProperty(DATABASE_NAME);
     }
@@ -81,5 +92,9 @@ public class DeploymentConstants implements Constants {
 
     public static String getDatabasePassword() {
         return System.getProperty(DATABASE_PASSWORD);
+    }
+
+    public static String getHibernatePersistenceDialect() {
+        return System.getProperty(HIBERNATE_PERSISTENCE_DIALECT);
     }
 }

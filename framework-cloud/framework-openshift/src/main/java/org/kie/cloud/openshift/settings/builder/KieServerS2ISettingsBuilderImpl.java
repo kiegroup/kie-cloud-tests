@@ -77,10 +77,10 @@ public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuil
 
     @Override
     public KieServerS2ISettingsBuilder withExternalDatabase() {
-        envVariables.put(OpenShiftTemplateConstants.DB_HOST, DeploymentConstants.getDatabaseHost());
-        envVariables.put(OpenShiftTemplateConstants.DB_DATABASE, DeploymentConstants.getExternalDatabaseName());
-        envVariables.put(OpenShiftTemplateConstants.DB_USERNAME, DeploymentConstants.getDatabaseUsername());
-        envVariables.put(OpenShiftTemplateConstants.DB_PASSWORD, DeploymentConstants.getDatabasePassword());
+        envVariables.put(OpenShiftTemplateConstants.DBE_SERVICE_HOST, DeploymentConstants.getDatabaseHost());
+        envVariables.put(OpenShiftTemplateConstants.DBE_DATABASE, DeploymentConstants.getExternalDatabaseName());
+        envVariables.put(OpenShiftTemplateConstants.DBE_USERNAME, DeploymentConstants.getDatabaseUsername());
+        envVariables.put(OpenShiftTemplateConstants.DBE_PASSWORD, DeploymentConstants.getDatabasePassword());
         return this;
     }
 
