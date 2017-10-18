@@ -25,4 +25,22 @@ import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseSc
  */
 public interface WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
 
+    /**
+     * Return setup builder with additional configuration of external maven
+     * repo.
+     *
+     * @param repoUrl Maven repo URL.
+     * @param repoUserName Maven repo user name.
+     * @param repoPassword Maven repo user password.
+     * @return Builder with configured external maven repo.
+     */
+    WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    /**
+     * Return setup builder with specified Smart router id.
+     *
+     * @param smartRouterId Smart router id.
+     * @return Builder with configured Smart router id.
+     */
+    WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder withSmartRouterId(String smartRouterId);
 }

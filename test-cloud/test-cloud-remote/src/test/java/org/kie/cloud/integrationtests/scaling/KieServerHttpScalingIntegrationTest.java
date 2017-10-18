@@ -23,9 +23,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -38,16 +39,22 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.integrationtests.router.client.KieServerRouterClient;
+import org.kie.server.router.Configuration;
 
-public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
+public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
+
+    private static final String SMART_ROUTER_ID = "test-kie-router";
 
     private KieServerMgmtControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
+    private KieServerRouterClient smartRouterAdminClient;
 
     @Override
-    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder()
+    protected WorkbenchRuntimeSmartRouterKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withSmartRouterId(SMART_ROUTER_ID)
                 .build();
     }
 
@@ -55,8 +62,9 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
     public void setUp() {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
 
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment());
     }
 
     @Test
@@ -64,19 +72,24 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
         String kieServerId = getKieServerId(kieServerClient);
 
         verifyServerTemplateContainsKieServers(kieServerId, 1);
+        verifyServerTemplateContainsKieServers(SMART_ROUTER_ID, 1);
 
         deployAndStartContainer();
 
         verifyContainerIsDeployed(kieServerClient, CONTAINER_ID);
         verifyServerTemplateContainsContainer(kieServerId, CONTAINER_ID);
+        verifyServerTemplateContainsContainer(SMART_ROUTER_ID, CONTAINER_ID);
+        verifySmartRouterContainsKieServers(kieServerId, 1);
 
         scaleKieServerTo(3);
 
         verifyServerTemplateContainsKieServers(kieServerId, 3);
+        verifySmartRouterContainsKieServers(kieServerId, 3);
 
         scaleKieServerTo(1);
 
         verifyServerTemplateContainsKieServers(kieServerId, 1);
+        verifySmartRouterContainsKieServers(kieServerId, 1);
     }
 
     private String getKieServerId(KieServicesClient kieServerClient) {
@@ -105,6 +118,18 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
     private void verifyServerTemplateContainsKieServers(String serverTemplate, int numberOfKieServers) {
         Collection<ServerInstanceKey> kieServers = kieControllerClient.getServerTemplate(serverTemplate).getServerInstanceKeys();
         assertThat(kieServers).hasSize(numberOfKieServers);
+    }
+
+    private void verifySmartRouterContainsKieServers(String kieServerId, int numberOfKieServers) {
+        Configuration routerConfig = smartRouterAdminClient.getRouterConfig();
+
+        assertThat(routerConfig.getHostsPerServer()).containsKey(kieServerId);
+        // TODO: Commented until "Duplicate Kie server registration" issue gets resolved
+//        assertThat(routerConfig.getHostsPerServer().get(kieServerId)).hasSize(numberOfKieServers);
+        assertThat(routerConfig.getHostsPerContainer()).containsKey(CONTAINER_ID);
+        // TODO: Commented until "Duplicate Kie server registration" issue gets resolved
+//        assertThat(routerConfig.getHostsPerContainer().get(CONTAINER_ID)).hasSize(numberOfKieServers);
+        assertThat(routerConfig.getContainerInfosPerContainer()).containsKey(CONTAINER_ID);
     }
 
     private void deployAndStartContainer() {
