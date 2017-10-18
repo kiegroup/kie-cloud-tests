@@ -34,8 +34,11 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl imp
         this.openshiftController = openShiftController;
 
         this.envVariables = new HashMap<String, String>();
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
+        // TODO: Hardcoded because Workbench runtime Smart router template is designed to handle unmanaged Kie servers.
+        // Therefore the template doesn't have possibility to set Kie server username/password for controller requests.
+        // These values are default, used when controller username/password isn't defined.
+        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, "executionUser");
+        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, "execution1!");
         this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
 
@@ -47,5 +50,19 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl imp
     @Override
     public WorkbenchRuntimeSmartRouterKieServerDatabaseScenario build() {
         return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl(openshiftController, envVariables);
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder withSmartRouterId(String smartRouterId) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_ID, smartRouterId);
+        return this;
     }
 }

@@ -35,6 +35,7 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_CONTROLLER_PWD = "KIE_SERVER_CONTROLLER_PWD";
     public static final String KIE_SERVER_CONTROLLER_SERVICE = "KIE_SERVER_CONTROLLER_SERVICE";
 
+    public static final String KIE_SERVER_ROUTER_ID = "KIE_SERVER_ROUTER_ID";
     public static final String KIE_SERVER_ROUTER_HOST = "KIE_SERVER_ROUTER_HOST";
     public static final String KIE_SERVER_ROUTER_PORT = "KIE_SERVER_ROUTER_PORT";
     public static final String KIE_SERVER_ROUTER_SERVICE = "KIE_SERVER_ROUTER_SERVICE";
