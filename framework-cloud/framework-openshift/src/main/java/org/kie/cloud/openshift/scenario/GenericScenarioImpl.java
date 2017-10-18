@@ -33,6 +33,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +48,15 @@ public class GenericScenarioImpl implements GenericScenario {
 
     private List<DeploymentSettings> kieServerSettingsList;
     private List<DeploymentSettings> workbenchSettingsList;
+    private List<DeploymentSettings> monitoringSettingsList;
 
     private static final Logger logger = LoggerFactory.getLogger(GenericScenarioImpl.class);
 
-    public GenericScenarioImpl(OpenShiftController openshiftController, List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList) {
+    public GenericScenarioImpl(OpenShiftController openshiftController, List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList, List<DeploymentSettings> monitoringSettingsList) {
         this.openshiftController = openshiftController;
         this.kieServerSettingsList = kieServerSettingsList;
         this.workbenchSettingsList = workbenchSettingsList;
+        this.monitoringSettingsList = monitoringSettingsList;
 
         workbenchDeployments = new ArrayList<>();
         kieServerDeployments = new ArrayList<>();
@@ -95,6 +98,12 @@ public class GenericScenarioImpl implements GenericScenario {
             deployTemplateWithSettings(project, workbenchSettings);
 
             workbenchDeployments.add(createWorkbenchDeployment(projectName, workbenchSettings));
+        }
+
+        for (DeploymentSettings monitoringSettings : monitoringSettingsList) {
+            deployTemplateWithSettings(project, monitoringSettings);
+
+            workbenchDeployments.add(createWorkbenchMonitoringDeployment(projectName, monitoringSettings));
         }
 
         for (DeploymentSettings kieServerSettings : kieServerSettingsList) {
@@ -165,5 +174,16 @@ public class GenericScenarioImpl implements GenericScenario {
         workbenchDeployment.setServiceName(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.APPLICATION_NAME, OpenShiftConstants.getKieApplicationName()));
 
         return workbenchDeployment;
+    }
+
+    private WorkbenchDeployment createWorkbenchMonitoringDeployment(String namespace, DeploymentSettings deploymentSettings) {
+        WorkbenchRuntimeDeploymentImpl monitoringDeployment = new WorkbenchRuntimeDeploymentImpl();
+        monitoringDeployment.setOpenShiftController(openshiftController);
+        monitoringDeployment.setNamespace(namespace);
+        monitoringDeployment.setUsername(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
+        monitoringDeployment.setPassword(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()));
+        monitoringDeployment.setServiceName(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.APPLICATION_NAME, OpenShiftConstants.getKieApplicationName()));
+
+        return monitoringDeployment;
     }
 }

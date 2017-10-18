@@ -30,16 +30,18 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
 
     private List<DeploymentSettings> kieServerSettingsList;
     private List<DeploymentSettings> workbenchSettingsList;
+    private List<DeploymentSettings> monitoringSettingsList;
 
     public GenericScenarioBuilderImpl(OpenShiftController openShiftController) {
         this.openshiftController = openShiftController;
         this.kieServerSettingsList = new ArrayList<>();
         this.workbenchSettingsList = new ArrayList<>();
+        this.monitoringSettingsList = new ArrayList<>();
     }
 
     @Override
     public GenericScenario build() {
-        return new GenericScenarioImpl(openshiftController, kieServerSettingsList, workbenchSettingsList);
+        return new GenericScenarioImpl(openshiftController, kieServerSettingsList, workbenchSettingsList, monitoringSettingsList);
     }
 
     @Override
@@ -51,6 +53,12 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
     @Override
     public GenericScenarioBuilder withWorkbench(DeploymentSettings workbenchSettings) {
         workbenchSettingsList.add(workbenchSettings);
+        return this;
+    }
+
+    @Override
+    public GenericScenarioBuilder withMonitoring(DeploymentSettings workbenchSettings) {
+        monitoringSettingsList.add(workbenchSettings);
         return this;
     }
 

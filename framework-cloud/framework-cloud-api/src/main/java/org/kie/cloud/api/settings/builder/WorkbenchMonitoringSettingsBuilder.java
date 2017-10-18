@@ -18,12 +18,12 @@ package org.kie.cloud.api.settings.builder;
 import org.kie.cloud.api.settings.DeploymentSettings;
 
 /**
- * Cloud settings builder for Workbench.
+ * Cloud settings builder for Workbench monitoring console.
  *
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public interface WorkbenchSettingsBuilder extends SettingsBuilder<DeploymentSettings> {
+public interface WorkbenchMonitoringSettingsBuilder extends SettingsBuilder<DeploymentSettings> {
 
     /**
      * Return configured builder with Kie Admin user. This user is used as admin
@@ -33,7 +33,7 @@ public interface WorkbenchSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @param password
      * @return
      */
-    WorkbenchSettingsBuilder withAdminUser(String user, String password);
+    WorkbenchMonitoringSettingsBuilder withAdminUser(String user, String password);
 
     /**
      * Return configured builder with application name.
@@ -41,7 +41,7 @@ public interface WorkbenchSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @param name Application name.
      * @return Builder
      */
-    WorkbenchSettingsBuilder withApplicationName(String name);
+    WorkbenchMonitoringSettingsBuilder withApplicationName(String name);
 
     /**
      * Return configured builder with Controller user.
@@ -50,7 +50,7 @@ public interface WorkbenchSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @param password Controller password.
      * @return Builder
      */
-    WorkbenchSettingsBuilder withControllerUser(String username, String password);
+    WorkbenchMonitoringSettingsBuilder withControllerUser(String username, String password);
 
     /**
      * Return configured builder with Kie Server user.
@@ -59,5 +59,5 @@ public interface WorkbenchSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @param password
      * @return
      */
-    WorkbenchSettingsBuilder withKieServerUser(String username, String password);
+    WorkbenchMonitoringSettingsBuilder withKieServerUser(String username, String password);
 }

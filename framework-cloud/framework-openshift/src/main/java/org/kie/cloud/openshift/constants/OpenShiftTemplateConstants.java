@@ -63,6 +63,10 @@ public class OpenShiftTemplateConstants {
 
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "KIE_SERVER_CONTAINER_DEPLOYMENT";
 
+    public static final String KIE_SERVER_SYNC_DEPLOY = "KIE_SERVER_SYNC_DEPLOY";
+
+    public static final String DROOLS_SERVER_FILTER_CLASSES = "DROOLS_SERVER_FILTER_CLASSES";
+
     public static final String SOURCE_REPOSITORY_URL = "SOURCE_REPOSITORY_URL";
     public static final String SOURCE_REPOSITORY_REF = "SOURCE_REPOSITORY_REF";
     public static final String CONTEXT_DIR = "CONTEXT_DIR";

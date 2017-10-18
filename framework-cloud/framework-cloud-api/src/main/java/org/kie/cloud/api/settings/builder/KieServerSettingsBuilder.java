@@ -18,12 +18,12 @@ package org.kie.cloud.api.settings.builder;
 import org.kie.cloud.api.settings.DeploymentSettings;
 
 /**
- * Cloud settings builder for Kie Server S2I.
+ * Cloud settings builder for Kie Server.
  *
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentSettings> {
+public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSettings> {
 
     /**
      * Return configured builder with application name.
@@ -31,7 +31,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param name Application name.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withApplicationName(String name);
+    KieServerSettingsBuilder withApplicationName(String name);
 
     /**
      * Return configured builder with Kie Server user.
@@ -40,7 +40,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param kieServerPwd Kie Server password.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withKieServerUser(String kieServerUser, String kieServerPwd);
+    KieServerSettingsBuilder withKieServerUser(String kieServerUser, String kieServerPwd);
 
     /**
      * Return configured builder with Controller user.
@@ -49,7 +49,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param controllerPwd Controller password.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withControllerUser(String controllerUser, String controllerPwd);
+    KieServerSettingsBuilder withControllerUser(String controllerUser, String controllerPwd);
 
     /**
      * Return configured builder with connection to Controller set by service
@@ -58,7 +58,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param serviceName Controller service name.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withControllerConnection(String serviceName);
+    KieServerSettingsBuilder withControllerConnection(String serviceName);
 
     /**
      * Return configured builder with connection to Controller.
@@ -67,18 +67,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param port port of Controller.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withControllerConnection(String url, String port);
-
-    /**
-     * Return configured builder with external database connection. Values for
-     * external database are add by system properties.
-     *
-     * System properties for external database configuration: db.hostname,
-     * db.name, db.password, db.username.
-     *
-     * @return Builder
-     */
-    KieServerS2ISettingsBuilder withExternalDatabase();
+    KieServerSettingsBuilder withControllerConnection(String url, String port);
 
     /**
      * Return configured builder with Kie Container deployment.
@@ -86,17 +75,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param kieContainerDeployment Kie Container deployment.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withContainerDeployment(String kieContainerDeployment);
-
-    /**
-     * Return configured builder with Source location
-     *
-     * @param gitRepoUrl Repository url.
-     * @param gitReference Repository reference (branch/tag). E.g. 'master'.
-     * @param gitContextDir Repositoy context (location of pom file).
-     * @return Buillder
-     */
-    KieServerS2ISettingsBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir);
+    KieServerSettingsBuilder withContainerDeployment(String kieContainerDeployment);
 
     /**
      * Return configured builder with Maven repository.
@@ -104,7 +83,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param url Address of the maven repository.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withMavenRepoUrl(String url);
+    KieServerSettingsBuilder withMavenRepoUrl(String url);
 
     /**
      * Return configured builder with Maven repository set by service name.
@@ -113,7 +92,7 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param path Path to maven repositoy (e.g. '/maven2/').
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withMavenRepoService(String serviceName, String path);
+    KieServerSettingsBuilder withMavenRepoService(String serviceName, String path);
 
     /**
      * Return configured builder with Maven user.
@@ -122,5 +101,30 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param repoPassword Maven password.
      * @return Builder
      */
-    KieServerS2ISettingsBuilder withMavenRepoUser(String repoUser, String repoPassword);
+    KieServerSettingsBuilder withMavenRepoUser(String repoUser, String repoPassword);
+
+    /**
+     * Return configured builder with set Kie Server sync deploying.
+     *
+     * @param syncDeploy set to true for sync deploy to Kie server
+     * @return Builder
+     */
+    KieServerSettingsBuilder withKieServerSyncDeploy(boolean syncDeploy);
+
+    /**
+     * Return configured builder with set bypass auth for Kie server.
+     *
+     * @param bypassAuth set to true for bypass auth for Kie server.
+     * @return Builder
+     */
+    KieServerSettingsBuilder withKieServerBypassAuthUser(boolean bypassAuth);
+
+    /**
+     * Return configured builder with enbaled drools classes filter for Kie
+     * server.
+     *
+     * @param droolsFilter set to true to enable drools classes filter.
+     * @return Builder
+     */
+    KieServerSettingsBuilder withDroolsServerFilterClasses(boolean droolsFilter);
 }
