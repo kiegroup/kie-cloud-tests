@@ -17,7 +17,9 @@ package org.kie.cloud.common.provider;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
@@ -42,8 +44,17 @@ public class KieServerClientProvider {
     }
 
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, long clientTimeout) {
+        return getKieServerClient(kieServerDeployment, new HashSet<>(), clientTimeout);
+    }
+
+    public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, Set<Class<?>> extraClasses) {
+        return getKieServerClient(kieServerDeployment, extraClasses, KIE_SERVER_TIMEOUT);
+    }
+
+    public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, Set<Class<?>> extraClasses, long clientTimeout) {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieServerDeployment.getUrl().toString() + "/services/rest/server",
                 kieServerDeployment.getUsername(), kieServerDeployment.getPassword(), clientTimeout);
+        configuration.addExtraClasses(extraClasses);
         KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
         return kieServerClient;
     }
