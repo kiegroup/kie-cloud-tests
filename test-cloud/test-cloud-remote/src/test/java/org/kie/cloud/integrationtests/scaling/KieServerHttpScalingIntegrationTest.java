@@ -28,6 +28,8 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.util.SmartRouterUtils;
+import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -135,7 +137,13 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
     private void deployAndStartContainer() {
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
+        // Wait until container is started in Kie server
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        // Wait until container is registered in Smart router
+        SmartRouterUtils.waitForContainerStart(smartRouterAdminClient, CONTAINER_ID);
+        // Wait until container is registered in Workbench under Smart router server template
+        // (containers are registered asynchronously in a batch).
+        WorkbenchUtils.waitForContainerRegistration(kieControllerClient, SMART_ROUTER_ID, CONTAINER_ID);
     }
 
     private void scaleKieServerTo(int count) {
