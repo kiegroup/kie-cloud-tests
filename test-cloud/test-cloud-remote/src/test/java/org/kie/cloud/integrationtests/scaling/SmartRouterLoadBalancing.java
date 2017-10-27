@@ -17,6 +17,7 @@ package org.kie.cloud.integrationtests.scaling;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -36,7 +37,8 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 
-public class SmartRouterLoadBalancing extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
+public class SmartRouterLoadBalancing extends
+        AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
 
     private KieServerMgmtControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -46,28 +48,38 @@ public class SmartRouterLoadBalancing extends AbstractCloudIntegrationTest<Workb
     private static final String LOG_PROCESS_ID = "definition-project.logProcess";
     private static final String LOG_MESSAGE = "Log process was started";
 
-    @Override protected WorkbenchRuntimeSmartRouterKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    @Override protected WorkbenchRuntimeSmartRouterKieServerDatabaseScenario createDeploymentScenario(
+            DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory
                 .getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(
+                        MavenConstants.getMavenRepoUrl(),
+                        MavenConstants.getMavenRepoUser(),
+                        MavenConstants.getMavenRepoPassword())
                 .build();
     }
 
     @Test
     public void testRouterLoadBalancing() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(
+                ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
 
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(
+                deploymentScenario.getWorkbenchRuntimeDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
+        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(),
+                CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME,
+                DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
         deploymentScenario.getKieServerDeployment().scale(2);
 
-        kieServerClientRouter = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(),
-                deploymentScenario.getKieServerDeployment().getUsername(), deploymentScenario.getKieServerDeployment().getPassword());
+        kieServerClientRouter = KieServerClientProvider.getSmartRouterClient(
+                deploymentScenario.getSmartRouterDeployment(),
+                deploymentScenario.getKieServerDeployment().getUsername(),
+                deploymentScenario.getKieServerDeployment().getPassword());
 
         ServiceResponse<KieServerInfo> kieServerInfo = kieServerClientRouter.getServerInfo();
         List<String> capabilities = kieServerInfo.getResult().getCapabilities();
@@ -78,15 +90,16 @@ public class SmartRouterLoadBalancing extends AbstractCloudIntegrationTest<Workb
         Assertions.assertThat(processDefinitions).isNotNull();
         Assertions.assertThat(processDefinitions.stream().anyMatch(p -> p.getId().equals(LOG_PROCESS_ID)));
 
-        ProcessServicesClient processServicesClient = kieServerClientRouter.getServicesClient(ProcessServicesClient.class);
+        ProcessServicesClient processServicesClient = kieServerClientRouter.getServicesClient(
+                ProcessServicesClient.class);
         for (int i = 0; i < PROCESS_NUMBER; i++) {
             processServicesClient.startProcess(CONTAINER_ID, LOG_PROCESS_ID);
         }
 
         List<Instance> kieServerInstances = deploymentScenario.getKieServerDeployment().getInstances();
-        Assertions.assertThat(kieServerInstances.size()).isGreaterThan(1);
         for (Instance kieServerInstance : kieServerInstances) {
-            Assertions.assertThat(kieServerInstance.getLogs()).contains(LOG_MESSAGE);
+            Assertions.assertThat(StringUtils.countMatches(kieServerInstance.getLogs(), LOG_MESSAGE))
+                    .isGreaterThan(PROCESS_NUMBER / 4);
         }
     }
 }
