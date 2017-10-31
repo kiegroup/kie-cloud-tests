@@ -20,6 +20,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.git.GitProvider;
@@ -61,6 +62,8 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
     protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
 
+    private static final int SCENARIO_DEPLOYMENT_ATTEMPTS = 3;
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);
 
     private final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
@@ -72,11 +75,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     public void initializeDeployment() {
         deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
 
-        try {
-            deploymentScenario.deploy();
-        } catch (MissingResourceException e) {
-            logger.warn("Skipping test because of missing resource.", e);
-            Assume.assumeNoException(e);
+        boolean isDeployed = false;
+        for (int i = 0; i < SCENARIO_DEPLOYMENT_ATTEMPTS && !isDeployed; i++) {
+            isDeployed = deployScenario();
         }
     }
 
@@ -89,6 +90,24 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
                 gitProvider.deleteGitRepository(deploymentScenario.getNamespace());
             }
         }
+    }
+
+    /**
+     * @return True if deployment is successful.
+     */
+    private boolean deployScenario() {
+        try {
+            deploymentScenario.deploy();
+            return true;
+        } catch (MissingResourceException e) {
+            logger.warn("Skipping test because of missing resource.", e);
+            Assume.assumeNoException(e);
+        } catch (DeploymentTimeoutException e) {
+            logger.warn("Scenario didn't start in defined timeout, undeploying.", e);
+            cleanEnvironment();
+        }
+
+        return false;
     }
 
     protected abstract T createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory);

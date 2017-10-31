@@ -18,6 +18,7 @@ package org.kie.cloud.api.scenario;
 import java.util.List;
 
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 
 /**
  * Cloud deployment scenario representation.
@@ -35,8 +36,9 @@ public interface DeploymentScenario {
      * Create and deploy deployment scenario.
      *
      * @throws MissingResourceException If scenario is missing any required resource.
+     * @throws DeploymentTimeoutException In case scenario deployment isn't started in defined timeout.
      */
-    void deploy() throws MissingResourceException;
+    void deploy() throws MissingResourceException, DeploymentTimeoutException;
 
     /**
      * Undeploy and delete deployment scenario.

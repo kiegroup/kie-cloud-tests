@@ -41,8 +41,9 @@ public interface Deployment {
      * Wait until Deployment is ready to use. This method waits until all
      * instances of deployment are initialized and ready and for router to
      * expose url.
+     * @throws DeploymentTimeoutException In case deployment isn't scaled in defined timeout.
      */
-    void waitForScale();
+    void waitForScale() throws DeploymentTimeoutException;
 
     /**
      * Return list of all already running instances of the deployment.
