@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClientTimeoutException;
 import io.fabric8.openshift.client.OpenShiftClient;
+import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.openshift.resource.DeploymentConfig;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 
@@ -58,12 +60,12 @@ public class DeploymentConfigImpl implements DeploymentConfig {
     }
 
     @Override
-    public void waitUntilAllPodsAreReady() {
+    public void waitUntilAllPodsAreReady() throws DeploymentTimeoutException {
         waitUntilAllPodsAreStarted();
         waitUntilAllPodsAreRunning();
     }
 
-    private void waitUntilAllPodsAreStarted() {
+    private void waitUntilAllPodsAreStarted() throws DeploymentTimeoutException {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + OpenShiftResourceConstants.DEPLOYMENT_PODS_TERMINATION_TIMEOUT;
         int expectedPods = client.deploymentConfigs().inNamespace(projectName).withName(deploymentConfigName).get().getSpec().getReplicas().intValue();
 
@@ -79,17 +81,19 @@ public class DeploymentConfigImpl implements DeploymentConfig {
                 throw new RuntimeException("Interrupted while waiting for pods to start.", e);
             }
         }
-        throw new RuntimeException("Timeout while waiting for pods to start.");
+        throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
     }
 
-    private void waitUntilAllPodsAreRunning() {
+    private void waitUntilAllPodsAreRunning() throws DeploymentTimeoutException {
         List<Pod> pods = client.pods().inNamespace(projectName).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
         for(Pod pod : pods) {
             try {
                 client.pods().inNamespace(projectName).withName(pod.getMetadata().getName()).waitUntilReady(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for pod to be ready.", e);
+                throw new RuntimeException("Interrupted while waiting for pod '" + pod.getMetadata().getName() + "' to be ready.", e);
+            } catch (KubernetesClientTimeoutException e) {
+                throw new DeploymentTimeoutException("Timeout while waiting for pod '" + pod.getMetadata().getName() + "' to be ready.", e);
             }
         }
     }

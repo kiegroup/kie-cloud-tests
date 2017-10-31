@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.resource;
 
+import org.kie.cloud.api.deployment.DeploymentTimeoutException;
+
 /**
  * Deployment config representation.
  */
@@ -41,8 +43,9 @@ public interface DeploymentConfig {
 
     /**
      * Wait until all pods are initialized and ready.
+     * @throws DeploymentTimeoutException In case pods didn't start in defined timeout.
      */
-    public void waitUntilAllPodsAreReady();
+    public void waitUntilAllPodsAreReady() throws DeploymentTimeoutException;
 
     /**
      * Delete deployment controller.
