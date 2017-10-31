@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.scenario;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,9 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
         logger.info("Waiting for Database deployment to become ready.");
         databaseDeployment.waitForScale();
+
+        // Used to track persistent volume content due to issues with volume cleanup
+        storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/bpmsuite");
     }
 
     @Override
@@ -153,5 +157,10 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
     @Override
     public List<Deployment> getDeployments() {
         return Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment);
+    }
+
+    private void storeProjectInfoToPersistentVolume(Deployment deployment, String persistentVolumeMountPath) {
+        String storeCommand = "echo \"Project " + projectName + ", time " + Instant.now() + "\" > " + persistentVolumeMountPath + "/info.txt";
+        workbenchDeployment.getInstances().get(0).runCommand("/bin/bash", "-c", storeCommand);
     }
 }
