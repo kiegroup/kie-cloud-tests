@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.deployment;
 
+import java.net.URI;
 import java.net.URL;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
@@ -23,6 +24,7 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
 
     private URL url;
     private URL secureUrl;
+    private URI webSocketUri;
     private String username;
     private String password;
 
@@ -41,6 +43,13 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
             secureUrl = getHttpsRouteUrl(secureServiceName);
         }
         return secureUrl;
+    }
+
+    @Override public URI getWebSocketUri() {
+        if (webSocketUri == null) {
+            webSocketUri = getWebSocketRouteUri(serviceName);
+        }
+        return webSocketUri;
     }
 
     @Override public String getUsername() {

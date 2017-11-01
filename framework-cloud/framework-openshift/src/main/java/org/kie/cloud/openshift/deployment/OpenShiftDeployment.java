@@ -18,6 +18,8 @@ package org.kie.cloud.openshift.deployment;
 import static java.util.stream.Collectors.toList;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,15 +123,27 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     protected URL getHttpRouteUrl(String serviceName) {
-        return getRouteUrl("http", serviceName);
+        try {
+            return getRouteUri("http", serviceName).toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected URL getHttpsRouteUrl(String serviceName) {
-        return getRouteUrl("https", serviceName);
+        try {
+            return getRouteUri("https", serviceName).toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private URL getRouteUrl(String protocol, String serviceName) {
-        URL url;
+    protected URI getWebSocketRouteUri(String serviceName) {
+        return getRouteUri("ws", serviceName);
+    }
+
+    private URI getRouteUri(String protocol, String serviceName) {
+        URI uri;
         Service service = openShiftController.getProject(namespace).getService(serviceName);
 
         String routeHost = null;
@@ -140,20 +154,21 @@ public abstract class OpenShiftDeployment implements Deployment {
         } else {
             routeHost = service.getRoute().getRouteHost();
         }
-        String urlValue = protocol + "://" + routeHost + ":" + retrievePort(protocol);
+        String uriValue = protocol + "://" + routeHost + ":" + retrievePort(protocol);
 
         try {
-            url = new URL(urlValue.toString());
-        } catch (MalformedURLException e) {
+            uri = new URI(uriValue.toString());
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
 
-        return url;
+        return uri;
     }
 
     private String retrievePort(String protocol) {
         switch (protocol) {
             case "http":
+            case "ws":
                 return "80";
             case "https":
                 return "443";

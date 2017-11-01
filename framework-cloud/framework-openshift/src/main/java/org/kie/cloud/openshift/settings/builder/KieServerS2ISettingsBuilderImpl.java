@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
@@ -59,6 +60,12 @@ public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuil
     public KieServerS2ISettingsBuilder withControllerUser(String controllerUser, String controllerPwd) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, controllerUser);
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, controllerPwd);
+        return this;
+    }
+
+    @Override
+    public KieServerS2ISettingsBuilder withControllerProtocol(Protocol protocol) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PROTOCOL, protocol.name());
         return this;
     }
 
@@ -118,4 +125,9 @@ public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuil
         return this;
     }
 
+    @Override
+    public KieServerS2ISettingsBuilder withKieServerSyncDeploy(boolean syncDeploy) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SYNC_DEPLOY, Boolean.toString(syncDeploy));
+        return this;
+    }
 }
