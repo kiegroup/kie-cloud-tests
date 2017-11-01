@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.api.settings.builder;
 
+import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.api.settings.DeploymentSettings;
 
 /**
@@ -50,6 +51,14 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return Builder
      */
     KieServerS2ISettingsBuilder withControllerUser(String controllerUser, String controllerPwd);
+
+    /**
+     * Return configured builder with connection to Controller.
+     *
+     * @param protocol Protocol for URL to Controller.
+     * @return Builder
+     */
+    KieServerS2ISettingsBuilder withControllerProtocol(Protocol protocol);
 
     /**
      * Return configured builder with connection to Controller set by service
@@ -123,4 +132,12 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return Builder
      */
     KieServerS2ISettingsBuilder withMavenRepoUser(String repoUser, String repoPassword);
+
+    /**
+     * Return configured builder with set Kie Server sync deploying.
+     *
+     * @param syncDeploy set to true for sync deploy to Kie server
+     * @return Builder
+     */
+    KieServerS2ISettingsBuilder withKieServerSyncDeploy(boolean syncDeploy);
 }
