@@ -117,6 +117,9 @@
               <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
             </systemProperties>
+            <parallel>classes</parallel>
+            <threadCount>3</threadCount>
+            <perCoreThreadCount>false</perCoreThreadCount>
           </configuration>
         </plugin>
       </plugins>
