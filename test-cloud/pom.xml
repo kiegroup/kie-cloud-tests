@@ -50,6 +50,7 @@
   </properties>
 
   <modules>
+    <module>test-cloud-images</module>
     <module>test-cloud-remote</module>
   </modules>
 
