@@ -36,6 +36,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String DEFINITION_PROJECT_SNAPSHOT_NAME = "definition-project-snapshot";
     protected static final String DEFINITION_PROJECT_SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
 
+    protected static final String CLOUD_BALANCE_PROJECT_SNAPSHOT_NAME = "cloudbalance-snapshot";
+    protected static final String CLOUD_BALANCE_PROJECT_SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
+
     protected static final String TIMER_PROJECT_NAME = "timer-project";
     protected static final String TIMER_PROJECT_VERSION = "1.0.0.Final";
 
