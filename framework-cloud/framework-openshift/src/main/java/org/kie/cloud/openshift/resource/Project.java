@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.cloud.openshift.image.ImageStream;
+
 /**
  * Project representation.
  */
@@ -101,4 +103,12 @@ public interface Project {
      * @return Default routing subdomain.
      */
     public String getDefaultRoutingSubdomain();
+
+    /**
+     * Get image associated with image stream.
+     *
+     * @param imageStream Image stream.
+     * @return Image referenced by image stream available in this project.
+     */
+    public Image getImage(ImageStream imageStream);
 }

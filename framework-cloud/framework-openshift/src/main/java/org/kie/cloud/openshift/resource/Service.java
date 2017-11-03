@@ -39,7 +39,7 @@ public interface Service {
      * @param envVariables Environment variables to be set in pods started by this deployment.
      * @return Created Deployment config.
      */
-    public DeploymentConfig createDeploymentConfig(String image, Map<String, String> envVariables);
+    public DeploymentConfig createDeploymentConfig(Image image, Map<String, String> envVariables);
 
     /**
      * Create deployment config - responsible for deploying and controlling of pods.
@@ -51,7 +51,7 @@ public interface Service {
      * @param pods Number of pods to be started.
      * @return Created Deployment config.
      */
-    public DeploymentConfig createDeploymentConfig(String image, Map<String, String> envVariables, int pods);
+    public DeploymentConfig createDeploymentConfig(Image image, Map<String, String> envVariables, int pods);
 
     /**
      * @return Deployment config associated to this service.
