@@ -115,7 +115,8 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
     private void signalStartLongScript(Long pid) {
         new Thread(() -> {
             try {
-                processServicesClient.signalProcessInstance(CONTAINER_ID, pid, SIGNAL_NAME, null);
+                ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
+                processClient.signalProcessInstance(CONTAINER_ID, pid, SIGNAL_NAME, null);
             } catch (KieServicesHttpException e) {
                 // Expected
             }

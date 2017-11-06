@@ -71,6 +71,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
             }
         } catch (IOException e) {
+            logger.error("Error in downloading workbench login screen using secure connection", e);
             fail("Error in downloading workbench login screen using secure connection", e);
         }
     }
@@ -88,6 +89,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 assertThat(serverTemplateExists(SERVER_ID, httpClient)).isTrue();
             }
         } catch (IOException e) {
+            logger.error("Unable to connect to workbench REST API", e);
             throw new RuntimeException("Unable to connect to workbench REST API", e);
         }
     }
