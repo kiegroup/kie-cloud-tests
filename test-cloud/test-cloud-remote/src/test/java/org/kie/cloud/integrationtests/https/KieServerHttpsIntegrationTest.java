@@ -74,6 +74,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 Assertions.assertThat(kieServerInfo.getCapabilities()).contains(KieServerConstants.CAPABILITY_BRM);
             }
         } catch (Exception e) {
+            logger.error("Unable to connect to KIE server REST API", e);
             throw new RuntimeException("Unable to connect to KIE server REST API", e);
         }
     }
@@ -97,6 +98,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 Assertions.assertThat(containers).contains(CONTAINER_ID);
             }
         } catch (Exception e) {
+            logger.error("Unable to connect to KIE server REST API", e);
             throw new RuntimeException("Unable to connect to KIE server REST API", e);
         }
     }
