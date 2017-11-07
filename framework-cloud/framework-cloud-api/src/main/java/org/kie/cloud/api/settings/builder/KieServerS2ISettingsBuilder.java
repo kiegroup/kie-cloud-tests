@@ -79,6 +79,23 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
     KieServerS2ISettingsBuilder withControllerConnection(String url, String port);
 
     /**
+     * Return configured builder with connection to Smart Router.
+     *
+     * @param url URL to Smart Router.
+     * @param port port of Smart Router.
+     * @return Builder.
+     */
+    KieServerS2ISettingsBuilder withSmartRouterConnection(String url, String port);
+
+    /**
+     * Return configured builder with connection to Smart Router.
+     *
+     * @param serviceName Smart Router service name.
+     * @return Builder.
+     */
+    KieServerS2ISettingsBuilder withSmartRouterConnection(String serviceName);
+
+    /**
      * Return configured builder with external database connection. Values for
      * external database are add by system properties.
      *
@@ -140,4 +157,23 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return Builder
      */
     KieServerS2ISettingsBuilder withKieServerSyncDeploy(boolean syncDeploy);
+
+    /**
+     * Return configured builder with set host route. Custom hostname for http
+     * service route.
+     *
+     * @param http
+     * @return
+     */
+    KieServerS2ISettingsBuilder withHostame(String http);
+
+    /**
+     * Return configured builder with set secured host route. Custom hostname
+     * for https service route.
+     *
+     * @param https
+     * @return
+     */
+    KieServerS2ISettingsBuilder withSecuredHostame(String https);
+
 }

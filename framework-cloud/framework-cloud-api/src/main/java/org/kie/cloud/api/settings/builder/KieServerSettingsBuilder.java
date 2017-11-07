@@ -70,6 +70,23 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
     KieServerSettingsBuilder withControllerConnection(String url, String port);
 
     /**
+     * Return configured builder with connection to Smart Router.
+     *
+     * @param url URL to Smart Router.
+     * @param port port of Smart Router.
+     * @return Builder.
+     */
+    KieServerSettingsBuilder withSmartRouterConnection(String url, String port);
+
+    /**
+     * Return configured builder with connection to Smart Router.
+     *
+     * @param serviceName Smart Router service name.
+     * @return Builder.
+     */
+    KieServerSettingsBuilder withSmartRouterConnection(String serviceName);
+
+    /**
      * Return configured builder with Kie Container deployment.
      *
      * @param kieContainerDeployment Kie Container deployment.
@@ -127,4 +144,22 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @return Builder
      */
     KieServerSettingsBuilder withDroolsServerFilterClasses(boolean droolsFilter);
+
+    /**
+     * Return configured builder with set host route. Custom hostname for http
+     * service route.
+     *
+     * @param http
+     * @return
+     */
+    KieServerSettingsBuilder withHostame(String http);
+
+    /**
+     * Return configured builder with set secured host route. Custom hostname
+     * for https service route.
+     *
+     * @param https
+     * @return
+     */
+    KieServerSettingsBuilder withSecuredHostame(String https);
 }

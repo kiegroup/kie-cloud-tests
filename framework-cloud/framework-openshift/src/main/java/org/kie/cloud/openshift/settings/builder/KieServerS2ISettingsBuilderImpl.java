@@ -83,6 +83,19 @@ public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuil
     }
 
     @Override
+    public KieServerS2ISettingsBuilder withSmartRouterConnection(String url, String port) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_HOST, url);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_PORT, port);
+        return this;
+    }
+
+    @Override
+    public KieServerS2ISettingsBuilder withSmartRouterConnection(String serviceName) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_SERVICE, serviceName);
+        return this;
+    }
+
+    @Override
     public KieServerS2ISettingsBuilder withExternalDatabase() {
         envVariables.put(OpenShiftTemplateConstants.DBE_SERVICE_HOST, DeploymentConstants.getDatabaseHost());
         envVariables.put(OpenShiftTemplateConstants.DBE_DATABASE, DeploymentConstants.getExternalDatabaseName());
@@ -130,4 +143,17 @@ public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuil
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SYNC_DEPLOY, Boolean.toString(syncDeploy));
         return this;
     }
+
+    @Override
+    public KieServerS2ISettingsBuilder withHostame(String http) {
+        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTP, http);
+        return this;
+    }
+
+    @Override
+    public KieServerS2ISettingsBuilder withSecuredHostame(String https) {
+        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTPS, https);
+        return this;
+    }
+
 }

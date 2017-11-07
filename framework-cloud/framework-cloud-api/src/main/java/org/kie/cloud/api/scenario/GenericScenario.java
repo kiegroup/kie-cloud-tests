@@ -17,6 +17,7 @@ package org.kie.cloud.api.scenario;
 
 import java.util.List;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 public interface GenericScenario extends DeploymentScenario {
@@ -36,4 +37,12 @@ public interface GenericScenario extends DeploymentScenario {
      * @see KieServerDeployment
      */
     List<KieServerDeployment> getKieServerDeployments();
+
+    /**
+     * Return List of all Smart Router deployments.
+     *
+     * @return SmartRouterDeployment
+     * @see SmartRouterDeployment
+     */
+    List<SmartRouterDeployment> getSmartRouterDeployments();
 }

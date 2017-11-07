@@ -22,6 +22,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDa
 import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
+import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -32,6 +33,7 @@ import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieSe
 import org.kie.cloud.openshift.scenario.builder.WorkbenchWithKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchSettingsBuilderImpl;
 
@@ -88,6 +90,11 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     @Override
     public WorkbenchMonitoringSettingsBuilder getWorkbenchMonitoringSettingsBuilder() {
         return new WorkbenchMonitoringSettingsBuilderImpl();
+    }
+
+    @Override
+    public SmartRouterSettingsBuilder getSmartRouterSettingsBuilder() {
+        return new SmartRouterSettingsBuilderImpl();
     }
 
     @Override

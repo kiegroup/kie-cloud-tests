@@ -35,6 +35,8 @@ public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
 
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
     }
 
     @Override
@@ -66,6 +68,18 @@ public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
     public WorkbenchSettingsBuilder withKieServerUser(String username, String password) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, username);
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, password);
+        return this;
+    }
+
+    @Override
+    public WorkbenchSettingsBuilder withHostame(String http) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, http);
+        return this;
+    }
+
+    @Override
+    public WorkbenchSettingsBuilder withSecuredHostame(String https) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, https);
         return this;
     }
 }

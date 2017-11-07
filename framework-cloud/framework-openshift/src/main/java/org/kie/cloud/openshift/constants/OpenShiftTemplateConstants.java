@@ -37,9 +37,11 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_CONTROLLER_SERVICE = "KIE_SERVER_CONTROLLER_SERVICE";
 
     public static final String KIE_SERVER_ROUTER_ID = "KIE_SERVER_ROUTER_ID";
+    public static final String KIE_SERVER_ROUTER_NAME = "KIE_SERVER_ROUTER_NAME";
     public static final String KIE_SERVER_ROUTER_HOST = "KIE_SERVER_ROUTER_HOST";
     public static final String KIE_SERVER_ROUTER_PORT = "KIE_SERVER_ROUTER_PORT";
     public static final String KIE_SERVER_ROUTER_SERVICE = "KIE_SERVER_ROUTER_SERVICE";
+    public static final String KIE_SERVER_ROUTER_URL_EXTERNAL = "KIE_SERVER_ROUTER_URL_EXTERNAL";
 
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
@@ -63,6 +65,7 @@ public class OpenShiftTemplateConstants {
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";
     public static final String EXECUTION_SERVER_HOSTNAME_HTTP = "EXECUTION_SERVER_HOSTNAME_HTTP";
     public static final String EXECUTION_SERVER_HOSTNAME_HTTPS = "EXECUTION_SERVER_HOSTNAME_HTTPS";
+    public static final String SMART_ROUTER_HOSTNAME_HTTP = "SMART_ROUTER_HOSTNAME_HTTP";
 
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "KIE_SERVER_CONTAINER_DEPLOYMENT";
 

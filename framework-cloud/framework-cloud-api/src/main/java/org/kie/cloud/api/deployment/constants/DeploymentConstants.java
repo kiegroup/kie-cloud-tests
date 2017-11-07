@@ -42,6 +42,8 @@ public class DeploymentConstants implements Constants {
     public static final String DATABASE_USERNAME = "db.username";
     public static final String DATABASE_PASSWORD = "db.password";
 
+    public static final String DEFAULT_DOMAIN_SUFFIX = "default.domain.suffix";
+
     public static String getKieServerUser() {
         return System.getProperty(KIE_SERVER_USER);
     }
@@ -96,5 +98,9 @@ public class DeploymentConstants implements Constants {
 
     public static String getHibernatePersistenceDialect() {
         return System.getProperty(HIBERNATE_PERSISTENCE_DIALECT);
+    }
+
+    public static String getDefaultDomainSuffix() {
+        return System.getProperty(DEFAULT_DOMAIN_SUFFIX);
     }
 }
