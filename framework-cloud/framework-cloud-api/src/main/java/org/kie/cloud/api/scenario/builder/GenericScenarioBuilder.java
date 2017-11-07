@@ -29,6 +29,14 @@ public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<Generi
     GenericScenarioBuilder withKieServer(DeploymentSettings kieServerSettings);
 
     /**
+     * Return scenario Builder with added Kie Server deployment into scenario.
+     *
+     * @param kieServersSettings deployment settinfs for Kie Server.
+     * @return Builder
+     */
+    GenericScenarioBuilder withKieServer(DeploymentSettings... kieServersSettings);
+
+    /**
      * Return scenario Builder with added Workbench deployment into scenario.
      *
      * @param workbenchSettings
@@ -41,8 +49,16 @@ public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<Generi
      * scenario.
      *
      * @param workbenchSettings
-     * @return
+     * @return Builder
      */
     GenericScenarioBuilder withMonitoring(DeploymentSettings workbenchSettings);
+
+    /**
+     * Return scenario Builder with added Smart router deployment into scenario.
+     *
+     * @param smartRouterSettings
+     * @return Builder
+     */
+    GenericScenarioBuilder withSmartRouter(DeploymentSettings smartRouterSettings);
 
 }

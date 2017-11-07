@@ -60,4 +60,22 @@ public interface WorkbenchSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @return
      */
     WorkbenchSettingsBuilder withKieServerUser(String username, String password);
+
+    /**
+     * Return configured builder with set host route. Custom hostname for http
+     * service route.
+     *
+     * @param http
+     * @return
+     */
+    WorkbenchSettingsBuilder withHostame(String http);
+
+    /**
+     * Return configured builder with set secured host route. Custom hostname
+     * for https service route.
+     *
+     * @param https
+     * @return
+     */
+    WorkbenchSettingsBuilder withSecuredHostame(String https);
 }

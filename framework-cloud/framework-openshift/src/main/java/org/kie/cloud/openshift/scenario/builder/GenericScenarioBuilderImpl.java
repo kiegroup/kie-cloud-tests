@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.scenario.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.kie.cloud.api.scenario.GenericScenario;
@@ -31,22 +32,30 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
     private List<DeploymentSettings> kieServerSettingsList;
     private List<DeploymentSettings> workbenchSettingsList;
     private List<DeploymentSettings> monitoringSettingsList;
+    private List<DeploymentSettings> smartRouterSettingsList;
 
     public GenericScenarioBuilderImpl(OpenShiftController openShiftController) {
         this.openshiftController = openShiftController;
         this.kieServerSettingsList = new ArrayList<>();
         this.workbenchSettingsList = new ArrayList<>();
         this.monitoringSettingsList = new ArrayList<>();
+        this.smartRouterSettingsList = new ArrayList<>();
     }
 
     @Override
     public GenericScenario build() {
-        return new GenericScenarioImpl(openshiftController, kieServerSettingsList, workbenchSettingsList, monitoringSettingsList);
+        return new GenericScenarioImpl(openshiftController, kieServerSettingsList, workbenchSettingsList, monitoringSettingsList, smartRouterSettingsList);
     }
 
     @Override
     public GenericScenarioBuilder withKieServer(DeploymentSettings kieServerSettings) {
         kieServerSettingsList.add(kieServerSettings);
+        return this;
+    }
+
+    @Override
+    public GenericScenarioBuilder withKieServer(DeploymentSettings... kieServersSettings) {
+        kieServerSettingsList.addAll(Arrays.asList(kieServersSettings));
         return this;
     }
 
@@ -59,6 +68,12 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
     @Override
     public GenericScenarioBuilder withMonitoring(DeploymentSettings workbenchSettings) {
         monitoringSettingsList.add(workbenchSettings);
+        return this;
+    }
+
+    @Override
+    public GenericScenarioBuilder withSmartRouter(DeploymentSettings smartRouterSettings) {
+        smartRouterSettingsList.add(smartRouterSettings);
         return this;
     }
 

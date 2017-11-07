@@ -47,6 +47,8 @@
     <org.kie.workbench.pwd>adminUser1!</org.kie.workbench.pwd>
     <org.kie.server.controller.user>controllerUser</org.kie.server.controller.user>
     <org.kie.server.controller.pwd>controllerUser1!</org.kie.server.controller.pwd>
+
+    <default.domain.suffix/>
   </properties>
 
   <modules>
@@ -93,6 +95,7 @@
               <kie.app.template.kie-server.database.external>${kie.app.template.kie-server.database.external}</kie.app.template.kie-server.database.external>
               <kie.app.template.workbench-monitoring>${kie.app.template.workbench-monitoring}</kie.app.template.workbench-monitoring>
               <kie.app.template.workbench-monitoring.smartrouter>${kie.app.template.workbench-monitoring.smartrouter}</kie.app.template.workbench-monitoring.smartrouter>
+              <kie.app.template.smartrouter>${kie.app.template.smartrouter}</kie.app.template.smartrouter>
               <db.hostname>${db.hostname}</db.hostname>
               <db.port>${db.port}</db.port>
               <db.name>${db.name}</db.name>
@@ -115,6 +118,7 @@
               <org.kie.workbench.pwd>${org.kie.workbench.pwd}</org.kie.workbench.pwd>
               <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
+              <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
             </systemProperties>
           </configuration>
         </plugin>
