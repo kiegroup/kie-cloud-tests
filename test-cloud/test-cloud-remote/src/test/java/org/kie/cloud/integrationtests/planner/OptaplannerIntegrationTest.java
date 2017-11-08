@@ -17,10 +17,12 @@ package org.kie.cloud.integrationtests.planner;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
@@ -63,6 +65,11 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Wor
                         MavenConstants.getMavenRepoUser(),
                         MavenConstants.getMavenRepoPassword())
                 .build();
+    }
+
+    @Before
+    public void setRouterTimeout() {
+        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
     }
 
     @Test
