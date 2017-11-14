@@ -52,6 +52,7 @@
   </properties>
 
   <modules>
+    <module>test-cloud-images</module>
     <module>test-cloud-remote</module>
   </modules>
 
@@ -120,6 +121,9 @@
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
             </systemProperties>
+            <parallel>classes</parallel>
+            <threadCount>3</threadCount>
+            <perCoreThreadCount>false</perCoreThreadCount>
           </configuration>
         </plugin>
       </plugins>

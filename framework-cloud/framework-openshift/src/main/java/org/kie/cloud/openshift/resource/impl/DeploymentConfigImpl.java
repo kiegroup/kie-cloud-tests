@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.resource.impl;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientTimeoutException;
@@ -60,6 +61,13 @@ public class DeploymentConfigImpl implements DeploymentConfig {
     }
 
     @Override
+    public List<org.kie.cloud.openshift.resource.Pod> getPods() {
+        return getDeploymentPods().stream()
+                .map(n -> new PodImpl(client, projectName, n.getMetadata().getName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void waitUntilAllPodsAreReady() throws DeploymentTimeoutException {
         waitUntilAllPodsAreStarted();
         waitUntilAllPodsAreRunning();
@@ -70,7 +78,7 @@ public class DeploymentConfigImpl implements DeploymentConfig {
         int expectedPods = client.deploymentConfigs().inNamespace(projectName).withName(deploymentConfigName).get().getSpec().getReplicas().intValue();
 
         while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            if(client.pods().inNamespace(projectName).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems().size() == expectedPods) {
+            if(getDeploymentPods().size() == expectedPods) {
                 return;
             }
 
@@ -85,8 +93,7 @@ public class DeploymentConfigImpl implements DeploymentConfig {
     }
 
     private void waitUntilAllPodsAreRunning() throws DeploymentTimeoutException {
-        List<Pod> pods = client.pods().inNamespace(projectName).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
-        for(Pod pod : pods) {
+        for(Pod pod : getDeploymentPods()) {
             try {
                 client.pods().inNamespace(projectName).withName(pod.getMetadata().getName()).waitUntilReady(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
@@ -96,5 +103,9 @@ public class DeploymentConfigImpl implements DeploymentConfig {
                 throw new DeploymentTimeoutException("Timeout while waiting for pod '" + pod.getMetadata().getName() + "' to be ready.", e);
             }
         }
+    }
+
+    private List<Pod> getDeploymentPods() {
+        return client.pods().inNamespace(projectName).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
     }
 }

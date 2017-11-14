@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.resource;
 
+import java.util.List;
+
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 
 /**
@@ -51,4 +53,11 @@ public interface DeploymentConfig {
      * Delete deployment controller.
      */
     public void delete();
+
+    /**
+     * Returns all Pods associated with this Deployment config
+     *
+     * @return List of Pods for this DC.
+     */
+    public List<Pod> getPods();
 }

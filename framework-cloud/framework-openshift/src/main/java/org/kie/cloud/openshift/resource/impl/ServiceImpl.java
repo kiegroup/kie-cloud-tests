@@ -28,6 +28,7 @@ import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.DeploymentTriggerPolicyBuilder;
 import io.fabric8.openshift.api.model.RouteBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
+import org.kie.cloud.openshift.resource.Image;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Service;
 
@@ -54,15 +55,15 @@ public class ServiceImpl implements Service {
     }
 
     @Override
-    public DeploymentConfigImpl createDeploymentConfig(String image, Map<String, String> envVariables) {
+    public DeploymentConfigImpl createDeploymentConfig(Image image, Map<String, String> envVariables) {
         return createDeploymentConfig(image, envVariables, 1);
     }
 
     @Override
-    public DeploymentConfigImpl createDeploymentConfig(String image, Map<String, String> envVariables, int pods) {
+    public DeploymentConfigImpl createDeploymentConfig(Image image, Map<String, String> envVariables, int pods) {
         Map<String, String> selector = new HashMap<String, String>();
         // To be paired with service
-        selector.put("deploymentconfig", serviceName);
+        selector.put("deploymentConfig", serviceName);
 
         List<EnvVar> envVar = convertEnvVariables(envVariables);
 
@@ -83,7 +84,7 @@ public class ServiceImpl implements Service {
                             .withContainers(
                                     new ContainerBuilder()
                                     .withName(serviceName)
-                                    .withImage(image)
+                                    .withImage(image.getImageReference())
                                     .withEnv(envVar)
                                     .build())
                         .endSpec()

@@ -17,6 +17,7 @@ package org.kie.cloud.integrationtests.util;
 
 import java.time.Duration;
 
+import org.kie.cloud.common.time.TimeUtils;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 
