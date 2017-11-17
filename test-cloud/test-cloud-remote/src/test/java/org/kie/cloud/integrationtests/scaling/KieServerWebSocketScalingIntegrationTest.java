@@ -115,6 +115,7 @@ public class KieServerWebSocketScalingIntegrationTest {
         scaleKieServerTo(3);
 
         String kieServerId = getKieServerId(kieServerClient);
+        waitUntilKieServerLogsContain(WEBSOCKET_CONNECTION);
         verifyKieServerLogsContain(WEBSOCKET_CONNECTION);
         verifyServerTemplateContainsKieServers(kieServerId, 3);
 
