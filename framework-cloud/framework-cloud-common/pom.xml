@@ -38,6 +38,10 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-mgmt-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-integ-tests-common</artifactId>
       <exclusions>
         <exclusion>

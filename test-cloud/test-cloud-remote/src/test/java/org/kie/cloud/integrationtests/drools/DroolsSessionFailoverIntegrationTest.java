@@ -44,7 +44,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.RuleServicesClient;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     public void executeSimpleRuleFailoverTest() throws InterruptedException {
         logger.debug("Register Kie Container to Kie Server");
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        kieServerMgmtControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, RULE_PROJECT_NAME, RULE_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieServerMgmtControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, RULE_PROJECT_NAME, RULE_PROJECT_VERSION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
         WorkbenchUtils.waitForContainerRegistration(kieServerMgmtControllerClient, SMART_ROUTER_ID, CONTAINER_ID);
 
