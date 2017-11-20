@@ -17,12 +17,19 @@ package org.kie.cloud.integrationtests.util;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.git.GitProvider;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchUtils {
@@ -50,5 +57,16 @@ public class WorkbenchUtils {
             Collection<ContainerSpec> containersSpec = kieControllerClient.getServerTemplate(serverTemplate).getContainersSpec();
             return containersSpec.stream().anyMatch(n -> n.getId().equals(containerId));
         });
+    }
+
+    public static void saveContainerSpec(KieServerMgmtControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
+        saveContainerSpec(kieControllerClient, serverTemplateId, serverTemplateName, containerId, containerAlias, groupId, artifactId, version, status, Collections.emptyMap());
+    }
+
+    public static void saveContainerSpec(KieServerMgmtControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
+        ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
+        ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
+        ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);
+        kieControllerClient.saveContainerSpec(serverTemplateId, containerSpec);
     }
 }

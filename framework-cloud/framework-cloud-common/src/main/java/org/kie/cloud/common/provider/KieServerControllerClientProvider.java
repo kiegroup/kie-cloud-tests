@@ -20,12 +20,13 @@ import java.util.Collection;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
 
 public class KieServerControllerClientProvider {
 
     public static KieServerMgmtControllerClient getKieServerMgmtControllerClient(WorkbenchDeployment workbenchDeployment) {
-        KieServerMgmtControllerClient kieServerMgmtControllerClient = new KieServerMgmtControllerClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
+        KieServerMgmtControllerClient kieServerMgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
                 workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
         return kieServerMgmtControllerClient;
     }

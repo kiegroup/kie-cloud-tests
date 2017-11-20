@@ -33,7 +33,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 
 public class TimerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
 
@@ -60,7 +60,7 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
         deploymentScenario.getKieServerDeployment().waitForScale();
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
-        kieControllerClient.saveContainerSpec(serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, TIMER_PROJECT_NAME, TIMER_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, TIMER_PROJECT_NAME, TIMER_PROJECT_VERSION, KieContainerStatus.STARTED);
 
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
         List<Integer> completedOnly = Arrays.asList(org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED);
