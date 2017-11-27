@@ -101,9 +101,9 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
-        <groupId>org.guvnor</groupId>
-        <artifactId>guvnor-rest-client</artifactId>
-        <version>${version.org.kie}</version>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-rest-client</artifactId>
+        <version>${version.org.uberfire}</version>
       </dependency>
       <dependency>
         <groupId>org.gitlab</groupId>

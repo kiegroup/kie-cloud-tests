@@ -24,11 +24,12 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
-import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.common.client.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -46,7 +47,9 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
 
     @Before
     public void setUp() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), TIMER_PROJECT_NAME);
+        WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployment();
+        gitProvider.createGitRepository(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(workbenchDeployment.getNamespace()), workbenchDeployment, TIMER_PROJECT_NAME);
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
     }

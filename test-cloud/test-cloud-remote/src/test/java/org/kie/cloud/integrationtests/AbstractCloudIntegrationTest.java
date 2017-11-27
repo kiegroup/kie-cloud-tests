@@ -71,6 +71,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
     protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
 
+    // Path relative to target/classes folder
+    protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
+
     private static final int SCENARIO_DEPLOYMENT_ATTEMPTS = 3;
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);

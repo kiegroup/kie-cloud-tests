@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.util;
+package org.kie.cloud.common.client.util;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.common.time.TimeUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.spec.Capability;
@@ -37,18 +37,13 @@ public class WorkbenchUtils {
     private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
     private static final String REPOSITORY_NAME = "myRepo";
 
-    // Path relative to target/classes folder
-    private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
-
     private static final Duration WAIT_STEP = Duration.ofSeconds(1);
     private static final Duration MAX_WAIT_DURATION = Duration.ofSeconds(15);
 
-    public static void deployProjectToWorkbench(GitProvider gitProvider, WorkbenchDeployment workbenchDeployment, String projectName) {
-        gitProvider.createGitRepository(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
+    public static void deployProjectToWorkbench(String repositoryUrl, WorkbenchDeployment workbenchDeployment, String projectName) {
         WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
         workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchDeployment.getUsername());
-        workbenchClient.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, gitProvider.getRepositoryUrl(workbenchDeployment.getNamespace()));
+        workbenchClient.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, repositoryUrl);
         workbenchClient.deployProject(REPOSITORY_NAME, projectName);
     }
 

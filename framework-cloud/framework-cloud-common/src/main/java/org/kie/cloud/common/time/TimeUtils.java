@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.util;
+package org.kie.cloud.common.time;
 
 import java.time.Duration;
 import java.time.Instant;

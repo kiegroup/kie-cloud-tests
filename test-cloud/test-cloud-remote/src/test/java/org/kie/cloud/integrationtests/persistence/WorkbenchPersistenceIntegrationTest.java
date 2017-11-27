@@ -25,12 +25,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
-import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.common.client.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
@@ -61,7 +62,9 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployment();
+        gitProvider.createGitRepository(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(workbenchDeployment.getNamespace()), workbenchDeployment, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         String kieServerLocation = serverInfo.getLocation();
