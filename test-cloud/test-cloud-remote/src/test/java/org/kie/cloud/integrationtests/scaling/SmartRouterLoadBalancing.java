@@ -17,7 +17,7 @@ package org.kie.cloud.integrationtests.scaling;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
