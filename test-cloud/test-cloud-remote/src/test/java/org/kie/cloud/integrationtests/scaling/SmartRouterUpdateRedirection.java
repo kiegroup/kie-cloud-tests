@@ -17,9 +17,7 @@ package org.kie.cloud.integrationtests.scaling;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,19 +34,22 @@ import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.QueryServicesClient;
+import org.kie.server.client.ProcessServicesClient;
 
 public class SmartRouterUpdateRedirection extends AbstractCloudIntegrationTest<GenericScenario> {
 
     private static final int RETRIES_NUMBER = 5;
 
     private static final String CONTAINER_ID_UPDATED = "container-updated";
+    private static final String LOG_MESSAGE = "Log process was started";
 
     private final String smartRouterName = "smart-router-" + UUID.randomUUID().toString().substring(0, 4);
     private final String smartRouterHostname = smartRouterName + DeploymentConstants.getDefaultDomainSuffix();
     private final String smartRouterPort = "80";
+
+    private KieServerDeployment kieServerDeployment1;
+    private KieServerDeployment kieServerDeployment2;
 
     private KieServicesClient kieServerClient1;
     private KieServicesClient kieServerClient2;
@@ -83,8 +84,8 @@ public class SmartRouterUpdateRedirection extends AbstractCloudIntegrationTest<G
 
     @Before
     public void prepateClientsAndProject() {
-        KieServerDeployment kieServerDeployment1 = deploymentScenario.getKieServerDeployments().get(0);
-        KieServerDeployment kieServerDeployment2 = deploymentScenario.getKieServerDeployments().get(1);
+        kieServerDeployment1 = deploymentScenario.getKieServerDeployments().get(0);
+        kieServerDeployment2 = deploymentScenario.getKieServerDeployments().get(1);
         SmartRouterDeployment smartRouterDeployment = deploymentScenario.getSmartRouterDeployments().get(0);
 
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
@@ -97,7 +98,7 @@ public class SmartRouterUpdateRedirection extends AbstractCloudIntegrationTest<G
     }
 
     @Test
-    public void testRouterLoadBalancing() {
+    public void testRouterContainerIdLoadBalancing() {
         deployProject(kieServerClient1, CONTAINER_ID, Kjar.DEFINITION_SNAPSHOT);
         deployProject(kieServerClient2, CONTAINER_ID, Kjar.DEFINITION_SNAPSHOT);
 
@@ -110,18 +111,36 @@ public class SmartRouterUpdateRedirection extends AbstractCloudIntegrationTest<G
         }
     }
 
+    @Test
+    public void testRouterContainerAliasLoadBalancing() {
+        deployProject(kieServerClient1, CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION_SNAPSHOT);
+        deployProject(kieServerClient2, CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION_SNAPSHOT);
+
+        for (int i = 0; i < RETRIES_NUMBER; i++) {
+            verifyProcessAvailableInContainer(smartRouterClient, CONTAINER_ALIAS, LOG_PROCESS_ID);
+        }
+
+        assertThat(kieServerDeployment1.getInstances()).hasSize(1);
+        assertThat(kieServerDeployment1.getInstances().get(0).getLogs()).contains(LOG_MESSAGE);
+        assertThat(kieServerDeployment2.getInstances()).hasSize(1);
+        assertThat(kieServerDeployment2.getInstances().get(0).getLogs()).contains(LOG_MESSAGE);
+    }
+
     private void deployProject(KieServicesClient kieServerClient, String containerId, Kjar project) {
+        deployProject(kieServerClient, containerId, CONTAINER_ALIAS, project);
+    }
+
+    private void deployProject(KieServicesClient kieServerClient, String containerId, String containerAlias, Kjar project) {
         KieContainerResource resource = new KieContainerResource(containerId,
                 new ReleaseId(project.getGroupId(), project.getName(), project.getVersion()));
-        resource.setContainerAlias(CONTAINER_ALIAS);
+        resource.setContainerAlias(containerAlias);
 
         kieServerClient.createContainer(containerId, resource);
     }
 
     private void verifyProcessAvailableInContainer(KieServicesClient kieServerClient, String containerId, String processId) {
-        QueryServicesClient queryClient = kieServerClient.getServicesClient(QueryServicesClient.class);
-        List<ProcessDefinition> processes = queryClient.findProcessesByContainerId(containerId, 0, 100);
-        List<String> processIds = processes.stream().map(n -> n.getId()).collect(Collectors.toList());
-        assertThat(processIds).contains(processId);
+        ProcessServicesClient processClient = kieServerClient.getServicesClient(ProcessServicesClient.class);
+        Long pId = processClient.startProcess(containerId, processId);
+        assertThat(pId).isNotNull();
     }
 }

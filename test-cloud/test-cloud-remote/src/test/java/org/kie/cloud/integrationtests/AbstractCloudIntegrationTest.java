@@ -56,6 +56,7 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String SIGNALTASK_PROCESS_ID = "definition-project.signaltask";
     protected static final String LONG_SCRIPT_PROCESS_ID = "definition-project.longScript";
     protected static final String SIMPLE_RULEFLOW_PROCESS_ID = "simple-ruleflow";
+    protected static final String LOG_PROCESS_ID = "definition-project.logProcess";
 
     protected static final String SIGNAL_NAME = "signal1";
     protected static final String SIGNAL_2_NAME = "signal2";
