@@ -44,4 +44,8 @@ public enum Kjar {
     public String getVersion() {
         return version;
     }
+
+    public String toString() {
+        return groupId + ":" + name + ":" + version;
+    }
 }
