@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.integrationtests.smoke;
-
-import java.util.List;
+package org.kie.cloud.integrationtests.s2i;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +27,7 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.Kjar;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -34,18 +35,14 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class KieServerS2ISmokeIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iSimpleIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
 
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected UserTaskServicesClient taskServicesClient;
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerS2ISmokeIntegrationTest.class);
-
-    private static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "=" + PROJECT_GROUP_ID + ":" + DEFINITION_PROJECT_NAME + ":" + DEFINITION_PROJECT_VERSION;
+    private static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "=" + Kjar.DEFINITION.toString();
 
     private static final String REPO_BRANCH = "master";
     private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
