@@ -46,7 +46,6 @@ public class SmartRouterLoadBalancing extends
     private KieServicesClient kieServerClientRouter;
 
     private static final int PROCESS_NUMBER = 100;
-    private static final String LOG_PROCESS_ID = "definition-project.logProcess";
     private static final String LOG_MESSAGE = "Log process was started";
 
     @Override protected WorkbenchRuntimeSmartRouterKieServerDatabaseScenario createDeploymentScenario(
