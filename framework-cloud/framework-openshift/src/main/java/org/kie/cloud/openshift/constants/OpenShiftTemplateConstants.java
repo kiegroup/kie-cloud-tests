@@ -76,5 +76,6 @@ public class OpenShiftTemplateConstants {
     public static final String SOURCE_REPOSITORY_URL = "SOURCE_REPOSITORY_URL";
     public static final String SOURCE_REPOSITORY_REF = "SOURCE_REPOSITORY_REF";
     public static final String CONTEXT_DIR = "CONTEXT_DIR";
+    public static final String ARTIFACT_DIR = "ARTIFACT_DIR";
 
 }

@@ -119,6 +119,15 @@ public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuil
     }
 
     @Override
+    public KieServerS2ISettingsBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
+        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
+        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
+        envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
+        envVariables.put(OpenShiftTemplateConstants.ARTIFACT_DIR, artifactDirs);
+        return this;
+    }
+
+    @Override
     public KieServerS2ISettingsBuilder withMavenRepoUrl(String url) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, url);
         return this;

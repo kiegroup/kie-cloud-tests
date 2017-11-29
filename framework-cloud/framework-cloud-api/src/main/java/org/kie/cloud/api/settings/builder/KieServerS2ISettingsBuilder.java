@@ -119,10 +119,21 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      *
      * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
-     * @param gitContextDir Repositoy context (location of pom file).
-     * @return Buillder
+     * @param gitContextDir Repository context (location of pom file).
+     * @return Builder
      */
     KieServerS2ISettingsBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir);
+
+    /**
+     * Return configured builder with Source location
+     *
+     * @param gitRepoUrl Repository url.
+     * @param gitReference Repository reference (branch/tag). E.g. 'master'.
+     * @param gitContextDir Repository context (location of pom file).
+     * @param artifactDirs Directories containing built kjars, separated by commas. For example "usertask-project/target,signaltask-project/target".
+     * @return Builder
+     */
+    KieServerS2ISettingsBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs);
 
     /**
      * Return configured builder with Maven repository.
@@ -175,5 +186,4 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return
      */
     KieServerS2ISettingsBuilder withSecuredHostame(String https);
-
 }
