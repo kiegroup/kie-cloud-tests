@@ -38,6 +38,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
@@ -101,10 +102,10 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
     }
 
     private void verifyOneServerTemplateWithContainer(String kieServerLocation, String containerId) {
-        Collection<ServerTemplate> serverTemplates = kieControllerClient.listServerTemplates();
-        assertThat(serverTemplates).as("Number of server templates differ.").hasSize(1);
+        ServerTemplateList serverTemplates = kieControllerClient.listServerTemplates();
+        assertThat(serverTemplates.getServerTemplates()).as("Number of server templates differ.").hasSize(1);
 
-        ServerTemplate serverTemplate = serverTemplates.iterator().next();
+        ServerTemplate serverTemplate = serverTemplates.getServerTemplates()[0];
         assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
         assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
         assertThat(serverTemplate.getContainersSpec()).hasSize(1);

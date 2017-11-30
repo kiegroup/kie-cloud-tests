@@ -118,8 +118,8 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
     }
 
     protected void checkServerTemplateIsRegistred(String expectedId, String expectedName) {
-        assertThat(kieServerMgmtControllerClient.listServerTemplates()).hasSize(1);
-        ServerTemplate serverTemplate = kieServerMgmtControllerClient.listServerTemplates().iterator().next();
+        assertThat(kieServerMgmtControllerClient.listServerTemplates().getServerTemplates()).hasSize(1);
+        ServerTemplate serverTemplate = kieServerMgmtControllerClient.listServerTemplates().getServerTemplates()[0];
         assertThat(serverTemplate.getId()).isEqualTo(expectedId);
         assertThat(serverTemplate.getName()).isEqualTo(expectedName);
     }
