@@ -16,10 +16,9 @@
 package org.kie.cloud.common.provider;
 
 import java.time.Instant;
-import java.util.Collection;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
 
@@ -38,8 +37,8 @@ public class KieServerControllerClientProvider {
         Instant timeoutTime = Instant.now().plusSeconds(30);
         while (Instant.now().isBefore(timeoutTime)) {
 
-            Collection<ServerTemplate> serverTemplates = getKieServerMgmtControllerClient(workbenchDeployment).listServerTemplates();
-            if(serverTemplates.size() == numberOfServerTemplates) {
+            ServerTemplateList serverTemplates = getKieServerMgmtControllerClient(workbenchDeployment).listServerTemplates();
+            if(serverTemplates.getServerTemplates().length == numberOfServerTemplates) {
                 return;
             }
 

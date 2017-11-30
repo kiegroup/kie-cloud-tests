@@ -17,6 +17,7 @@ package org.kie.cloud.integrationtests.architecture.emptymanagedkieserver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,7 +38,6 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
@@ -116,10 +116,10 @@ public class EmptyManagedKieServerConnectionIntegrationTest extends AbstractClou
     }
 
     private void verifyControllerContainsServerTemplate(String serverTemplate) {
-        List<String> serverTemplateIds = kieControllerClient.listServerTemplates()
-                                                            .stream()
-                                                            .map(ServerTemplate::getId)
-                                                            .collect(Collectors.toList());
+        ServerTemplate[] serverTemplates = kieControllerClient.listServerTemplates().getServerTemplates();
+        List<String> serverTemplateIds = Arrays.stream(serverTemplates)
+                                                .map(ServerTemplate::getId)
+                                                .collect(Collectors.toList());
         assertThat(serverTemplateIds).as("Server template " + serverTemplate + " isn't registered in controller.").contains(serverTemplate);
     }
 
