@@ -1,0 +1,199 @@
+/*
+ * Copyright 2017 JBoss by Red Hat.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.kie.cloud.integrationtests.architecture;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.ProcessServicesClient;
+import org.kie.server.client.QueryServicesClient;
+import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.integrationtests.router.client.KieServerRouterClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Test for Architecture 4 from
+ * http://mswiderski.blogspot.cz/2017/08/cloud-runtime-architectures-for-jbpm.html
+ */
+public class UnmanagedKieServersWithSmartRouterIntegrationTest extends AbstractCloudArchitectureIntegrationTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(UnmanagedKieServersWithSmartRouterIntegrationTest.class);
+
+    private final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
+
+    private static final String SMART_ROUTER_HOSTNAME = SMART_ROUTER_NAME + DeploymentConstants.getDefaultDomainSuffix();
+
+    private DeploymentSettings smartRouter;
+
+    private DeploymentSettings
+            kieServerABC,
+            kieServerDEF,
+            kieServerGHI;
+
+    private KieServerRouterClient smartRouterAdminClient;
+    private KieServicesClient smartRouterClient;
+
+    private KieServicesClient kieServerClientABC;
+    private KieServicesClient kieServerClientDEF;
+    private KieServicesClient kieServerClientGHI;
+
+    protected ProcessServicesClient smartProcessServicesClient;
+    protected UserTaskServicesClient smartTaskServicesClient;
+    protected QueryServicesClient smartQueryServicesClient;
+
+    @Override
+    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        repositoryName = gitProvider.createGitRepositoryWithPrefix("architectureRepository", PROJECT_SOURCE_FOLDER);
+
+        smartRouter = deploymentScenarioFactory.getSmartRouterSettingsBuilder()
+                .withApplicationName(SMART_ROUTER_NAME)
+                .withSmartRouterID(SMART_ROUTER_ID)
+                .withHostame(RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME)
+                .withSmartRouterExternalUrl("http://" + RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME + ":" + PORT)
+                .build();
+
+        kieServerABC = configureKieServerS2I(deploymentScenarioFactory, KIE_SERVER_ABC_NAME, KIE_CONTAINER_DEPLOYMENT_ABC);
+        kieServerDEF = configureKieServerS2I(deploymentScenarioFactory, KIE_SERVER_DEF_NAME, KIE_CONTAINER_DEPLOYMENT_DEF);
+        kieServerGHI = configureKieServerS2I(deploymentScenarioFactory, KIE_SERVER_GHI_NAME, KIE_CONTAINER_DEPLOYMENT_GHI);
+
+        return deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withSmartRouter(smartRouter)
+                .withKieServer(kieServerABC, kieServerDEF, kieServerGHI)
+                .build();
+    }
+
+    private DeploymentSettings configureKieServerS2I(DeploymentScenarioBuilderFactory deploymentScenarioFactory, String applicationName, String containerDeploymnet) {
+        return deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+                .withApplicationName(applicationName)
+                .withHostame(RANDOM_URL_PREFIX + applicationName + DeploymentConstants.getDefaultDomainSuffix())
+                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                .withSmartRouterConnection(RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME, PORT)
+                .withContainerDeployment(containerDeploymnet)
+                .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                .build();
+    }
+
+    @Before
+    public void setUp() {
+        smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployments().get(0));
+
+        kieServerClientABC = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
+        kieServerClientDEF = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(1));
+        kieServerClientGHI = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(2));
+        smartRouterClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployments().get(0), DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword());
+
+        smartProcessServicesClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
+        smartTaskServicesClient = smartRouterClient.getServicesClient(UserTaskServicesClient.class);
+        smartQueryServicesClient = smartRouterClient.getServicesClient(QueryServicesClient.class);
+    }
+
+    @After
+    public void deleteRepo() {
+        gitProvider.deleteGitRepository(repositoryName);
+    }
+
+    @Test
+    public void testUnmanagedKieServersWithSmartRouterArchitecture() {
+        connectionBetweenDeployments();
+        scaleKieServerTo(deploymentScenario.getKieServerDeployments(), 3);
+
+        // Ignore due https://issues.jboss.org/browse/RHBPMS-4899
+        //workWithSignalsAndTasks();
+    }
+
+    private void connectionBetweenDeployments() {
+        String kieServerIdABC = getKieServerId(kieServerClientABC);
+        String kieServerIdDEF = getKieServerId(kieServerClientDEF);
+        String kieServerIdGHI = getKieServerId(kieServerClientGHI);
+
+        logger.debug("Check architecture after start");
+        verifyContainerIsDeployed(kieServerClientABC, CONTAINER_ID_ABC);
+        verifyContainerIsDeployed(kieServerClientDEF, CONTAINER_ID_DEF);
+        verifyContainerIsDeployed(kieServerClientGHI, CONTAINER_ID_GHI);
+
+        verifySmartRouterContainsKieServers(smartRouterAdminClient, 1, Arrays.asList(CONTAINER_ID_ABC, CONTAINER_ID_DEF, CONTAINER_ID_GHI), kieServerIdABC, kieServerIdDEF, kieServerIdGHI);
+
+        //check registred URLs in smart router!?
+        logger.debug("Scale up all Kie server deployments");
+        scaleKieServerTo(deploymentScenario.getKieServerDeployments(), 3);
+
+        logger.debug("Check all");
+        verifySmartRouterContainsKieServers(smartRouterAdminClient, 3, Arrays.asList(CONTAINER_ID_ABC, CONTAINER_ID_DEF, CONTAINER_ID_GHI), kieServerIdABC, kieServerIdDEF, kieServerIdGHI);
+
+        logger.debug("scale some server down");
+        scaleKieServerTo(0, deploymentScenario.getKieServerDeployments().get(1));
+
+        logger.debug("check all again");
+        verifySmartRouterContainsKieServers(smartRouterAdminClient, 2, Arrays.asList(CONTAINER_ID_ABC, CONTAINER_ID_GHI), kieServerIdABC, kieServerIdGHI);
+    }
+
+    private void workWithSignalsAndTasks() {
+        logger.debug("Start process instance");
+        List<Long> signalProcessInstances = createSignalProcesses();
+
+        assertThat(smartQueryServicesClient.findProcessInstances(0, 10)).hasSize(6);
+
+        smartProcessServicesClient.signalProcessInstances(CONTAINER_ID_ABC, signalProcessInstances, SIGNAL_NAME, null);
+        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(2), SIGNAL_NAME, null);
+        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(3), SIGNAL_2_NAME, null);
+
+        assertThat(smartTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(3);
+
+        smartProcessServicesClient.signal(CONTAINER_ID_ABC, SIGNAL_2_NAME, null);
+        assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED), 0, 10)).hasSize(2);
+
+        assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10)).hasSize(4);
+        List<TaskSummary> activeTasks = smartTaskServicesClient.findTasks(USER_YODA, 0, 10);
+        assertThat(activeTasks).hasSize(1);
+        assertThat(activeTasks.get(0).getContainerId()).isEqualTo(CONTAINER_ID_DEF);
+        assertThat(activeTasks.get(0).getProcessInstanceId()).isEqualTo(signalProcessInstances.get(2));
+
+        smartTaskServicesClient.startTask(CONTAINER_ID_DEF, activeTasks.get(0).getId(), USER_YODA);
+        smartTaskServicesClient.completeTask(CONTAINER_ID_DEF, activeTasks.get(0).getId(), USER_YODA, Collections.emptyMap());
+
+        assertThat(smartQueryServicesClient.findProcessesByContainerId(CONTAINER_ID_GHI, 0, 10)).hasSize(2);
+        smartProcessServicesClient.abortProcessInstance(CONTAINER_ID_GHI, signalProcessInstances.get(5));
+
+        assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED), 0, 10)).hasSize(4);
+        assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10)).hasSize(2);
+        assertThat(smartTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(0);
+    }
+
+    private List<Long> createSignalProcesses() {
+        // Start 2 instance of SignalUserTask each process on each container
+        return Stream.of(CONTAINER_ID_ABC, CONTAINER_ID_ABC, CONTAINER_ID_DEF, CONTAINER_ID_DEF, CONTAINER_ID_GHI, CONTAINER_ID_GHI)
+                .map(containerId -> smartProcessServicesClient.startProcess(containerId, SIGNALUSERTASK_PROCESS_ID))
+                .collect(Collectors.toList());
+    }
+}
