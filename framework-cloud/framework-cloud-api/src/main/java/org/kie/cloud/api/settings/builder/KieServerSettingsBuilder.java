@@ -43,6 +43,15 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
     KieServerSettingsBuilder withKieServerUser(String kieServerUser, String kieServerPwd);
 
     /**
+     * Return configured builder with Kie Admin user.
+     *
+     * @param user Kie Admin username.
+     * @param password Kie Admin password.
+     * @return Builder
+     */
+    KieServerSettingsBuilder withAdminUser(String user, String password);
+
+    /**
      * Return configured builder with Controller user.
      *
      * @param controllerUser Controller username.
@@ -64,19 +73,39 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
      * Return configured builder with connection to Controller.
      *
      * @param url URL to Controller.
-     * @param port port of Controller.
+     * @param port port of Controller URL.
      * @return Builder
      */
     KieServerSettingsBuilder withControllerConnection(String url, String port);
 
     /**
+     * Return configured builder with connection to Controller.
+     *
+     * @param protocol protocol of Controller URL.
+     * @param url URL to Controller.
+     * @param port port of Controller URL.
+     * @return Builder
+     */
+    KieServerSettingsBuilder withControllerConnection(String protocol, String url, String port);
+
+    /**
      * Return configured builder with connection to Smart Router.
      *
      * @param url URL to Smart Router.
-     * @param port port of Smart Router.
+     * @param port port of Smart Router URL.
      * @return Builder.
      */
     KieServerSettingsBuilder withSmartRouterConnection(String url, String port);
+
+    /**
+     * Return configured builder with connection to Smart Router.
+     *
+     * @param protocol protocol of Smart Router URL.
+     * @param url URL to Smart Router.
+     * @param port port of Smart Router URL.
+     * @return Builder.
+     */
+    KieServerSettingsBuilder withSmartRouterConnection(String protocol, String url, String port);
 
     /**
      * Return configured builder with connection to Smart Router.
@@ -106,10 +135,27 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
      * Return configured builder with Maven repository set by service name.
      *
      * @param serviceName Service name (e.g. Business central deployment).
+     * @return Builder
+     */
+    KieServerSettingsBuilder withMavenRepoService(String serviceName);
+
+    /**
+     * Return configured builder with Maven repository set by service name.
+     *
+     * @param serviceName Service name (e.g. Business central deployment).
      * @param path Path to maven repositoy (e.g. '/maven2/').
      * @return Builder
      */
     KieServerSettingsBuilder withMavenRepoService(String serviceName, String path);
+
+    /**
+     * Return configured builder with Maven user for the Maven service.
+     *
+     * @param workbenchMavenUser
+     * @param workbenchMavenPassword
+     * @return
+     */
+    KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword);
 
     /**
      * Return configured builder with Maven user.

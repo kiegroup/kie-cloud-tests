@@ -21,6 +21,7 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
@@ -37,6 +38,10 @@ public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
+
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override
@@ -80,6 +85,13 @@ public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
     @Override
     public WorkbenchSettingsBuilder withSecuredHostame(String https) {
         envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, https);
+        return this;
+    }
+
+    @Override
+    public WorkbenchSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
         return this;
     }
 }
