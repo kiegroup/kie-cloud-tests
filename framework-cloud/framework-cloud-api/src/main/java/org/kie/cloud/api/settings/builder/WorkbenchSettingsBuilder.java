@@ -78,4 +78,13 @@ public interface WorkbenchSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @return
      */
     WorkbenchSettingsBuilder withSecuredHostame(String https);
+
+    /**
+     * Return configure builder with Maven repo service user.
+     *
+     * @param workbenchMavenUser
+     * @param workbenchMavenPassword
+     * @return
+     */
+    WorkbenchSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword);
 }

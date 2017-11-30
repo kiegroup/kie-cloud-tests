@@ -42,6 +42,7 @@ public class OpenShiftTemplateConstants {
 
     public static final String KIE_SERVER_ROUTER_ID = "KIE_SERVER_ROUTER_ID";
     public static final String KIE_SERVER_ROUTER_NAME = "KIE_SERVER_ROUTER_NAME";
+    public static final String KIE_SERVER_ROUTER_PROTOCOL = "KIE_SERVER_ROUTER_PROTOCOL";
     public static final String KIE_SERVER_ROUTER_HOST = "KIE_SERVER_ROUTER_HOST";
     public static final String KIE_SERVER_ROUTER_PORT = "KIE_SERVER_ROUTER_PORT";
     public static final String KIE_SERVER_ROUTER_SERVICE = "KIE_SERVER_ROUTER_SERVICE";
@@ -49,9 +50,12 @@ public class OpenShiftTemplateConstants {
 
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
-    public static final String MAVEN_REPO_URL = "MAVEN_REPO_URL";
     public static final String MAVEN_REPO_SERVICE = "MAVEN_REPO_SERVICE";
     public static final String MAVEN_REPO_PATH = "MAVEN_REPO_PATH";
+    public static final String BUSINESS_CENTRAL_MAVEN_USERNAME = "BUSINESS_CENTRAL_MAVEN_USERNAME";
+    public static final String BUSINESS_CENTRAL_MAVEN_PASSWORD = "BUSINESS_CENTRAL_MAVEN_PASSWORD";
+
+    public static final String MAVEN_REPO_URL = "MAVEN_REPO_URL";
     public static final String MAVEN_REPO_USERNAME = "MAVEN_REPO_USERNAME";
     public static final String MAVEN_REPO_PASSWORD = "MAVEN_REPO_PASSWORD";
 

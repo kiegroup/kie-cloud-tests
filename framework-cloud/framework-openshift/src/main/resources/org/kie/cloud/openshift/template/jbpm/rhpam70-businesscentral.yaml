@@ -70,6 +70,17 @@ parameters:
   name: KIE_MBEANS
   value: enabled
   required: false
+- displayName: Username for the Maven service hosted by Business Central
+  description: Username to access the Maven service hosted by Business Central inside EAP.
+  name: BUSINESS_CENTRAL_MAVEN_USERNAME
+  required: false
+  value: mavenUser
+- displayName: Password for the Maven service hosted by Business Central
+  description: Password to access the Maven service hosted by Business Central inside EAP.
+  name: BUSINESS_CENTRAL_MAVEN_PASSWORD
+  from: "[a-zA-Z]{6}[0-9]{1}!"
+  generate: expression
+  required: false
 - displayName: Business Central Custom http Route Hostname
   description: 'Custom hostname for http service route.  Leave blank for default hostname,
     e.g.: <application-name>-rhpamcentr-<project>.<default-domain-suffix>'
@@ -85,8 +96,8 @@ parameters:
 - displayName: Business Central Server Keystore Secret Name
   description: The name of the secret containing the keystore file
   name: BUSINESS_CENTRAL_HTTPS_SECRET
-  value: businesscentral-app-secret
-  required: false
+  example: businesscentral-app-secret
+  required: true
 - displayName: Business Central Server Keystore Filename
   description: The name of the keystore file within the secret
   name: BUSINESS_CENTRAL_HTTPS_KEYSTORE
@@ -120,6 +131,11 @@ parameters:
   name: BUSINESS_CENTRAL_MEMORY_LIMIT
   value: 2Gi
   required: false
+- displayName: Business Central Volume Capacity
+  description: Size of the persistent storage for Business Central's runtime data.
+  name: BUSINESS_CENTRAL_VOLUME_CAPACITY
+  value: 1Gi
+  required: true
 objects:
 - kind: ServiceAccount
   apiVersion: v1
@@ -226,6 +242,8 @@ objects:
           - name: businesscentral-keystore-volume
             mountPath: "/etc/businesscentral-secret-volume"
             readOnly: true
+          - name: "${APPLICATION_NAME}-rhpamcentr-pvol"
+            mountPath: "/opt/eap/standalone/data/bpmsuite"
           livenessProbe:
             exec:
               command:
@@ -267,6 +285,10 @@ objects:
             value: "${KIE_SERVER_CONTROLLER_PWD}"
           - name: KIE_SERVER_CONTROLLER_USER
             value: "${KIE_SERVER_CONTROLLER_USER}"
+          - name: KIE_MAVEN_USER
+            value: "${BUSINESS_CENTRAL_MAVEN_USERNAME}"
+          - name: KIE_MAVEN_PWD
+            value: "${BUSINESS_CENTRAL_MAVEN_PASSWORD}"
           - name: HTTPS_KEYSTORE_DIR
             value: "/etc/businesscentral-secret-volume"
           - name: HTTPS_KEYSTORE
@@ -283,3 +305,19 @@ objects:
         - name: businesscentral-keystore-volume
           secret:
             secretName: "${BUSINESS_CENTRAL_HTTPS_SECRET}"
+        - name: "${APPLICATION_NAME}-rhpamcentr-pvol"
+          persistentVolumeClaim:
+            claimName: "${APPLICATION_NAME}-rhpamcentr-claim"
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: "${APPLICATION_NAME}-rhpamcentr-claim"
+    labels:
+      application: "${APPLICATION_NAME}"
+      service: "${APPLICATION_NAME}-rhpamcentr"
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${BUSINESS_CENTRAL_VOLUME_CAPACITY}"

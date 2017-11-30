@@ -58,6 +58,13 @@ public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
     }
 
     @Override
+    public KieServerSettingsBuilder withAdminUser(String user, String password) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, user);
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, password);
+        return this;
+    }
+
+    @Override
     public KieServerSettingsBuilder withControllerUser(String controllerUser, String controllerPwd) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, controllerUser);
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, controllerPwd);
@@ -78,7 +85,23 @@ public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
     }
 
     @Override
+    public KieServerSettingsBuilder withControllerConnection(String protocol, String url, String port) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PROTOCOL, protocol);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_HOST, url);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PORT, port);
+        return this;
+    }
+
+    @Override
     public KieServerSettingsBuilder withSmartRouterConnection(String url, String port) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_HOST, url);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_PORT, port);
+        return this;
+    }
+
+    @Override
+    public KieServerSettingsBuilder withSmartRouterConnection(String protocol, String url, String port) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_PROTOCOL, protocol);
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_HOST, url);
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_PORT, port);
         return this;
@@ -103,9 +126,22 @@ public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
     }
 
     @Override
+    public KieServerSettingsBuilder withMavenRepoService(String service) {
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_SERVICE, service);
+        return this;
+    }
+
+    @Override
     public KieServerSettingsBuilder withMavenRepoService(String service, String path) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_SERVICE, service);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PATH, path);
+        return this;
+    }
+
+    @Override
+    public KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
         return this;
     }
 
@@ -137,6 +173,7 @@ public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
     @Override
     public KieServerSettingsBuilder withHostame(String http) {
         envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTP, http);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOST, http);
         return this;
     }
 
