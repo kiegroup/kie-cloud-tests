@@ -52,6 +52,12 @@
       </exclusions>
     </dependency>
 
+    <!-- Kie server router -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-router-proxy</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -61,6 +67,12 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-wb-tests-rest</artifactId>
+    </dependency>
+
+    <!-- UberFire rest client -->
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-rest-client</artifactId>
     </dependency>
   </dependencies>
 

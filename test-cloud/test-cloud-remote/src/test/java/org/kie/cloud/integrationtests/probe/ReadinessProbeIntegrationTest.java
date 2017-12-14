@@ -19,12 +19,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
-import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.common.client.util.WorkbenchUtils;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -92,7 +93,9 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
 
     @Test
     public void testKieServerReadinessProbe() {
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployment();
+        gitProvider.createGitRepository(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(workbenchDeployment.getNamespace()), workbenchDeployment, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
         KieServerMgmtControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());

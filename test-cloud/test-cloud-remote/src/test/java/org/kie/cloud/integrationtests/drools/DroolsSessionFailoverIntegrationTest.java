@@ -36,7 +36,7 @@ import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseSc
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
-import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.common.client.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerStatus;
