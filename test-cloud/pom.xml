@@ -88,6 +88,7 @@
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <!-- All templates have to be passed as properties to failsafe plugin. -->
               <kie.app.template.workbench>${kie.app.template.workbench}</kie.app.template.workbench>
+              <kie.app.template.workbench.kie-server>${kie.app.template.workbench.kie-server}</kie.app.template.workbench.kie-server>
               <kie.app.template.workbench.kie-server.database>${kie.app.template.workbench.kie-server.database}</kie.app.template.workbench.kie-server.database>
               <kie.app.template.kie-server>${kie.app.template.kie-server}</kie.app.template.kie-server>
               <kie.app.template.kie-server-s2i>${kie.app.template.kie-server-s2i}</kie.app.template.kie-server-s2i>

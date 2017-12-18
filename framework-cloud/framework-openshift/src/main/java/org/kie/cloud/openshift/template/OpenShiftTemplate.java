@@ -25,6 +25,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
  * OpenShift templates which are currently available.
  */
 public enum OpenShiftTemplate {
+    WORKBENCH_KIE_SERVER(OpenShiftConstants.KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER),
     WORKBENCH_KIE_SERVER_DATABASE(OpenShiftConstants.KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE),
     KIE_SERVER_DATABASE_EXTERNAL(OpenShiftConstants.KIE_APP_TEMPLATE_KIE_SERVER_DATABASE_EXTERNAL),
     KIE_SERVER(OpenShiftConstants.KIE_APP_TEMPLATE_KIE_SERVER),
