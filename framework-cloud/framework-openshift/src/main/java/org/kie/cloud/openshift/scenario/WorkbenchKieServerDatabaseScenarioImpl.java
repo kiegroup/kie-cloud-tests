@@ -26,7 +26,7 @@ import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.OpenShiftController;
@@ -40,7 +40,7 @@ import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServerScenario {
+public class WorkbenchKieServerDatabaseScenarioImpl implements WorkbenchKieServerDatabaseScenario {
 
     private OpenShiftController openshiftController;
     private String projectName;
@@ -50,9 +50,9 @@ public class WorkbenchWithKieServerScenarioImpl implements WorkbenchWithKieServe
 
     private Map<String, String> envVariables;
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkbenchWithKieServerScenarioImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerDatabaseScenarioImpl.class);
 
-    public WorkbenchWithKieServerScenarioImpl(OpenShiftController openShiftController, Map<String, String> envVariables) {
+    public WorkbenchKieServerDatabaseScenarioImpl(OpenShiftController openShiftController, Map<String, String> envVariables) {
         this.openshiftController = openShiftController;
         this.envVariables = envVariables;
     }

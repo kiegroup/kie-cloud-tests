@@ -35,12 +35,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
+public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
 
@@ -52,8 +52,8 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     private static final String SERVER_NAME = "KieServer";
 
     @Override
-    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
+    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
     }
 
     @Test

@@ -19,7 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
@@ -38,15 +38,15 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
+public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
     private Client httpKieServerClient;
 
     private static final Logger logger = LoggerFactory.getLogger(ReadinessProbeIntegrationTest.class);
 
     @Override
-    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
+    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
     }
 
     @Before

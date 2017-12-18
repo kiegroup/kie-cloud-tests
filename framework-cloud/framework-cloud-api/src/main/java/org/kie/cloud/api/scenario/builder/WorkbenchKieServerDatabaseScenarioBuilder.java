@@ -15,15 +15,15 @@
 
 package org.kie.cloud.api.scenario.builder;
 
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 
 /**
  * Cloud builder for Workbench and Kie Server in project. Built setup
- * for WorkbenchWithKieServerScenario
+ * for WorkbenchKieServerDatabaseScenario
  *
- * @see WorkbenchWithKieServerScenario
+ * @see WorkbenchKieServerDatabaseScenario
  */
-public interface WorkbenchWithKieServerScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchWithKieServerScenario> {
+public interface WorkbenchKieServerDatabaseScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchKieServerDatabaseScenario> {
 
     /**
      * Return setup builder with additional configuration of external maven
@@ -34,5 +34,5 @@ public interface WorkbenchWithKieServerScenarioBuilder extends DeploymentScenari
      * @param repoPassword Maven repo user password.
      * @return Builder with configured external maven repo.
      */
-    WorkbenchWithKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+    WorkbenchKieServerDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
 }
