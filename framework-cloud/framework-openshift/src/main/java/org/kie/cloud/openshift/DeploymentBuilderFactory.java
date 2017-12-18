@@ -18,8 +18,9 @@ package org.kie.cloud.openshift;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
@@ -29,8 +30,9 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
@@ -51,6 +53,11 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
 
     @Override public String getCloudAPIImplementationName() {
         return CLOUD_API_IMPLEMENTATION_NAME;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder getWorkbenchKieServerScenarioBuilder() {
+        return new WorkbenchKieServerScenarioBuilderImpl(controller);
     }
 
     @Override
