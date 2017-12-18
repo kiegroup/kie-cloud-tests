@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
@@ -35,13 +35,13 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 
-public class TimerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
+public class TimerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
     private KieServerMgmtControllerClient kieControllerClient;
 
     @Override
-    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
+    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
     }
 
     @Before

@@ -19,18 +19,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
-import org.kie.cloud.api.scenario.builder.WorkbenchWithKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.scenario.WorkbenchWithKieServerScenarioImpl;
+import org.kie.cloud.openshift.scenario.WorkbenchKieServerDatabaseScenarioImpl;
 
-public class WorkbenchWithKieServerScenarioBuilderImpl implements WorkbenchWithKieServerScenarioBuilder {
+public class WorkbenchKieServerDatabaseScenarioBuilderImpl implements WorkbenchKieServerDatabaseScenarioBuilder {
 
     private OpenShiftController openshiftController;
     private Map<String, String> envVariables;
 
-    public WorkbenchWithKieServerScenarioBuilderImpl(OpenShiftController openShiftController) {
+    public WorkbenchKieServerDatabaseScenarioBuilderImpl(OpenShiftController openShiftController) {
         this.openshiftController = openShiftController;
 
         this.envVariables = new HashMap<String, String>();
@@ -45,12 +45,12 @@ public class WorkbenchWithKieServerScenarioBuilderImpl implements WorkbenchWithK
     }
 
     @Override
-    public WorkbenchWithKieServerScenario build() {
-        return new WorkbenchWithKieServerScenarioImpl(openshiftController, envVariables);
+    public WorkbenchKieServerDatabaseScenario build() {
+        return new WorkbenchKieServerDatabaseScenarioImpl(openshiftController, envVariables);
     }
 
     @Override
-    public WorkbenchWithKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
+    public WorkbenchKieServerDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
