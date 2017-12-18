@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Deployment;
-import org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
@@ -42,15 +42,15 @@ import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
-public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchWithKieServerScenario> {
+public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
     private WorkbenchClient workbenchClient;
     private KieServerMgmtControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
 
     @Override
-    protected WorkbenchWithKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchWithKieServerScenarioBuilder().build();
+    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
     }
 
     @Before

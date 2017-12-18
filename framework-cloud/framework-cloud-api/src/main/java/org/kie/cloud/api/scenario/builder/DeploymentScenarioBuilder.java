@@ -20,8 +20,8 @@ package org.kie.cloud.api.scenario.builder;
  *
  * @see org.kie.cloud.api.scenario.DeploymentScenario
  *
- * @param <T> Setup to be built e.g. WorkbenchWithKieServerScenario
- * @see org.kie.cloud.api.scenario.WorkbenchWithKieServerScenario
+ * @param <T> Setup to be built e.g. WorkbenchKieServerDatabaseScenario
+ * @see org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario
  */
 public interface DeploymentScenarioBuilder<T> {
 
