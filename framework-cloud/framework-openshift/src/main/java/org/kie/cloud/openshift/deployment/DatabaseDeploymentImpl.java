@@ -16,21 +16,16 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
-import org.kie.cloud.openshift.resource.Service;
 
 public class DatabaseDeploymentImpl extends OpenShiftDeployment implements DatabaseDeployment {
-
-    private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
 
     private String username;
     private String password;
     private String databaseName;
     private URL url;
-    private String applicationName;
+    private String serviceName;
 
     public void setUsername(String username) {
         this.username = username;
@@ -70,25 +65,10 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
 
     @Override
     public String getServiceName() {
-        if (databaseName == null) {
-            // Database name not set, try to guess it from all available services
-            List<Service> services = openShiftController.getProject(namespace).getServices();
-            for (Service service : services) {
-                if (DATABASE_REGEXP.matcher(service.getName()).matches()) {
-                    return service.getName();
-                }
-            }
-            throw new RuntimeException("No available database found among services.");
+        if (serviceName == null) {
+            serviceName = ServiceUtil.getDatabaseServiceName(openShiftController, namespace);
         }
-        return applicationName + "-" + databaseName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
-
-    public String getApplicationName() {
-        return applicationName;
+        return serviceName;
     }
 
     @Override

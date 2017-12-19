@@ -94,11 +94,16 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         consoleSmartRouterEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PORT, Integer.toString(workbenchRuntimeDeployment.getUrl().getPort()));
         project.processTemplateAndCreateResources(OpenShiftTemplate.CONSOLE_SMARTROUTER.getTemplateUrl(), consoleSmartRouterEnvVariables);
 
+        // TODO: Temporary values. Can be deleted when default Kie server host parameter is implemented.
+        String urlPrexif = UUID.randomUUID().toString().substring(0, 4) + "-";
+        String kieServerHostname = urlPrexif + "kie-server" + DeploymentConstants.getDefaultDomainSuffix();
+        String kieServerPort = "80";
+
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_S2I.getTemplateUrl().toString());
         Map<String, String> kieServerEnvVariables = new HashMap<String, String>(envVariables);
         kieServerEnvVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
-        kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOST, kieServerDeployment.getUrl().getHost());
-        kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PORT, Integer.toString(kieServerDeployment.getUrl().getPort()));
+        kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOST, kieServerHostname);
+        kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PORT, kieServerPort);
         kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_HOST, smartRouterDeployment.getUrl().getHost());
         kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_PORT, Integer.toString(smartRouterDeployment.getUrl().getPort()));
         kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_HOST, workbenchRuntimeDeployment.getUrl().getHost());
@@ -197,7 +202,6 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
 //        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setUsername("executionUser");
         kieServerDeployment.setPassword("execution1!");
-        kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
 
         return kieServerDeployment;
     }
@@ -206,7 +210,6 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         DatabaseDeploymentImpl databaseDeployment = new DatabaseDeploymentImpl();
         databaseDeployment.setOpenShiftController(openshiftController);
         databaseDeployment.setNamespace(namespace);
-        databaseDeployment.setApplicationName(OpenShiftConstants.getKieApplicationName());
         return databaseDeployment;
     }
 }
