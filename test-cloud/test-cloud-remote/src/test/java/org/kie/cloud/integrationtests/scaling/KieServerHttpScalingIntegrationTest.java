@@ -36,6 +36,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
@@ -96,14 +97,14 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
 
     private String getKieServerId(KieServicesClient kieServerClient) {
         ServiceResponse<KieServerInfo> serverInfo = kieServerClient.getServerInfo();
-        assertThat(serverInfo.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+        assertThat(serverInfo.getType()).isEqualTo(ResponseType.SUCCESS);
 
         return serverInfo.getResult().getServerId();
     }
 
     private void verifyContainerIsDeployed(KieServicesClient kieServerClient, String containerId) {
         ServiceResponse<KieContainerResourceList> containers = kieServerClient.listContainers();
-        assertThat(containers.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+        assertThat(containers.getType()).isEqualTo(ResponseType.SUCCESS);
 
         List<KieContainerResource> containerList = containers.getResult().getContainers();
         assertThat(containerList).hasSize(1);
