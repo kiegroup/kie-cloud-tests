@@ -29,17 +29,16 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
     private String serviceName;
     private String secureServiceName;
 
-
     @Override public URL getUrl() {
         if (url == null) {
-            url = getHttpRouteUrl(serviceName);
+            url = getHttpRouteUrl(getServiceName());
         }
         return url;
     }
 
     @Override public URL getSecureUrl() {
         if (secureUrl == null) {
-            secureUrl = getHttpsRouteUrl(secureServiceName);
+            secureUrl = getHttpsRouteUrl(getSecureServiceName());
         }
         return secureUrl;
     }
@@ -62,19 +61,17 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
 
     @Override
     public String getServiceName() {
+        if (serviceName == null) {
+            serviceName = ServiceUtil.getKieServerServiceName(openShiftController, namespace);
+        }
         return serviceName;
     }
 
-    public void setServiceName(String applicationName) {
-        this.serviceName = applicationName + "-execserv";
-    }
-
     public String getSecureServiceName() {
+        if (secureServiceName == null) {
+            secureServiceName = ServiceUtil.getKieServerSecureServiceName(openShiftController, namespace);
+        }
         return secureServiceName;
-    }
-
-    public void setSecureServiceName(String applicationName) {
-        this.secureServiceName = "secure-" + applicationName + "-execserv";
     }
 
     @Override public void waitForScale() {

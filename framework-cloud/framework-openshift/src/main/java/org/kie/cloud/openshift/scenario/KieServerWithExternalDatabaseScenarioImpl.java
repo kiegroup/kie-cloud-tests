@@ -69,8 +69,6 @@ public class KieServerWithExternalDatabaseScenarioImpl implements KieServerWithE
         kieServerDeployment.setNamespace(project.getName());
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
-        kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
-        kieServerDeployment.setSecureServiceName(OpenShiftConstants.getKieApplicationName());
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
