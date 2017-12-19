@@ -88,21 +88,16 @@ public class WorkbenchKieServerDatabaseScenarioImpl implements WorkbenchKieServe
         workbenchDeployment.setNamespace(projectName);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
-        workbenchDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
-        workbenchDeployment.setSecureServiceName(OpenShiftConstants.getKieApplicationName());
 
         kieServerDeployment = new KieServerDeploymentImpl();
         kieServerDeployment.setOpenShiftController(openshiftController);
         kieServerDeployment.setNamespace(projectName);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
-        kieServerDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
-        kieServerDeployment.setSecureServiceName(OpenShiftConstants.getKieApplicationName());
 
         databaseDeployment = new DatabaseDeploymentImpl();
         databaseDeployment.setOpenShiftController(openshiftController);
         databaseDeployment.setNamespace(projectName);
-        databaseDeployment.setApplicationName(OpenShiftConstants.getKieApplicationName());
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();

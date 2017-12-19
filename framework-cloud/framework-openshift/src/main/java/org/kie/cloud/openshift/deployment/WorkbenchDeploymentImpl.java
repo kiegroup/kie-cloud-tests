@@ -33,21 +33,21 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
 
     @Override public URL getUrl() {
         if (url == null) {
-            url = getHttpRouteUrl(serviceName);
+            url = getHttpRouteUrl(getServiceName());
         }
         return url;
     }
 
     @Override public URL getSecureUrl() {
         if (secureUrl == null) {
-            secureUrl = getHttpsRouteUrl(secureServiceName);
+            secureUrl = getHttpsRouteUrl(getSecureServiceName());
         }
         return secureUrl;
     }
 
     @Override public URI getWebSocketUri() {
         if (webSocketUri == null) {
-            webSocketUri = getWebSocketRouteUri(serviceName);
+            webSocketUri = getWebSocketRouteUri(getServiceName());
         }
         return webSocketUri;
     }
@@ -70,19 +70,17 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
 
     @Override
     public String getServiceName() {
+        if (serviceName == null) {
+            serviceName = ServiceUtil.getWorkbenchServiceName(openShiftController, namespace);
+        }
         return serviceName;
     }
 
-    public void setServiceName(String applicationName) {
-        this.serviceName = applicationName + "-buscentr";
-    }
-
     public String getSecureServiceName() {
+        if (secureServiceName == null) {
+            secureServiceName = ServiceUtil.getWorkbenchSecureServiceName(openShiftController, namespace);
+        }
         return secureServiceName;
-    }
-
-    public void setSecureServiceName(String applicationName) {
-        this.secureServiceName = "secure-" + applicationName + "-buscentr";
     }
 
     @Override public void waitForScale() {
