@@ -18,11 +18,11 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 
 public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
-    private KieServerMgmtControllerClient kieControllerClient;
+    private KieServerControllerClient kieControllerClient;
 
     private KieServicesClient kieServerClient;
     private ProcessServicesClient processClient;
@@ -37,7 +37,7 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
     public void setUp() {
         WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());

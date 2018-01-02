@@ -39,13 +39,13 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
     private WorkbenchClient workbenchClient;
-    private KieServerMgmtControllerClient kieControllerClient;
+    private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
 
     @Override
@@ -56,7 +56,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
     @Before
     public void setUp() {
         workbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
     }
 

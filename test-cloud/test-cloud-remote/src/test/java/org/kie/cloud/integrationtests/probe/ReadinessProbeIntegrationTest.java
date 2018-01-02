@@ -33,7 +33,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.common.rest.Authenticator;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
         WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
-        KieServerMgmtControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
+        KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
 
         Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JAXB, this.getClass().getClassLoader());

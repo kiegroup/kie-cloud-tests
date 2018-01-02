@@ -15,12 +15,12 @@
  */
 package org.kie.cloud.integrationtests.drools;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -44,7 +44,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.RuleServicesClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     private static final String LIST_OUTPUT_NAME = "output-list";
     private static final String KIE_SESSION = "defaultKieSession";
 
-    private KieServerMgmtControllerClient kieServerMgmtControllerClient;
+    private KieServerControllerClient kieServerControllerClient;
     private KieServicesClient smartRouterServicesClient;
     private RuleServicesClient smartRouterRuleServiceClient;
 
@@ -81,7 +81,7 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     public void setUp() {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rule-project").getFile());
 
-        kieServerMgmtControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
+        kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
         smartRouterServicesClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment().getUsername(), deploymentScenario.getKieServerDeployment().getPassword(), TimeUnit.MINUTES.toMillis(10));
         smartRouterRuleServiceClient = smartRouterServicesClient.getServicesClient(RuleServicesClient.class);
 
@@ -95,9 +95,9 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     public void executeSimpleRuleFailoverTest() throws InterruptedException {
         logger.debug("Register Kie Container to Kie Server");
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieServerMgmtControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, RULE_PROJECT_NAME, RULE_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, RULE_PROJECT_NAME, RULE_PROJECT_VERSION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
-        WorkbenchUtils.waitForContainerRegistration(kieServerMgmtControllerClient, SMART_ROUTER_ID, CONTAINER_ID);
+        WorkbenchUtils.waitForContainerRegistration(kieServerControllerClient, SMART_ROUTER_ID, CONTAINER_ID);
 
         logger.debug("Get Kie Server Instance");
         Instance kieServerInstance = deploymentScenario.getKieServerDeployment().getInstances().iterator().next();

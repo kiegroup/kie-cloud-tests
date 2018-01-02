@@ -33,11 +33,11 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 
 public class TimerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
-    private KieServerMgmtControllerClient kieControllerClient;
+    private KieServerControllerClient kieControllerClient;
 
     @Override
     protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
@@ -48,7 +48,7 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
     public void setUp() {
         WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), TIMER_PROJECT_NAME);
 
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
     }
 
     @Test

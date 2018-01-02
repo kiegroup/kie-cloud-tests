@@ -38,7 +38,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 
@@ -124,7 +124,7 @@ public abstract class AbstractCloudArchitectureIntegrationTest extends AbstractC
         assertThat(container.getStatus()).isEqualTo(KieContainerStatus.STARTED);
     }
 
-    protected void verifyServerTemplateContainsContainers(KieServerMgmtControllerClient kieControllerClient, String serverTemplate, String... containerIds) {
+    protected void verifyServerTemplateContainsContainers(KieServerControllerClient kieControllerClient, String serverTemplate, String... containerIds) {
         Collection<ContainerSpec> containersSpec = kieControllerClient.getServerTemplate(serverTemplate).getContainersSpec();
         assertThat(containersSpec).hasSize(containerIds.length);
         List<String> containersSpecIds = getAllContainersSpecIds(containersSpec);
@@ -135,7 +135,7 @@ public abstract class AbstractCloudArchitectureIntegrationTest extends AbstractC
         return containerSpecs.stream().map(spec -> spec.getId()).collect(Collectors.toList());
     }
 
-    protected void verifyServerTemplateContainsKieServers(KieServerMgmtControllerClient kieControllerClient, String serverTemplate, int numberOfKieServers) {
+    protected void verifyServerTemplateContainsKieServers(KieServerControllerClient kieControllerClient, String serverTemplate, int numberOfKieServers) {
         Collection<ServerInstanceKey> kieServers = kieControllerClient.getServerTemplate(serverTemplate).getServerInstanceKeys();
         assertThat(kieServers).hasSize(numberOfKieServers);
     }

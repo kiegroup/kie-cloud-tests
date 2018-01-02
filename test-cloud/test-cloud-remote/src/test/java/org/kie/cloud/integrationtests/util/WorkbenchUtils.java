@@ -29,7 +29,7 @@ import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchUtils {
@@ -52,18 +52,18 @@ public class WorkbenchUtils {
         workbenchClient.deployProject(REPOSITORY_NAME, projectName);
     }
 
-    public static void waitForContainerRegistration(KieServerMgmtControllerClient kieControllerClient, String serverTemplate, String containerId) {
+    public static void waitForContainerRegistration(KieServerControllerClient kieControllerClient, String serverTemplate, String containerId) {
         TimeUtils.wait(MAX_WAIT_DURATION, WAIT_STEP, () -> {
             Collection<ContainerSpec> containersSpec = kieControllerClient.getServerTemplate(serverTemplate).getContainersSpec();
             return containersSpec.stream().anyMatch(n -> n.getId().equals(containerId));
         });
     }
 
-    public static void saveContainerSpec(KieServerMgmtControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
+    public static void saveContainerSpec(KieServerControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
         saveContainerSpec(kieControllerClient, serverTemplateId, serverTemplateName, containerId, containerAlias, groupId, artifactId, version, status, Collections.emptyMap());
     }
 
-    public static void saveContainerSpec(KieServerMgmtControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
+    public static void saveContainerSpec(KieServerControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
         ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
         ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
         ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);

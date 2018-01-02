@@ -39,7 +39,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,7 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
             kieServerDEF,
             kieServerGHI;
 
-    private KieServerMgmtControllerClient kieControllerClient;
+    private KieServerControllerClient kieControllerClient;
     private KieServerRouterClient smartRouterAdminClient;
     private KieServicesClient smartRouterClient;
     private KieServicesClient kieServerClientABC;
@@ -116,7 +116,7 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
 
     @Before
     public void setUp() {
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployments().get(0));
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployments().get(0));
         smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployments().get(0));
 
         kieServerClientABC = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
