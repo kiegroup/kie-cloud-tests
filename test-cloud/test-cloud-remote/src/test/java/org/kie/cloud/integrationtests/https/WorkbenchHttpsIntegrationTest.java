@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.StreamSupport;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -34,13 +36,23 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
+@RunWith(Parameterized.class)
+public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+
+    @Parameter
+    public WorkbenchKieServerScenario workbenchKieServerScenario;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
 
@@ -51,9 +63,21 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     private static final String SERVER_ID = "KieServerId";
     private static final String SERVER_NAME = "KieServer";
 
+    @Parameters
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder().build();
+        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
+
+        return Arrays.asList(new Object[][] {
+                 { workbenchKieServerScenario }, {workbenchKieServerDatabaseScenario }
+           });
+    }
+
     @Override
-    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
+    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return workbenchKieServerScenario;
     }
 
     @Test

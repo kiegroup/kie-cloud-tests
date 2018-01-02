@@ -70,8 +70,11 @@ public class WorkbenchKieServerScenarioImpl implements WorkbenchKieServerScenari
         logger.info("Creating project " + projectName);
         Project project = openshiftController.createProject(projectName);
 
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppSecret());
-        project.createResources(OpenShiftConstants.getKieAppSecret());
+        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppWorkbenchSecret());
+        project.createResources(OpenShiftConstants.getKieAppWorkbenchSecret());
+
+        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppKieServerSecret());
+        project.createResources(OpenShiftConstants.getKieAppKieServerSecret());
 
         logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
         project.createResources(OpenShiftConstants.getKieImageStreams());

@@ -43,6 +43,14 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String KIE_APP_SECRET = "kie.app.secret";
     /**
+     * URL pointing to OpenShift resource file containing Workbench keystore for HTTPS communication.
+     */
+    public static final String KIE_APP_WORKBENCH_SECRET = "kie.app.workbench.secret";
+    /**
+     * URL pointing to OpenShift resource file containing Kie server keystore for HTTPS communication.
+     */
+    public static final String KIE_APP_KIE_SERVER_SECRET = "kie.app.kie-server.secret";
+    /**
      * URL pointing to OpenShift resource file containing image streams with all available images.
      */
     public static final String KIE_IMAGE_STREAMS = "kie.image.streams";
@@ -105,6 +113,14 @@ public class OpenShiftConstants implements Constants {
 
     public static String getKieAppSecret() {
         return System.getProperty(KIE_APP_SECRET);
+    }
+
+    public static String getKieAppWorkbenchSecret() {
+        return System.getProperty(KIE_APP_WORKBENCH_SECRET);
+    }
+
+    public static String getKieAppKieServerSecret() {
+        return System.getProperty(KIE_APP_KIE_SERVER_SECRET);
     }
 
     public static String getKieImageStreams() {
