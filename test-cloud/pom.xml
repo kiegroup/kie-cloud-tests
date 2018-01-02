@@ -23,6 +23,8 @@
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
+    <kie.app.workbench.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/decisioncentral-app-secret.yaml</kie.app.workbench.secret>
+    <kie.app.kie-server.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/kieserver-app-secret.yaml</kie.app.kie-server.secret>
     <!-- Templates are specified in specific properties files. Path is relative to submodules of this module. -->
     <kie.app.templates.general>${project.parent.build.resources[0].directory}/templates-general.properties</kie.app.templates.general>
     <kie.app.templates.mysql>${project.parent.build.resources[0].directory}/templates-mysql.properties</kie.app.templates.mysql>
@@ -85,6 +87,8 @@
               <openshift.username>${openshift.username}</openshift.username>
               <openshift.password>${openshift.password}</openshift.password>
               <kie.app.secret>${kie.app.secret}</kie.app.secret>
+              <kie.app.workbench.secret>${kie.app.workbench.secret}</kie.app.workbench.secret>
+              <kie.app.kie-server.secret>${kie.app.kie-server.secret}</kie.app.kie-server.secret>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <!-- All templates have to be passed as properties to failsafe plugin. -->
               <kie.app.template.workbench>${kie.app.template.workbench}</kie.app.template.workbench>
