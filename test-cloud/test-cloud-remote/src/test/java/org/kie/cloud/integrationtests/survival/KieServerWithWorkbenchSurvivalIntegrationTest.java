@@ -15,8 +15,11 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -38,15 +41,13 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.common.rest.Authenticator;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
-    private KieServerMgmtControllerClient kieServerMgmtControllerClient;
+    private KieServerControllerClient kieServerControllerClient;
 
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
@@ -63,7 +64,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
     public void setUp() {
         WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
-        kieServerMgmtControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
 
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
@@ -82,7 +83,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
         checkServerTemplateInstanceCount(serverInfo.getServerId(), 1);
 
         logger.debug("Register Kie Container to Kie Server");
-        WorkbenchUtils.saveContainerSpec(kieServerMgmtControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
         logger.debug("Start process instance");
@@ -118,14 +119,14 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
     }
 
     protected void checkServerTemplateIsRegistred(String expectedId, String expectedName) {
-        assertThat(kieServerMgmtControllerClient.listServerTemplates().getServerTemplates()).hasSize(1);
-        ServerTemplate serverTemplate = kieServerMgmtControllerClient.listServerTemplates().getServerTemplates()[0];
+        assertThat(kieServerControllerClient.listServerTemplates().getServerTemplates()).hasSize(1);
+        ServerTemplate serverTemplate = kieServerControllerClient.listServerTemplates().getServerTemplates()[0];
         assertThat(serverTemplate.getId()).isEqualTo(expectedId);
         assertThat(serverTemplate.getName()).isEqualTo(expectedName);
     }
 
     protected void checkServerTemplateInstanceCount(String serverTemplateId, int expected) {
-        ServerTemplate serverTemplate = kieServerMgmtControllerClient.getServerTemplate(serverTemplateId);
+        ServerTemplate serverTemplate = kieServerControllerClient.getServerTemplate(serverTemplateId);
         assertThat(serverTemplate).isNotNull();
         assertThat(serverTemplate.getServerInstanceKeys()).isNotNull().hasSize(expected);
     }
