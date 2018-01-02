@@ -44,7 +44,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 
 public class KieServerWebSocketScalingIntegrationTest {
 
@@ -54,7 +54,7 @@ public class KieServerWebSocketScalingIntegrationTest {
     private WorkbenchDeployment workbenchDeployment;
     private KieServerDeployment kieServerDeployment;
 
-    private KieServerMgmtControllerClient kieControllerClient;
+    private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
 
     private static final String CONTAINER_ID = "cont-id";
@@ -97,7 +97,7 @@ public class KieServerWebSocketScalingIntegrationTest {
         kieServerDeployment = kieServerScenario.getKieServerDeployments().get(0);
 
         kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(workbenchDeployment);
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
     }
 
     @After

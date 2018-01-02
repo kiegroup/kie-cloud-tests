@@ -19,15 +19,15 @@ import java.time.Instant;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClientFactory;
+import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.server.controller.client.KieServerControllerClientFactory;
 
 public class KieServerControllerClientProvider {
 
-    public static KieServerMgmtControllerClient getKieServerMgmtControllerClient(WorkbenchDeployment workbenchDeployment) {
-        KieServerMgmtControllerClient kieServerMgmtControllerClient = KieServerMgmtControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
+    public static KieServerControllerClient getKieServerControllerClient(WorkbenchDeployment workbenchDeployment) {
+        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
                 workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
-        return kieServerMgmtControllerClient;
+        return kieServerControllerClient;
     }
 
     /**
@@ -37,7 +37,7 @@ public class KieServerControllerClientProvider {
         Instant timeoutTime = Instant.now().plusSeconds(30);
         while (Instant.now().isBefore(timeoutTime)) {
 
-            ServerTemplateList serverTemplates = getKieServerMgmtControllerClient(workbenchDeployment).listServerTemplates();
+            ServerTemplateList serverTemplates = getKieServerControllerClient(workbenchDeployment).listServerTemplates();
             if(serverTemplates.getServerTemplates().length == numberOfServerTemplates) {
                 return;
             }
