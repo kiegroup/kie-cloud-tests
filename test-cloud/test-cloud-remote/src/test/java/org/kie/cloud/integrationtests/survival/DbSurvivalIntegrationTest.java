@@ -15,6 +15,9 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -33,16 +36,13 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
 
-    private KieServerMgmtControllerClient kieServerMgmtControllerClient;
+    private KieServerControllerClient kieServerControllerClient;
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected QueryServicesClient queryServicesClient;
@@ -57,7 +57,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<Work
     public void setUp() {
         WorkbenchUtils.deployProjectToWorkbench(gitProvider, deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
-        kieServerMgmtControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
 
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
@@ -68,7 +68,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<Work
     public void reconnectionDbTest() {
         logger.debug("Register Kie Container to Kie Server");
         KieServerInfo serverInfo = kieServicesClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieServerMgmtControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
         logger.debug("Start process instance");

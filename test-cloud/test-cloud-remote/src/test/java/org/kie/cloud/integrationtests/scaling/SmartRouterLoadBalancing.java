@@ -36,12 +36,12 @@ import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.management.client.KieServerMgmtControllerClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 
 public class SmartRouterLoadBalancing extends
         AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
 
-    private KieServerMgmtControllerClient kieControllerClient;
+    private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
     private KieServicesClient kieServerClientRouter;
 
@@ -64,7 +64,7 @@ public class SmartRouterLoadBalancing extends
         MavenDeployer.buildAndDeployMavenProject(
                 ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
 
-        kieControllerClient = KieServerControllerClientProvider.getKieServerMgmtControllerClient(
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(
                 deploymentScenario.getWorkbenchRuntimeDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
 
