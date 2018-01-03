@@ -62,6 +62,11 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-wb-tests-rest</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>cz.xtf</groupId>
+      <artifactId>utilities</artifactId>
+    </dependency>
   </dependencies>
 
 </project>
