@@ -29,6 +29,11 @@
 
     <version.org.gitlab>1.2.8</version.org.gitlab>
     <version.org.eclipse.mylyn.github>2.1.5</version.org.eclipse.mylyn.github>
+
+    <version.cz.xtf>0.6-SNAPSHOT</version.cz.xtf>
+    <!-- Version adjustments due to mismatch between Kie BOM and XTF dependencies. -->
+    <version.kubernetes-client>3.0.3</version.kubernetes-client>
+    <version.kubernetes-model>2.0.4</version.kubernetes-model>
   </properties>
 
   <repositories>
@@ -46,6 +51,28 @@
         <enabled>true</enabled>
         <updatePolicy>daily</updatePolicy>
       </snapshots>
+    </repository>
+    <repository>
+      <id>bintray-xtf-cz-xtf</id>
+      <name>Bintray XTF</name>
+      <url>https://dl.bintray.com/xtf-cz/xtf</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>oss-jfrog-snapshots</id>
+      <name>oss-jfrog-artifactory-snapshots</name>
+      <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
     </repository>
   </repositories>
 
@@ -114,6 +141,17 @@
         <groupId>org.eclipse.mylyn.github</groupId>
         <artifactId>org.eclipse.egit.github.core</artifactId>
         <version>${version.org.eclipse.mylyn.github}</version>
+      </dependency>
+      <dependency>
+        <groupId>cz.xtf</groupId>
+        <artifactId>utilities</artifactId>
+        <version>${version.cz.xtf}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
