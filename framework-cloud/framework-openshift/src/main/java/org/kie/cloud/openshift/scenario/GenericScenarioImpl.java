@@ -90,6 +90,10 @@ public class GenericScenarioImpl implements GenericScenario {
 
     @Override
     public void deploy() {
+        workbenchDeployments.clear();
+        kieServerDeployments.clear();
+        smartRouterDeployments.clear();
+
         // OpenShift restriction: Hostname must be shorter than 63 characters
         projectName = UUID.randomUUID().toString().substring(0, 4);
         OpenShiftConstants.getNamespacePrefix().ifPresent(p -> projectName = p + "-" + projectName);
