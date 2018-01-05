@@ -21,18 +21,14 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl;
 
 public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl implements WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder {
 
-    private OpenShiftController openshiftController;
     private Map<String, String> envVariables;
 
-    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl(OpenShiftController openShiftController) {
-        this.openshiftController = openShiftController;
-
+    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl() {
         this.envVariables = new HashMap<String, String>();
         // TODO: Hardcoded because Workbench runtime Smart router template is designed to handle unmanaged Kie servers.
         // Therefore the template doesn't have possibility to set Kie server username/password for controller requests.
@@ -49,7 +45,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl imp
 
     @Override
     public WorkbenchRuntimeSmartRouterKieServerDatabaseScenario build() {
-        return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl(openshiftController, envVariables);
+        return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl(envVariables);
     }
 
     @Override

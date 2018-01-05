@@ -29,18 +29,14 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.KieServerWithExternalDatabaseScenarioImpl;
 
 public class KieServerWithExternalDatabaseScenarioBuilderImpl implements KieServerWithExternalDatabaseScenarioBuilder {
 
-    private OpenShiftController openshiftController;
     private Map<String, String> envVariables;
 
-    public KieServerWithExternalDatabaseScenarioBuilderImpl(OpenShiftController openShiftController) {
-        this.openshiftController = openShiftController;
-
+    public KieServerWithExternalDatabaseScenarioBuilderImpl() {
         this.envVariables = new HashMap<String, String>();
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
@@ -56,7 +52,7 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl implements KieServ
     }
 
     @Override public KieServerWithExternalDatabaseScenario build() {
-        return new KieServerWithExternalDatabaseScenarioImpl(openshiftController, envVariables);
+        return new KieServerWithExternalDatabaseScenarioImpl(envVariables);
     }
 
     @Override
