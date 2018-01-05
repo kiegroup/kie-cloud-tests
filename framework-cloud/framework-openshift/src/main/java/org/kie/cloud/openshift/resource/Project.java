@@ -17,13 +17,14 @@ package org.kie.cloud.openshift.resource;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
+
+import cz.xtf.openshift.OpenShiftUtil;
 
 /**
  * Project representation.
  */
-public interface Project {
+public interface Project extends AutoCloseable {
 
     /**
      * @return Project name.
@@ -36,33 +37,9 @@ public interface Project {
     public void delete();
 
     /**
-     * Create new service.
-     *
-     * @param service Service name.
-     * @return Created service.
+     * @return OpenShift client.
      */
-    public Service createService(String service);
-
-    /**
-     * Create new service.
-     *
-     * @param service Service name.
-     * @param protocol Service communication protocol, usually TCP.
-     * @param ports Ports available from outside.
-     * @return Created service.
-     */
-    public Service createService(String service, String protocol, int... ports);
-
-    /**
-     * @return List of services available in this project.
-     */
-    public List<Service> getServices();
-
-    /**
-     * @param serviceName Service name.
-     * @return Service object corresponding to this name.
-     */
-    public Service getService(String serviceName);
+    public OpenShiftUtil getOpenShiftUtil();
 
     /**
      * Process template and create all resources defined there.
@@ -93,12 +70,4 @@ public interface Project {
      * @param inputStream Input stream with resource list to be created
      */
     public void createResources(InputStream inputStream);
-
-    /**
-     * Get default subdomain configured for OpenShift instance.
-     * This value is used for assuming route URL before the route is created.
-     *
-     * @return Default routing subdomain.
-     */
-    public String getDefaultRoutingSubdomain();
 }

@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.deployment;
 import java.net.URL;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.openshift.resource.Project;
 
 public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieServerDeployment {
 
@@ -28,6 +29,10 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
 
     private String serviceName;
     private String secureServiceName;
+
+    public KieServerDeploymentImpl(Project project) {
+        super(project);
+    }
 
     @Override public URL getUrl() {
         if (url == null) {
@@ -62,21 +67,21 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getKieServerServiceName(openShiftController, namespace);
+            serviceName = ServiceUtil.getKieServerServiceName(getOpenShiftUtil());
         }
         return serviceName;
     }
 
     public String getSecureServiceName() {
         if (secureServiceName == null) {
-            secureServiceName = ServiceUtil.getKieServerSecureServiceName(openShiftController, namespace);
+            secureServiceName = ServiceUtil.getKieServerSecureServiceName(getOpenShiftUtil());
         }
         return secureServiceName;
     }
 
     @Override public void waitForScale() {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().waitUntilAllPodsAreReady();
-        if (openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().podsNumber() > 0) {
+        super.waitForScale();
+        if (getInstances().size() > 0) {
             RouterUtil.waitForRouter(getUrl());
         }
     }

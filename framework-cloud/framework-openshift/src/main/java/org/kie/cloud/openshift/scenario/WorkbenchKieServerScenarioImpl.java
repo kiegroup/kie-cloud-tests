@@ -19,29 +19,23 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
-import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
-import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchKieServerScenarioImpl implements WorkbenchKieServerScenario {
+public class WorkbenchKieServerScenarioImpl extends OpenShiftScenario implements WorkbenchKieServerScenario {
 
-    private OpenShiftController openshiftController;
-    private String projectName;
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
 
@@ -49,26 +43,13 @@ public class WorkbenchKieServerScenarioImpl implements WorkbenchKieServerScenari
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
-    public WorkbenchKieServerScenarioImpl(OpenShiftController openShiftController, Map<String, String> envVariables) {
-        this.openshiftController = openShiftController;
+    public WorkbenchKieServerScenarioImpl(Map<String, String> envVariables) {
         this.envVariables = envVariables;
     }
 
     @Override
-    public String getNamespace() {
-        return projectName;
-    }
-
-    @Override
     public void deploy() {
-        // OpenShift restriction: Hostname must be shorter than 63 characters
-        projectName = UUID.randomUUID().toString().substring(0, 4);
-        OpenShiftConstants.getNamespacePrefix().ifPresent(p -> projectName = p + "-" + projectName);
-
-        logger.info("Generated project name is " + projectName);
-
-        logger.info("Creating project " + projectName);
-        Project project = openshiftController.createProject(projectName);
+        super.deploy();
 
         logger.info("Creating secrets from " + OpenShiftConstants.getKieAppWorkbenchSecret());
         project.createResources(OpenShiftConstants.getKieAppWorkbenchSecret());
@@ -83,15 +64,11 @@ public class WorkbenchKieServerScenarioImpl implements WorkbenchKieServerScenari
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER.getTemplateUrl(), envVariables);
 
-        workbenchDeployment = new WorkbenchDeploymentImpl();
-        workbenchDeployment.setOpenShiftController(openshiftController);
-        workbenchDeployment.setNamespace(projectName);
+        workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
-        kieServerDeployment = new KieServerDeploymentImpl();
-        kieServerDeployment.setOpenShiftController(openshiftController);
-        kieServerDeployment.setNamespace(projectName);
+        kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
@@ -106,25 +83,6 @@ public class WorkbenchKieServerScenarioImpl implements WorkbenchKieServerScenari
 
         // Used to track persistent volume content due to issues with volume cleanup
         storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/bpmsuite");
-    }
-
-    @Override
-    public void undeploy() {
-        InstanceLogUtil.writeDeploymentLogs(this);
-
-        for(Deployment deployment : getDeployments()) {
-            if(deployment != null && deployment.isReady()) {
-                deployment.scale(0);
-                deployment.waitForScale();
-            }
-        }
-
-        Project project = openshiftController.getProject(projectName);
-        project.delete();
-    }
-
-    public OpenShiftController getOpenshiftController() {
-        return openshiftController;
     }
 
     @Override

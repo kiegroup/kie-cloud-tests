@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.kie.cloud.openshift.OpenShiftController;
-import org.kie.cloud.openshift.resource.Service;
+import cz.xtf.openshift.OpenShiftUtil;
+import io.fabric8.kubernetes.api.model.Service;
 
 public class ServiceUtil {
 
@@ -30,35 +30,35 @@ public class ServiceUtil {
     private static final Pattern SECURE_KIE_SERVER_REGEXP = Pattern.compile("secure-.*(-execserv|-kieserver)");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
 
-    public static String getWorkbenchServiceName(OpenShiftController openShiftController, String namespace) {
-        return getServiceName(openShiftController, namespace, WORKBENCH_REGEXP);
+    public static String getWorkbenchServiceName(OpenShiftUtil util) {
+        return getServiceName(util, WORKBENCH_REGEXP);
     }
 
-    public static String getWorkbenchSecureServiceName(OpenShiftController openShiftController, String namespace) {
-        return getServiceName(openShiftController, namespace, SECURE_WORKBENCH_REGEXP);
+    public static String getWorkbenchSecureServiceName(OpenShiftUtil util) {
+        return getServiceName(util, SECURE_WORKBENCH_REGEXP);
     }
 
-    public static String getKieServerServiceName(OpenShiftController openShiftController, String namespace) {
-        return getServiceName(openShiftController, namespace, KIE_SERVER_REGEXP);
+    public static String getKieServerServiceName(OpenShiftUtil util) {
+        return getServiceName(util, KIE_SERVER_REGEXP);
     }
 
-    public static String getKieServerSecureServiceName(OpenShiftController openShiftController, String namespace) {
-        return getServiceName(openShiftController, namespace, SECURE_KIE_SERVER_REGEXP);
+    public static String getKieServerSecureServiceName(OpenShiftUtil util) {
+        return getServiceName(util, SECURE_KIE_SERVER_REGEXP);
     }
 
-    public static String getDatabaseServiceName(OpenShiftController openShiftController, String namespace) {
-        return getServiceName(openShiftController, namespace, DATABASE_REGEXP);
+    public static String getDatabaseServiceName(OpenShiftUtil util) {
+        return getServiceName(util, DATABASE_REGEXP);
     }
 
-    private static String getServiceName(OpenShiftController openShiftController, String namespace, Pattern regexp) {
+    private static String getServiceName(OpenShiftUtil util, Pattern regexp) {
         // Try to find service name from all available services
-        List<Service> services = openShiftController.getProject(namespace).getServices();
+        List<Service> services = util.getServices();
         for (Service service : services) {
-            if (regexp.matcher(service.getName()).matches()) {
-                return service.getName();
+            if (regexp.matcher(service.getMetadata().getName()).matches()) {
+                return service.getMetadata().getName();
             }
         }
-        String serviceNames = services.stream().map(Service::getName).collect(Collectors.joining(", "));
+        String serviceNames = services.stream().map(s -> s.getMetadata().getName()).collect(Collectors.joining(", "));
         throw new RuntimeException("Service defined by regexp " + regexp.toString() + " not found. Available services: " + serviceNames);
     }
 }

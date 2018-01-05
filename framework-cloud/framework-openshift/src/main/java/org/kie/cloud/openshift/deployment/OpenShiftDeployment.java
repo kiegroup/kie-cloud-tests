@@ -24,36 +24,44 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
+import java.util.function.BooleanSupplier;
 
+import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.wait.WaitUtil;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
+
 import java.time.Duration;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
-import org.kie.cloud.openshift.resource.Service;
+import org.kie.cloud.openshift.resource.Project;
 
 public abstract class OpenShiftDeployment implements Deployment {
 
-    protected OpenShiftController openShiftController;
-    protected String namespace;
+    private OpenShiftUtil util;
+    private Project project;
 
-    public OpenShiftController getOpenShiftController() {
-        return openShiftController;
+    public OpenShiftDeployment(Project project) {
+        this.project = project;
+        this.util = project.getOpenShiftUtil();
     }
 
-    public void setOpenShiftController(OpenShiftController openShiftController) {
-        this.openShiftController = openShiftController;
+    public OpenShiftUtil getOpenShiftUtil() {
+        return util;
+    }
+
+    public void setOpenShiftUtil(OpenShiftUtil util) {
+        this.util = util;
     }
 
     @Override
     public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
+        return project.getName();
     }
 
     @Override
@@ -64,7 +72,8 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void deleteInstances(List<Instance> instances) {
         for (Instance instance : instances) {
-            openShiftController.getClient().pods().inNamespace(namespace).withName(instance.getName()).withGracePeriod(0).delete();
+            Pod pod = util.getPod(instance.getName());
+            util.deletePod(pod);
         }
     }
 
@@ -72,13 +81,17 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void scale(int instances) {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().scalePods(instances);
+        util.withUser(client -> {
+            return client.deploymentConfigs().inNamespace(getNamespace()).withName(getServiceName()).scale(instances, true);
+        });
+        // Wait flag while scaling of deployment config doesn't seem to work correctly, use own waiting functionality
+        waitForScale();
     }
 
     @Override
     public boolean isReady() {
         try {
-            Service service = openShiftController.getProject(namespace).getService(getServiceName());
+            Service service = util.getService(getServiceName());
             return service != null;
         } catch (Exception e) {
             return false;
@@ -88,12 +101,16 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public List<Instance> getInstances() {
         if (isReady()) {
-            String deploymentConfigName = openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().getName();
-            List<Pod> pods = openShiftController.getClient().pods().inNamespace(namespace).withLabel(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, deploymentConfigName).list().getItems();
+            // Deployment config has a same name as its service.
+            String deploymentConfigName = getServiceName();
 
-            List<Instance> instances = pods.stream().map((pod) -> {
-                return createInstance(pod);
-            }).collect(toList());
+            List<Instance> instances = util.getPods().stream()
+                    .filter(pod -> {
+                        String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
+                        return deploymentConfigName.equals(podsDeploymentConfigName);
+                    })
+                    .map(pod -> createInstance(pod))
+                    .collect(toList());
 
             return instances;
         }
@@ -102,24 +119,69 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
+    public void waitForScale() {
+        waitUntilAllPodsAreReady();
+        waitUntilAllPodsAreRunning();
+    }
+
+    private void waitUntilAllPodsAreReady() {
+        int expectedPods = util.getDeploymentConfig(getServiceName()).getSpec().getReplicas().intValue();
+
+        BooleanSupplier arePodsReady = () -> {
+            List<Pod> pods = util.getLabeledPods(Collections.singletonMap(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName()));
+
+            if (pods.size() == expectedPods) {
+                return pods.stream().allMatch(WaitUtil::isPodReady);
+            } else {
+                return false;
+            }
+        };
+
+        try {
+            WaitUtil.waitFor(arePodsReady, null, WaitUtil.DEFAULT_WAIT_INTERVAL, OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Exception while waiting for scale.");
+        } catch (TimeoutException e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
+        }
+    }
+
+    private void waitUntilAllPodsAreRunning() {
+        BooleanSupplier arePodsRunning = () -> {
+            List<Pod> pods = util.getLabeledPods(Collections.singletonMap(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName()));
+            return pods.stream().allMatch(WaitUtil::isPodRunning);
+        };
+
+        try {
+            WaitUtil.waitFor(arePodsRunning, null, WaitUtil.DEFAULT_WAIT_INTERVAL, OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Exception while waiting for scale.");
+        } catch (TimeoutException e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
+        }
+    }
+
+    @Override
     public void setRouterTimeout(Duration timeoutValue) {
-        openShiftController.getClient()
-                .routes()
-                .inNamespace(getNamespace())
-                .withName(getServiceName())
-                .edit()
-                .editMetadata()
-                .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds()+"s")
-                .endMetadata()
-                .done();
+        // Route has a same name as its service.
+        String routeName = getServiceName();
+        util.withUser(client -> {
+            client
+            .routes()
+            .withName(routeName)
+            .edit()
+            .editMetadata()
+            .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds()+"s")
+            .endMetadata()
+            .done();
+            return null;
+        });
     }
 
     private Instance createInstance(Pod pod) {
-        OpenShiftInstance instance = new OpenShiftInstance();
-        instance.setOpenShiftController(openShiftController);
-        instance.setNamespace(namespace);
-        instance.setName(pod.getMetadata().getName());
-        return instance;
+        String instanceName = pod.getMetadata().getName();
+
+        return new OpenShiftInstance(util, getNamespace(), instanceName);
     }
 
     protected URL getHttpRouteUrl(String serviceName) {
@@ -144,15 +206,15 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     private URI getRouteUri(String protocol, String serviceName) {
         URI uri;
-        Service service = openShiftController.getProject(namespace).getService(serviceName);
+        Service service = util.getService(serviceName);
 
         String routeHost = null;
         if(service == null) {
             // Service doesn't exist, create URL using default subdomain
-            String defaultRoutingSubdomain = openShiftController.getProject(namespace).getDefaultRoutingSubdomain();
-            routeHost = getServiceName() + "-" + namespace + defaultRoutingSubdomain;
+            String defaultRoutingSubdomain = DeploymentConstants.getDefaultDomainSuffix();
+            routeHost = getServiceName() + "-" + getNamespace() + defaultRoutingSubdomain;
         } else {
-            routeHost = service.getRoute().getRouteHost();
+            routeHost = util.getRoute(serviceName).getSpec().getHost();
         }
         String uriValue = protocol + "://" + routeHost + ":" + retrievePort(protocol);
 

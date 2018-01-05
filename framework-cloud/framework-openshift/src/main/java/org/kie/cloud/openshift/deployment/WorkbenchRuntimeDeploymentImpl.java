@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URL;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.openshift.resource.Project;
 
 public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implements WorkbenchDeployment {
 
@@ -30,6 +31,10 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
 
     private String serviceName;
     private String secureServiceName;
+
+    public WorkbenchRuntimeDeploymentImpl(Project project) {
+        super(project);
+    }
 
     @Override public URL getUrl() {
         if (url == null) {
@@ -86,8 +91,8 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
     }
 
     @Override public void waitForScale() {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().waitUntilAllPodsAreReady();
-        if (openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().podsNumber() > 0) {
+        super.waitForScale();
+        if (getInstances().size() > 0) {
             RouterUtil.waitForRouter(getUrl());
         }
     }
