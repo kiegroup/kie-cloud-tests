@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift;
 
+import cz.xtf.TestConfiguration;
 import cz.xtf.openshift.OpenShiftUtil;
 import cz.xtf.openshift.OpenShiftUtils;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -42,7 +43,7 @@ public class OpenShiftController {
      * @return OpenShiftUtil with default namespace configured.
      */
     public static OpenShiftUtil getOpenShiftUtil() {
-        return OpenShiftUtils.masterUtil();
+        return getOpenShiftUtil(TestConfiguration.masterNamespace());
     }
 
     /**
