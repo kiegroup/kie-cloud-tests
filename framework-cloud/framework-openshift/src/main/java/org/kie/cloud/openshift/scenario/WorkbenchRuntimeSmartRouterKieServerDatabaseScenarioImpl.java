@@ -64,12 +64,6 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends Op
         kieServerDeployment = createKieServerDeployment(project);
         databaseDeployment = createDatabaseDeployment(project);
 
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppSecret());
-        project.createResources(OpenShiftConstants.getKieAppSecret());
-
-        logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
-        project.createResources(OpenShiftConstants.getKieImageStreams());
-
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CONSOLE_SMARTROUTER.getTemplateUrl().toString());
         Map<String, String> consoleSmartRouterEnvVariables = new HashMap<String, String>(envVariables);
         consoleSmartRouterEnvVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
