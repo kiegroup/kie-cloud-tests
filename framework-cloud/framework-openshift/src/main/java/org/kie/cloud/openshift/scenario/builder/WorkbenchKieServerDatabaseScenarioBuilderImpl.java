@@ -21,18 +21,14 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilder;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerDatabaseScenarioImpl;
 
 public class WorkbenchKieServerDatabaseScenarioBuilderImpl implements WorkbenchKieServerDatabaseScenarioBuilder {
 
-    private OpenShiftController openshiftController;
     private Map<String, String> envVariables;
 
-    public WorkbenchKieServerDatabaseScenarioBuilderImpl(OpenShiftController openShiftController) {
-        this.openshiftController = openShiftController;
-
+    public WorkbenchKieServerDatabaseScenarioBuilderImpl() {
         this.envVariables = new HashMap<String, String>();
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
@@ -46,7 +42,7 @@ public class WorkbenchKieServerDatabaseScenarioBuilderImpl implements WorkbenchK
 
     @Override
     public WorkbenchKieServerDatabaseScenario build() {
-        return new WorkbenchKieServerDatabaseScenarioImpl(openshiftController, envVariables);
+        return new WorkbenchKieServerDatabaseScenarioImpl(envVariables);
     }
 
     @Override

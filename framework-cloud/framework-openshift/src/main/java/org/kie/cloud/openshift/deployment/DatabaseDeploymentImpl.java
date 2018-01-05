@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.deployment;
 import java.net.URL;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
+import org.kie.cloud.openshift.resource.Project;
 
 public class DatabaseDeploymentImpl extends OpenShiftDeployment implements DatabaseDeployment {
 
@@ -26,6 +27,10 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     private String databaseName;
     private URL url;
     private String serviceName;
+
+    public DatabaseDeploymentImpl(Project project) {
+        super(project);
+    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -66,13 +71,8 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getDatabaseServiceName(openShiftController, namespace);
+            serviceName = ServiceUtil.getDatabaseServiceName(getOpenShiftUtil());
         }
         return serviceName;
-    }
-
-    @Override
-    public void waitForScale() {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().waitUntilAllPodsAreReady();
     }
 }

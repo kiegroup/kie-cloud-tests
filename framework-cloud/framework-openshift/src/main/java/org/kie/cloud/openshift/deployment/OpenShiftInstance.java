@@ -17,40 +17,20 @@ package org.kie.cloud.openshift.deployment;
 
 import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
-import io.fabric8.kubernetes.client.KubernetesClientException;
+import cz.xtf.openshift.OpenShiftUtil;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.openshift.OpenShiftController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OpenShiftInstance implements Instance {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenShiftInstance.class);
-
-    private OpenShiftController openShiftController;
+    private OpenShiftUtil util;
     private String name;
     private String namespace;
 
-    public void setName(String name) {
+    public OpenShiftInstance(OpenShiftUtil util, String namespace, String name) {
+        this.util = util;
         this.name = name;
-    }
-
-    public void setNamespace(String namespace) {
         this.namespace = namespace;
-    }
-
-    public OpenShiftController getOpenShiftController() {
-        return openShiftController;
-    }
-
-    public void setOpenShiftController(OpenShiftController openShiftController) {
-        this.openShiftController = openShiftController;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -58,17 +38,23 @@ public class OpenShiftInstance implements Instance {
         return namespace;
     }
 
+    public OpenShiftUtil getOpenShiftUtil() {
+        return util;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
     @Override public CommandExecutionResult runCommand(String... command) {
-        return runCommandImpl(openShiftController.getClient().pods().inNamespace(namespace).withName(name), command);
+        return util.withUser(client -> {
+            return runCommandImpl(client.pods().withName(name), command);
+        });
     }
 
     @Override
     public String getLogs() {
-        try {
-            return openShiftController.getClient().pods().inNamespace(namespace).withName(name).getLog();
-        } catch (KubernetesClientException e) {
-            logger.info("Exception while retrieving OpenShift log for pod with name " + name, e);
-            return "";
-        }
+        return util.getPodLog(name);
     }
 }

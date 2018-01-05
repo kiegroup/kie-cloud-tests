@@ -24,6 +24,11 @@
     </dependency>
 
     <dependency>
+      <groupId>cz.xtf</groupId>
+      <artifactId>utilities</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
     </dependency>
