@@ -26,9 +26,10 @@
     <kie.app.workbench.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/decisioncentral-app-secret.yaml</kie.app.workbench.secret>
     <kie.app.kie-server.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/kieserver-app-secret.yaml</kie.app.kie-server.secret>
     <!-- Templates are specified in specific properties files. Path is relative to submodules of this module. -->
-    <kie.app.templates.general>${project.parent.build.resources[0].directory}/templates-general.properties</kie.app.templates.general>
-    <kie.app.templates.mysql>${project.parent.build.resources[0].directory}/templates-mysql.properties</kie.app.templates.mysql>
-    <kie.app.templates.postgresql>${project.parent.build.resources[0].directory}/templates-postgresql.properties</kie.app.templates.postgresql>
+    <kie.app.templates.jbpm.general>${project.parent.build.resources[0].directory}/templates-jbpm-general.properties</kie.app.templates.jbpm.general>
+    <kie.app.templates.jbpm.mysql>${project.parent.build.resources[0].directory}/templates-jbpm-mysql.properties</kie.app.templates.jbpm.mysql>
+    <kie.app.templates.jbpm.postgresql>${project.parent.build.resources[0].directory}/templates-jbpm-postgresql.properties</kie.app.templates.jbpm.postgresql>
+    <kie.app.templates.drools.general>${project.parent.build.resources[0].directory}/templates-drools-general.properties</kie.app.templates.drools.general>
 
     <kie.app.name>myapp</kie.app.name>
 
@@ -70,11 +71,6 @@
               <goals>
                 <goal>read-project-properties</goal>
               </goals>
-              <configuration>
-                <files combine.children="append">
-                  <file>${kie.app.templates.general}</file>
-                </files>
-              </configuration>
             </execution>
           </executions>
         </plugin>
@@ -133,6 +129,42 @@
 
   <profiles>
     <profile>
+      <id>drools</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>properties-maven-plugin</artifactId>
+              <configuration>
+                <files combine.children="append">
+                  <file>${kie.app.templates.drools.general}</file>
+                </files>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>jbpm</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>properties-maven-plugin</artifactId>
+              <configuration>
+                <files combine.children="append">
+                  <file>${kie.app.templates.jbpm.general}</file>
+                </files>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>mysql</id>
       <build>
         <pluginManagement>
@@ -141,8 +173,8 @@
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>properties-maven-plugin</artifactId>
               <configuration>
-                <files>
-                  <file>${kie.app.templates.mysql}</file>
+                <files combine.children="append">
+                  <file>${kie.app.templates.jbpm.mysql}</file>
                 </files>
               </configuration>
             </plugin>
@@ -159,8 +191,8 @@
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>properties-maven-plugin</artifactId>
               <configuration>
-                <files>
-                  <file>${kie.app.templates.postgresql}</file>
+                <files combine.children="append">
+                  <file>${kie.app.templates.jbpm.postgresql}</file>
                 </files>
               </configuration>
             </plugin>
