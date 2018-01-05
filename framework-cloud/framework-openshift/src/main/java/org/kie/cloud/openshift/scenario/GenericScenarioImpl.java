@@ -89,12 +89,6 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         kieServerDeployments.clear();
         smartRouterDeployments.clear();
 
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppSecret());
-        project.createResources(OpenShiftConstants.getKieAppSecret());
-
-        logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
-        project.createResources(OpenShiftConstants.getKieImageStreams());
-
         for (DeploymentSettings workbenchSettings : workbenchSettingsList) {
             deployTemplateWithSettings(project, workbenchSettings);
             workbenchDeployments.add(createWorkbenchDeployment(project, workbenchSettings));

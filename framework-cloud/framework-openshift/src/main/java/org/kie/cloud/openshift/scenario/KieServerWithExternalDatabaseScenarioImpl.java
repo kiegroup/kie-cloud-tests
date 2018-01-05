@@ -23,7 +23,6 @@ import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
@@ -47,12 +46,6 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
     @Override public void deploy() {
         super.deploy();
-
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppSecret());
-        project.createResources(OpenShiftConstants.getKieAppSecret());
-
-        logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
-        project.createResources(OpenShiftConstants.getKieImageStreams());
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
