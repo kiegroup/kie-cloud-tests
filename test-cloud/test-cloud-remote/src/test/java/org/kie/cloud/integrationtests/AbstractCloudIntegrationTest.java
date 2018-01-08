@@ -46,6 +46,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String RULE_PROJECT_NAME = "rule-project";
     protected static final String RULE_PROJECT_VERSION = "1.0.0-SNAPSHOT";
 
+    protected static final String HELLO_RULES_PROJECT_NAME = "hello-rules-snapshot";
+    protected static final String HELLO_RULES_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+
     protected static final String CONTAINER_ID = "cont-id";
     protected static final String CONTAINER_ALIAS = "cont-alias";
 

@@ -1,8 +1,24 @@
+/*
+ * Copyright 2018 JBoss by Red Hat.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.kie.cloud.integrationtests.probe;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -18,13 +34,18 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -38,16 +59,36 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
+@RunWith(Parameterized.class)
+public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+
+    @Parameterized.Parameter
+    public WorkbenchKieServerScenario workbenchKieServerScenario;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        return Arrays.asList(new Object[][]{
+            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}
+        });
+    }
+
+    @Override
+    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return workbenchKieServerScenario;
+    }
 
     private Client httpKieServerClient;
 
     private static final Logger logger = LoggerFactory.getLogger(ReadinessProbeIntegrationTest.class);
-
-    @Override
-    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
-    }
 
     @Before
     public void setUp() {
@@ -55,7 +96,7 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
                 .establishConnectionTimeout(10, TimeUnit.SECONDS)
                 .socketTimeout(10, TimeUnit.SECONDS)
                 .register(new Authenticator(deploymentScenario.getKieServerDeployment().getUsername(),
-                        deploymentScenario.getKieServerDeployment().getPassword()))
+                                deploymentScenario.getKieServerDeployment().getPassword()))
                 .build();
     }
 
@@ -116,7 +157,7 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
             Response response = target.request().get();
 
-            if(response.getStatus() == Response.Status.OK.getStatusCode()) {
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 ServiceResponse<?> serviceResponse = marshaller.unmarshall(response.readEntity(String.class), ServiceResponse.class);
                 KieContainerResourceList containerList = (KieContainerResourceList) serviceResponse.getResult();
                 Assertions.assertThat(containerList.getContainers().size()).isEqualTo(1);

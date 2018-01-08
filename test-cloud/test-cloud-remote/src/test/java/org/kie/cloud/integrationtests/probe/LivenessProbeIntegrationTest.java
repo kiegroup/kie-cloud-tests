@@ -16,21 +16,53 @@
 package org.kie.cloud.integrationtests.probe;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.TimeUtils;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
+@RunWith(Parameterized.class)
+public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+
+    @Parameterized.Parameter
+    public WorkbenchKieServerScenario workbenchKieServerScenario;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        return Arrays.asList(new Object[][]{
+            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}
+        });
+    }
+
+    @Override
+    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return workbenchKieServerScenario;
+    }
 
     private static final String UNDEPLOY_COMMAND = "/opt/eap/bin/jboss-cli.sh -c --command='undeploy ROOT.war'";
     private static final Duration KILL_POD_TIME = Duration.ofSeconds(60);
@@ -80,7 +112,4 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
         Assertions.assertThat(newPodName).isNotEqualTo(brokenPodName);
     }
 
-    @Override protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
-    }
 }

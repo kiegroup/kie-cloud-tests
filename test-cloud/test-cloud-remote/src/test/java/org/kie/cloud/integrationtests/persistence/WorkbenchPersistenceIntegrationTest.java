@@ -11,10 +11,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.cloud.integrationtests.persistence;
 
+import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
@@ -23,9 +23,15 @@ import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.RepositoryResponse;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
@@ -42,15 +48,33 @@ import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
-public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
+@RunWith(Parameterized.class)
+public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+
+    @Parameter
+    public WorkbenchKieServerScenario workbenchKieServerScenario;
 
     private WorkbenchClient workbenchClient;
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
 
+    @Parameters
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+                .build();
+        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
+                .build();
+
+        return Arrays.asList(new Object[][]{
+            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}
+        });
+    }
+
     @Override
-    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
+    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return workbenchKieServerScenario;
     }
 
     @Before

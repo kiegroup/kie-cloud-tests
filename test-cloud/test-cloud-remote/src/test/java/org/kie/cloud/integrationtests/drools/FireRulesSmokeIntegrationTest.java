@@ -59,8 +59,8 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
     private static final String KIE_SESSION = "defaultKieSession";
-    private static final String FAST_RULE = "Fast rule executed";
-    private static final String SLOW_RULE = "Slow rule executed";
+    private static final String HELLO_RULE = "Hello.";
+    private static final String WORLD_RULE = "World.";
 
     @Override
     protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
@@ -71,21 +71,19 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
 
     @Before
     public void setUp() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rule-project").getFile());
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
 
         kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
 
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         kieServerRuleServiceClient = kieServerClient.getServicesClient(RuleServicesClient.class);
-
-        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(5));
     }
 
     @Test
     public void executeSimpleRuleFailoverTest() throws InterruptedException {
         logger.debug("Register Kie Container to Kie Server");
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, RULE_PROJECT_NAME, RULE_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, HELLO_RULES_PROJECT_NAME, HELLO_RULES_PROJECT_VERSION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
         WorkbenchUtils.waitForContainerRegistration(kieServerControllerClient, serverInfo.getServerId(), CONTAINER_ID);
 
@@ -106,10 +104,8 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
         List<String> outcome = (List<String>) result.getValue(LIST_OUTPUT_NAME);
         assertThat(outcome).hasSize(2);
 
-        assertThat(outcome.get(0)).startsWith(FAST_RULE);
-        assertThat(outcome.get(1)).startsWith(SLOW_RULE);
-
-        System.out.println("***********\n\n" + outcome + "\n\n**********");
+        assertThat(outcome.get(0)).startsWith(HELLO_RULE);
+        assertThat(outcome.get(1)).startsWith(WORLD_RULE);
     }
 
 }
