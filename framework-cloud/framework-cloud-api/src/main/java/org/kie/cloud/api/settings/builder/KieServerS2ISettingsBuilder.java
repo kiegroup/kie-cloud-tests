@@ -186,4 +186,12 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return
      */
     KieServerS2ISettingsBuilder withSecuredHostame(String https);
+
+    /**
+     * Return configured builder with enabled drools classes filter for Kie server.
+     *
+     * @param droolsFilter set to true to enable drools classes filter.
+     * @return Builder
+     */
+    KieServerS2ISettingsBuilder withDroolsServerFilterClasses(boolean droolsFilter);
 }
