@@ -36,7 +36,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
-public class KieServerS2iSimpleIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
 
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
@@ -51,7 +51,7 @@ public class KieServerS2iSimpleIntegrationTest extends AbstractCloudIntegrationT
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2ISmokeRepository", PROJECT_SOURCE_FOLDER);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", PROJECT_SOURCE_FOLDER);
 
         DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
