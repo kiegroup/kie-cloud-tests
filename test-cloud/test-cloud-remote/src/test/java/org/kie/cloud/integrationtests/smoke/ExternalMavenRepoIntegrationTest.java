@@ -19,10 +19,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -38,9 +38,10 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -53,6 +54,7 @@ import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 
 @RunWith(Parameterized.class)
+@Category(Smoke.class)
 public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
 
     @Parameter
@@ -80,7 +82,6 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
     private static final String HELLO_RULE = "Hello.";
     private static final String WORLD_RULE = "World.";
 
-    private static final String RULE_CONTAINER_ID = "rule-container-id";
     private static KieCommands commandsFactory = KieServices.Factory.get().getCommands();
 
     @Override
@@ -95,11 +96,33 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
     }
 
     @Test
+    @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
 
         kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION)));
-        kieServerClient.createContainer(RULE_CONTAINER_ID, new KieContainerResource(RULE_CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, HELLO_RULES_PROJECT_NAME, HELLO_RULES_PROJECT_VERSION)));
+
+        ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
+        UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
+
+        Long userTaskPid = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
+        assertThat(userTaskPid).isNotNull();
+
+        List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 10);
+        assertThat(tasks).isNotNull().hasSize(1);
+
+        taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
+
+        ProcessInstance userTaskPi = processClient.getProcessInstance(CONTAINER_ID, userTaskPid);
+        assertThat(userTaskPi).isNotNull();
+        assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
+    }
+
+    @Test
+    public void testRulesFromExternalMavenRepo() {
+        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+
+        kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, HELLO_RULES_PROJECT_NAME, HELLO_RULES_PROJECT_VERSION)));
 
         RuleServicesClient ruleClient = KieServerClientProvider.getRuleClient(deploymentScenario.getKieServerDeployment());
 
@@ -109,7 +132,7 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
         commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
-        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(RULE_CONTAINER_ID, batchExecutionCommand);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecutionCommand);
 
         KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
@@ -118,30 +141,6 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
         assertThat(outcome).hasSize(2);
         assertThat(outcome.get(0)).startsWith(HELLO_RULE);
         assertThat(outcome.get(1)).startsWith(WORLD_RULE);
-
-        try {
-            startAndCompleteUsertaskProcess();
-        } catch (KieServicesException ex) {
-            // OK for drools test.
-            assertThat(ex.getMessage()).contains("Server that this client is connected to has no capabilities to handle ProcessServicesClient");
-        }
-
     }
 
-    private void startAndCompleteUsertaskProcess() {
-        ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
-        UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
-
-        Long userTaskPid = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
-        Assertions.assertThat(userTaskPid).isNotNull();
-
-        List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks).isNotNull().hasSize(1);
-
-        taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
-
-        ProcessInstance userTaskPi = processClient.getProcessInstance(CONTAINER_ID, userTaskPid);
-        Assertions.assertThat(userTaskPi).isNotNull();
-        Assertions.assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
-    }
 }
