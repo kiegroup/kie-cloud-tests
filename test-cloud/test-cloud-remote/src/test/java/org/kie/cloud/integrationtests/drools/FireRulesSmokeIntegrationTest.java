@@ -17,12 +17,12 @@ package org.kie.cloud.integrationtests.drools;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
@@ -33,6 +33,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -46,6 +47,7 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Category(Smoke.class)
 public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(DroolsSessionFailoverIntegrationTest.class);

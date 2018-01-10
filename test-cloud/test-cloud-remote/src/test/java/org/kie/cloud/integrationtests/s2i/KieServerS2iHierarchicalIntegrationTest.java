@@ -23,12 +23,14 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -82,6 +84,7 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractCloudIntegr
     }
 
     @Test
+    @Category(JBPMOnly.class)
     public void testContainerAfterExecServerS2iStart() {
         List<KieContainerResource> containers = kieServicesClient.listContainers().getResult().getContainers();
         assertThat(containers).hasSize(1);
