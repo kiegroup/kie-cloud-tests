@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
@@ -38,7 +38,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.SolverServicesClient;
 
-public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
+public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
 
     private static final ReleaseId CLOUD_BALANCE_RELEASE_ID = new ReleaseId(
             PROJECT_GROUP_ID,
@@ -56,10 +56,10 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Wor
             "org.kie.server.testing.DeleteComputerProblemFactChange";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
 
-    @Override protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(
-            DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    @Override
+    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory
-                .getWorkbenchKieServerDatabaseScenarioBuilder()
+                .getWorkbenchKieServerScenarioBuilder()
                 .withExternalMavenRepo(
                         MavenConstants.getMavenRepoUrl(),
                         MavenConstants.getMavenRepoUser(),
