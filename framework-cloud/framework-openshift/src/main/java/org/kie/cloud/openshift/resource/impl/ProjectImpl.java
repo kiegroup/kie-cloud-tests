@@ -55,42 +55,30 @@ public class ProjectImpl implements Project {
 
     @Override
     public void processTemplateAndCreateResources(URL templateUrl, Map<String, String> envVariables) {
-        util.withUser(client -> {
-            KubernetesList resourceList = client.templates().inNamespace(projectName).load(templateUrl).process(envVariables);
-            client.lists().inNamespace(projectName).create(resourceList);
-            return null;
-        });
+        KubernetesList resourceList = util.client().templates().inNamespace(projectName).load(templateUrl).process(envVariables);
+        util.client().lists().inNamespace(projectName).create(resourceList);
     }
 
     @Override
     public void processTemplateAndCreateResources(InputStream templateInputStream, Map<String, String> envVariables) {
-        util.withUser(client -> {
-            KubernetesList resourceList = client.templates().inNamespace(projectName).load(templateInputStream).process(envVariables);
-            client.lists().inNamespace(projectName).create(resourceList);
-            return null;
-        });
+        KubernetesList resourceList = util.client().templates().inNamespace(projectName).load(templateInputStream).process(envVariables);
+        util.client().lists().inNamespace(projectName).create(resourceList);
     }
 
     @Override
     public void createResources(String resourceUrl) {
-        util.withUser(client -> {
-            try {
-                KubernetesList resourceList = client.lists().inNamespace(projectName).load(new URL(resourceUrl)).get();
-                client.lists().inNamespace(projectName).create(resourceList);
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Malformed resource URL", e);
-            }
-            return null;
-        });
+        try {
+            KubernetesList resourceList = util.client().lists().inNamespace(projectName).load(new URL(resourceUrl)).get();
+            util.client().lists().inNamespace(projectName).create(resourceList);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed resource URL", e);
+        }
     }
 
     @Override
     public void createResources(InputStream inputStream) {
-        util.withUser(client -> {
-            KubernetesList resourceList = client.lists().inNamespace(projectName).load(inputStream).get();
-            client.lists().inNamespace(projectName).create(resourceList);
-            return null;
-        });
+        KubernetesList resourceList = util.client().lists().inNamespace(projectName).load(inputStream).get();
+        util.client().lists().inNamespace(projectName).create(resourceList);
     }
 
     public void close() {

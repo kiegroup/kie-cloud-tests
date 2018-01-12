@@ -48,9 +48,7 @@ public class OpenShiftInstance implements Instance {
     }
 
     @Override public CommandExecutionResult runCommand(String... command) {
-        return util.withUser(client -> {
-            return runCommandImpl(client.pods().withName(name), command);
-        });
+        return runCommandImpl(util.client().pods().withName(name), command);
     }
 
     @Override
