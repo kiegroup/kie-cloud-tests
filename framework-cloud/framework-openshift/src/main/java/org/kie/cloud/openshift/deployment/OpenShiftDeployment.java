@@ -81,9 +81,7 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void scale(int instances) {
-        util.withUser(client -> {
-            return client.deploymentConfigs().inNamespace(getNamespace()).withName(getServiceName()).scale(instances, true);
-        });
+        util.client().deploymentConfigs().inNamespace(getNamespace()).withName(getServiceName()).scale(instances, true);
         // Wait flag while scaling of deployment config doesn't seem to work correctly, use own waiting functionality
         waitForScale();
     }
@@ -165,8 +163,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     public void setRouterTimeout(Duration timeoutValue) {
         // Route has a same name as its service.
         String routeName = getServiceName();
-        util.withUser(client -> {
-            client
+        util.client()
             .routes()
             .withName(routeName)
             .edit()
@@ -174,8 +171,6 @@ public abstract class OpenShiftDeployment implements Deployment {
             .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds()+"s")
             .endMetadata()
             .done();
-            return null;
-        });
     }
 
     private Instance createInstance(Pod pod) {
