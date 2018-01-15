@@ -15,29 +15,17 @@
 
 package org.kie.cloud.openshift;
 
+import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.resource.impl.ProjectImpl;
+
 import cz.xtf.TestConfiguration;
 import cz.xtf.openshift.OpenShiftUtil;
 import cz.xtf.openshift.OpenShiftUtils;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
-import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 
 /**
  * Utility class for access to OpenShiftUtil. It provides basic OpenShift client initialization and basic project handling.
  */
 public class OpenShiftController {
-
-    private static final String OPENSHIFT_URL = OpenShiftConstants.getOpenShiftUrl();
-    private static final String OPENSHIFT_USERNAME = OpenShiftConstants.getOpenShiftUserName();
-    private static final String OPENSHIFT_PASSWORD = OpenShiftConstants.getOpenShiftPassword();
-
-    static {
-        System.setProperty("xtf.config.master.url", OPENSHIFT_URL);
-        System.setProperty("xtf.config.master.username", OPENSHIFT_USERNAME);
-        System.setProperty("xtf.config.master.password", OPENSHIFT_PASSWORD);
-        System.setProperty("xtf.config.master.admin.username", OPENSHIFT_USERNAME);
-        System.setProperty("xtf.config.master.admin.password", OPENSHIFT_PASSWORD);
-    }
 
     /**
      * @return OpenShiftUtil with default namespace configured.
