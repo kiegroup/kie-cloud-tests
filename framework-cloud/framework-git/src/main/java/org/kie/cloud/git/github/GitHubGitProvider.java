@@ -16,13 +16,13 @@
 package org.kie.cloud.git.github;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.kie.cloud.git.AbstractGitProvider;
 import org.kie.cloud.git.constants.GitConstants;
-import org.kie.cloud.git.gitlab.GitLabGitProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,9 @@ public class GitHubGitProvider extends AbstractGitProvider {
     private GitHubClient client;
 
     @Override
-    public void createGitRepository(String repositoryName, String repositoryPath) {
+    public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
+        String repositoryName = repositoryPrefixName + "-" + UUID.randomUUID().toString().substring(0, 4);
+
         try {
             RepositoryService service = new RepositoryService(client);
 
@@ -48,6 +50,8 @@ public class GitHubGitProvider extends AbstractGitProvider {
             logger.error("Error while preparing GitHub project " + repositoryName, e);
             throw new RuntimeException("Error while preparing GitHub project " + repositoryName, e);
         }
+
+        return repositoryName;
     }
 
     @Override

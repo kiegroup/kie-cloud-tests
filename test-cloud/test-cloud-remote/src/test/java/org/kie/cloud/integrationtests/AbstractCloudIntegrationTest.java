@@ -77,6 +77,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
 
     private static final int SCENARIO_DEPLOYMENT_ATTEMPTS = 3;
 
+    // Path relative to target/classes folder
+    protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);
 
     private final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();

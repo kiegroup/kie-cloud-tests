@@ -132,6 +132,12 @@
               <xtf.config.master.password>${openshift.password}</xtf.config.master.password>
               <xtf.config.master.admin.username>${openshift.username}</xtf.config.master.admin.username>
               <xtf.config.master.admin.password>${openshift.password}</xtf.config.master.admin.password>
+              <!-- GitLab -->
+              <xtf.config.gitlab.url>${gitlab.url}</xtf.config.gitlab.url>
+              <xtf.config.gitlab.username>${gitlab.username}</xtf.config.gitlab.username>
+              <xtf.config.gitlab.password>${gitlab.password}</xtf.config.gitlab.password>
+              <xtf.config.gitlab.group.enabled>false</xtf.config.gitlab.group.enabled>
+              <xtf.config.gitlab.token>disabled</xtf.config.gitlab.token>
             </systemProperties>
           </configuration>
         </plugin>
