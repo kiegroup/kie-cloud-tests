@@ -53,7 +53,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", PROJECT_SOURCE_FOLDER);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)

@@ -70,7 +70,7 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractCloudIntegrationT
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", PROJECT_SOURCE_FOLDER);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)

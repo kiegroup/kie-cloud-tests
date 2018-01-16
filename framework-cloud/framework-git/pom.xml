@@ -19,10 +19,10 @@
       <artifactId>framework-cloud-api</artifactId>
     </dependency>
 
-    <!-- GitLab client -->
+    <!-- XTF dependencies -->
     <dependency>
-      <groupId>org.gitlab</groupId>
-      <artifactId>java-gitlab-api</artifactId>
+      <groupId>cz.xtf</groupId>
+      <artifactId>utilities</artifactId>
     </dependency>
 
     <!-- GitHub client -->
