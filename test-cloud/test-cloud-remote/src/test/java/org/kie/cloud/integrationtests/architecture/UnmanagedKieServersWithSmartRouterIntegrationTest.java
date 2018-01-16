@@ -74,7 +74,7 @@ public class UnmanagedKieServersWithSmartRouterIntegrationTest extends AbstractC
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("architectureRepository", PROJECT_SOURCE_FOLDER);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix("architectureRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         smartRouter = deploymentScenarioFactory.getSmartRouterSettingsBuilder()
                 .withApplicationName(SMART_ROUTER_NAME)

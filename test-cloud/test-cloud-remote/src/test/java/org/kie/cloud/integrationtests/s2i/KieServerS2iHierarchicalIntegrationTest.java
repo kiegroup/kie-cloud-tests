@@ -59,7 +59,7 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractCloudIntegr
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, PROJECT_SOURCE_FOLDER);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)

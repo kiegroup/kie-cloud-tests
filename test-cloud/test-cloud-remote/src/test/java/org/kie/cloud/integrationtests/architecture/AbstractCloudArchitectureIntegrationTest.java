@@ -65,8 +65,6 @@ public abstract class AbstractCloudArchitectureIntegrationTest extends AbstractC
             KIE_SERVER_DEF_NAME = "kie-server-def",
             KIE_SERVER_GHI_NAME = "kie-server-ghi";
 
-    protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
-
     protected static final String PORT = "80";
 
     protected String repositoryName;
