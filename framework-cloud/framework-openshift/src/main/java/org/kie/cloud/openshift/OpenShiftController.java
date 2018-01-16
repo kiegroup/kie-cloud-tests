@@ -39,7 +39,7 @@ public class OpenShiftController {
      * @return OpenShiftUtil with project namespace configured.
      */
     public static OpenShiftUtil getOpenShiftUtil(String projectName) {
-        return OpenShiftUtils.masterUtil(projectName);
+        return OpenShiftUtils.master(projectName);
     }
 
     /**
