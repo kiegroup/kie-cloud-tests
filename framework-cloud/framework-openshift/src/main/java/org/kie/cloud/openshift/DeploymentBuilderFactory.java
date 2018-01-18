@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift;
 
+import cz.xtf.openshift.OpenShiftUtil;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
@@ -26,8 +27,6 @@ import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
-import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilderImpl;
@@ -43,12 +42,7 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
 
     private static final String CLOUD_API_IMPLEMENTATION_NAME = "openshift";
 
-    OpenShiftController controller;
-
     public DeploymentBuilderFactory() {
-        controller = new OpenShiftController(OpenShiftConstants.getOpenShiftUrl(),
-                OpenShiftConstants.getOpenShiftUserName(),
-                OpenShiftConstants.getOpenShiftPassword());
     }
 
     @Override public String getCloudAPIImplementationName() {
@@ -57,26 +51,26 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
 
     @Override
     public WorkbenchKieServerScenarioBuilder getWorkbenchKieServerScenarioBuilder() {
-        return new WorkbenchKieServerScenarioBuilderImpl(controller);
+        return new WorkbenchKieServerScenarioBuilderImpl();
     }
 
     @Override
     public WorkbenchKieServerDatabaseScenarioBuilder getWorkbenchKieServerDatabaseScenarioBuilder() {
-        return new WorkbenchKieServerDatabaseScenarioBuilderImpl(controller);
+        return new WorkbenchKieServerDatabaseScenarioBuilderImpl();
     }
 
     @Override
     public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder() {
-        return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl(controller);
+        return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl();
     }
 
     @Override public KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder() {
-        return new KieServerWithExternalDatabaseScenarioBuilderImpl(controller);
+        return new KieServerWithExternalDatabaseScenarioBuilderImpl();
     }
 
     @Override
     public GenericScenarioBuilder getGenericScenarioBuilder() {
-        return new GenericScenarioBuilderImpl(controller);
+        return new GenericScenarioBuilderImpl();
     }
 
     @Override
@@ -106,7 +100,8 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
 
     @Override
     public void deleteNamespace(String namespace) {
-        Project project = controller.getProject(namespace);
-        project.delete();
+        try (OpenShiftUtil util = OpenShiftController.getOpenShiftUtil(namespace)) {
+            util.deleteProject();
+        }
     }
 }

@@ -15,73 +15,33 @@
 
 package org.kie.cloud.git.gitlab;
 
-import java.io.IOException;
-
-import org.gitlab.api.GitlabAPI;
-import org.gitlab.api.models.GitlabProject;
-import org.gitlab.api.models.GitlabSession;
 import org.kie.cloud.git.AbstractGitProvider;
-import org.kie.cloud.git.constants.GitConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import cz.xtf.git.GitLabUtil;
+import cz.xtf.git.GitProject;
 
 public class GitLabGitProvider extends AbstractGitProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(GitLabGitProvider.class);
-
-    private GitlabAPI gitLabApi;
+    private GitLabUtil gitLabUtil;
 
     @Override
-    public void createGitRepository(String repositoryName, String repositoryPath) {
-        try {
-            GitlabProject gitLabProject = gitLabApi.createUserProject(gitLabApi.getUser().getId(), repositoryName, null, null, null, null, null, null, null, true, null, null);
-            String httpUrl = gitLabProject.getHttpUrl();
-
-            pushToGitRepository(httpUrl, repositoryPath);
-        } catch (Exception e) {
-            logger.error("Error while preparing GitLab project " + repositoryName, e);
-            throw new RuntimeException("Error while preparing GitLab project " + repositoryName, e);
-        }
+    public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
+        GitProject gitProject = gitLabUtil.createProjectFromPath(repositoryPrefixName, repositoryPath);
+        return gitProject.getName();
     }
 
     @Override
     public void deleteGitRepository(String repositoryName) {
-        try {
-            for (GitlabProject project : gitLabApi.getProjects()) {
-                if (project.getName().equals(repositoryName)) {
-                    gitLabApi.deleteProject(project.getId());
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Error while deleting GitLab project " + repositoryName, e);
-            throw new RuntimeException("Error while deleting GitLab project " + repositoryName, e);
-        }
+        gitLabUtil.deleteProject(repositoryName);
     }
 
     @Override
     public String getRepositoryUrl(String repositoryName) {
-        try {
-            for (GitlabProject project : gitLabApi.getProjects()) {
-                if (project.getName().equals(repositoryName)) {
-                    return project.getHttpUrl();
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Error while retrieving GitLab projects from " + repositoryName, e);
-            throw new RuntimeException("Error while retrieving GitLab projects from " + repositoryName, e);
-        }
-        throw new RuntimeException("URL of repository " + repositoryName + " not found");
+        return gitLabUtil.getProjectUrl(repositoryName);
     }
 
     @Override
     public void init() {
-        try {
-            GitlabSession session = GitlabAPI.connect(GitConstants.getGitLabUrl(), GitConstants.getGitLabUser(), GitConstants.getGitLabPassword());
-            String privateToken = session.getPrivateToken();
-            gitLabApi = GitlabAPI.connect(GitConstants.getGitLabUrl(), privateToken);
-        } catch (IOException e) {
-            logger.error("Error while initializing GitLab.", e);
-            throw new RuntimeException("Error while initializing GitLab.", e);
-        }
+        gitLabUtil = new GitLabUtil();
     }
 }

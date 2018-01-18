@@ -19,8 +19,6 @@ public interface GitProvider {
 
     String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath);
 
-    void createGitRepository(String repositoryName, String repositoryPath);
-
     void deleteGitRepository(String repositoryName);
 
     String getRepositoryUrl(String repositoryName);

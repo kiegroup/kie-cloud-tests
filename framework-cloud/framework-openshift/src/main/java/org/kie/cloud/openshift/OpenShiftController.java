@@ -15,116 +15,51 @@
 
 package org.kie.cloud.openshift;
 
-import java.io.Closeable;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.openshift.client.DefaultOpenShiftClient;
-import io.fabric8.openshift.client.OpenShiftClient;
-import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 
-public class OpenShiftController implements Closeable {
+import cz.xtf.TestConfiguration;
+import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.openshift.OpenShiftUtils;
 
-    private OpenShiftClient client;
+/**
+ * Utility class for access to OpenShiftUtil. It provides basic OpenShift client initialization and basic project handling.
+ */
+public class OpenShiftController {
 
     /**
-     * Create OpenShift controller using values defined by syst. properties.
-     * @see https://github.com/fabric8io/kubernetes-client
+     * @return OpenShiftUtil with default namespace configured.
      */
-    public OpenShiftController() {
-        client = new DefaultOpenShiftClient();
+    public static OpenShiftUtil getOpenShiftUtil() {
+        return getOpenShiftUtil(TestConfiguration.masterNamespace());
     }
 
     /**
-     * Create OpenShift controller using specified values.
-     *
-     * @param openShiftMasterUrl URL to running OpenShift instance (for example https://master.openshiftdomain:8443).
-     * @param username Username for logging into OpenShift.
-     * @param password Password for logging into OpenShift.
+     * @param projectName Namespace to be set to OpenShiftUtil.
+     * @return OpenShiftUtil with project namespace configured.
      */
-    public OpenShiftController(String openShiftMasterUrl, String username, String password) {
-        // Trust to all certificates (even self signed ones)
-        System.setProperty(Config.KUBERNETES_TRUST_CERT_SYSTEM_PROPERTY, "true");
-
-        Config config = new ConfigBuilder().withMasterUrl(openShiftMasterUrl).withUsername(username).withPassword(password).build();
-        client = new DefaultOpenShiftClient(config);
+    public static OpenShiftUtil getOpenShiftUtil(String projectName) {
+        return OpenShiftUtils.master(projectName);
     }
 
     /**
-     * Create OpenShift project.
-     *
-     * @param projectName OpenShift project name.
+     * @param projectName Project name.
+     * @return Project object representing created project.
      */
-    public Project createProject(String projectName) {
-        client.projectrequests().createNew()
-                .withNewMetadata()
-                    .withName(projectName)
-                .endMetadata()
-                .withDescription("New project " + projectName)
-                .withDisplayName(projectName)
-            .done();
+    public static Project createProject(String projectName) {
+        try (OpenShiftUtil util = getOpenShiftUtil()) {
+            util.createProjectRequest(projectName);
 
-        waitForProjectCreation(projectName);
-
-        return new ProjectImpl(client, projectName);
-    }
-
-    /**
-     * Load Openshift project
-     *
-     * @param projectName Open Openshift project name
-     * @return Open Openshift project
-     */
-    public Project getProject(String projectName) {
-        Project project = new ProjectImpl(client, projectName);
-        List<io.fabric8.openshift.api.model.Project> projectList = client.projects().list().getItems();
-        if (projectList.stream().anyMatch(p -> p.getMetadata().getName().equals(projectName)) == false) {
-            throw new RuntimeException(String.format("Project with name %s not found", projectName));
-        }
-
-        return project;
-    }
-
-    /**
-     * @return OpenShiftClient for tests requiring specific functionality which is not covered by framework.
-     */
-    public OpenShiftClient getClient() {
-        return client;
-    }
-
-    @Override
-    public void close() {
-        if (client != null) {
-            client.close();
+            return new ProjectImpl(projectName);
         }
     }
 
     /**
-     * Wait until project is created.
-     *
-     * @param projectName Project to be created
+     * @param projectName Project name.
      */
-    private void waitForProjectCreation(String projectName) {
-        Instant timeoutTime = Instant.now().plus(OpenShiftResourceConstants.PROJECT_CREATION_TIMEOUT, ChronoUnit.MILLIS);
-        while (Instant.now().isBefore(timeoutTime)) {
-            List<io.fabric8.openshift.api.model.Project> projectList = client.projects().list().getItems();
-            if (projectList.stream().anyMatch(p -> p.getMetadata().getName().equals(projectName))) {
-                return;
-            }
-
-            try {
-                Thread.sleep(200L);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for project " + projectName + " to be created.", e);
-            }
+    public static void deleteProject(String projectName) {
+        try (OpenShiftUtil util = getOpenShiftUtil()) {
+            util.deleteProject(projectName);
         }
-
-        throw new RuntimeException("Timeout while waiting for project " + projectName + " to be created.");
     }
 }

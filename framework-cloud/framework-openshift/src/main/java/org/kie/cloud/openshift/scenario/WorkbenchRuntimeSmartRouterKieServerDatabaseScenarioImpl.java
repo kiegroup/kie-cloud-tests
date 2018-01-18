@@ -28,9 +28,7 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
-import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
@@ -42,10 +40,8 @@ import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements WorkbenchRuntimeSmartRouterKieServerDatabaseScenario {
+public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends OpenShiftScenario implements WorkbenchRuntimeSmartRouterKieServerDatabaseScenario {
 
-    private OpenShiftController openshiftController;
-    private String projectName;
     private WorkbenchDeployment workbenchRuntimeDeployment;
     private SmartRouterDeployment smartRouterDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
@@ -55,37 +51,18 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl.class);
 
-    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl(OpenShiftController openShiftController, Map<String, String> envVariables) {
-        this.openshiftController = openShiftController;
+    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl(Map<String, String> envVariables) {
         this.envVariables = envVariables;
     }
 
     @Override
-    public String getNamespace() {
-        return projectName;
-    }
-
-    @Override
     public void deploy() {
-        // OpenShift restriction: Hostname must be shorter than 63 characters
-        projectName = UUID.randomUUID().toString().substring(0, 4);
-        OpenShiftConstants.getNamespacePrefix().ifPresent(p -> projectName = p + "-" + projectName);
+        super.deploy();
 
-        logger.info("Generated project name is " + projectName);
-
-        logger.info("Creating project " + projectName);
-        Project project = openshiftController.createProject(projectName);
-
-        workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(projectName);
-        smartRouterDeployment = createSmartRouterDeployment(projectName);
-        kieServerDeployment = createKieServerDeployment(projectName);
-        databaseDeployment = createDatabaseDeployment(projectName);
-
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppSecret());
-        project.createResources(OpenShiftConstants.getKieAppSecret());
-
-        logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
-        project.createResources(OpenShiftConstants.getKieImageStreams());
+        workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
+        smartRouterDeployment = createSmartRouterDeployment(project);
+        kieServerDeployment = createKieServerDeployment(project);
+        databaseDeployment = createDatabaseDeployment(project);
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CONSOLE_SMARTROUTER.getTemplateUrl().toString());
         Map<String, String> consoleSmartRouterEnvVariables = new HashMap<String, String>(envVariables);
@@ -130,25 +107,6 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
     }
 
     @Override
-    public void undeploy() {
-        InstanceLogUtil.writeDeploymentLogs(this);
-
-        for(Deployment deployment : getDeployments()) {
-            if(deployment != null && deployment.isReady()) {
-                deployment.scale(0);
-                deployment.waitForScale();
-            }
-        }
-
-        Project project = openshiftController.getProject(projectName);
-        project.delete();
-    }
-
-    public OpenShiftController getOpenshiftController() {
-        return openshiftController;
-    }
-
-    @Override
     public WorkbenchDeployment getWorkbenchRuntimeDeployment() {
         return workbenchRuntimeDeployment;
     }
@@ -173,10 +131,8 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         return Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerDeployment, databaseDeployment);
     }
 
-    private WorkbenchDeployment createWorkbenchRuntimeDeployment(String namespace) {
-        WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl();
-        workbenchRuntimeDeployment.setOpenShiftController(openshiftController);
-        workbenchRuntimeDeployment.setNamespace(namespace);
+    private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
+        WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl(project);
         workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
         workbenchRuntimeDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
@@ -184,19 +140,15 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         return workbenchRuntimeDeployment;
     }
 
-    private SmartRouterDeployment createSmartRouterDeployment(String namespace) {
-        SmartRouterDeploymentImpl smartRouterDeployment = new SmartRouterDeploymentImpl();
-        smartRouterDeployment.setOpenShiftController(openshiftController);
-        smartRouterDeployment.setNamespace(namespace);
+    private SmartRouterDeployment createSmartRouterDeployment(Project project) {
+        SmartRouterDeploymentImpl smartRouterDeployment = new SmartRouterDeploymentImpl(project);
         smartRouterDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
 
         return smartRouterDeployment;
     }
 
-    private KieServerDeploymentImpl createKieServerDeployment(String namespace) {
-        KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl();
-        kieServerDeployment.setOpenShiftController(openshiftController);
-        kieServerDeployment.setNamespace(namespace);
+    private KieServerDeploymentImpl createKieServerDeployment(Project project) {
+        KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
         // TODO: Hardcoded, see WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl
 //        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
 //        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
@@ -206,10 +158,8 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl implements
         return kieServerDeployment;
     }
 
-    private DatabaseDeploymentImpl createDatabaseDeployment(String namespace) {
-        DatabaseDeploymentImpl databaseDeployment = new DatabaseDeploymentImpl();
-        databaseDeployment.setOpenShiftController(openshiftController);
-        databaseDeployment.setNamespace(namespace);
+    private DatabaseDeploymentImpl createDatabaseDeployment(Project project) {
+        DatabaseDeploymentImpl databaseDeployment = new DatabaseDeploymentImpl(project);
         return databaseDeployment;
     }
 }

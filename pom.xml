@@ -34,6 +34,7 @@
     <!-- Version adjustments due to mismatch between Kie BOM and XTF dependencies. -->
     <version.kubernetes-client>3.0.3</version.kubernetes-client>
     <version.kubernetes-model>2.0.4</version.kubernetes-model>
+    <version.org.apache.maven.shared>1.5</version.org.apache.maven.shared>
   </properties>
 
   <repositories>
@@ -152,6 +153,11 @@
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.shared</groupId>
+        <artifactId>maven-verifier</artifactId>
+        <version>${version.org.apache.maven.shared}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

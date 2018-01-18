@@ -22,12 +22,14 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -36,7 +38,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
-public class KieServerS2iSimpleIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
 
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
@@ -51,7 +53,7 @@ public class KieServerS2iSimpleIntegrationTest extends AbstractCloudIntegrationT
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2ISmokeRepository", PROJECT_SOURCE_FOLDER);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
@@ -76,6 +78,7 @@ public class KieServerS2iSimpleIntegrationTest extends AbstractCloudIntegrationT
     }
 
     @Test
+    @Category(JBPMOnly.class)
     public void testContainerAfterExecServerS2IStart() {
         List<KieContainerResource> containers = kieServicesClient.listContainers().getResult().getContainers();
         assertThat(containers).isNotNull().hasSize(1);

@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.scenario;
 
-import static org.kie.cloud.openshift.scenario.util.ProjectUtils.createProject;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,27 +23,20 @@ import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
-import org.kie.cloud.common.logs.InstanceLogUtil;
-import org.kie.cloud.openshift.OpenShiftController;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
-import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerWithExternalDatabaseScenarioImpl implements KieServerWithExternalDatabaseScenario {
+public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario implements KieServerWithExternalDatabaseScenario {
 
-    private OpenShiftController openshiftController;
     private KieServerDeploymentImpl kieServerDeployment;
-    private Project project;
     private Map<String, String> envVariables;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public KieServerWithExternalDatabaseScenarioImpl(OpenShiftController openShiftController, Map<String, String> envVariables) {
-        this.openshiftController = openShiftController;
+    public KieServerWithExternalDatabaseScenarioImpl(Map<String, String> envVariables) {
         this.envVariables = envVariables;
     }
 
@@ -53,42 +44,19 @@ public class KieServerWithExternalDatabaseScenarioImpl implements KieServerWithE
         return kieServerDeployment;
     }
 
-    @Override public String getNamespace() {
-        return project.getName();
-    }
-
     @Override public void deploy() {
-        project = createProject(openshiftController);
+        super.deploy();
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl(), envVariables);
 
-        kieServerDeployment = new KieServerDeploymentImpl();
-        kieServerDeployment.setOpenShiftController(openshiftController);
-        kieServerDeployment.setNamespace(project.getName());
+        kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
-    }
-
-    @Override public void undeploy() {
-        InstanceLogUtil.writeDeploymentLogs(this);
-
-        for(Deployment deployment : getDeployments()) {
-            if(deployment != null && deployment.isReady()) {
-                deployment.scale(0);
-                deployment.waitForScale();
-            }
-        }
-
-        project.delete();
-    }
-
-    public OpenShiftController getOpenshiftController() {
-        return openshiftController;
     }
 
     @Override public List<Deployment> getDeployments() {

@@ -46,6 +46,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String RULE_PROJECT_NAME = "rule-project";
     protected static final String RULE_PROJECT_VERSION = "1.0.0-SNAPSHOT";
 
+    protected static final String HELLO_RULES_PROJECT_NAME = "hello-rules-snapshot";
+    protected static final String HELLO_RULES_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+
     protected static final String CONTAINER_ID = "cont-id";
     protected static final String CONTAINER_ALIAS = "cont-alias";
 
@@ -73,6 +76,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
 
     private static final int SCENARIO_DEPLOYMENT_ATTEMPTS = 3;
+
+    // Path relative to target/classes folder
+    protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);
 

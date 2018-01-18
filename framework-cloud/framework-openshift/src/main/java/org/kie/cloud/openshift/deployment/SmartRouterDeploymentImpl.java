@@ -18,12 +18,17 @@ package org.kie.cloud.openshift.deployment;
 import java.net.URL;
 
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.openshift.resource.Project;
 
 public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements SmartRouterDeployment {
 
     private URL url;
 
     private String serviceName;
+
+    public SmartRouterDeploymentImpl(Project project) {
+        super(project);
+    }
 
     @Override public URL getUrl() {
         if (url == null) {
@@ -42,8 +47,8 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
     }
 
     @Override public void waitForScale() {
-        openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().waitUntilAllPodsAreReady();
-        if (openShiftController.getProject(namespace).getService(getServiceName()).getDeploymentConfig().podsNumber() > 0) {
+        super.waitForScale();
+        if (getInstances().size() > 0) {
             RouterUtil.waitForRouter(getUrl());
         }
     }

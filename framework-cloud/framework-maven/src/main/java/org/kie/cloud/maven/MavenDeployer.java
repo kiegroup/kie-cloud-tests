@@ -15,46 +15,70 @@
 
 package org.kie.cloud.maven;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.apache.maven.cli.MavenCli;
+import org.apache.maven.it.VerificationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cz.xtf.maven.MavenUtil;
 
 public class MavenDeployer {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenDeployer.class);
 
+    private static final String SETTINGS_XML_PATH = System.getProperty("kjars.build.settings.xml");
+
+    /**
+     * Build Maven project from specified directory using maven command "clean install".
+     *
+     * @param basedir Directory to build a project from.
+     */
+    public static void buildAndInstallMavenProject(String basedir) {
+        buildMavenProject(basedir, "install");
+    }
+
+    /**
+     * Build Maven project from specified directory using maven command "clean deploy".
+     *
+     * @param basedir Directory to build a project from.
+     */
     public static void buildAndDeployMavenProject(String basedir) {
-        String buildSettings = System.getProperty("kjars.build.settings.xml");
+        buildMavenProject(basedir, "deploy");
+    }
 
-        // need to backup (and later restore) the current class loader, because the Maven/Plexus does some classloader
-        // magic which then results in CNFE in RestEasy client
-        // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
-        // remote repo
-        logger.debug("Building and deploying Maven project from basedir '{}'.", basedir);
-        ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
-        System.setProperty("maven.multiModuleProjectDirectory", basedir); // required by MavenCli 3.3.0+
+    /**
+     * Build Maven project from specified directory using maven command from parameter.
+     *
+     * @param basedir Directory to build a project from.
+     * @param buildCommand Build command, for example "install" or "deploy".
+     */
+    private static void buildMavenProject(String basedir, String buildCommand) {
+        try {
+            MavenUtil mavenUtil = MavenUtil.forProject(Paths.get(basedir)).forkJvm();
+            addSettingsXmlPathIfExists(mavenUtil);
+            mavenUtil.executeGoals(buildCommand);
 
-        List<String> mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-e", "clean", "deploy"));;
-
-        // use custom settings.xml file, if one specified
-        if (buildSettings != null && !buildSettings.isEmpty()) {
-            mvnArgs.add("-s");
-            mvnArgs.add(buildSettings);
+            logger.debug("Maven project successfully built and deployed!");
+        } catch (VerificationException e) {
+            throw new RuntimeException("Error while building Maven project from basedir " + basedir, e);
         }
+    }
 
-        MavenCli cli = new MavenCli();
-        int mvnRunResult = cli.doMain(mvnArgs.toArray(new String[mvnArgs.size()]), basedir, System.out, System.err);
-
-        Thread.currentThread().setContextClassLoader(classLoaderBak);
-
-        if (mvnRunResult != 0) {
-            throw new RuntimeException("Error while building Maven project from basedir " + basedir +
-                    ". Return code=" + mvnRunResult);
+    /**
+     * Add settings.xml file to maven build if it was defined and exists.
+     *
+     * @param mavenUtil
+     */
+    private static void addSettingsXmlPathIfExists(MavenUtil mavenUtil) {
+        if (SETTINGS_XML_PATH != null && !SETTINGS_XML_PATH.isEmpty()) {
+            Path settingsXmlPath = Paths.get(SETTINGS_XML_PATH);
+            if (settingsXmlPath.toFile().exists()) {
+                mavenUtil.useSettingsXml(settingsXmlPath);
+            } else {
+                throw new RuntimeException("Path to settings.xml file with value " + SETTINGS_XML_PATH + " points to non existing location.");
+            }
         }
-        logger.debug("Maven project successfully built and deployed!");
     }
 }

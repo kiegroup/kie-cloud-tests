@@ -22,20 +22,16 @@ import java.util.List;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.scenario.GenericScenarioImpl;
 
 public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
-
-    private OpenShiftController openshiftController;
 
     private List<DeploymentSettings> kieServerSettingsList;
     private List<DeploymentSettings> workbenchSettingsList;
     private List<DeploymentSettings> monitoringSettingsList;
     private List<DeploymentSettings> smartRouterSettingsList;
 
-    public GenericScenarioBuilderImpl(OpenShiftController openShiftController) {
-        this.openshiftController = openShiftController;
+    public GenericScenarioBuilderImpl() {
         this.kieServerSettingsList = new ArrayList<>();
         this.workbenchSettingsList = new ArrayList<>();
         this.monitoringSettingsList = new ArrayList<>();
@@ -44,7 +40,7 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
 
     @Override
     public GenericScenario build() {
-        return new GenericScenarioImpl(openshiftController, kieServerSettingsList, workbenchSettingsList, monitoringSettingsList, smartRouterSettingsList);
+        return new GenericScenarioImpl(kieServerSettingsList, workbenchSettingsList, monitoringSettingsList, smartRouterSettingsList);
     }
 
     @Override

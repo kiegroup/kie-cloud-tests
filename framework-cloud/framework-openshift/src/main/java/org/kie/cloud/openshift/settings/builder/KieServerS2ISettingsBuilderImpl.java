@@ -165,4 +165,9 @@ public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuil
         return this;
     }
 
+    @Override
+    public KieServerS2ISettingsBuilder withDroolsServerFilterClasses(boolean droolsFilter) {
+        envVariables.put(OpenShiftTemplateConstants.DROOLS_SERVER_FILTER_CLASSES, Boolean.toString(droolsFilter));
+        return this;
+    }
 }
