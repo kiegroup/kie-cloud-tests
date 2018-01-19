@@ -162,4 +162,19 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends Op
         DatabaseDeploymentImpl databaseDeployment = new DatabaseDeploymentImpl(project);
         return databaseDeployment;
     }
+
+    @Override
+    public List<WorkbenchDeployment> getWorkbenchDeployments() {
+        return Arrays.asList(workbenchRuntimeDeployment);
+    }
+
+    @Override
+    public List<KieServerDeployment> getKieServerDeployments() {
+        return Arrays.asList(kieServerDeployment);
+    }
+
+    @Override
+    public List<SmartRouterDeployment> getSmartRouterDeployments() {
+        return Arrays.asList(smartRouterDeployment);
+    }
 }

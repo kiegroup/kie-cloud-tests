@@ -19,6 +19,9 @@ import java.util.List;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
+import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 /**
  * Cloud deployment scenario representation.
@@ -51,4 +54,31 @@ public interface DeploymentScenario {
      * @return All available deployments.
      */
     List<Deployment> getDeployments();
+
+    /**
+     * Return List of all Workbench deployments. If there aren't any deployment,
+     * then is returned empty list.
+     *
+     * @return WorkbenchDeployments
+     * @see WorkbenchDeployment
+     */
+    List<WorkbenchDeployment> getWorkbenchDeployments();
+
+    /**
+     * Return List of all Kie Server deployments. If there aren't any
+     * deployment, then is returned empty list.
+     *
+     * @return KieServerDeployments
+     * @see KieServerDeployment
+     */
+    List<KieServerDeployment> getKieServerDeployments();
+
+    /**
+     * Return List of all Smart Router deployments. If there aren't any
+     * deployment, then is returned empty list.
+     *
+     * @return SmartRouterDeployments
+     * @see SmartRouterDeployment
+     */
+    List<SmartRouterDeployment> getSmartRouterDeployments();
 }
