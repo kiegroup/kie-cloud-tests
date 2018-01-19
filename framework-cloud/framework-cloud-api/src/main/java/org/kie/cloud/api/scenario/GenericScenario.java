@@ -15,34 +15,9 @@
  */
 package org.kie.cloud.api.scenario;
 
-import java.util.List;
-import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.SmartRouterDeployment;
-import org.kie.cloud.api.deployment.WorkbenchDeployment;
-
+/**
+ * Cloud generic deployment scenario representation.
+ */
 public interface GenericScenario extends DeploymentScenario {
 
-    /**
-     * Return List of all Workbench deployments.
-     *
-     * @return WorkbenchDeployment
-     * @see WorkbenchDeployment
-     */
-    List<WorkbenchDeployment> getWorkbenchDeployments();
-
-    /**
-     * Return List of all Kie Server deployments.
-     *
-     * @return KieServerDeployment
-     * @see KieServerDeployment
-     */
-    List<KieServerDeployment> getKieServerDeployments();
-
-    /**
-     * Return List of all Smart Router deployments.
-     *
-     * @return SmartRouterDeployment
-     * @see SmartRouterDeployment
-     */
-    List<SmartRouterDeployment> getSmartRouterDeployments();
 }
