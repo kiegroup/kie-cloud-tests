@@ -17,12 +17,14 @@ package org.kie.cloud.openshift.scenario;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
@@ -106,5 +108,20 @@ public class WorkbenchKieServerDatabaseScenarioImpl extends OpenShiftScenario im
     private void storeProjectInfoToPersistentVolume(Deployment deployment, String persistentVolumeMountPath) {
         String storeCommand = "echo \"Project " + projectName + ", time " + Instant.now() + "\" > " + persistentVolumeMountPath + "/info.txt";
         workbenchDeployment.getInstances().get(0).runCommand("/bin/bash", "-c", storeCommand);
+    }
+
+    @Override
+    public List<WorkbenchDeployment> getWorkbenchDeployments() {
+        return Arrays.asList(workbenchDeployment);
+    }
+
+    @Override
+    public List<KieServerDeployment> getKieServerDeployments() {
+        return Arrays.asList(kieServerDeployment);
+    }
+
+    @Override
+    public List<SmartRouterDeployment> getSmartRouterDeployments() {
+        return Collections.emptyList();
     }
 }

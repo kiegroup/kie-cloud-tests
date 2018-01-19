@@ -16,11 +16,14 @@
 package org.kie.cloud.openshift.scenario;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
@@ -61,5 +64,20 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
     @Override public List<Deployment> getDeployments() {
         return Arrays.asList(kieServerDeployment);
+    }
+
+    @Override
+    public List<WorkbenchDeployment> getWorkbenchDeployments() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<KieServerDeployment> getKieServerDeployments() {
+        return Arrays.asList(kieServerDeployment);
+    }
+
+    @Override
+    public List<SmartRouterDeployment> getSmartRouterDeployments() {
+        return Collections.emptyList();
     }
 }

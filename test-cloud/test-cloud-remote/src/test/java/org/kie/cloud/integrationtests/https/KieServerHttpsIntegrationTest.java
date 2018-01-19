@@ -36,8 +36,12 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -55,10 +59,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
     @Parameter
-    public WorkbenchKieServerScenario workbenchKieServerScenario;
+    public DeploymentScenario kieServerScenario;
 
     private static final Marshaller marshaller
             = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(), MarshallingFormat.JAXB, KieServerHttpsIntegrationTest.class.getClassLoader());
@@ -76,22 +80,39 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
+        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerSettings)
+                .build();
+
+        DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        GenericScenario kieServerS2Iscenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerS2ISettings)
+                .build();
+
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}
+            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}, {kieServerS2Iscenario}
         });
     }
 
     @Override
-    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return workbenchKieServerScenario;
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return kieServerScenario;
     }
 
     @Test
     public void testKieServerInfo() {
-        final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(deploymentScenario.getKieServerDeployment().getUsername(),
-                deploymentScenario.getKieServerDeployment().getPassword());
+        final KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
+        final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
+                kieServerDeployment.getPassword());
         try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-            try (CloseableHttpResponse response = httpClient.execute(serverInforRequest())) {
+            try (CloseableHttpResponse response = httpClient.execute(serverInforRequest(kieServerDeployment))) {
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
                 final String responseContent = HttpsUtils.readResponseContent(response);
@@ -109,14 +130,15 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     public void testDeployContainer() {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
 
-        final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(deploymentScenario.getKieServerDeployment().getUsername(),
-                deploymentScenario.getKieServerDeployment().getPassword());
+        final KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
+        final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
+                kieServerDeployment.getPassword());
         try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-            try (CloseableHttpResponse response = httpClient.execute(createContainerRequest(CONTAINER_ID, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION))) {
+            try (CloseableHttpResponse response = httpClient.execute(createContainerRequest(kieServerDeployment, CONTAINER_ID, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION))) {
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
             }
 
-            try (CloseableHttpResponse response = httpClient.execute(getContainersRequest())) {
+            try (CloseableHttpResponse response = httpClient.execute(getContainersRequest(kieServerDeployment))) {
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
                 final String responseContent = HttpsUtils.readResponseContent(response);
@@ -129,9 +151,9 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
         }
     }
 
-    private HttpGet serverInforRequest() {
+    private HttpGet serverInforRequest(KieServerDeployment kieServerDeployment) {
         try {
-            final URL url = new URL(deploymentScenario.getKieServerDeployment().getSecureUrl(), KIE_SERVER_INFO_REST_REQUEST_URL);
+            final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_SERVER_INFO_REST_REQUEST_URL);
             final HttpGet request = new HttpGet(url.toString());
 
             return request;
@@ -140,9 +162,9 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
         }
     }
 
-    private HttpPut createContainerRequest(String containerName, String groupId, String artifactId, String version) {
+    private HttpPut createContainerRequest(KieServerDeployment kieServerDeployment, String containerName, String groupId, String artifactId, String version) {
         try {
-            final URL url = new URL(deploymentScenario.getKieServerDeployment().getSecureUrl(), KIE_CONTAINER_REQUEST_URL + "/" + containerName);
+            final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINER_REQUEST_URL + "/" + containerName);
             final HttpPut request = new HttpPut(url.toString());
             request.setHeader("Content-Type", "application/xml");
             request.setEntity(new StringEntity(createContainerRequestContent(containerName, groupId, artifactId, version)));
@@ -153,9 +175,9 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
         }
     }
 
-    private HttpGet getContainersRequest() {
+    private HttpGet getContainersRequest(KieServerDeployment kieServerDeployment) {
         try {
-            final URL url = new URL(deploymentScenario.getKieServerDeployment().getSecureUrl(), KIE_CONTAINER_REQUEST_URL);
+            final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINER_REQUEST_URL);
             final HttpGet request = new HttpGet(url.toString());
 
             return request;
