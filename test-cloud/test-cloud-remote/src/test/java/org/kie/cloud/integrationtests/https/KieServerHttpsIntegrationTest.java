@@ -69,7 +69,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerHttpsIntegrationTest.class);
 
-    @Parameters
+    @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
