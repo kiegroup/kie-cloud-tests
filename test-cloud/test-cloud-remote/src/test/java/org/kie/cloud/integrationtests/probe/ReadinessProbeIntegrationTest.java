@@ -36,6 +36,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
@@ -62,10 +64,10 @@ import org.slf4j.LoggerFactory;
 @RunWith(Parameterized.class)
 public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
 
-    @Parameterized.Parameter
+    @Parameter
     public WorkbenchKieServerScenario workbenchKieServerScenario;
 
-    @Parameterized.Parameters
+    @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 

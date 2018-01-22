@@ -63,7 +63,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     private static final String SERVER_ID = "KieServerId";
     private static final String SERVER_NAME = "KieServer";
 
-    @Parameters
+    @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
