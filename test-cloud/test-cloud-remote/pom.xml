@@ -95,8 +95,9 @@
               <kjars.build.settings.xml>${kjars.build.settings.xml}</kjars.build.settings.xml>
               <instance.logs>${project.build.directory}/instances</instance.logs>
             </systemProperties>
-            <parallel>classes</parallel>
-            <threadCount>3</threadCount>
+            <parallel>suitesAndClasses</parallel>
+            <threadCountClasses>3</threadCountClasses>
+            <threadCountSuites>2</threadCountSuites>
             <perCoreThreadCount>false</perCoreThreadCount>
           </configuration>
         </plugin>
