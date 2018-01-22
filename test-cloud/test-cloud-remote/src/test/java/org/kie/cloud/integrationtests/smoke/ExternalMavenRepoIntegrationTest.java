@@ -34,8 +34,11 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
@@ -55,10 +58,10 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 
 @RunWith(Parameterized.class)
 @Category(Smoke.class)
-public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
     @Parameter
-    public WorkbenchKieServerScenario workbenchKieServerScenario;
+    public DeploymentScenario kieServerScenario;
 
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
@@ -71,8 +74,24 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
+        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerSettings)
+                .build();
+
+        DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        GenericScenario kieServerS2Iscenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerS2ISettings)
+                .build();
+
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}
+            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}, {kieServerS2Iscenario}
         });
     }
 
@@ -85,8 +104,8 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
     private static KieCommands commandsFactory = KieServices.Factory.get().getCommands();
 
     @Override
-    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return workbenchKieServerScenario;
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return kieServerScenario;
     }
 
     @Before
@@ -98,12 +117,12 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
 
         kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION)));
 
-        ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
-        UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
+        ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
+        UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployments().get(0));
 
         Long userTaskPid = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
         assertThat(userTaskPid).isNotNull();
@@ -120,11 +139,11 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
 
     @Test
     public void testRulesFromExternalMavenRepo() {
-        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
 
         kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, HELLO_RULES_PROJECT_NAME, HELLO_RULES_PROJECT_VERSION)));
 
-        RuleServicesClient ruleClient = KieServerClientProvider.getRuleClient(deploymentScenario.getKieServerDeployment());
+        RuleServicesClient ruleClient = KieServerClientProvider.getRuleClient(deploymentScenario.getKieServerDeployments().get(0));
 
         List<Command<?>> commands = new ArrayList<>();
         BatchExecutionCommand batchExecutionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
