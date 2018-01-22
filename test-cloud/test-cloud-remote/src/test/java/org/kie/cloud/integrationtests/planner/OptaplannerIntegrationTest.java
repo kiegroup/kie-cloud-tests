@@ -18,16 +18,27 @@ package org.kie.cloud.integrationtests.planner;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
@@ -38,7 +49,11 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.SolverServicesClient;
 
-public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+@RunWith(Parameterized.class)
+public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+
+    @Parameter
+    public DeploymentScenario kieServerScenario;
 
     private static final ReleaseId CLOUD_BALANCE_RELEASE_ID = new ReleaseId(
             PROJECT_GROUP_ID,
@@ -56,20 +71,46 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Wor
             "org.kie.server.testing.DeleteComputerProblemFactChange";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
 
-    @Override
-    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory
-                .getWorkbenchKieServerScenarioBuilder()
-                .withExternalMavenRepo(
-                        MavenConstants.getMavenRepoUrl(),
-                        MavenConstants.getMavenRepoUser(),
-                        MavenConstants.getMavenRepoPassword())
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
+        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerSettings)
+                .build();
+
+        DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        GenericScenario kieServerS2Iscenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerS2ISettings)
+                .build();
+
+        return Arrays.asList(new Object[][]{
+            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}, {kieServerS2Iscenario}
+        });
+    }
+
+    @Override
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return kieServerScenario;
     }
 
     @Before
     public void setRouterTimeout() {
-        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
+        deploymentScenario.getKieServerDeployments().get(0).setRouterTimeout(Duration.ofMinutes(3));
     }
 
     @Test
@@ -80,7 +121,7 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Wor
         KieContainer kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
 
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(
-                deploymentScenario.getKieServerDeployment(),
+                deploymentScenario.getKieServerDeployments().get(0),
                 extraClasses(kieContainer));
         kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, CLOUD_BALANCE_RELEASE_ID));
 
