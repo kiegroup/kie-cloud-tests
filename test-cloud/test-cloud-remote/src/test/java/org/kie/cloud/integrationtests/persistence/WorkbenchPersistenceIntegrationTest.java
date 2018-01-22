@@ -58,7 +58,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
 
-    @Parameters
+    @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
