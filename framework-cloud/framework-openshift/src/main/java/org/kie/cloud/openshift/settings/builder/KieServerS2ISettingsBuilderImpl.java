@@ -17,30 +17,17 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.protocol.Protocol;
-import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
-import org.kie.cloud.openshift.template.OpenShiftTemplate;
 
-public class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuilder {
+public abstract class KieServerS2ISettingsBuilderImpl implements KieServerS2ISettingsBuilder {
 
-    private Map<String, String> envVariables;
-    private final OpenShiftTemplate appTemplate = OpenShiftTemplate.KIE_SERVER_S2I;
+    protected Map<String, String> envVariables;
 
     public KieServerS2ISettingsBuilderImpl() {
-        envVariables = new HashMap<>();
-
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
-    }
-
-    @Override
-    public DeploymentSettings build() {
-        return new DeploymentSettingsImpl(envVariables, appTemplate);
+        this.envVariables = new HashMap<>();
     }
 
     @Override
