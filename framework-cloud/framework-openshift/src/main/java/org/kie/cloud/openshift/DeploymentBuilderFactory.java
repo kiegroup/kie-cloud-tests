@@ -32,7 +32,8 @@ import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseSce
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerS2ISettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.KieServerBasicS2ISettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderImpl;
@@ -79,8 +80,13 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     }
 
     @Override
-    public KieServerS2ISettingsBuilder getKieServerS2ISettingsBuilder() {
-        return new KieServerS2ISettingsBuilderImpl();
+    public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
+        return new KieServerHttpsS2ISettingsBuilderImpl();
+    }
+
+    @Override
+    public KieServerS2ISettingsBuilder getKieServerBasicS2ISettingsBuilder() {
+        return new KieServerBasicS2ISettingsBuilderImpl();
     }
 
     @Override

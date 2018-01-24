@@ -84,7 +84,7 @@ public class KieServerWebSocketScalingIntegrationTest {
         workbenchMonitoringScenario.deploy();
         workbenchDeployment = workbenchMonitoringScenario.getWorkbenchDeployments().get(0);
 
-        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .withControllerProtocol(Protocol.ws)
                 .withControllerConnection(workbenchDeployment.getWebSocketUri().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().getPort()))
