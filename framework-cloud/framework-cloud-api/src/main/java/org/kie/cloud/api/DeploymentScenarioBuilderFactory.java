@@ -36,7 +36,8 @@ public interface DeploymentScenarioBuilderFactory {
     GenericScenarioBuilder getGenericScenarioBuilder();
 
     KieServerSettingsBuilder getKieServerSettingsBuilder();
-    KieServerS2ISettingsBuilder getKieServerS2ISettingsBuilder();
+    KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder();
+    KieServerS2ISettingsBuilder getKieServerBasicS2ISettingsBuilder();
     WorkbenchSettingsBuilder getWorkbenchSettingsBuilder();
     WorkbenchMonitoringSettingsBuilder getWorkbenchMonitoringSettingsBuilder();
     SmartRouterSettingsBuilder getSmartRouterSettingsBuilder();

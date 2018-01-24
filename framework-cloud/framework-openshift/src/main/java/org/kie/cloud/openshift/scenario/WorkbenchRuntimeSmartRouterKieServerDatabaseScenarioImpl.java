@@ -76,7 +76,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends Op
         String kieServerHostname = urlPrexif + "kie-server" + DeploymentConstants.getDefaultDomainSuffix();
         String kieServerPort = "80";
 
-        logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_S2I.getTemplateUrl().toString());
+        logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_HTTPS_S2I.getTemplateUrl().toString());
         Map<String, String> kieServerEnvVariables = new HashMap<String, String>(envVariables);
         kieServerEnvVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOST, kieServerHostname);
@@ -87,7 +87,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends Op
         kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PORT, Integer.toString(workbenchRuntimeDeployment.getUrl().getPort()));
         kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, workbenchRuntimeDeployment.getUsername());
         kieServerEnvVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, workbenchRuntimeDeployment.getPassword());
-        project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_S2I.getTemplateUrl(), kieServerEnvVariables);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_HTTPS_S2I.getTemplateUrl(), kieServerEnvVariables);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchRuntimeDeployment.waitForScale();

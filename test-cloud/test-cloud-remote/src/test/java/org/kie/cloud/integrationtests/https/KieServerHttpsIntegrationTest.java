@@ -88,7 +88,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 .withKieServer(kieServerSettings)
                 .build();
 
-        DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+        DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                 .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();

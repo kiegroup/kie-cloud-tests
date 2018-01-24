@@ -16,6 +16,7 @@
 package org.kie.cloud.integrationtests.architecture;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -27,10 +28,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.server.api.model.instance.TaskSummary;
@@ -46,7 +53,24 @@ import org.slf4j.LoggerFactory;
  * Test for Architecture 4 from
  * http://mswiderski.blogspot.cz/2017/08/cloud-runtime-architectures-for-jbpm.html
  */
+@RunWith(Parameterized.class)
 public class UnmanagedKieServersWithSmartRouterIntegrationTest extends AbstractCloudArchitectureIntegrationTest {
+
+    @Parameter
+    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+
+        KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
+
+        return Arrays.asList(new Object[][]{
+            {kieServerHttpsS2ISettings}, {kieServerBasicS2ISettings}
+        });
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(UnmanagedKieServersWithSmartRouterIntegrationTest.class);
 
@@ -83,9 +107,9 @@ public class UnmanagedKieServersWithSmartRouterIntegrationTest extends AbstractC
                 .withSmartRouterExternalUrl("http://" + RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME + ":" + PORT)
                 .build();
 
-        kieServerABC = configureKieServerS2I(deploymentScenarioFactory, KIE_SERVER_ABC_NAME, KIE_CONTAINER_DEPLOYMENT_ABC);
-        kieServerDEF = configureKieServerS2I(deploymentScenarioFactory, KIE_SERVER_DEF_NAME, KIE_CONTAINER_DEPLOYMENT_DEF);
-        kieServerGHI = configureKieServerS2I(deploymentScenarioFactory, KIE_SERVER_GHI_NAME, KIE_CONTAINER_DEPLOYMENT_GHI);
+        kieServerABC = configureKieServerS2I(KIE_SERVER_ABC_NAME, KIE_CONTAINER_DEPLOYMENT_ABC);
+        kieServerDEF = configureKieServerS2I(KIE_SERVER_DEF_NAME, KIE_CONTAINER_DEPLOYMENT_DEF);
+        kieServerGHI = configureKieServerS2I(KIE_SERVER_GHI_NAME, KIE_CONTAINER_DEPLOYMENT_GHI);
 
         return deploymentScenarioFactory.getGenericScenarioBuilder()
                 .withSmartRouter(smartRouter)
@@ -93,8 +117,8 @@ public class UnmanagedKieServersWithSmartRouterIntegrationTest extends AbstractC
                 .build();
     }
 
-    private DeploymentSettings configureKieServerS2I(DeploymentScenarioBuilderFactory deploymentScenarioFactory, String applicationName, String containerDeploymnet) {
-        return deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+    private DeploymentSettings configureKieServerS2I(String applicationName, String containerDeploymnet) {
+        return kieServerS2ISettingsBuilder
                 .withApplicationName(applicationName)
                 .withHostame(RANDOM_URL_PREFIX + applicationName + DeploymentConstants.getDefaultDomainSuffix())
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())

@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.integrationtests.s2i;
 
+import java.util.Arrays;
+import java.util.Collection;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -24,9 +26,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
@@ -39,7 +47,24 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
+@RunWith(Parameterized.class)
 public class KieServerS2iHierarchicalIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+
+    @Parameter
+    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+
+        KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
+
+        return Arrays.asList(new Object[][]{
+            {kieServerHttpsS2ISettings}, {kieServerBasicS2ISettings}
+        });
+    }
 
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
@@ -61,7 +86,7 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractCloudIntegr
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = gitProvider.createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
-        DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+        DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
                 .build();
