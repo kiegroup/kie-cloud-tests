@@ -18,6 +18,8 @@ package org.kie.cloud.integrationtests.s2i;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -25,14 +27,20 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
@@ -44,7 +52,24 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 
+@RunWith(Parameterized.class)
 public class KieServerS2iDroolsIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+
+    @Parameter
+    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+
+        KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
+
+        return Arrays.asList(new Object[][]{
+            {kieServerHttpsS2ISettings}, {kieServerBasicS2ISettings}
+        });
+    }
 
     private KieServicesClient kieServicesClient;
     private RuleServicesClient ruleClient;
@@ -72,7 +97,7 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractCloudIntegrationT
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
-        DeploymentSettings kieServerS2Isettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+        DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
                 .withDroolsServerFilterClasses(false)

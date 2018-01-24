@@ -73,7 +73,11 @@ public class OpenShiftConstants implements Constants {
     /**
      * URL pointing to OpenShift template file containing just Kie server S2I.
      */
-    public static final String KIE_APP_TEMPLATE_KIE_SERVER_S2I = "kie.app.template.kie-server-s2i";
+    public static final String KIE_APP_TEMPLATE_KIE_SERVER_HTTPS_S2I = "kie.app.template.kie-server-https-s2i";
+    /**
+     * URL pointing to OpenShift template file containing just Kie server S2I.
+     */
+    public static final String KIE_APP_TEMPLATE_KIE_SERVER_BASIC_S2I = "kie.app.template.kie-server-basic-s2i";
     /**
      * URL pointing to OpenShift template file containing Kie server and database.
      */

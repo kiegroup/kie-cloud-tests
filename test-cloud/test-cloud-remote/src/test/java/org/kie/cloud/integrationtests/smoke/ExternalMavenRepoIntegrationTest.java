@@ -82,16 +82,24 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
                 .withKieServer(kieServerSettings)
                 .build();
 
-        DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+        DeploymentSettings kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                 .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
-        GenericScenario kieServerS2Iscenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerS2ISettings)
+        GenericScenario kieServerHttpsS2Iscenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerHttpsS2ISettings)
+                .build();
+
+        DeploymentSettings kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+        GenericScenario kieServerBasicS2Iscenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerBasicS2ISettings)
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}, {kieServerS2Iscenario}
+            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}, {kieServerHttpsS2Iscenario}, {kieServerBasicS2Iscenario}
         });
     }
 

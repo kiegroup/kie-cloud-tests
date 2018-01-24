@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -28,10 +29,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
@@ -49,7 +56,24 @@ import org.slf4j.LoggerFactory;
  * Test for Architecture 2 from
  * http://mswiderski.blogspot.cz/2017/08/cloud-runtime-architectures-for-jbpm.html
  */
+@RunWith(Parameterized.class)
 public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extends AbstractCloudArchitectureIntegrationTest {
+
+    @Parameter
+    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+
+        KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
+
+        return Arrays.asList(new Object[][]{
+            {kieServerHttpsS2ISettings}, {kieServerBasicS2ISettings}
+        });
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(ManagedKieServersWithSmartRouterAndControllerIntegrationTest.class);
 
@@ -118,7 +142,7 @@ public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extend
     }
 
     private DeploymentSettings configureKieServerS2I(DeploymentScenarioBuilderFactory deploymentScenarioFactory, String applicationName, String containerDeploymnet) {
-        return deploymentScenarioFactory.getKieServerS2ISettingsBuilder()
+        return kieServerS2ISettingsBuilder
                 .withApplicationName(applicationName)
                 .withHostame(RANDOM_URL_PREFIX + applicationName + DeploymentConstants.getDefaultDomainSuffix())
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
