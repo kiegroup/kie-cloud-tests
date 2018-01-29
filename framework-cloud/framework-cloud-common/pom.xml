@@ -63,6 +63,22 @@
       <artifactId>kie-wb-tests-rest</artifactId>
     </dependency>
 
+    <!-- HttpsUtils -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <dependency>
       <groupId>cz.xtf</groupId>
       <artifactId>utilities</artifactId>
