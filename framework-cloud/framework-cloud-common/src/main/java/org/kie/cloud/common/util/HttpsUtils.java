@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.https;
+package org.kie.cloud.common.util;
 
 import java.io.IOException;
 import java.io.InputStream;
