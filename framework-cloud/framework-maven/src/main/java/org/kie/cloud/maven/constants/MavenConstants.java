@@ -34,4 +34,9 @@ public class MavenConstants implements Constants {
     public static String getMavenRepoPassword() {
         return System.getProperty(MAVEN_REPO_PASSWORD);
     }
+
+    @Override
+    public void initConfigProperties() {
+        // Nothing to init here.
+    }
 }

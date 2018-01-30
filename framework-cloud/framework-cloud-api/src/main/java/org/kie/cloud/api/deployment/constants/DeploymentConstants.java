@@ -103,4 +103,9 @@ public class DeploymentConstants implements Constants {
     public static String getDefaultDomainSuffix() {
         return System.getProperty(DEFAULT_DOMAIN_SUFFIX);
     }
+
+    @Override
+    public void initConfigProperties() {
+        // Nothing to init here.
+    }
 }

@@ -51,4 +51,14 @@ public class GitConstants implements Constants {
     public static String getGitHubPassword() {
         return System.getProperty(GITHUB_PASSWORD);
     }
+
+    @Override
+    public void initConfigProperties() {
+        // init XTF configuration for GitLab
+        System.setProperty("xtf.config.gitlab.url", getGitLabUrl());
+        System.setProperty("xtf.config.gitlab.username", getGitLabUser());
+        System.setProperty("xtf.config.gitlab.password", getGitLabPassword());
+        System.setProperty("xtf.config.gitlab.group.enabled", "false");
+        System.setProperty("xtf.config.gitlab.token", "disabled");
+    }
 }

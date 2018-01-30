@@ -18,6 +18,7 @@ package org.kie.cloud.git;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kie.cloud.api.constants.ConfigurationInitializer;
 import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProvider;
 import org.kie.cloud.git.gitlab.GitLabGitProvider;
@@ -27,6 +28,8 @@ public class GitProviderFactory {
     private static Map<String, GitProvider> gitProviders = new HashMap<>();
 
     static {
+        ConfigurationInitializer.initConfigProperties();
+
         gitProviders.put("GitLab", new GitLabGitProvider());
         gitProviders.put("GitHub", new GitHubGitProvider());
     }
