@@ -18,6 +18,8 @@ package org.kie.cloud.openshift.deployment;
 import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
 import cz.xtf.openshift.OpenShiftUtil;
+import io.fabric8.kubernetes.api.model.Pod;
+
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.Instance;
 
@@ -53,6 +55,7 @@ public class OpenShiftInstance implements Instance {
 
     @Override
     public String getLogs() {
-        return util.getPodLog(name);
+        Pod pod = util.getPod(name);
+        return util.getPodLog(pod);
     }
 }
