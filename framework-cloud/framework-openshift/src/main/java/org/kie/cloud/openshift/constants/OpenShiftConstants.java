@@ -134,4 +134,14 @@ public class OpenShiftConstants implements Constants {
     public static String getKieApplicationName() {
         return System.getProperty(KIE_APP_NAME);
     }
+
+    @Override
+    public void initConfigProperties() {
+        // init XTF configuration for OpenShift
+        System.setProperty("xtf.config.master.url", getOpenShiftUrl());
+        System.setProperty("xtf.config.master.username", getOpenShiftUserName());
+        System.setProperty("xtf.config.master.password", getOpenShiftPassword());
+        System.setProperty("xtf.config.master.admin.username", getOpenShiftUserName());
+        System.setProperty("xtf.config.master.admin.password", getOpenShiftPassword());
+    }
 }

@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.maven.it.VerificationException;
+import org.kie.cloud.api.constants.ConfigurationInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,10 @@ public class MavenDeployer {
     private static final Logger logger = LoggerFactory.getLogger(MavenDeployer.class);
 
     private static final String SETTINGS_XML_PATH = System.getProperty("kjars.build.settings.xml");
+
+    static {
+        ConfigurationInitializer.initConfigProperties();
+    }
 
     /**
      * Build Maven project from specified directory using maven command "clean install".

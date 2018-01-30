@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,20 @@
 
 package org.kie.cloud.api.constants;
 
-public interface Constants {
+import java.util.ServiceLoader;
+
+/**
+ * Used to initialize properties of nested frameworks, for example to initialize XTF configuration.
+ */
+public class ConfigurationInitializer {
 
     /**
-     * Configure properties of nested frameworks.
+     * Load all constants and configure appropriate properties of nested frameworks.
      */
-    void initConfigProperties();
+    public static void initConfigProperties() {
+        ServiceLoader<Constants> serviceLoader = ServiceLoader.load(Constants.class);
+        for (Constants constants : serviceLoader) {
+            constants.initConfigProperties();
+        }
+    }
 }
