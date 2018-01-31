@@ -52,7 +52,10 @@ import org.kie.server.client.SolverServicesClient;
 @RunWith(Parameterized.class)
 public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public DeploymentScenario kieServerScenario;
 
     private static final ReleaseId CLOUD_BALANCE_RELEASE_ID = new ReleaseId(
@@ -71,7 +74,7 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Dep
             "org.kie.server.testing.DeleteComputerProblemFactChange";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -91,7 +94,9 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Dep
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
+            {"KIE Server", kieServerScenario}
         });
     }
 

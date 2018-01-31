@@ -49,7 +49,10 @@ import org.kie.server.client.SolverServicesClient;
 @RunWith(Parameterized.class)
 public class KieServerS2iOptaplannerIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
 
     private static final String CLOUD_BALANCE_SOLVER_ID = "cloudsolver";
@@ -75,7 +78,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractCloudIntegra
     private KieContainer kieContainer;
     private SolverServicesClient solverClient;
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -83,7 +86,8 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractCloudIntegra
         KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
 
         return Arrays.asList(new Object[][]{
-            {kieServerHttpsS2ISettings}, {kieServerBasicS2ISettings}
+            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings},
+            {"KIE Server Basic S2I", kieServerBasicS2ISettings}
         });
     }
 
