@@ -61,7 +61,10 @@ import org.slf4j.LoggerFactory;
 @RunWith(Parameterized.class)
 public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public DeploymentScenario kieServerScenario;
 
     private static final Marshaller marshaller
@@ -69,7 +72,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerHttpsIntegrationTest.class);
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -97,7 +100,10 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudIntegrationTest<
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}, {kieServerS2Iscenario}
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
+            {"KIE Server", kieServerScenario},
+            {"KIE Server HTTPS S2I", kieServerS2Iscenario}
         });
     }
 

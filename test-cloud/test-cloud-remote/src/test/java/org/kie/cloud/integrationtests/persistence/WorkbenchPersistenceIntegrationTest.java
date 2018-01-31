@@ -51,14 +51,17 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 @RunWith(Parameterized.class)
 public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public WorkbenchKieServerScenario workbenchKieServerScenario;
 
     private WorkbenchClient workbenchClient;
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -68,7 +71,8 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
         });
     }
 

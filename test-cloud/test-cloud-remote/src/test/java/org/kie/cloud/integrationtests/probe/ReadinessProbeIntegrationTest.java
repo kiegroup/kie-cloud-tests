@@ -64,10 +64,13 @@ import org.slf4j.LoggerFactory;
 @RunWith(Parameterized.class)
 public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public WorkbenchKieServerScenario workbenchKieServerScenario;
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -79,7 +82,8 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
         });
     }
 

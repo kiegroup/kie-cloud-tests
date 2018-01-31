@@ -61,7 +61,10 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
 
     private static final Logger logger = LoggerFactory.getLogger(DroolsSessionFailoverIntegrationTest.class);
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public DeploymentScenario kieServerScenario;
 
     private KieServicesClient kieServerClient;
@@ -75,7 +78,7 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
     private static final String HELLO_RULE = "Hello.";
     private static final String WORLD_RULE = "World.";
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -95,7 +98,9 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
+            {"KIE Server", kieServerScenario}
         });
     }
 
