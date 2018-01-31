@@ -51,7 +51,10 @@ import org.slf4j.LoggerFactory;
 @RunWith(Parameterized.class)
 public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public WorkbenchKieServerScenario workbenchKieServerScenario;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
@@ -63,15 +66,16 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudIntegrationTest<
     private static final String SERVER_ID = "KieServerId";
     private static final String SERVER_NAME = "KieServer";
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder().build();
         WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
 
-        return Arrays.asList(new Object[][] {
-                 { workbenchKieServerScenario }, {workbenchKieServerDatabaseScenario }
+        return Arrays.asList(new Object[][]{
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
            });
     }
 

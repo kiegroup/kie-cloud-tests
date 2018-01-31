@@ -60,10 +60,13 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 @Category(Smoke.class)
 public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
     public DeploymentScenario kieServerScenario;
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -99,7 +102,11 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}, {kieServerHttpsS2Iscenario}, {kieServerBasicS2Iscenario}
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
+            {"KIE Server", kieServerScenario},
+            {"KIE Server HTTPS S2I", kieServerHttpsS2Iscenario},
+            {"KIE Server Basic S2I", kieServerBasicS2Iscenario}
         });
     }
 

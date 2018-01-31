@@ -58,10 +58,12 @@ import org.slf4j.LoggerFactory;
 @RunWith(Parameterized.class)
 public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest extends AbstractCloudArchitectureIntegrationTest {
 
-    @Parameter
+    @Parameter(value = 0)
+    public String testScenarioName;
+    @Parameter(value = 1)
     public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
@@ -70,7 +72,8 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
         KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
 
         return Arrays.asList(new Object[][]{
-            {kieServerHttpsS2ISettings}, {kieServerBasicS2ISettings}
+            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings},
+            {"KIE Server Basic S2I", kieServerBasicS2ISettings}
         });
     }
 
