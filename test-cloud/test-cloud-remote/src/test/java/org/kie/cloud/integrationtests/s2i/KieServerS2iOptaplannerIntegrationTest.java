@@ -1,8 +1,9 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2018 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -11,19 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
+package org.kie.cloud.integrationtests.s2i;
 
-package org.kie.cloud.integrationtests.planner;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.assertj.core.api.Assertions;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,31 +35,23 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
-import org.kie.server.api.model.KieContainerResource;
+import org.kie.cloud.integrationtests.Kjar;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.SolverServicesClient;
 
 @RunWith(Parameterized.class)
-public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+public class KieServerS2iOptaplannerIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
 
     @Parameter
-    public DeploymentScenario kieServerScenario;
+    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
 
-    private static final ReleaseId CLOUD_BALANCE_RELEASE_ID = new ReleaseId(
-            PROJECT_GROUP_ID,
-            CLOUD_BALANCE_PROJECT_SNAPSHOT_NAME,
-            CLOUD_BALANCE_PROJECT_SNAPSHOT_VERSION);
     private static final String CLOUD_BALANCE_SOLVER_ID = "cloudsolver";
     private static final String CLOUD_BALANCE_SOLVER_CONFIG = "cloudbalance-solver.xml";
 
@@ -71,56 +64,62 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Dep
             "org.kie.server.testing.DeleteComputerProblemFactChange";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
 
+    private static final Kjar DEPLOYED_KJAR = Kjar.CLOUD_BALANCE_SNAPSHOT;
+    private static final ReleaseId CLOUD_BALANCE_RELEASE_ID = new ReleaseId(DEPLOYED_KJAR.getGroupId(), DEPLOYED_KJAR.getName(), DEPLOYED_KJAR.getVersion());
+    private static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "=" + DEPLOYED_KJAR.toString();
+
+    private static final String REPO_BRANCH = "master";
+    private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
+
+    private String repositoryName;
+    private KieContainer kieContainer;
+    private SolverServicesClient solverClient;
+
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-
-        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-        GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerSettings)
-                .build();
+        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+        KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
 
         return Arrays.asList(new Object[][]{
-            {workbenchKieServerScenario}, {workbenchKieServerDatabaseScenario}, {kieServerScenario}
+            {kieServerHttpsS2ISettings}, {kieServerBasicS2ISettings}
         });
     }
 
     @Override
-    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return kieServerScenario;
+    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+
+        DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
+                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                .build();
+
+        return deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerS2Isettings)
+                .build();
     }
 
     @Before
-    public void setRouterTimeout() {
-        deploymentScenario.getKieServerDeployments().get(0).setRouterTimeout(Duration.ofMinutes(3));
-    }
-
-    @Test
-    public void testExecuteSolver() throws Exception {
-        MavenDeployer.buildAndDeployMavenProject(
-                ClassLoader.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
-
-        KieContainer kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
+    public void setUp() throws ClassNotFoundException {
+        kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
 
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(
                 deploymentScenario.getKieServerDeployments().get(0),
                 extraClasses(kieContainer));
-        kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, CLOUD_BALANCE_RELEASE_ID));
+        solverClient = kieServerClient.getServicesClient(SolverServicesClient.class);
+    }
 
-        SolverServicesClient solverClient = kieServerClient.getServicesClient(SolverServicesClient.class);
-        SolverInstance solverInstance = solverClient.createSolver(CONTAINER_ID,
-                CLOUD_BALANCE_SOLVER_ID, CLOUD_BALANCE_SOLVER_CONFIG);
-        Assertions.assertThat(solverInstance).isNotNull();
+    @After
+    public void deleteRepo() {
+        gitProvider.deleteGitRepository(repositoryName);
+    }
+
+    @Test
+    public void testExecuteSolver() throws Exception {
+        SolverInstance solverInstance = solverClient.createSolver(CONTAINER_ID, CLOUD_BALANCE_SOLVER_ID, CLOUD_BALANCE_SOLVER_CONFIG);
+        assertThat(solverInstance).isNotNull();
 
         Object planningProblem = loadPlanningProblem(kieContainer, 5, 15);
         solverClient.solvePlanningProblem(CONTAINER_ID, CLOUD_BALANCE_SOLVER_ID, planningProblem);
@@ -130,11 +129,10 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Dep
             Thread.sleep(3000);
             solverInstance = solverClient.getSolver(CONTAINER_ID, CLOUD_BALANCE_SOLVER_ID);
         }
-        solverInstance = solverClient.getSolver(CONTAINER_ID, CLOUD_BALANCE_SOLVER_ID);
-        Assertions.assertThat(solverInstance.getStatus()).isEqualTo(SolverInstance.SolverStatus.NOT_SOLVING);
-        Assertions.assertThat(solverInstance.getScoreWrapper()).isNotNull();
-        Assertions.assertThat(solverInstance.getScoreWrapper().getScoreString()).isNotNull();
-        Assertions.assertThat(solverInstance.getScoreWrapper().getScoreString()).isNotEmpty();
+
+        assertThat(solverInstance.getStatus()).isEqualTo(SolverInstance.SolverStatus.NOT_SOLVING);
+        assertThat(solverInstance.getScoreWrapper()).isNotNull();
+        assertThat(solverInstance.getScoreWrapper().getScoreString()).isNotEmpty();
     }
 
     private Set<Class<?>> extraClasses(KieContainer kieContainer) throws ClassNotFoundException {
