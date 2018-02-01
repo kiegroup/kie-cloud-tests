@@ -55,8 +55,9 @@
 
   <repositories>
     <repository>
+       <!-- Needed to download the Optaplanner SNAPSHOTs during build -->
       <id>jboss-repository</id>
-      <url>https://repository.jboss.org</url>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
     </repository>
   </repositories>
 </project>
