@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -140,10 +141,13 @@ public class EmptyManagedKieServersWithSmartRouterAndControllerIntegrationTest e
                 .build();
     }
 
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+    }
+
     @Before
     public void setUp() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployments().get(0));
         smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployments().get(0));
 

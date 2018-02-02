@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -112,9 +113,13 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractCloudIntegrationT
                 .build();
     }
 
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndInstallMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session").getFile());
+    }
+
     @Before
     public void setUp() throws ClassNotFoundException {
-        MavenDeployer.buildAndInstallMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session").getFile());
         kjarClassLoader = KieServices.Factory.get().newKieContainer(RELEASE_ID).getClassLoader();
 
         extraClasses = Collections.singleton(Class.forName(PERSON_CLASS_NAME, true, kjarClassLoader));
