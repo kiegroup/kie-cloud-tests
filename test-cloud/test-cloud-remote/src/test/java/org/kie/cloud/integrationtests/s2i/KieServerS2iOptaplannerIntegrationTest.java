@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,6 +42,7 @@ import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.maven.MavenDeployer;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.client.KieServicesClient;
@@ -103,6 +105,12 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractCloudIntegra
         return deploymentScenarioFactory.getGenericScenarioBuilder()
                 .withKieServer(kieServerS2Isettings)
                 .build();
+    }
+
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndInstallMavenProject(
+                ClassLoader.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
     }
 
     @Before

@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
@@ -59,11 +60,13 @@ public class SmartRouterLoadBalancing extends
                 .build();
     }
 
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+    }
+
     @Test
     public void testRouterLoadBalancing() {
-        MavenDeployer.buildAndDeployMavenProject(
-                ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(
                 deploymentScenario.getWorkbenchRuntimeDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());

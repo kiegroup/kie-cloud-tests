@@ -29,6 +29,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.assertj.core.api.Assertions;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -113,6 +114,11 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
         return kieServerScenario;
     }
 
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+    }
+
     @Test
     public void testKieServerInfo() {
         final KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
@@ -135,8 +141,6 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
 
     @Test
     public void testDeployContainer() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-
         final KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
         final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
                 kieServerDeployment.getPassword());
