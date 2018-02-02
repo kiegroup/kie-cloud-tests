@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -105,6 +106,12 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Dep
         return kieServerScenario;
     }
 
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndDeployMavenProject(
+                ClassLoader.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
+    }
+
     @Before
     public void setRouterTimeout() {
         deploymentScenario.getKieServerDeployments().get(0).setRouterTimeout(Duration.ofMinutes(3));
@@ -112,9 +119,6 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Dep
 
     @Test
     public void testExecuteSolver() throws Exception {
-        MavenDeployer.buildAndDeployMavenProject(
-                ClassLoader.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
-
         KieContainer kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
 
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(
