@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -123,8 +124,8 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
         return kieServerScenario;
     }
 
-    @Before
-    public void deployMavenProject() {
+    @BeforeClass
+    public static void deployMavenProject() {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
     }

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -82,14 +83,17 @@ public class SmartRouterUpdateRedirection extends AbstractCloudIntegrationTest<G
                 .build();
     }
 
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101-snapshot").getFile());
+    }
+
     @Before
     public void prepateClientsAndProject() {
         kieServerDeployment1 = deploymentScenario.getKieServerDeployments().get(0);
         kieServerDeployment2 = deploymentScenario.getKieServerDeployments().get(1);
         SmartRouterDeployment smartRouterDeployment = deploymentScenario.getSmartRouterDeployments().get(0);
-
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101-snapshot").getFile());
 
         kieServerClient1 = KieServerClientProvider.getKieServerClient(kieServerDeployment1);
         kieServerClient2 = KieServerClientProvider.getKieServerClient(kieServerDeployment2);
