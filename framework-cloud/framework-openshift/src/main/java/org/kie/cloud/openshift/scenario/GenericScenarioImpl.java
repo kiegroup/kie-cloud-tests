@@ -117,6 +117,8 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         for (KieServerDeployment kieServerDeployment : kieServerDeployments) {
             kieServerDeployment.waitForScale();
         }
+
+        logNodeNameOfAllInstances();
     }
 
     private void deployTemplateWithSettings(Project project, DeploymentSettings deploymentSettings) {

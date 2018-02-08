@@ -73,6 +73,8 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftScenario implements
         logger.info("Waiting for Kie server to register itself to the Workbench.");
         KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment, 1);
 
+        logNodeNameOfAllInstances();
+
         // Used to track persistent volume content due to issues with volume cleanup
         storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/bpmsuite");
     }
