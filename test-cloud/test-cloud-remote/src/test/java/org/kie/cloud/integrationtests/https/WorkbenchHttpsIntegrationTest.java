@@ -45,7 +45,6 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.util.HttpsUtils;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
