@@ -26,6 +26,8 @@ import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.fabric8.kubernetes.api.model.Pod;
+
 public abstract class OpenShiftScenario implements DeploymentScenario {
 
     protected String projectName;
@@ -78,6 +80,17 @@ public abstract class OpenShiftScenario implements DeploymentScenario {
             project.close();
         } catch (Exception e) {
             throw new RuntimeException("Error while undeploying scenario.", e);
+        }
+    }
+
+    protected void logNodeNameOfAllInstances() {
+        for (Deployment deployment : getDeployments()) {
+            deployment.getInstances().forEach(instance -> {
+                Pod pod = project.getOpenShiftUtil().getPod(instance.getName());
+                String podName = pod.getMetadata().getName();
+                String instanceNodeName = pod.getSpec().getNodeName();
+                logger.info("Node name of the {}: {} ", podName, instanceNodeName);
+            });
         }
     }
 }

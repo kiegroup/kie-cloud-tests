@@ -81,6 +81,8 @@ public class WorkbenchKieServerDatabaseScenarioImpl extends OpenShiftScenario im
         logger.info("Waiting for Database deployment to become ready.");
         databaseDeployment.waitForScale();
 
+        logNodeNameOfAllInstances();
+
         // Used to track persistent volume content due to issues with volume cleanup
         storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/bpmsuite");
     }
