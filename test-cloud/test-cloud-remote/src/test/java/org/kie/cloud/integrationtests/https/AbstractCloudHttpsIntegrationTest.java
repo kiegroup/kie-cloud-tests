@@ -46,10 +46,10 @@ public abstract class AbstractCloudHttpsIntegrationTest<T extends DeploymentScen
     }
 
     private void waitForSecureRouter(URL secureUrl, String username, String password) {
-        Instant endTime = Instant.now().plus(Duration.of(5, ChronoUnit.SECONDS));
+        Instant endTime = Instant.now().plus(Duration.of(15, ChronoUnit.SECONDS));
+        logger.info("Waiting for router to expose secure url: {}", secureUrl.toString());
 
         while (Instant.now().isBefore(endTime)) {
-            logger.info("Waiting for router to expose secure url: {}", secureUrl.toString());
             final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(username, password);
 
             try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider);
@@ -57,13 +57,17 @@ public abstract class AbstractCloudHttpsIntegrationTest<T extends DeploymentScen
                 if (response.getStatusLine().getStatusCode() == HttpsURLConnection.HTTP_OK) {
                     return;
                 }
-
-                Thread.sleep(250L);
             } catch (SSLHandshakeException e) {
-                logger.warn("Caught SSLHandshakeException. Try to connection again.", e);
+                logger.warn("Caught SSLHandshakeException. Try to connection again.");
             } catch (Exception e) {
-                logger.error("Error waiting for router", e);
+                logger.error("Error waiting for router");
                 throw new RuntimeException("Error waiting for router", e);
+            }
+            try {
+                Thread.sleep(250L);
+            } catch (InterruptedException ex) {
+                logger.error("Error waiting for router");
+                throw new RuntimeException("Error waiting for router", ex);
             }
         }
     }
