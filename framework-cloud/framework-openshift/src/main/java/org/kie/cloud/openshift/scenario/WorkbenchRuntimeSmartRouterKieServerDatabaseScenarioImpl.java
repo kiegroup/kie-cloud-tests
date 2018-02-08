@@ -101,6 +101,8 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends Op
         logger.info("Waiting for Kie server and Smart router to register itself to the Workbench.");
         KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment, 2);
 
+        logNodeNameOfAllInstances();
+
         // TODO: temporary disabled due to Kie server S2I workaround
 //        logger.info("Waiting for Database deployment to become ready.");
 //        databaseDeployment.waitForScale();

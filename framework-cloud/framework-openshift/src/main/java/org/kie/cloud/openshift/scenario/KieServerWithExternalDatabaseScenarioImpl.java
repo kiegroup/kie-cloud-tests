@@ -60,6 +60,8 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
+
+        logNodeNameOfAllInstances();
     }
 
     @Override public List<Deployment> getDeployments() {
