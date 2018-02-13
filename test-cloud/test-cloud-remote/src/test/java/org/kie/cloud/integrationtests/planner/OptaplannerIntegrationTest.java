@@ -42,6 +42,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.util.KieServerUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -124,7 +125,7 @@ public class OptaplannerIntegrationTest extends AbstractCloudIntegrationTest<Dep
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(
                 deploymentScenario.getKieServerDeployments().get(0),
                 extraClasses(kieContainer));
-        kieServerClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, CLOUD_BALANCE_RELEASE_ID));
+        KieServerUtils.createContainer(kieServerClient, new KieContainerResource(CONTAINER_ID, CLOUD_BALANCE_RELEASE_ID), Duration.ofMinutes(3));
 
         SolverServicesClient solverClient = kieServerClient.getServicesClient(SolverServicesClient.class);
         SolverInstance solverInstance = solverClient.createSolver(CONTAINER_ID,
