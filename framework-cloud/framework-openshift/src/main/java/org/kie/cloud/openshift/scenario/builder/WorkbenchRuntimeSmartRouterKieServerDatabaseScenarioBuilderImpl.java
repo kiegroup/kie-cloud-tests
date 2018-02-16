@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.scenario.builder;
 
@@ -26,21 +26,20 @@ import org.kie.cloud.openshift.scenario.WorkbenchRuntimeSmartRouterKieServerData
 
 public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl implements WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder {
 
-    private Map<String, String> envVariables;
+    private final Map<String, String> envVariables = new HashMap<>();
 
     public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl() {
-        this.envVariables = new HashMap<String, String>();
         // TODO: Hardcoded because Workbench runtime Smart router template is designed to handle unmanaged Kie servers.
         // Therefore the template doesn't have possibility to set Kie server username/password for controller requests.
         // These values are default, used when controller username/password isn't defined.
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, "executionUser");
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, "execution1!");
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
-        this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, "executionUser");
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, "execution1!");
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
 
         // By default use Workbench as maven repo, repo URL is derived from Workbench automatically if not defined
-        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
-        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
     }
 
     @Override
@@ -59,6 +58,12 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl imp
     @Override
     public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder withSmartRouterId(String smartRouterId) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_ID, smartRouterId);
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder withKieServerId(String kieServerId) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ID, kieServerId);
         return this;
     }
 }

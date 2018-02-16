@@ -11,12 +11,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 
 public interface KieServerWithExternalDatabaseScenarioBuilder extends DeploymentScenarioBuilder<KieServerWithExternalDatabaseScenario> {
-    public KieServerWithExternalDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    KieServerWithExternalDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    KieServerWithExternalDatabaseScenarioBuilder withKieServerId(String kieServerId);
 }

@@ -11,28 +11,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 
 /**
- * Cloud builder for Workbench and Kie Server in project. Built setup
- * for WorkbenchKieServerDatabaseScenario
- *
+ * Cloud builder for Workbench and Kie Server in project. Built setup for WorkbenchKieServerDatabaseScenario.
  * @see WorkbenchKieServerDatabaseScenario
  */
 public interface WorkbenchKieServerDatabaseScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchKieServerDatabaseScenario> {
 
     /**
-     * Return setup builder with additional configuration of external maven
-     * repo.
-     *
+     * Return setup builder with additional configuration of external maven repo.
      * @param repoUrl Maven repo URL.
      * @param repoUserName Maven repo user name.
      * @param repoPassword Maven repo user password.
      * @return Builder with configured external maven repo.
      */
     WorkbenchKieServerDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    /**
+     * @param kieServerId kie-server id
+     * @return Builder with environment variable for kie-server id set to given id
+     */
+    WorkbenchKieServerDatabaseScenarioBuilder withKieServerId(String kieServerId);
+
 }
