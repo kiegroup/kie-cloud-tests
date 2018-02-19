@@ -30,7 +30,7 @@
     <version.org.gitlab>1.2.8</version.org.gitlab>
     <version.org.eclipse.mylyn.github>2.1.5</version.org.eclipse.mylyn.github>
 
-    <version.cz.xtf>0.6-SNAPSHOT</version.cz.xtf>
+    <version.cz.xtf>0.6</version.cz.xtf>
     <!-- Version adjustments due to mismatch between Kie BOM and XTF dependencies. -->
     <version.kubernetes-client>3.0.3</version.kubernetes-client>
     <version.kubernetes-model>2.0.4</version.kubernetes-model>
