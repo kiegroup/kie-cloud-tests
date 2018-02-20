@@ -23,8 +23,8 @@
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
-    <kie.app.workbench.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/decisioncentral-app-secret.yaml</kie.app.workbench.secret>
-    <kie.app.kie-server.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/kieserver-app-secret.yaml</kie.app.kie-server.secret>
+    <kie.app.workbench.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-cp/decisioncentral-app-secret.yaml</kie.app.workbench.secret>
+    <kie.app.kie-server.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-cp/kieserver-app-secret.yaml</kie.app.kie-server.secret>
     <!-- Templates are specified in specific properties files. Path is relative to submodules of this module. -->
     <kie.app.templates.jbpm.general>${project.parent.build.resources[0].directory}/templates-jbpm-general.properties</kie.app.templates.jbpm.general>
     <kie.app.templates.jbpm.mysql>${project.parent.build.resources[0].directory}/templates-jbpm-mysql.properties</kie.app.templates.jbpm.mysql>
