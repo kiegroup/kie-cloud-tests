@@ -40,9 +40,10 @@ public class RouterUtil {
     public static void waitForRouter(URL url) {
         LocalDateTime endTime = LocalDateTime.now().plus(ROUTER_WAIT_TIME);
 
+        logger.info("Waiting for router to expose url: {}", url.toString());
+
         while (LocalDateTime.now().isBefore(endTime)) {
             try {
-                logger.info("Waiting for router to expose url: {}", url.toString());
                 HttpGet request = new HttpGet(url.toString());
                 HttpClient client = HttpClientBuilder.create().build();
                 HttpResponse response = client.execute(request);
