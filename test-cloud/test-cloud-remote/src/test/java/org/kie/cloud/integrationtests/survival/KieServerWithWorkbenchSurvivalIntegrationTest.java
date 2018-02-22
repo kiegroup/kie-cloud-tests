@@ -17,9 +17,11 @@ package org.kie.cloud.integrationtests.survival;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -148,6 +150,8 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
             WebTarget target = httpKieServerClient.target(url.toString());
             response = target.request().get();
             assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        } catch (ProcessingException e) {
+            validateProcessingExceptionCausedBySocketTimeoutException(e);
         } catch (Exception e) {
             throw new RuntimeException("Error creating list container request.", e);
         } finally {
@@ -157,4 +161,15 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
         }
     }
 
+    /**
+     * Check that ProcessingException is caused by SocketTimeoutException, otherwise throw the ProcessingException.
+     * @param e ProcessingException
+     */
+    private void validateProcessingExceptionCausedBySocketTimeoutException(ProcessingException e) {
+        if (e.getCause() instanceof SocketTimeoutException) {
+            logger.debug("ProcessingException caused by SocketTimeoutException, indicates that Kie server is unavailable.");
+        } else {
+            throw e;
+        }
+    }
 }
