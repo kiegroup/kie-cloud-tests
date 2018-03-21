@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 
 import org.guvnor.rest.client.ProjectResponse;
-import org.guvnor.rest.client.RepositoryResponse;
+import org.guvnor.rest.client.Space;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,7 +90,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
@@ -107,16 +107,15 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
 
     @Test
     public void testWorkbenchProjectPersistence() {
-        workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
-        workbenchClient.createRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME);
-        workbenchClient.createProject(REPOSITORY_NAME, DEFINITION_PROJECT_NAME, PROJECT_GROUP_ID, DEFINITION_PROJECT_VERSION);
+        workbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+        workbenchClient.createProject(SPACE_NAME, DEFINITION_PROJECT_NAME, PROJECT_GROUP_ID, DEFINITION_PROJECT_VERSION);
 
-        assertRepositoryAndProjectExists(REPOSITORY_NAME, DEFINITION_PROJECT_NAME);
+        assertSpaceAndProjectExists(SPACE_NAME, DEFINITION_PROJECT_NAME);
 
         scaleToZeroAndToOne(deploymentScenario.getWorkbenchDeployment());
 
-        assertRepositoryAndProjectExists(REPOSITORY_NAME, DEFINITION_PROJECT_NAME);
-        workbenchClient.deployProject(REPOSITORY_NAME, DEFINITION_PROJECT_NAME);
+        assertSpaceAndProjectExists(SPACE_NAME, DEFINITION_PROJECT_NAME);
+        workbenchClient.deployProject(SPACE_NAME, DEFINITION_PROJECT_NAME);
 
         scaleToZeroAndToOne(deploymentScenario.getWorkbenchDeployment());
 
@@ -142,11 +141,11 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
         assertThat(serverTemplate.getContainersSpec().iterator().next().getId()).isEqualTo(containerId);
     }
 
-    private void assertRepositoryAndProjectExists(String repoName, String projectName) {
-        Collection<RepositoryResponse> repositories = workbenchClient.getRepositories();
-        assertThat(repositories.stream().anyMatch(n -> n.getName().equals(repoName))).as("Repository " + repoName + " not found.").isTrue();
+    private void assertSpaceAndProjectExists(String spaceName, String projectName) {
+        Collection<Space> spaces = workbenchClient.getSpaces();
+        assertThat(spaces.stream().anyMatch(n -> n.getName().equals(spaceName))).as("Space " + spaceName + " not found.").isTrue();
 
-        Collection<ProjectResponse> projects = workbenchClient.getProjects(repoName);
+        Collection<ProjectResponse> projects = workbenchClient.getProjects(spaceName);
         assertThat(projects.stream().anyMatch(n -> n.getName().equals(projectName))).as("Project " + projectName + " not found.").isTrue();
     }
 

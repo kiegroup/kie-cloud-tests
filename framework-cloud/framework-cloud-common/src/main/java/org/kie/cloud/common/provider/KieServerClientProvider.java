@@ -67,7 +67,6 @@ public class KieServerClientProvider {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(smartRouterDeployment.getUrl().toString(),
                 userName, password, clientTimeout);
         List<String> capabilities = Arrays.asList(KieServerConstants.CAPABILITY_BPM,
-                KieServerConstants.CAPABILITY_BPM_QUERIES,
                 KieServerConstants.CAPABILITY_BPM_UI,
                 KieServerConstants.CAPABILITY_BRM,
                 KieServerConstants.CAPABILITY_BRP,
