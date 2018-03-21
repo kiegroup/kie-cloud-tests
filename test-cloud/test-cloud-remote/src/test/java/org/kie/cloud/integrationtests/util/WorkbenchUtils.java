@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.server.api.model.KieContainerStatus;
@@ -33,17 +34,25 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchUtils {
 
-    private static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
-    private static final String REPOSITORY_NAME = "myRepo";
+    private static final String SPACE_NAME = "mySpace";
 
     private static final Duration WAIT_STEP = Duration.ofSeconds(1);
     private static final Duration MAX_WAIT_DURATION = Duration.ofSeconds(15);
 
     public static void deployProjectToWorkbench(String repositoryUrl, WorkbenchDeployment workbenchDeployment, String projectName) {
+        CloneProjectRequest cloneProjectRequest = createCloneProjectRequest(repositoryUrl, projectName);
+
         WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
-        workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, workbenchDeployment.getUsername());
-        workbenchClient.cloneRepository(ORGANIZATION_UNIT_NAME, REPOSITORY_NAME, repositoryUrl);
-        workbenchClient.deployProject(REPOSITORY_NAME, projectName);
+        workbenchClient.createSpace(SPACE_NAME, workbenchDeployment.getUsername());
+        workbenchClient.cloneRepository(SPACE_NAME, cloneProjectRequest);
+        workbenchClient.deployProject(SPACE_NAME, projectName);
+    }
+
+    private static CloneProjectRequest createCloneProjectRequest(String repositoryUrl, String projectName) {
+        CloneProjectRequest cloneProjectRequest = new CloneProjectRequest();
+        cloneProjectRequest.setGitURL(repositoryUrl);
+        cloneProjectRequest.setName(projectName);
+        return cloneProjectRequest;
     }
 
     public static void waitForContainerRegistration(KieServerControllerClient kieControllerClient, String serverTemplate, String containerId) {

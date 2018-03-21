@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.guvnor.rest.client.OrganizationalUnit;
+import org.guvnor.rest.client.Space;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -119,9 +119,9 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
 
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
-        workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
-        Collection<OrganizationalUnit> organizationalUnits = workbenchClient.getOrganizationalUnits();
-        Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_NAME))).isTrue();
+        workbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+        Collection<Space> spaces = workbenchClient.getSpaces();
+        Assertions.assertThat(spaces.stream().anyMatch(x -> x.getName().equals(SPACE_NAME))).isTrue();
 
         logger.debug("Scale workbench to 0");
         deploymentScenario.getWorkbenchDeployment().scale(0);
@@ -132,14 +132,14 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
 
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
-        workbenchClient.createOrganizationalUnit(ORGANIZATION_UNIT_SECOND_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
-        organizationalUnits = workbenchClient.getOrganizationalUnits();
-        Assertions.assertThat(organizationalUnits.stream().anyMatch(x -> x.getName().equals(ORGANIZATION_UNIT_SECOND_NAME))).isTrue();
+        workbenchClient.createSpace(SPACE_SECOND_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+        spaces = workbenchClient.getSpaces();
+        Assertions.assertThat(spaces.stream().anyMatch(x -> x.getName().equals(SPACE_SECOND_NAME))).isTrue();
     }
 
     @Test
     public void testKieServerReadinessProbe() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 

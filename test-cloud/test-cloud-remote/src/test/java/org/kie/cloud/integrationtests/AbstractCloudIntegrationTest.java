@@ -67,9 +67,8 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
 
     protected static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
-    protected static final String ORGANIZATION_UNIT_NAME = "myOrgUnit";
-    protected static final String ORGANIZATION_UNIT_SECOND_NAME = "myOrgUnitTwo";
-    protected static final String REPOSITORY_NAME = "myRepo";
+    protected static final String SPACE_NAME = "mySpace";
+    protected static final String SPACE_SECOND_NAME = "mySpaceTwo";
 
     protected static final String ORGANIZATIONAL_UNIT_REST_REQUEST = "rest/organizationalunits";
     protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";

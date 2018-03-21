@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.util.Collection;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,9 +34,11 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -48,8 +51,12 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.client.KieServerControllerClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KieServerWebSocketScalingIntegrationTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);
 
     private GenericScenario workbenchMonitoringScenario;
     private GenericScenario kieServerScenario;
@@ -79,28 +86,33 @@ public class KieServerWebSocketScalingIntegrationTest {
     public void setUp() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        DeploymentSettings workbenchMonitoringSettings = deploymentScenarioFactory.getWorkbenchMonitoringSettingsBuilder()
-                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                .build();
-        workbenchMonitoringScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withMonitoring(workbenchMonitoringSettings)
-                .build();
-        workbenchMonitoringScenario.deploy();
-        workbenchDeployment = workbenchMonitoringScenario.getWorkbenchDeployments().get(0);
+        try {
+            DeploymentSettings workbenchMonitoringSettings = deploymentScenarioFactory.getWorkbenchMonitoringSettingsBuilder()
+                    .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                    .build();
+            workbenchMonitoringScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                    .withMonitoring(workbenchMonitoringSettings)
+                    .build();
+            workbenchMonitoringScenario.deploy();
+            workbenchDeployment = workbenchMonitoringScenario.getWorkbenchDeployments().get(0);
 
-        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
-                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                .withControllerProtocol(Protocol.ws)
-                .withControllerConnection(workbenchDeployment.getWebSocketUri().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().getPort()))
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .withKieServerSyncDeploy(true)
-                .build();
-        kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerSettings)
-                .build();
-        kieServerScenario.deploy();
-        kieServerDeployment = kieServerScenario.getKieServerDeployments().get(0);
+            DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
+                    .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                    .withControllerProtocol(Protocol.ws)
+                    .withControllerConnection(workbenchDeployment.getWebSocketUri().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().getPort()))
+                    .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                    .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .withKieServerSyncDeploy(true)
+                    .build();
+            kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                    .withKieServer(kieServerSettings)
+                    .build();
+            kieServerScenario.deploy();
+            kieServerDeployment = kieServerScenario.getKieServerDeployments().get(0);
+        } catch (MissingResourceException e) {
+            logger.warn("Skipping test because of missing resource.", e);
+            Assume.assumeNoException(e);
+        }
 
         kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
