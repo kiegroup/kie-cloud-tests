@@ -26,6 +26,8 @@ public class ServiceUtil {
 
     private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhbacentr|-rhdmcentr)");
     private static final Pattern SECURE_WORKBENCH_REGEXP = Pattern.compile("secure-.*(-rhbacentr|-rhdmcentr)");
+    private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhbacentrmon");
+    private static final Pattern SECURE_WORKBENCH_MONITORING_REGEXP = Pattern.compile("secure-.*-rhbacentrmon");
     private static final Pattern KIE_SERVER_REGEXP = Pattern.compile("(?!secure-).*(-execserv|-kieserver)");
     private static final Pattern SECURE_KIE_SERVER_REGEXP = Pattern.compile("secure-.*(-execserv|-kieserver)");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
@@ -36,6 +38,14 @@ public class ServiceUtil {
 
     public static String getWorkbenchSecureServiceName(OpenShiftUtil util) {
         return getServiceName(util, SECURE_WORKBENCH_REGEXP);
+    }
+
+    public static String getWorkbenchMonitoringServiceName(OpenShiftUtil util) {
+        return getServiceName(util, WORKBENCH_MONITORING_REGEXP);
+    }
+
+    public static String getWorkbenchMonitoringSecureServiceName(OpenShiftUtil util) {
+        return getServiceName(util, SECURE_WORKBENCH_MONITORING_REGEXP);
     }
 
     public static String getKieServerServiceName(OpenShiftUtil util) {
