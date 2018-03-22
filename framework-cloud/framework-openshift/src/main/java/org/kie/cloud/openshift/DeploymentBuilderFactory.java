@@ -19,6 +19,7 @@ import cz.xtf.openshift.OpenShiftUtil;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabasePersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
@@ -29,6 +30,7 @@ import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
@@ -61,11 +63,17 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     }
 
     @Override
+    public WorkbenchKieServerDatabasePersistentScenarioBuilder getWorkbenchKieServerDatabasePersistentScenarioBuilder() {
+        return new WorkbenchKieServerDatabasePersistentScenarioBuilderImpl();
+    }
+
+    @Override
     public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder() {
         return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl();
     }
 
-    @Override public KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder() {
+    @Override
+    public KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder() {
         return new KieServerWithExternalDatabaseScenarioBuilderImpl();
     }
 
