@@ -24,6 +24,7 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_PWD = "KIE_SERVER_PWD";
     public static final String KIE_SERVER_HOST = "KIE_SERVER_HOST";
     public static final String KIE_SERVER_PORT = "KIE_SERVER_PORT";
+    public static final String KIE_SERVER_ID = "KIE_SERVER_ID";
 
     public static final String KIE_SERVER_PERSISTENCE_DIALECT = "KIE_SERVER_PERSISTENCE_DIALECT";
     public static final String KIE_SERVER_PERSISTENCE_DS = "KIE_SERVER_PERSISTENCE_DS";

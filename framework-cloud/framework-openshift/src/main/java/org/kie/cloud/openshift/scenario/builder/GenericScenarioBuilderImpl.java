@@ -26,17 +26,11 @@ import org.kie.cloud.openshift.scenario.GenericScenarioImpl;
 
 public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
 
-    private List<DeploymentSettings> kieServerSettingsList;
-    private List<DeploymentSettings> workbenchSettingsList;
-    private List<DeploymentSettings> monitoringSettingsList;
-    private List<DeploymentSettings> smartRouterSettingsList;
-
-    public GenericScenarioBuilderImpl() {
-        this.kieServerSettingsList = new ArrayList<>();
-        this.workbenchSettingsList = new ArrayList<>();
-        this.monitoringSettingsList = new ArrayList<>();
-        this.smartRouterSettingsList = new ArrayList<>();
-    }
+    private List<DeploymentSettings>
+            kieServerSettingsList = new ArrayList<>(),
+            workbenchSettingsList = new ArrayList<>(),
+            monitoringSettingsList = new ArrayList<>(),
+            smartRouterSettingsList = new ArrayList<>();
 
     @Override
     public GenericScenario build() {
