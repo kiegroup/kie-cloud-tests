@@ -23,16 +23,12 @@ import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabasePersistentSc
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerDatabasePersistentScenarioImpl;
 
-/**
- *
- * @author jschwan
- */
+
 public class WorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements WorkbenchKieServerDatabasePersistentScenarioBuilder {
 
-    private Map<String, String> envVariables;
+    private Map<String, String> envVariables = new HashMap<>();
 
     public WorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
-        this.envVariables = new HashMap<String, String>();
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
