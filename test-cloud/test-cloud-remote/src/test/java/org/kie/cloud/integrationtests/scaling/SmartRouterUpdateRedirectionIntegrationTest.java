@@ -38,7 +38,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 
-public class SmartRouterUpdateRedirection extends AbstractCloudIntegrationTest<GenericScenario> {
+public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
 
     private static final int RETRIES_NUMBER = 5;
 
