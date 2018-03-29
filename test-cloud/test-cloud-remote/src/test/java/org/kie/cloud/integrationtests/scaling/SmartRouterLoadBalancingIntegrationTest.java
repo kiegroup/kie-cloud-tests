@@ -39,7 +39,7 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-public class SmartRouterLoadBalancing extends
+public class SmartRouterLoadBalancingIntegrationTest extends
         AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
 
     private KieServerControllerClient kieControllerClient;
