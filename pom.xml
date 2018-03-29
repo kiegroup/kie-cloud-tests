@@ -35,6 +35,7 @@
     <version.kubernetes-client>3.0.3</version.kubernetes-client>
     <version.kubernetes-model>2.0.4</version.kubernetes-model>
     <version.org.apache.maven.shared>1.5</version.org.apache.maven.shared>
+    <version.org.apache.maven.failsafe>2.21.0</version.org.apache.maven.failsafe>
   </properties>
 
   <repositories>
@@ -161,4 +162,16 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${version.org.apache.maven.failsafe}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
