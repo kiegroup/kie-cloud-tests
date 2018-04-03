@@ -24,10 +24,10 @@ import io.fabric8.kubernetes.api.model.Service;
 
 public class ServiceUtil {
 
-    private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhbacentr|-rhdmcentr)");
-    private static final Pattern SECURE_WORKBENCH_REGEXP = Pattern.compile("secure-.*(-rhbacentr|-rhdmcentr)");
-    private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhbacentrmon");
-    private static final Pattern SECURE_WORKBENCH_MONITORING_REGEXP = Pattern.compile("secure-.*-rhbacentrmon");
+    private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhpamcentr|-rhdmcentr)");
+    private static final Pattern SECURE_WORKBENCH_REGEXP = Pattern.compile("secure-.*(-rhpamcentr|-rhdmcentr)");
+    private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhpamcentrmon");
+    private static final Pattern SECURE_WORKBENCH_MONITORING_REGEXP = Pattern.compile("secure-.*-rhpamcentrmon");
     private static final Pattern KIE_SERVER_REGEXP = Pattern.compile("(?!secure-).*(-execserv|-kieserver)");
     private static final Pattern SECURE_KIE_SERVER_REGEXP = Pattern.compile("secure-.*(-execserv|-kieserver)");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");

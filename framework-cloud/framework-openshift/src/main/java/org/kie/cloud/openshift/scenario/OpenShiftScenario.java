@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.scenario;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import org.kie.cloud.api.deployment.Deployment;
@@ -22,7 +23,9 @@ import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +54,11 @@ public abstract class OpenShiftScenario implements DeploymentScenario {
         logger.info("Creating project " + projectName);
         project = OpenShiftController.createProject(projectName);
 
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppSecret());
-        project.createResources(OpenShiftConstants.getKieAppSecret());
+        logger.info("Creating Business Central secrets from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftTemplateConstants.SECRET_NAME, "businesscentral-app-secret"));
 
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppWorkbenchSecret());
-        project.createResources(OpenShiftConstants.getKieAppWorkbenchSecret());
-
-        logger.info("Creating secrets from " + OpenShiftConstants.getKieAppKieServerSecret());
-        project.createResources(OpenShiftConstants.getKieAppKieServerSecret());
+        logger.info("Creating Kie server secrets from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftTemplateConstants.SECRET_NAME, "kieserver-app-secret"));
 
         logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
         project.createResources(OpenShiftConstants.getKieImageStreams());

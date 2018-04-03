@@ -22,7 +22,6 @@
     <openshift.password>redhat</openshift.password>
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
-    <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
     <!-- Templates and Secrets are specified in specific properties files. Path is relative to submodules of this module. -->
     <kie.app.jbpm.secrets>${project.parent.build.resources[0].directory}/jbpm-app-secret.properties</kie.app.jbpm.secrets>
     <kie.app.drools.secrets>${project.parent.build.resources[0].directory}/drools-app-secret.properties</kie.app.drools.secrets>
@@ -87,8 +86,6 @@
               <openshift.username>${openshift.username}</openshift.username>
               <openshift.password>${openshift.password}</openshift.password>
               <kie.app.secret>${kie.app.secret}</kie.app.secret>
-              <kie.app.workbench.secret>${kie.app.workbench.secret}</kie.app.workbench.secret>
-              <kie.app.kie-server.secret>${kie.app.kie-server.secret}</kie.app.kie-server.secret>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <!-- All templates have to be passed as properties to failsafe plugin. -->
               <kie.app.template.workbench>${kie.app.template.workbench}</kie.app.template.workbench>
