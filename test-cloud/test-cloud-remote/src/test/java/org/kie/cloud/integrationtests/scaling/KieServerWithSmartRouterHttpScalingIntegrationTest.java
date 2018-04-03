@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
@@ -74,6 +75,7 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
     }
 
     @Test
+    @Ignore("[RHBA-638] Missing configuration for Controller in S2I templates - configuration in Scenario")
     public void testConnectionBetweenDeployables() {
         String kieServerId = getKieServerId(kieServerClient);
 

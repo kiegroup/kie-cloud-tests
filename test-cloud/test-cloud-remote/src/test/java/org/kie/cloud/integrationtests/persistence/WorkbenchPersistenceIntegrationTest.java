@@ -30,6 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
@@ -67,12 +68,12 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
 
         WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                 .build();
-        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
+        WorkbenchKieServerDatabasePersistentScenario workbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabasePersistentScenarioBuilder()
                 .build();
 
         return Arrays.asList(new Object[][]{
             {"Workbench + KIE Server", workbenchKieServerScenario},
-            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
+            {"Workbench + KIE Server + Database - Persistent", workbenchKieServerDatabasePersistentScenario}
         });
     }
 

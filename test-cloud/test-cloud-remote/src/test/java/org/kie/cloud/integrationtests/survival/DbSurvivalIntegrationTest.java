@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
@@ -40,7 +40,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabaseScenario> {
+public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabasePersistentScenario> {
 
     private KieServerControllerClient kieServerControllerClient;
     protected KieServicesClient kieServicesClient;
@@ -49,8 +49,8 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<Work
     private static final Logger logger = LoggerFactory.getLogger(DbSurvivalIntegrationTest.class);
 
     @Override
-    protected WorkbenchKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
+    protected WorkbenchKieServerDatabasePersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchKieServerDatabasePersistentScenarioBuilder().build();
     }
 
     @Before

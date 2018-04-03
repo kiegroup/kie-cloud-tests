@@ -50,10 +50,12 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift resource file containing Kie server keystore for HTTPS communication.
      */
     public static final String KIE_APP_KIE_SERVER_SECRET = "kie.app.kie-server.secret";
+
     /**
      * URL pointing to OpenShift resource file containing image streams with all available images.
      */
     public static final String KIE_IMAGE_STREAMS = "kie.image.streams";
+
     /**
      * URL pointing to OpenShift template file containing Workbench and Kie server.
      */
@@ -63,9 +65,14 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE = "kie.app.template.workbench.kie-server.database";
     /**
+     * URL pointing to OpenShift template file containing Workbench, Kie server and database.
+     */
+    public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT = "kie.app.template.workbench.kie-server.database.persistent";
+    /**
      * URL pointing to OpenShift template file containing Kie server and external database.
      */
     public static final String KIE_APP_TEMPLATE_KIE_SERVER_DATABASE_EXTERNAL = "kie.app.template.kie-server.database.external";
+
     /**
      * URL pointing to OpenShift template file containing just Kie server.
      */
@@ -82,6 +89,7 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift template file containing Kie server and database.
      */
     public static final String KIE_APP_TEMPLATE_KIE_SERVER_DATABASE = "kie.app.template.kie-server.database";
+
     /**
      * URL pointing to OpenShift template file containing Workbench monitoring console and Smart router.
      */
@@ -90,10 +98,12 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift template file containing Workbench monitoring console.
      */
     public static final String KIE_APP_TEMPLATE_CONSOLE = "kie.app.template.workbench-monitoring";
+
     /**
      * URL pointing to OpenShift template file containing Smart router.
      */
     public static final String KIE_APP_TEMPLATE_SMARTROUTER = "kie.app.template.smartrouter";
+
     /**
      * URL pointing to OpenShift template file containing Workbench.
      */

@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -130,6 +131,7 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     @Test
     @Category(JBPMOnly.class)
+    @Ignore("[RHBA-638] Missing configuration for Controller in S2I templates")
     public void testConnectionBetweenDeployables() {
         scaleKieServerTo(3);
 

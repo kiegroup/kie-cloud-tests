@@ -137,6 +137,7 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends Op
         WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl(project);
         workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
+        workbenchRuntimeDeployment.setServiceName(OpenShiftConstants.getKieApplicationName());
 
         return workbenchRuntimeDeployment;
     }

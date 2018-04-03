@@ -94,6 +94,7 @@
               <kie.app.template.workbench>${kie.app.template.workbench}</kie.app.template.workbench>
               <kie.app.template.workbench.kie-server>${kie.app.template.workbench.kie-server}</kie.app.template.workbench.kie-server>
               <kie.app.template.workbench.kie-server.database>${kie.app.template.workbench.kie-server.database}</kie.app.template.workbench.kie-server.database>
+              <kie.app.template.workbench.kie-server.database.persistent>${kie.app.template.workbench.kie-server.database.persistent}</kie.app.template.workbench.kie-server.database.persistent>
               <kie.app.template.kie-server>${kie.app.template.kie-server}</kie.app.template.kie-server>
               <kie.app.template.kie-server-https-s2i>${kie.app.template.kie-server-https-s2i}</kie.app.template.kie-server-https-s2i>
               <kie.app.template.kie-server-basic-s2i>${kia.app.template.kie-server-basic-s2i}</kie.app.template.kie-server-basic-s2i>

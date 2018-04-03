@@ -24,17 +24,13 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
-import java.util.function.BooleanSupplier;
 
 import cz.xtf.openshift.OpenShiftUtil;
-import cz.xtf.wait.WaitUtil;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 
 import java.time.Duration;
 import org.kie.cloud.api.deployment.Deployment;
-import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -118,45 +114,21 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void waitForScale() {
-        waitUntilAllPodsAreReady();
-        waitUntilAllPodsAreRunning();
+        waitUntilAllPodsAreReadyAndRunning();
     }
 
-    private void waitUntilAllPodsAreReady() {
+    private void waitUntilAllPodsAreReadyAndRunning() {
         int expectedPods = util.getDeploymentConfig(getServiceName()).getSpec().getReplicas().intValue();
 
-        BooleanSupplier arePodsReady = () -> {
-            List<Pod> pods = util.getLabeledPods(Collections.singletonMap(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName()));
+        util.waiters()
+                .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                .assertEventually("Pods for service " + getServiceName() + " are not ready.");
 
-            if (pods.size() == expectedPods) {
-                return pods.stream().allMatch(WaitUtil::isPodReady);
-            } else {
-                return false;
-            }
-        };
-
-        try {
-            WaitUtil.waitFor(arePodsReady, null, WaitUtil.DEFAULT_WAIT_INTERVAL, OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Exception while waiting for scale.");
-        } catch (TimeoutException e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
-        }
-    }
-
-    private void waitUntilAllPodsAreRunning() {
-        BooleanSupplier arePodsRunning = () -> {
-            List<Pod> pods = util.getLabeledPods(Collections.singletonMap(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName()));
-            return pods.stream().allMatch(WaitUtil::isPodRunning);
-        };
-
-        try {
-            WaitUtil.waitFor(arePodsRunning, null, WaitUtil.DEFAULT_WAIT_INTERVAL, OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Exception while waiting for scale.");
-        } catch (TimeoutException e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
-        }
+        util.waiters()
+                .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                .assertEventually("Pods for service " + getServiceName() + " are not runnning.");
     }
 
     @Override
