@@ -82,7 +82,7 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
     }
 
     public void setServiceName(String applicationName) {
-        this.serviceName = applicationName + "-rhbacentrmon";
+        this.serviceName = applicationName + "-rhpamcentrmon";
     }
 
     public String getSecureServiceName() {
@@ -93,7 +93,7 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
     }
 
     public void setSecureServiceName(String applicationName) {
-        this.secureServiceName = "secure-" + applicationName + "-rhbacentrmon";
+        this.secureServiceName = "secure-" + applicationName + "-rhpamcentrmon";
     }
 
     @Override public void waitForScale() {

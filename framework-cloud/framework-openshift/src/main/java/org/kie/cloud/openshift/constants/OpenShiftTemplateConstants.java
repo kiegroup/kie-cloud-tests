@@ -79,4 +79,5 @@ public class OpenShiftTemplateConstants {
     public static final String CONTEXT_DIR = "CONTEXT_DIR";
     public static final String ARTIFACT_DIR = "ARTIFACT_DIR";
 
+    public static final String SECRET_NAME = "SECRET_NAME";
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
@@ -66,6 +67,7 @@ public class SmartRouterLoadBalancingIntegrationTest extends
     }
 
     @Test
+    @Ignore("[RHBA-638] Missing configuration for Controller in S2I templates - configuration in Scenario")
     public void testRouterLoadBalancing() {
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(
                 deploymentScenario.getWorkbenchRuntimeDeployment());

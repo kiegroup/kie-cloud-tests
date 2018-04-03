@@ -36,7 +36,9 @@ public enum OpenShiftTemplate {
     KIE_SERVER_HTTPS_S2I(OpenShiftConstants.KIE_APP_TEMPLATE_KIE_SERVER_HTTPS_S2I),
     KIE_SERVER_BASIC_S2I(OpenShiftConstants.KIE_APP_TEMPLATE_KIE_SERVER_BASIC_S2I),
     WORKBENCH(OpenShiftConstants.KIE_APP_TEMPLATE_WORKBENCH),
-    SMARTROUTER(OpenShiftConstants.KIE_APP_TEMPLATE_SMARTROUTER);
+    SMARTROUTER(OpenShiftConstants.KIE_APP_TEMPLATE_SMARTROUTER),
+    // Special template containing secret file.
+    SECRET(OpenShiftConstants.KIE_APP_SECRET);
 
     private String templateSystemPropertyKey;
 
