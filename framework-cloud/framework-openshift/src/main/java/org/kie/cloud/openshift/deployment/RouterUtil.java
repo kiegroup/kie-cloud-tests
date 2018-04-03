@@ -17,7 +17,7 @@ package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.io.IOUtils;
@@ -33,16 +33,16 @@ public class RouterUtil {
     private static final int ROUTER_CODE = 503;
     private static final String ROUTER_MESSAGE = "The application is currently not serving requests at this endpoint. It may not have been started or is still starting.";
     private static final long ROUTER_WAIT_ITERATION_TIME = 250;
-    private static final Duration ROUTER_WAIT_TIME = Duration.of(5, ChronoUnit.SECONDS);
+    private static final Duration ROUTER_WAIT_TIME = Duration.of(30, ChronoUnit.SECONDS);
 
     private static final Logger logger = LoggerFactory.getLogger(RouterUtil.class);
 
     public static void waitForRouter(URL url) {
-        LocalDateTime endTime = LocalDateTime.now().plus(ROUTER_WAIT_TIME);
+        Instant endTime = Instant.now().plus(ROUTER_WAIT_TIME);
 
         logger.info("Waiting for router to expose url: {}", url.toString());
 
-        while (LocalDateTime.now().isBefore(endTime)) {
+        while (Instant.now().isBefore(endTime)) {
             try {
                 HttpGet request = new HttpGet(url.toString());
                 HttpClient client = HttpClientBuilder.create().build();
@@ -63,5 +63,7 @@ public class RouterUtil {
                 throw new RuntimeException("Error waiting for router", e);
             }
         }
+
+        logger.warn("Timeout while waiting for router to expose url: {}. The URL is unreachable.", url.toString());
     }
 }
