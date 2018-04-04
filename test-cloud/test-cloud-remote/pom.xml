@@ -81,10 +81,6 @@
               <kjars.build.settings.xml>${kjars.build.settings.xml}</kjars.build.settings.xml>
               <instance.logs>${project.build.directory}/instances</instance.logs>
             </systemProperties>
-            <parallel>suitesAndClasses</parallel>
-            <threadCountClasses>3</threadCountClasses>
-            <threadCountSuites>2</threadCountSuites>
-            <perCoreThreadCount>false</perCoreThreadCount>
           </configuration>
         </plugin>
       </plugins>
@@ -110,6 +106,25 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+    </profile>
+    <profile>
+      <id>parallel</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <parallel>suitesAndClasses</parallel>
+                <threadCountClasses>3</threadCountClasses>
+                <threadCountSuites>2</threadCountSuites>
+                <perCoreThreadCount>false</perCoreThreadCount>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 </project>
