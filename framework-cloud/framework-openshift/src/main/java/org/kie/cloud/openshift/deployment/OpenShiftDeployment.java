@@ -31,6 +31,7 @@ import io.fabric8.kubernetes.api.model.Service;
 
 import java.time.Duration;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -120,15 +121,19 @@ public abstract class OpenShiftDeployment implements Deployment {
     private void waitUntilAllPodsAreReadyAndRunning() {
         int expectedPods = util.getDeploymentConfig(getServiceName()).getSpec().getReplicas().intValue();
 
-        util.waiters()
-                .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
-                .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                .assertEventually("Pods for service " + getServiceName() + " are not ready.");
+        try {
+            util.waiters()
+                    .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                    .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                    .assertEventually("Pods for service " + getServiceName() + " are not ready.");
 
-        util.waiters()
-                .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
-                .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                .assertEventually("Pods for service " + getServiceName() + " are not runnning.");
+            util.waiters()
+                    .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                    .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                    .assertEventually("Pods for service " + getServiceName() + " are not runnning.");
+        } catch (AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
+        }
     }
 
     @Override
