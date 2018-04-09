@@ -77,9 +77,6 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
         WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
@@ -101,7 +98,6 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {"Workbench + KIE Server", workbenchKieServerScenario},
             {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
             {"KIE Server", kieServerScenario},
             {"KIE Server HTTPS S2I", kieServerS2Iscenario}

@@ -70,11 +70,9 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder().build();
         WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
 
         return Arrays.asList(new Object[][]{
-            {"Workbench + KIE Server", workbenchKieServerScenario},
             {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
            });
     }

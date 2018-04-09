@@ -17,6 +17,9 @@ package org.kie.cloud.openshift.constants;
 
 public class OpenShiftTemplateConstants {
 
+    // Used as a generic password for all passwords in the template (Workbench user, Kie server user, Controller user, Workbench maven user)
+    public static final String DEFAULT_PASSWORD = "DEFAULT_PASSWORD";
+
     public static final String KIE_ADMIN_USER = "KIE_ADMIN_USER";
     public static final String KIE_ADMIN_PWD = "KIE_ADMIN_PWD";
 
