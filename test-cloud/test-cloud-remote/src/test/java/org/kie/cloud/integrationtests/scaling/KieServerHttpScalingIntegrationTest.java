@@ -50,7 +50,7 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
     @Override
     protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl())
                 .build();
     }
 

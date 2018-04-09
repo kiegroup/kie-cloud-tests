@@ -66,13 +66,10 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
-                .build();
         WorkbenchKieServerDatabasePersistentScenario workbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabasePersistentScenarioBuilder()
                 .build();
 
         return Arrays.asList(new Object[][]{
-            {"Workbench + KIE Server", workbenchKieServerScenario},
             {"Workbench + KIE Server + Database - Persistent", workbenchKieServerDatabasePersistentScenario}
         });
     }

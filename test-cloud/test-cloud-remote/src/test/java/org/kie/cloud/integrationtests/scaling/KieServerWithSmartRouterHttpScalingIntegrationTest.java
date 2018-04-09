@@ -132,11 +132,9 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
         Configuration routerConfig = smartRouterAdminClient.getRouterConfig();
 
         assertThat(routerConfig.getHostsPerServer()).containsKey(kieServerId);
-        // TODO: Commented until "Duplicate Kie server registration" issue gets resolved
-//        assertThat(routerConfig.getHostsPerServer().get(kieServerId)).hasSize(numberOfKieServers);
+        assertThat(routerConfig.getHostsPerServer().get(kieServerId)).hasSize(numberOfKieServers);
         assertThat(routerConfig.getHostsPerContainer()).containsKey(CONTAINER_ID);
-        // TODO: Commented until "Duplicate Kie server registration" issue gets resolved
-//        assertThat(routerConfig.getHostsPerContainer().get(CONTAINER_ID)).hasSize(numberOfKieServers);
+        assertThat(routerConfig.getHostsPerContainer().get(CONTAINER_ID)).hasSize(numberOfKieServers);
         assertThat(routerConfig.getContainerInfosPerContainer()).containsKey(CONTAINER_ID);
     }
 

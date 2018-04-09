@@ -30,13 +30,9 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
 
     public WorkbenchKieServerScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
-        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
 
-        // By default use Workbench as maven repo, repo URL is derived from Workbench automatically if not defined
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
+        envVariables.put(OpenShiftTemplateConstants.DEFAULT_PASSWORD, DeploymentConstants.getWorkbenchPassword());
     }
 
     @Override
@@ -45,10 +41,8 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     }
 
     @Override
-    public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
+    public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
 
