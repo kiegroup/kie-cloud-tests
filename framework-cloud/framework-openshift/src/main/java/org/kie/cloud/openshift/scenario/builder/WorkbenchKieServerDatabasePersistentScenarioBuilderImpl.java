@@ -33,10 +33,6 @@ public class WorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements 
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
-
-        // By default use Workbench as maven repo, repo URL is derived from Workbench automatically if not defined
-        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
-        this.envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
     }
 
     @Override
@@ -45,10 +41,9 @@ public class WorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements 
     }
 
     @Override
-    public WorkbenchKieServerDatabasePersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
+    public WorkbenchKieServerDatabasePersistentScenarioBuilder withExternalMavenRepo(String repoUrl) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+        // Maven username and password is currently hardcoded as KIE_ADMIN_USER and KIE_ADMIN_PWD until RHDM-319 is fixed.
         return this;
     }
 }
