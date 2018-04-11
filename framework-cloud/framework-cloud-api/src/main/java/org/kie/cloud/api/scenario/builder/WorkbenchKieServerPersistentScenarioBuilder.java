@@ -15,9 +15,9 @@
  */
 package org.kie.cloud.api.scenario.builder;
 
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 
-public interface WorkbenchKieServerDatabasePersistentScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchKieServerDatabasePersistentScenario> {
+public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchKieServerPersistentScenario> {
     /**
      * Return setup builder with additional configuration of external maven
      * repo.
@@ -25,5 +25,5 @@ public interface WorkbenchKieServerDatabasePersistentScenarioBuilder extends Dep
      * @param repoUrl Maven repo URL.
      * @return Builder with configured external maven repo.
      */
-    WorkbenchKieServerDatabasePersistentScenarioBuilder withExternalMavenRepo(String repoUrl);
+    WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl);
 }

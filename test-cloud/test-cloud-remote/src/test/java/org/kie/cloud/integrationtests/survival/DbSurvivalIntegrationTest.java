@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -50,7 +51,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<Work
 
     @Override
     protected WorkbenchKieServerDatabasePersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerDatabasePersistentScenarioBuilder().build();
+        throw new RuntimeException("No deployment scenario with persistent database currently available.");
     }
 
     @Before
@@ -67,6 +68,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<Work
     }
 
     @Test
+    @Ignore("No deployment scenario with persistent database currently available.")
     public void reconnectionDbTest() {
         logger.debug("Register Kie Container to Kie Server");
         KieServerInfo serverInfo = kieServicesClient.getServerInfo().getResult();
