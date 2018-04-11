@@ -28,6 +28,7 @@ import java.util.List;
 import cz.xtf.openshift.OpenShiftUtil;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.openshift.api.model.Route;
 
 import java.time.Duration;
 import org.kie.cloud.api.deployment.Deployment;
@@ -184,7 +185,11 @@ public abstract class OpenShiftDeployment implements Deployment {
             String defaultRoutingSubdomain = DeploymentConstants.getDefaultDomainSuffix();
             routeHost = getServiceName() + "-" + getNamespace() + defaultRoutingSubdomain;
         } else {
-            routeHost = util.getRoute(serviceName).getSpec().getHost();
+            Route route = util.getRoute(serviceName);
+            if (route == null) {
+                throw new RuntimeException("Route with name " + serviceName + " not found.");
+            }
+            routeHost = route.getSpec().getHost();
         }
         String uriValue = protocol + "://" + routeHost + ":" + retrievePort(protocol);
 
