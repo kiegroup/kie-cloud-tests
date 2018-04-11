@@ -79,8 +79,6 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void scale(int instances) {
         util.client().deploymentConfigs().inNamespace(getNamespace()).withName(getServiceName()).scale(instances, true);
-        // Wait flag while scaling of deployment config doesn't seem to work correctly, use own waiting functionality
-        waitForScale();
     }
 
     @Override
