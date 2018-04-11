@@ -56,10 +56,12 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift template file containing Workbench, Kie server and database.
      */
     public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE = "kie.app.template.workbench.kie-server.database";
+
     /**
-     * URL pointing to OpenShift template file containing Workbench, Kie server and database.
+     * URL pointing to OpenShift template file containing Workbench and Kie server.
      */
-    public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT = "kie.app.template.workbench.kie-server.database.persistent";
+    public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER_PERSISTENT = "kie.app.template.workbench.kie-server.persistent";
+
     /**
      * URL pointing to OpenShift template file containing Kie server and external database.
      */

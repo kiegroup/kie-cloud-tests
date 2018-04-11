@@ -20,32 +20,30 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.kie.cloud.api.deployment.DatabaseDeployment;
+
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftScenario implements WorkbenchKieServerDatabasePersistentScenario {
+public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario implements WorkbenchKieServerPersistentScenario {
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
-    private DatabaseDeploymentImpl databaseDeployment;
 
     private Map<String, String> envVariables;
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerDatabasePersistentScenarioImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerPersistentScenarioImpl.class);
 
-    public WorkbenchKieServerDatabasePersistentScenarioImpl(Map<String, String> envVariables) {
+    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables) {
         this.envVariables = envVariables;
     }
 
@@ -53,9 +51,9 @@ public class WorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftS
     public void deploy() {
         super.deploy();
 
-        logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl().toString());
+        logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
-        project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl(), envVariables);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
@@ -65,8 +63,6 @@ public class WorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftS
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
-        databaseDeployment = new DatabaseDeploymentImpl(project);
-
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
 
@@ -75,9 +71,6 @@ public class WorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftS
 
         logger.info("Waiting for Kie server to register itself to the Workbench.");
         KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment, 1);
-
-        logger.info("Waiting for Database deployment to become ready.");
-        databaseDeployment.waitForScale();
 
         logNodeNameOfAllInstances();
 
@@ -96,13 +89,8 @@ public class WorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftS
     }
 
     @Override
-    public DatabaseDeployment getDatabaseDeployment() {
-        return databaseDeployment;
-    }
-
-    @Override
     public List<Deployment> getDeployments() {
-        return Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment);
+        return Arrays.asList(workbenchDeployment, kieServerDeployment);
     }
 
     private void storeProjectInfoToPersistentVolume(Deployment deployment, String persistentVolumeMountPath) {

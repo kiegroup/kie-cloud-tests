@@ -18,17 +18,17 @@ package org.kie.cloud.openshift.scenario.builder;
 import java.util.HashMap;
 import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabasePersistentScenario;
-import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabasePersistentScenarioBuilder;
+import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.scenario.WorkbenchKieServerDatabasePersistentScenarioImpl;
+import org.kie.cloud.openshift.scenario.WorkbenchKieServerPersistentScenarioImpl;
 
 
-public class WorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements WorkbenchKieServerDatabasePersistentScenarioBuilder {
+public class WorkbenchKieServerPersistentScenarioBuilderImpl implements WorkbenchKieServerPersistentScenarioBuilder {
 
     private Map<String, String> envVariables = new HashMap<>();
 
-    public WorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
+    public WorkbenchKieServerPersistentScenarioBuilderImpl() {
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         this.envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
@@ -36,12 +36,12 @@ public class WorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements 
     }
 
     @Override
-    public WorkbenchKieServerDatabasePersistentScenario build() {
-        return new WorkbenchKieServerDatabasePersistentScenarioImpl(envVariables);
+    public WorkbenchKieServerPersistentScenario build() {
+        return new WorkbenchKieServerPersistentScenarioImpl(envVariables);
     }
 
     @Override
-    public WorkbenchKieServerDatabasePersistentScenarioBuilder withExternalMavenRepo(String repoUrl) {
+    public WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
         // Maven username and password is currently hardcoded as KIE_ADMIN_USER and KIE_ADMIN_PWD until RHDM-319 is fixed.
         return this;
