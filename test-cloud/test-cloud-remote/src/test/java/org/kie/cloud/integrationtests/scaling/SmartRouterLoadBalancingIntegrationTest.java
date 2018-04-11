@@ -80,6 +80,7 @@ public class SmartRouterLoadBalancingIntegrationTest extends
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
         deploymentScenario.getKieServerDeployment().scale(2);
+        deploymentScenario.getKieServerDeployment().waitForScale();
 
         kieServerClientRouter = KieServerClientProvider.getSmartRouterClient(
                 deploymentScenario.getSmartRouterDeployment(),
