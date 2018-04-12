@@ -58,14 +58,14 @@ public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractCloudIn
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        DeploymentSettings kieServer1 = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
+        DeploymentSettings kieServer1 = deploymentScenarioFactory.getKieServerDatabaseSettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                 .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withKieServerSyncDeploy(true)
                 .withApplicationName("kie-server-1")
                 .withSmartRouterConnection(smartRouterHostname, smartRouterPort)
                 .build();
-        DeploymentSettings kieServer2 = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
+        DeploymentSettings kieServer2 = deploymentScenarioFactory.getKieServerDatabaseSettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                 .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withKieServerSyncDeploy(true)
@@ -74,6 +74,7 @@ public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractCloudIn
                 .build();
         DeploymentSettings smartRouter = deploymentScenarioFactory.getSmartRouterSettingsBuilder()
                 .withHostame(smartRouterHostname)
+                .withSmartRouterExternalUrl("http://" + smartRouterHostname + ":" + smartRouterPort)
                 .build();
 
         return deploymentScenarioFactory.getGenericScenarioBuilder()

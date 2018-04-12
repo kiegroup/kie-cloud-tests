@@ -22,6 +22,7 @@ import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.ControllerDeployment;
 
 /**
  * Cloud deployment scenario representation.
@@ -81,4 +82,13 @@ public interface DeploymentScenario {
      * @see SmartRouterDeployment
      */
     List<SmartRouterDeployment> getSmartRouterDeployments();
+
+    /**
+     * Return List of all Controller deployments. If there aren't any
+     * deployment, then is returned empty list.
+     *
+     * @return ControllerDeployments
+     * @see ControllerDeployment
+     */
+    List<ControllerDeployment> getControllerDeployments();
 }

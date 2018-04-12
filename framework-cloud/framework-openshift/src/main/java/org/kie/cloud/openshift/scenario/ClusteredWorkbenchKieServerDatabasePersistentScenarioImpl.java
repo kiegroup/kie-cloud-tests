@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.kie.cloud.api.deployment.ControllerDeployment;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
@@ -115,6 +116,11 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
 
     @Override
     public List<SmartRouterDeployment> getSmartRouterDeployments() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
     }
 }

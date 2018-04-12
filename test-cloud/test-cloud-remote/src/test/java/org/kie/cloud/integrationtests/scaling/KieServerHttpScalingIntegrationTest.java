@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.integrationtests.scaling;
 
+import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
@@ -23,8 +24,15 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
@@ -42,16 +50,51 @@ import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+@RunWith(Parameterized.class)
+public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+
+    @Parameterized.Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameterized.Parameter(value = 1)
+    public DeploymentScenario deploymentScenario;
 
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
 
-    @Override
-    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl())
                 .build();
+
+        DeploymentSettings controllerSettings = deploymentScenarioFactory.getControllerSettingsBuilder()
+                .withApplicationName("standalone")
+                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                .withKieServerUser(DeploymentConstants.getKieServerUser(), DeploymentConstants.getKieServerPassword())
+                .build();
+        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerDatabaseSettingsBuilder()
+                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
+                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withControllerConnection("standalone-controller")
+                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
+                .build();
+        GenericScenario controllerAndKieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+                .withKieServer(kieServerSettings)
+                .withController(controllerSettings)
+                .build();
+
+        return Arrays.asList(new Object[][]{
+            {"Workbench + KIE Server", workbenchKieServerScenario},
+            {"Controller + KIE Server", controllerAndKieServerScenario}
+        });
+    }
+
+    @Override
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenario;
     }
 
     @BeforeClass
@@ -61,8 +104,12 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
 
     @Before
     public void setUp() {
-        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        if(deploymentScenario.getControllerDeployments().isEmpty()) {
+            kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployments().get(0));
+        } else {
+            kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getControllerDeployments().get(0));
+        }
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
     }
 
     @Test
@@ -114,12 +161,12 @@ public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegratio
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
         // Wait until container is started in Kie server
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployments().get(0), CONTAINER_ID);
         WorkbenchUtils.waitForContainerRegistration(kieControllerClient, serverInfo.getServerId(), CONTAINER_ID);
     }
 
     private void scaleKieServerTo(int count) {
-        deploymentScenario.getKieServerDeployment().scale(count);
-        deploymentScenario.getKieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerDeployments().get(0).scale(count);
+        deploymentScenario.getKieServerDeployments().get(0).waitForScale();
     }
 }
