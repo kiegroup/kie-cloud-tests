@@ -85,11 +85,9 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractCloudIntegra
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
-        KieServerS2ISettingsBuilder kieServerBasicS2ISettings = deploymentScenarioFactory.getKieServerBasicS2ISettingsBuilder();
 
         return Arrays.asList(new Object[][]{
-            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings},
-            {"KIE Server Basic S2I", kieServerBasicS2ISettings}
+            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings}
         });
     }
 

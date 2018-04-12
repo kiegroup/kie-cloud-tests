@@ -36,29 +36,35 @@ import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.kie.cloud.api.deployment.ControllerDeployment;
+import org.kie.cloud.openshift.deployment.ControllerDeploymentImpl;
 
 public class GenericScenarioImpl extends OpenShiftScenario implements GenericScenario {
 
     private List<WorkbenchDeployment> workbenchDeployments;
     private List<KieServerDeployment> kieServerDeployments;
     private List<SmartRouterDeployment> smartRouterDeployments;
+    private List<ControllerDeployment> controllerDeployments;
 
     private List<DeploymentSettings> kieServerSettingsList;
     private List<DeploymentSettings> workbenchSettingsList;
     private List<DeploymentSettings> monitoringSettingsList;
     private List<DeploymentSettings> smartRouterSettingsList;
+    private List<DeploymentSettings> controllerSettingsList;
 
     private static final Logger logger = LoggerFactory.getLogger(GenericScenarioImpl.class);
 
-    public GenericScenarioImpl(List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList, List<DeploymentSettings> monitoringSettingsList, List<DeploymentSettings> smartRouterSettingsList) {
+    public GenericScenarioImpl(List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList, List<DeploymentSettings> monitoringSettingsList, List<DeploymentSettings> smartRouterSettingsList, List<DeploymentSettings> controllerSettingsList) {
         this.kieServerSettingsList = kieServerSettingsList;
         this.workbenchSettingsList = workbenchSettingsList;
         this.monitoringSettingsList = monitoringSettingsList;
         this.smartRouterSettingsList = smartRouterSettingsList;
+        this.controllerSettingsList = controllerSettingsList;
 
         workbenchDeployments = new ArrayList<>();
         kieServerDeployments = new ArrayList<>();
         smartRouterDeployments = new ArrayList<>();
+        controllerDeployments = new ArrayList<>();
     }
 
     @Override
@@ -77,6 +83,11 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
     }
 
     @Override
+    public List<ControllerDeployment> getControllerDeployments() {
+        return controllerDeployments;
+    }
+
+    @Override
     public String getNamespace() {
         return projectName;
     }
@@ -86,6 +97,7 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         super.deploy();
 
         workbenchDeployments.clear();
+        controllerDeployments.clear();
         kieServerDeployments.clear();
         smartRouterDeployments.clear();
 
@@ -97,6 +109,11 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         for (DeploymentSettings monitoringSettings : monitoringSettingsList) {
             deployTemplateWithSettings(project, monitoringSettings);
             workbenchDeployments.add(createWorkbenchMonitoringDeployment(project, monitoringSettings));
+        }
+
+        for (DeploymentSettings controllerSettings : controllerSettingsList) {
+            deployTemplateWithSettings(project, controllerSettings);
+            controllerDeployments.add(createControllerDeployment(project, controllerSettings));
         }
 
         for (DeploymentSettings smartRouterSettings : smartRouterSettingsList) {
@@ -112,6 +129,10 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         logger.info("Waiting for Workbench deployment to become ready.");
         for (WorkbenchDeployment workbenchDeployment : workbenchDeployments) {
             workbenchDeployment.waitForScale();
+        }
+        logger.info("Waiting for Controller deployment to become ready.");
+        for(ControllerDeployment controllerDeployment : controllerDeployments) {
+            controllerDeployment.waitForScale();
         }
         logger.info("Waiting for Kie server deployment to become ready.");
         for (KieServerDeployment kieServerDeployment : kieServerDeployments) {
@@ -135,6 +156,7 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         deployments.addAll(workbenchDeployments);
         deployments.addAll(kieServerDeployments);
         deployments.addAll(smartRouterDeployments);
+        deployments.addAll(controllerDeployments);
         return deployments;
     }
 
@@ -142,6 +164,7 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
         kieServerDeployment.setPassword(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword()));
+        kieServerDeployment.scale(1);
 
         return kieServerDeployment;
     }
@@ -150,6 +173,7 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         WorkbenchDeploymentImpl workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
         workbenchDeployment.setPassword(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()));
+        workbenchDeployment.scale(1);
 
         return workbenchDeployment;
     }
@@ -158,6 +182,7 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         WorkbenchRuntimeDeploymentImpl monitoringDeployment = new WorkbenchRuntimeDeploymentImpl(project);
         monitoringDeployment.setUsername(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
         monitoringDeployment.setPassword(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()));
+        monitoringDeployment.scale(1);
 
         return monitoringDeployment;
     }
@@ -165,8 +190,18 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
     private SmartRouterDeployment createSmartRouterDeployment(Project project, DeploymentSettings deploymentSettings) {
         SmartRouterDeploymentImpl smartRouterDeployment = new SmartRouterDeploymentImpl(project);
         smartRouterDeployment.setServiceName(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.APPLICATION_NAME, OpenShiftConstants.getKieApplicationName()));
+        smartRouterDeployment.scale(1);
 
         return smartRouterDeployment;
+    }
+
+    private ControllerDeployment createControllerDeployment(Project project, DeploymentSettings deploymentSettings) {
+        ControllerDeploymentImpl controllerDeployment = new ControllerDeploymentImpl(project);
+        controllerDeployment.setUsername(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
+        controllerDeployment.setPassword(deploymentSettings.getEnvVariables().getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword()));
+        controllerDeployment.scale(1);
+
+        return controllerDeployment;
     }
 
 }

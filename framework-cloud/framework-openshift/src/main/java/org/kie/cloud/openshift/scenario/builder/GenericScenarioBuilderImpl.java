@@ -30,11 +30,12 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
             kieServerSettingsList = new ArrayList<>(),
             workbenchSettingsList = new ArrayList<>(),
             monitoringSettingsList = new ArrayList<>(),
-            smartRouterSettingsList = new ArrayList<>();
+            smartRouterSettingsList = new ArrayList<>(),
+            controllerSettingsList = new ArrayList<>();
 
     @Override
     public GenericScenario build() {
-        return new GenericScenarioImpl(kieServerSettingsList, workbenchSettingsList, monitoringSettingsList, smartRouterSettingsList);
+        return new GenericScenarioImpl(kieServerSettingsList, workbenchSettingsList, monitoringSettingsList, smartRouterSettingsList, controllerSettingsList);
     }
 
     @Override
@@ -67,4 +68,9 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
         return this;
     }
 
+    @Override
+    public GenericScenarioBuilder withController(DeploymentSettings controllerSettings) {
+        controllerSettingsList.add(controllerSettings);
+        return this;
+    }
 }

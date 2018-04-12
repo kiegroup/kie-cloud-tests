@@ -65,6 +65,7 @@ public class OpenShiftTemplateConstants {
     public static final String DBE_USERNAME = "DBE_USERNAME";
     public static final String DBE_PASSWORD = "DBE_PASSWORD";
 
+    public static final String CONTROLLER_HOSTNAME_HTTP = "CONTROLLER_HOSTNAME_HTTP";
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTP = "BUSINESS_CENTRAL_HOSTNAME_HTTP";
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";
     public static final String EXECUTION_SERVER_HOSTNAME_HTTP = "EXECUTION_SERVER_HOSTNAME_HTTP";

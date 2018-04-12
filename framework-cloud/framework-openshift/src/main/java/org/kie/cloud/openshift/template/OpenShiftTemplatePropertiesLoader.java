@@ -42,8 +42,8 @@ class OpenShiftTemplatePropertiesLoader {
             addPropertiesFromResource(generalTemplates);
         }
 
-        // TODO uncomment when Jakub's PR merged
-        //addPropertiesFromResource("single-jbpm-templates.properties");
+        // Load custom signle testing templates
+        addPropertiesFromResource("single-jbpm-templates.properties");
     }
 
     private static void addPropertiesFromResource(String resourceFilename) {

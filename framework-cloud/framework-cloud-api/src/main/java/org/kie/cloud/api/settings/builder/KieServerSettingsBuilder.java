@@ -162,4 +162,12 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @return
      */
     KieServerSettingsBuilder withSecuredHostame(String https);
+
+    /**
+     * Return configured builder with set Kie server HTTPS secret.
+     *
+     * @param secret
+     * @return Builder
+     */
+    KieServerSettingsBuilder withKieServerSecret(String secret);
 }

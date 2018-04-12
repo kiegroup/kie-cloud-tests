@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.kie.cloud.api.deployment.ControllerDeployment;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -113,6 +114,11 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
 
     @Override
     public List<SmartRouterDeployment> getSmartRouterDeployments() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
     }
 }

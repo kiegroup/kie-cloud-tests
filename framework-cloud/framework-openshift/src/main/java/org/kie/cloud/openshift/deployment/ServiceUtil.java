@@ -24,10 +24,15 @@ import io.fabric8.kubernetes.api.model.Service;
 
 public class ServiceUtil {
 
+    private static final Pattern CONTROLLER_REGEXP = Pattern.compile("(?!secure-).*-controller");
     private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhpamcentr|-rhdmcentr)");
     private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhpamcentrmon");
     private static final Pattern KIE_SERVER_REGEXP = Pattern.compile("(?!secure-).*(-execserv|-kieserver)");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
+
+    public static String getControllerServiceName(OpenShiftUtil util) {
+        return getServiceName(util, CONTROLLER_REGEXP);
+    }
 
     public static String getWorkbenchServiceName(OpenShiftUtil util) {
         return getServiceName(util, WORKBENCH_REGEXP);

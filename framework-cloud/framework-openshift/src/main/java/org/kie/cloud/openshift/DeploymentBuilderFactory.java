@@ -24,6 +24,7 @@ import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioB
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
+import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
@@ -36,8 +37,9 @@ import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseSce
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerBasicS2ISettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.ControllerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.KieServerDatabaseSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderImpl;
@@ -95,13 +97,18 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     }
 
     @Override
-    public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
-        return new KieServerHttpsS2ISettingsBuilderImpl();
+    public KieServerSettingsBuilder getKieServerDatabaseSettingsBuilder() {
+        return new KieServerDatabaseSettingsBuilderImpl();
     }
 
     @Override
-    public KieServerS2ISettingsBuilder getKieServerBasicS2ISettingsBuilder() {
-        return new KieServerBasicS2ISettingsBuilderImpl();
+    public ControllerSettingsBuilder getControllerSettingsBuilder() {
+        return new ControllerSettingsBuilderImpl();
+    }
+
+    @Override
+    public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
+        return new KieServerHttpsS2ISettingsBuilderImpl();
     }
 
     @Override

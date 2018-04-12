@@ -61,4 +61,11 @@ public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<Generi
      */
     GenericScenarioBuilder withSmartRouter(DeploymentSettings smartRouterSettings);
 
+    /**
+     * Return scenario Builder with added Controller deployment into scenario.
+     *
+     * @param controllerSettings
+     * @return Builder
+     */
+    GenericScenarioBuilder withController(DeploymentSettings controllerSettings);
 }

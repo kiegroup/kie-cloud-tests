@@ -100,20 +100,11 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .withKieServer(kieServerSettings)
                 .build();
 
-        DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-        GenericScenario kieServerS2Iscenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerS2ISettings)
-                .build();
-
         return Arrays.asList(new Object[][]{
             {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario},
             {"KIE Server", kieServerScenario},
-            {"KIE Server + Database", kieServerDatabaseScenario},
-            {"KIE Server HTTPS S2I", kieServerS2Iscenario}
+            {"KIE Server + Database", kieServerDatabaseScenario}
         });
     }
 

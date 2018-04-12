@@ -194,4 +194,12 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return Builder
      */
     KieServerS2ISettingsBuilder withDroolsServerFilterClasses(boolean droolsFilter);
+
+    /**
+     * Return configured builder with set Kie server HTTPS secret.
+     *
+     * @param secret
+     * @return Builder
+     */
+    KieServerS2ISettingsBuilder withKieServerSecret(String secret);
 }
