@@ -41,7 +41,6 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.util.HttpsUtils;
 import org.kie.cloud.maven.MavenDeployer;
@@ -116,44 +115,46 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
 
     @Test
     public void testKieServerInfo() {
-        final KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
-        final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
-                kieServerDeployment.getPassword());
-        try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-            try (CloseableHttpResponse response = httpClient.execute(serverInforRequest(kieServerDeployment))) {
+        for (final KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
+            final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
+                    kieServerDeployment.getPassword());
+            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider);
+                 CloseableHttpResponse response = httpClient.execute(serverInforRequest(kieServerDeployment))) {
+
                 Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
                 final String responseContent = HttpsUtils.readResponseContent(response);
                 ServiceResponse<KieServerInfo> kieServerInfoServiceResponse = marshaller.unmarshall(responseContent, ServiceResponse.class);
                 KieServerInfo kieServerInfo = kieServerInfoServiceResponse.getResult();
                 Assertions.assertThat(kieServerInfo.getCapabilities()).contains(KieServerConstants.CAPABILITY_BRM);
+            } catch (Exception e) {
+                logger.error("Unable to connect to KIE server REST API", e);
+                throw new RuntimeException("Unable to connect to KIE server REST API", e);
             }
-        } catch (Exception e) {
-            logger.error("Unable to connect to KIE server REST API", e);
-            throw new RuntimeException("Unable to connect to KIE server REST API", e);
         }
     }
 
     @Test
     public void testDeployContainer() {
-        final KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
-        final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
-                kieServerDeployment.getPassword());
-        try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-            try (CloseableHttpResponse response = httpClient.execute(createContainerRequest(kieServerDeployment, CONTAINER_ID, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION))) {
-                Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
-            }
+        for (final KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
+            final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
+                    kieServerDeployment.getPassword());
+            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
+                try (CloseableHttpResponse response = httpClient.execute(createContainerRequest(kieServerDeployment, CONTAINER_ID, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION))) {
+                    Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
+                }
 
-            try (CloseableHttpResponse response = httpClient.execute(getContainersRequest(kieServerDeployment))) {
-                Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                try (CloseableHttpResponse response = httpClient.execute(getContainersRequest(kieServerDeployment))) {
+                    Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
-                final String responseContent = HttpsUtils.readResponseContent(response);
-                final List<String> containers = parseListContainersResponse(responseContent);
-                Assertions.assertThat(containers).contains(CONTAINER_ID);
+                    final String responseContent = HttpsUtils.readResponseContent(response);
+                    final List<String> containers = parseListContainersResponse(responseContent);
+                    Assertions.assertThat(containers).contains(CONTAINER_ID);
+                }
+            } catch (Exception e) {
+                logger.error("Unable to connect to KIE server REST API", e);
+                throw new RuntimeException("Unable to connect to KIE server REST API", e);
             }
-        } catch (Exception e) {
-            logger.error("Unable to connect to KIE server REST API", e);
-            throw new RuntimeException("Unable to connect to KIE server REST API", e);
         }
     }
 
