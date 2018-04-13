@@ -88,6 +88,12 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift template file containing Workbench monitoring console and Smart router.
      */
     public static final String KIE_APP_TEMPLATE_CONSOLE_SMARTROUTER = "kie.app.template.workbench-monitoring.smartrouter";
+
+    /**
+     * URL pointing to OpenShift template file containing Workbench monitoring console Smart router, two Kie servers and two databases.
+     */
+    public static final String CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES = "kie.app.template.workbench-monitoring.smartrouter.two-kieservers.two-databases";
+
     /**
      * URL pointing to OpenShift template file containing Workbench monitoring console.
      */

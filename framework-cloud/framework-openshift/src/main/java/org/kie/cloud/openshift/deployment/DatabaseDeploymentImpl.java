@@ -27,6 +27,7 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     private String databaseName;
     private URL url;
     private String serviceName;
+    private String serviceSuffix = "";
 
     public DatabaseDeploymentImpl(Project project) {
         super(project);
@@ -63,6 +64,10 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
         return password;
     }
 
+    public void setServiceSuffix(String serviceSuffix) {
+        this.serviceSuffix = serviceSuffix;
+    }
+
     @Override
     public String getDatabaseName() {
         return databaseName;
@@ -71,7 +76,7 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getDatabaseServiceName(getOpenShiftUtil());
+            serviceName = ServiceUtil.getDatabaseServiceName(getOpenShiftUtil(), serviceSuffix);
         }
         return serviceName;
     }

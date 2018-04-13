@@ -41,6 +41,7 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.util.HttpsUtils;
 import org.kie.cloud.maven.MavenDeployer;
@@ -80,6 +81,10 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
+        WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
         DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                 .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
@@ -98,6 +103,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
 
         return Arrays.asList(new Object[][]{
             {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
+            {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"KIE Server", kieServerScenario},
             {"KIE Server HTTPS S2I", kieServerS2Iscenario}
         });

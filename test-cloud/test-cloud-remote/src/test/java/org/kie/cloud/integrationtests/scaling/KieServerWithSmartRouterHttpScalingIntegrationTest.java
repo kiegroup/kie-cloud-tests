@@ -22,10 +22,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
@@ -47,7 +46,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 
-public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
+public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
     private static final String SMART_ROUTER_ID = "test-kie-router";
 
     private KieServerControllerClient kieControllerClient;
@@ -55,8 +54,8 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
     private KieServerRouterClient smartRouterAdminClient;
 
     @Override
-    protected WorkbenchRuntimeSmartRouterKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder()
+    protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withSmartRouterId(SMART_ROUTER_ID)
                 .build();
@@ -70,12 +69,11 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
     @Before
     public void setUp() {
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
         smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment());
     }
 
     @Test
-    @Ignore("[RHBA-638] Missing configuration for Controller in S2I templates - configuration in Scenario")
     public void testConnectionBetweenDeployables() {
         String kieServerId = getKieServerId(kieServerClient);
 
@@ -142,7 +140,7 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
         // Wait until container is started in Kie server
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerOneDeployment(), CONTAINER_ID);
         // Wait until container is registered in Smart router
         SmartRouterUtils.waitForContainerStart(smartRouterAdminClient, CONTAINER_ID);
         // Wait until container is registered in Workbench under Smart router server template
@@ -151,7 +149,7 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
     }
 
     private void scaleKieServerTo(int count) {
-        deploymentScenario.getKieServerDeployment().scale(count);
-        deploymentScenario.getKieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerOneDeployment().scale(count);
+        deploymentScenario.getKieServerOneDeployment().waitForScale();
     }
 }

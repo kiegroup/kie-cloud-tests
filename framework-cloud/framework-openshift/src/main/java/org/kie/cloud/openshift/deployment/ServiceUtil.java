@@ -48,16 +48,16 @@ public class ServiceUtil {
         return getServiceName(util, SECURE_WORKBENCH_MONITORING_REGEXP);
     }
 
-    public static String getKieServerServiceName(OpenShiftUtil util) {
-        return getServiceName(util, KIE_SERVER_REGEXP);
+    public static String getKieServerServiceName(OpenShiftUtil util, String suffix) {
+        return getServiceName(util, Pattern.compile(KIE_SERVER_REGEXP.pattern() + suffix));
     }
 
-    public static String getKieServerSecureServiceName(OpenShiftUtil util) {
-        return getServiceName(util, SECURE_KIE_SERVER_REGEXP);
+    public static String getKieServerSecureServiceName(OpenShiftUtil util, String suffix) {
+        return getServiceName(util, Pattern.compile(SECURE_KIE_SERVER_REGEXP.pattern() + suffix));
     }
 
-    public static String getDatabaseServiceName(OpenShiftUtil util) {
-        return getServiceName(util, DATABASE_REGEXP);
+    public static String getDatabaseServiceName(OpenShiftUtil util, String suffix) {
+        return getServiceName(util, Pattern.compile(DATABASE_REGEXP.pattern() + suffix));
     }
 
     private static String getServiceName(OpenShiftUtil util, Pattern regexp) {
