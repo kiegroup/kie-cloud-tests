@@ -99,6 +99,7 @@
               <kie.app.template.kie-server.database.external>${kie.app.template.kie-server.database.external}</kie.app.template.kie-server.database.external>
               <kie.app.template.workbench-monitoring>${kie.app.template.workbench-monitoring}</kie.app.template.workbench-monitoring>
               <kie.app.template.workbench-monitoring.smartrouter>${kie.app.template.workbench-monitoring.smartrouter}</kie.app.template.workbench-monitoring.smartrouter>
+              <kie.app.template.workbench-monitoring.smartrouter.two-kieservers.two-databases>${kie.app.template.workbench-monitoring.smartrouter.two-kieservers.two-databases}</kie.app.template.workbench-monitoring.smartrouter.two-kieservers.two-databases>
               <kie.app.template.smartrouter>${kie.app.template.smartrouter}</kie.app.template.smartrouter>
               <db.hostname>${db.hostname}</db.hostname>
               <db.port>${db.port}</db.port>

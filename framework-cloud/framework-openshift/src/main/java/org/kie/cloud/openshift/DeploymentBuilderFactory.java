@@ -23,6 +23,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBu
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
@@ -34,6 +35,7 @@ import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScen
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerBasicS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
@@ -70,6 +72,11 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     @Override
     public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder() {
         return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl();
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder() {
+        return new WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl();
     }
 
     @Override

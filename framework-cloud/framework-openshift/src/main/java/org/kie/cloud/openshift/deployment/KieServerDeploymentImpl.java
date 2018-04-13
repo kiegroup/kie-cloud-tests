@@ -29,6 +29,7 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
 
     private String serviceName;
     private String secureServiceName;
+    private String serviceSuffix = "";
 
     public KieServerDeploymentImpl(Project project) {
         super(project);
@@ -64,17 +65,21 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         this.password = password;
     }
 
+    public void setServiceSuffix(String serviceSuffix) {
+        this.serviceSuffix = serviceSuffix;
+    }
+
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getKieServerServiceName(getOpenShiftUtil());
+            serviceName = ServiceUtil.getKieServerServiceName(getOpenShiftUtil(), serviceSuffix);
         }
         return serviceName;
     }
 
     public String getSecureServiceName() {
         if (secureServiceName == null) {
-            secureServiceName = ServiceUtil.getKieServerSecureServiceName(getOpenShiftUtil());
+            secureServiceName = ServiceUtil.getKieServerSecureServiceName(getOpenShiftUtil(), serviceSuffix);
         }
         return secureServiceName;
     }
