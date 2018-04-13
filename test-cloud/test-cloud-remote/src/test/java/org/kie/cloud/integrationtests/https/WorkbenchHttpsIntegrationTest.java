@@ -42,20 +42,21 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.util.HttpsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegrationTest<WorkbenchKieServerScenario> {
+public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegrationTest<DeploymentScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public WorkbenchKieServerScenario workbenchKieServerScenario;
+    public DeploymentScenario workbenchScenario;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchHttpsIntegrationTest.class);
 
@@ -78,58 +79,60 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
     }
 
     @Override
-    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return workbenchKieServerScenario;
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return workbenchScenario;
     }
 
     @Test
     public void testLoginScreen() throws InterruptedException {
-        final URL url = deploymentScenario.getWorkbenchDeployment().getSecureUrl();
-        logger.debug("Test login screen on url {}", url.toString());
+        for (final WorkbenchDeployment workbenchDeployment : deploymentScenario.getWorkbenchDeployments()) {
+            final URL url = workbenchDeployment.getSecureUrl();
+            logger.debug("Test login screen on url {}", url.toString());
 
-        try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient()) {
             final HttpGet httpGet = new HttpGet(url.toString());
-            try (final CloseableHttpResponse response = httpClient.execute(httpGet)) {
+            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient();
+                final CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 // Test that login screen is available
                 assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
                 String responseContent = HttpsUtils.readResponseContent(response);
                 assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
+            } catch (IOException e) {
+                logger.error("Error in downloading workbench login screen using secure connection", e);
+                fail("Error in downloading workbench login screen using secure connection", e);
             }
-        } catch (IOException e) {
-            logger.error("Error in downloading workbench login screen using secure connection", e);
-            fail("Error in downloading workbench login screen using secure connection", e);
         }
     }
 
     @Test
     public void testSecureRest() {
-        try {
-            CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(deploymentScenario.getWorkbenchDeployment().getUsername(),
-                    deploymentScenario.getWorkbenchDeployment().getPassword());
-            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-                // Create server template using REST API
-                assertThat(createServerTemplate(SERVER_ID, httpClient)).isTrue();
+        for (final WorkbenchDeployment workbenchDeployment : deploymentScenario.getWorkbenchDeployments()) {
+            try {
+                CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
+                try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
+                    // Create server template using REST API
+                    assertThat(createServerTemplate(SERVER_ID, httpClient, workbenchDeployment.getSecureUrl())).isTrue();
 
-                // Check that server template exists
-                assertThat(serverTemplateExists(SERVER_ID, httpClient)).isTrue();
+                    // Check that server template exists
+                    assertThat(serverTemplateExists(SERVER_ID, httpClient, workbenchDeployment.getSecureUrl())).isTrue();
+                }
+            } catch (IOException e) {
+                logger.error("Unable to connect to workbench REST API", e);
+                throw new RuntimeException("Unable to connect to workbench REST API", e);
             }
-        } catch (IOException e) {
-            logger.error("Unable to connect to workbench REST API", e);
-            throw new RuntimeException("Unable to connect to workbench REST API", e);
         }
     }
 
-    private boolean createServerTemplate(String name, CloseableHttpClient httpClient) {
-        try (CloseableHttpResponse response = httpClient.execute(serverTemplateCreateRequest(name))) {
+    private boolean createServerTemplate(String serverTemplateName, CloseableHttpClient httpClient, URL secureWorkbenchUrl) {
+        try (CloseableHttpResponse response = httpClient.execute(serverTemplateCreateRequest(secureWorkbenchUrl, serverTemplateName))) {
             return (response.getStatusLine().getStatusCode() == HttpsURLConnection.HTTP_CREATED);
         } catch (Exception e) {
             throw new RuntimeException("Error creating new server template", e);
         }
     }
 
-    private boolean serverTemplateExists(String name, CloseableHttpClient httpClient) {
-        try (final CloseableHttpResponse response = httpClient.execute(serverTemplatesListRequest(name))) {
+    private boolean serverTemplateExists(String serverTemplateName, CloseableHttpClient httpClient, URL secureWorkbenchUrl) {
+        try (final CloseableHttpResponse response = httpClient.execute(serverTemplatesListRequest(secureWorkbenchUrl))) {
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
 
             String responseContent = HttpsUtils.readResponseContent(response);
@@ -140,18 +143,18 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
             return StreamSupport.stream(serverTemplatesJsonArray.spliterator(), false)
                     .map(x -> x.getAsJsonObject())
                     .map(o -> o.get(SERVER_ID_PARAMETER).getAsString())
-                    .anyMatch(s -> s.equals(name));
+                    .anyMatch(s -> s.equals(serverTemplateName));
         } catch (Exception e) {
             throw new RuntimeException("Can not obtain list of server templates", e);
         }
     }
 
-    private HttpPut serverTemplateCreateRequest(String name) {
+    private HttpPut serverTemplateCreateRequest(URL secureWorkbenchUrl, String serverTemplateName) {
         try {
-            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), "rest/controller/management/servers/" + name);
+            final URL url = new URL(secureWorkbenchUrl, "rest/controller/management/servers/" + serverTemplateName);
             final HttpPut request = new HttpPut(url.toString());
             request.setHeader("Content-Type", "application/json");
-            request.setEntity(new StringEntity(createServerTemplateJson(name)));
+            request.setEntity(new StringEntity(createServerTemplateJson(serverTemplateName)));
 
             return request;
         } catch (Exception e) {
@@ -159,9 +162,9 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
         }
     }
 
-    private HttpGet serverTemplatesListRequest(String name) {
+    private HttpGet serverTemplatesListRequest(URL secureWorkbenchUrl) {
         try {
-            final URL url = new URL(deploymentScenario.getWorkbenchDeployment().getSecureUrl(), "rest/controller/management/servers");
+            final URL url = new URL(secureWorkbenchUrl, "rest/controller/management/servers");
             final HttpGet request = new HttpGet(url.toString());
             request.setHeader("Content-Type", "application/json");
 
@@ -171,9 +174,9 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
         }
     }
 
-    private String createServerTemplateJson(String name) {
+    private String createServerTemplateJson(String serverTemplateName) {
         JsonObject serverTemplate = new JsonObject();
-        serverTemplate.addProperty(SERVER_ID_PARAMETER, name);
+        serverTemplate.addProperty(SERVER_ID_PARAMETER, serverTemplateName);
         serverTemplate.addProperty(SERVER_NAME_PARAMETER, SERVER_NAME);
 
         Gson gson = new Gson();
