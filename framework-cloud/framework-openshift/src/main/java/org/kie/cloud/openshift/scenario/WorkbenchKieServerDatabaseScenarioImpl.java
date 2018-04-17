@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.scenario;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -104,7 +105,9 @@ public class WorkbenchKieServerDatabaseScenarioImpl extends OpenShiftScenario im
 
     @Override
     public List<Deployment> getDeployments() {
-        return Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment);
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment));
+        deployments.removeAll(Collections.singleton(null));
+        return deployments;
     }
 
     private void storeProjectInfoToPersistentVolume(Deployment deployment, String persistentVolumeMountPath) {

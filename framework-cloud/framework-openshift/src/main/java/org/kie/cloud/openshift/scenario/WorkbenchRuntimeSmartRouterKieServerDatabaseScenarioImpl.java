@@ -15,7 +15,9 @@
 
 package org.kie.cloud.openshift.scenario;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +132,9 @@ public class WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioImpl extends Op
 
     @Override
     public List<Deployment> getDeployments() {
-        return Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerDeployment, databaseDeployment);
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerDeployment, databaseDeployment));
+        deployments.removeAll(Collections.singleton(null));
+        return deployments;
     }
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {

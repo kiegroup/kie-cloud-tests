@@ -16,6 +16,7 @@
 package org.kie.cloud.api;
 
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
@@ -37,6 +38,7 @@ public interface DeploymentScenarioBuilderFactory {
     WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder();
     WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder();
     KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder();
+    KieServerWithDatabaseScenarioBuilder getKieServerWithDatabaseScenarioBuilder();
     GenericScenarioBuilder getGenericScenarioBuilder();
 
     KieServerSettingsBuilder getKieServerSettingsBuilder();

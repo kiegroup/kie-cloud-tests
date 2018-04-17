@@ -36,6 +36,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
@@ -74,10 +75,15 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
         WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl())
                 .build();
+
         WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
         WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        KieServerWithDatabaseScenario kieServerDatabaseScenario = deploymentScenarioFactory.getKieServerWithDatabaseScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
@@ -110,6 +116,7 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
             {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
             {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"KIE Server", kieServerScenario},
+            {"KIE Server + Database", kieServerDatabaseScenario},
             {"KIE Server HTTPS S2I", kieServerHttpsS2Iscenario},
             {"KIE Server Basic S2I", kieServerBasicS2Iscenario}
         });
