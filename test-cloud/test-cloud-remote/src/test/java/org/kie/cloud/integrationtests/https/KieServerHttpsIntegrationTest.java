@@ -40,6 +40,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
@@ -85,6 +86,10 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
+        KieServerWithDatabaseScenario kieServerDatabaseScenario = deploymentScenarioFactory.getKieServerWithDatabaseScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
         DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                 .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
@@ -105,6 +110,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
             {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
             {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"KIE Server", kieServerScenario},
+            {"KIE Server + Database", kieServerDatabaseScenario},
             {"KIE Server HTTPS S2I", kieServerS2Iscenario}
         });
     }

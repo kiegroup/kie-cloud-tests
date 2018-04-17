@@ -17,20 +17,28 @@ package org.kie.cloud.integrationtests.smoke;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
@@ -46,7 +54,14 @@ import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 
 @Category(Smoke.class)
+@RunWith(Parameterized.class)
 public class KieServerWithBuiltKjarIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
+    public DeploymentScenario kieServerScenario;
 
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
@@ -63,8 +78,15 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractCloudIntegrat
     private KieServicesClient kieServerClient;
     private RuleServicesClient ruleClient;
 
-    @Override
-    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        KieServerWithDatabaseScenario kieServerDatabaseScenario = deploymentScenarioFactory.getKieServerWithDatabaseScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                .build();
+
         DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                 .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
@@ -74,6 +96,14 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractCloudIntegrat
                 .withKieServer(kieServerSettings)
                 .build();
 
+        return Arrays.asList(new Object[][]{
+            {"KIE Server", kieServerScenario},
+            {"KIE Server + Database", kieServerDatabaseScenario},
+        });
+    }
+
+    @Override
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return kieServerScenario;
     }
 
