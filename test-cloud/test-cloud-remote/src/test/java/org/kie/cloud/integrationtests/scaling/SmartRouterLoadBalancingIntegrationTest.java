@@ -24,7 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
@@ -41,7 +41,7 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
 public class SmartRouterLoadBalancingIntegrationTest extends
-        AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
+        AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -50,10 +50,10 @@ public class SmartRouterLoadBalancingIntegrationTest extends
     private static final int PROCESS_NUMBER = 100;
     private static final String LOG_MESSAGE = "Log process was started";
 
-    @Override protected WorkbenchRuntimeSmartRouterKieServerDatabaseScenario createDeploymentScenario(
+    @Override protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(
             DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory
-                .getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder()
+                .getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .withExternalMavenRepo(
                         MavenConstants.getMavenRepoUrl(),
                         MavenConstants.getMavenRepoUser(),
@@ -67,25 +67,25 @@ public class SmartRouterLoadBalancingIntegrationTest extends
     }
 
     @Test
-    @Ignore("[RHBA-638] Missing configuration for Controller in S2I templates - configuration in Scenario")
+    @Ignore("https://issues.jboss.org/browse/RHPAM-740")
     public void testRouterLoadBalancing() {
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(
                 deploymentScenario.getWorkbenchRuntimeDeployment());
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(),
                 CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME,
                 DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerOneDeployment(), CONTAINER_ID);
 
-        deploymentScenario.getKieServerDeployment().scale(2);
-        deploymentScenario.getKieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerOneDeployment().scale(2);
+        deploymentScenario.getKieServerOneDeployment().waitForScale();
 
         kieServerClientRouter = KieServerClientProvider.getSmartRouterClient(
                 deploymentScenario.getSmartRouterDeployment(),
-                deploymentScenario.getKieServerDeployment().getUsername(),
-                deploymentScenario.getKieServerDeployment().getPassword());
+                deploymentScenario.getKieServerOneDeployment().getUsername(),
+                deploymentScenario.getKieServerOneDeployment().getPassword());
 
         ServiceResponse<KieServerInfo> kieServerInfo = kieServerClientRouter.getServerInfo();
         List<String> capabilities = kieServerInfo.getResult().getCapabilities();
@@ -102,7 +102,7 @@ public class SmartRouterLoadBalancingIntegrationTest extends
             processServicesClient.startProcess(CONTAINER_ID, LOG_PROCESS_ID);
         }
 
-        List<Instance> kieServerInstances = deploymentScenario.getKieServerDeployment().getInstances();
+        List<Instance> kieServerInstances = deploymentScenario.getKieServerOneDeployment().getInstances();
         for (Instance kieServerInstance : kieServerInstances) {
             Assertions.assertThat(StringUtils.countMatches(kieServerInstance.getLogs(), LOG_MESSAGE))
                     .isGreaterThan(PROCESS_NUMBER / 4);

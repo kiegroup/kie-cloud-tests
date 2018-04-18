@@ -21,9 +21,7 @@ import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -34,9 +32,7 @@ import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerBasicS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
@@ -62,18 +58,8 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     }
 
     @Override
-    public WorkbenchKieServerDatabaseScenarioBuilder getWorkbenchKieServerDatabaseScenarioBuilder() {
-        return new WorkbenchKieServerDatabaseScenarioBuilderImpl();
-    }
-
-    @Override
     public WorkbenchKieServerPersistentScenarioBuilder getWorkbenchKieServerPersistentScenarioBuilder() {
         return new WorkbenchKieServerPersistentScenarioBuilderImpl();
-    }
-
-    @Override
-    public WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder() {
-        return new WorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilderImpl();
     }
 
     @Override
