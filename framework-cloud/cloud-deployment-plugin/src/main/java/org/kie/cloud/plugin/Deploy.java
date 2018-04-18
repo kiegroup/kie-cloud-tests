@@ -40,7 +40,7 @@ import org.apache.maven.project.MavenProject;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 
 @Mojo(name = "deploy")
 public class Deploy extends AbstractMojo {
@@ -58,7 +58,7 @@ public class Deploy extends AbstractMojo {
 
         DeploymentScenarioBuilderFactory deploymentScenarioBuilderFactory = DeploymentScenarioBuilderFactoryLoader.getInstance(implementation);
 
-        WorkbenchKieServerDatabaseScenario scenario = deploymentScenarioBuilderFactory.getWorkbenchKieServerDatabaseScenarioBuilder().build();
+        WorkbenchKieServerScenario scenario = deploymentScenarioBuilderFactory.getWorkbenchKieServerScenarioBuilder().build();
         scenario.deploy();
         WorkbenchDeployment workbenchDeployment = scenario.getWorkbenchDeployment();
 

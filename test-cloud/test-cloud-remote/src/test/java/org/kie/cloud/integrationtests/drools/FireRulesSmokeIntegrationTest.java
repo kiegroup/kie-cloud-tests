@@ -39,7 +39,6 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
@@ -86,9 +85,6 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
         WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl())
                 .build();
-        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
 
         DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
                 .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
@@ -100,7 +96,6 @@ public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<
 
         return Arrays.asList(new Object[][]{
             {"Workbench + KIE Server", workbenchKieServerScenario},
-            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
             {"KIE Server", kieServerScenario}
         });
     }

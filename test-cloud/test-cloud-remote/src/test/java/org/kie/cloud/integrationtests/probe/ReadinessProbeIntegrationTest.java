@@ -40,7 +40,6 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
@@ -77,13 +76,9 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
         WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl())
                 .build();
-        WorkbenchKieServerDatabaseScenario workbenchKieServerDatabaseScenario = deploymentScenarioFactory.getWorkbenchKieServerDatabaseScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
 
         return Arrays.asList(new Object[][]{
             {"Workbench + KIE Server", workbenchKieServerScenario},
-            {"Workbench + KIE Server + Database", workbenchKieServerDatabaseScenario},
         });
     }
 

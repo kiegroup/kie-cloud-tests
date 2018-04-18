@@ -33,7 +33,7 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterKieServerDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
@@ -50,7 +50,7 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterKieServerDatabaseScenario> {
+public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(DroolsSessionFailoverIntegrationTest.class);
     private static final String SMART_ROUTER_ID = "test-kie-router";
@@ -71,8 +71,8 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     private static final String SLOW_RULE = "Slow rule executed";
 
     @Override
-    protected WorkbenchRuntimeSmartRouterKieServerDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterKieServerDatabaseScenarioBuilder()
+    protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withSmartRouterId(SMART_ROUTER_ID)
                 .build();
@@ -86,10 +86,10 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     @Before
     public void setUp() {
         kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
-        smartRouterServicesClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment().getUsername(), deploymentScenario.getKieServerDeployment().getPassword(), TimeUnit.MINUTES.toMillis(10));
+        smartRouterServicesClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment().getUsername(), deploymentScenario.getKieServerOneDeployment().getPassword(), TimeUnit.MINUTES.toMillis(10));
         smartRouterRuleServiceClient = smartRouterServicesClient.getServicesClient(RuleServicesClient.class);
 
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
 
         deploymentScenario.getSmartRouterDeployment().setRouterTimeout(Duration.ofMinutes(5));
     }
@@ -100,11 +100,11 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
         logger.debug("Register Kie Container to Kie Server");
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, RULE_PROJECT_NAME, RULE_PROJECT_VERSION, KieContainerStatus.STARTED);
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerOneDeployment(), CONTAINER_ID);
         WorkbenchUtils.waitForContainerRegistration(kieServerControllerClient, SMART_ROUTER_ID, CONTAINER_ID);
 
         logger.debug("Get Kie Server Instance");
-        Instance kieServerInstance = deploymentScenario.getKieServerDeployment().getInstances().iterator().next();
+        Instance kieServerInstance = deploymentScenario.getKieServerOneDeployment().getInstances().iterator().next();
 
         logger.debug("Set Batch command");
         List<Command<?>> commands = new ArrayList<Command<?>>();
@@ -137,7 +137,7 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
         assertThat(outcome.get(1)).startsWith(SLOW_RULE);
 
         logger.debug("Check Kie server deployment");
-        List<Instance> kieServerInstances = deploymentScenario.getKieServerDeployment().getInstances();
+        List<Instance> kieServerInstances = deploymentScenario.getKieServerOneDeployment().getInstances();
         assertThat(kieServerInstances).hasSize(2).doesNotContain(kieServerInstance);
         logger.debug("Check Kie server logs. Only one Kie server executed command.");
         assertThat(instanceLogContains(kieServerInstances.get(0), FAST_RULE, SLOW_RULE)).isNotEqualTo(instanceLogContains(kieServerInstances.get(1), FAST_RULE, SLOW_RULE));
@@ -155,14 +155,14 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     private Thread kieServerFailoverThread(Instance kieServerInstance) {
         return new Thread(() -> {
             logger.debug("Scale Kie server to 2");
-            deploymentScenario.getKieServerDeployment().scale(2);
+            deploymentScenario.getKieServerOneDeployment().scale(2);
             logger.debug("Wait for scale");
-            deploymentScenario.getKieServerDeployment().waitForScale();
+            deploymentScenario.getKieServerOneDeployment().waitForScale();
 
             logger.debug("Force delete (kill) Kie server instance.");
-            deploymentScenario.getKieServerDeployment().deleteInstances(kieServerInstance);
+            deploymentScenario.getKieServerOneDeployment().deleteInstances(kieServerInstance);
             logger.debug("Wait for scale");
-            deploymentScenario.getKieServerDeployment().waitForScale();
+            deploymentScenario.getKieServerOneDeployment().waitForScale();
         });
     }
 }
