@@ -44,6 +44,8 @@ public class DeploymentConstants implements Constants {
 
     public static final String DEFAULT_DOMAIN_SUFFIX = "default.domain.suffix";
 
+    public static final String KIE_ARTIFACT_VERSION = "kie.artifact.version";
+
     public static String getKieServerUser() {
         return System.getProperty(KIE_SERVER_USER);
     }
@@ -102,6 +104,10 @@ public class DeploymentConstants implements Constants {
 
     public static String getDefaultDomainSuffix() {
         return System.getProperty(DEFAULT_DOMAIN_SUFFIX);
+    }
+
+    public static String getKieArtifactVersion() {
+        return System.getProperty(KIE_ARTIFACT_VERSION);
     }
 
     @Override
