@@ -54,6 +54,8 @@
 
     <!-- This property can be overridden to exclude specific test category according to specific needs. -->
     <failsafe.excluded.groups/>
+
+    <kie.artifact.version>please-define-kie-artifact-version</kie.artifact.version> <!-- Version of Kie artifacts used in images. -->
   </properties>
 
   <modules>
@@ -124,6 +126,7 @@
               <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
+              <kie.artifact.version>${kie.artifact.version}</kie.artifact.version>
             </systemProperties>
           </configuration>
         </plugin>
