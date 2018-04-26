@@ -46,7 +46,7 @@ public abstract class AbstractCloudIntegrationTest {
 
     protected static final String ORGANIZATIONAL_UNIT_REST_REQUEST = "rest/organizationalunits";
     protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
-    protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
+    protected static final String KIE_CONTAINERS_REQUEST_URL = "services/rest/server/containers";
 
     // Path relative to target/classes folder
     protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";

@@ -42,6 +42,13 @@ public class DeploymentConstants implements Constants {
     public static final String DATABASE_USERNAME = "db.username";
     public static final String DATABASE_PASSWORD = "db.password";
 
+    public static final String SSO_ADMIN_USERNAME = "sso.admin.username";
+    public static final String SSO_ADMIN_PASSWORD = "sso.admin.password";
+    public static final String SSO_SERVICE_USERNAME =  "sso.service.username";
+    public static final String SSO_SERVICE_PASSWORD = "sso.service.password";
+
+    public static final String SSO_REALM = "sso.app.realm";
+
     public static final String DEFAULT_DOMAIN_SUFFIX = "default.domain.suffix";
 
     public static final String KIE_ARTIFACT_VERSION = "kie.artifact.version";
@@ -102,6 +109,25 @@ public class DeploymentConstants implements Constants {
         return System.getProperty(HIBERNATE_PERSISTENCE_DIALECT);
     }
 
+    public static String getSSOAdminUser() {
+        return System.getProperty(SSO_ADMIN_USERNAME);
+    }
+
+    public static String getSSOAdminPassword() {
+        return System.getProperty(SSO_ADMIN_PASSWORD);
+    }
+
+    public static String getSSOServiceUser() {
+        return System.getProperty(SSO_SERVICE_USERNAME);
+    }
+
+    public static String getSSOServicePassword() {
+        return System.getProperty(SSO_SERVICE_PASSWORD);
+    }
+
+    public static String gettSSORealm() {
+        return System.getProperty(SSO_REALM);
+    }
     public static String getDefaultDomainSuffix() {
         return System.getProperty(DEFAULT_DOMAIN_SUFFIX);
     }

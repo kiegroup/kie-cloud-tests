@@ -160,7 +160,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
 
         WebTarget target;
         try {
-            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl(), KIE_CONTAINER_REQUEST_URL);
+            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl(), KIE_CONTAINERS_REQUEST_URL);
             target = httpKieServerClient.target(url.toString());
         } catch (Exception e) {
             throw new RuntimeException("Error creating list container request.", e);

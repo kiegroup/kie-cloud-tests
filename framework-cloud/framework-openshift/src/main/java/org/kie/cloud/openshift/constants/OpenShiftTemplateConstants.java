@@ -75,6 +75,10 @@ public class OpenShiftTemplateConstants {
     public static final String EXECUTION_SERVER_HOSTNAME_HTTP = "EXECUTION_SERVER_HOSTNAME_HTTP";
     public static final String EXECUTION_SERVER_HOSTNAME_HTTPS = "EXECUTION_SERVER_HOSTNAME_HTTPS";
     public static final String SMART_ROUTER_HOSTNAME_HTTP = "SMART_ROUTER_HOSTNAME_HTTP";
+    public static final String EXECUTION_SERVER1_HOSTNAME_HTTP = "EXECUTION_SERVER1_HOSTNAME_HTTP";
+    public static final String EXECUTION_SERVER1_HOSTNAME_HTTPS = "EXECUTION_SERVER1_HOSTNAME_HTTP";
+    public static final String EXECUTION_SERVER2_HOSTNAME_HTTP = "EXECUTION_SERVER2_HOSTNAME_HTTP";
+    public static final String EXECUTION_SERVER2_HOSTNAME_HTTPS = "EXECUTION_SERVER2_HOSTNAME_HTTP";
 
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "KIE_SERVER_CONTAINER_DEPLOYMENT";
 
@@ -92,4 +96,27 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_HTTPS_SECRET = "KIE_SERVER_HTTPS_SECRET";
 
     public static final String TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL = "TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL";
+
+    public static final String SSO_ADMIN_USERNAME = "SSO_ADMIN_USERNAME";
+    public static final String SSO_ADMIN_PASSWORD = "SSO_ADMIN_PASSWORD";
+    public static final String SSO_REALM = "SSO_REALM";
+    public static final String SSO_SERVICE_USERNAME = "SSO_SERVICE_USERNAME";
+    public static final String SSO_SERVICE_PASSWORD = "SSO_SERVICE_PASSWORD";
+
+    // env variables for kie images
+    public static final String SSO_URL = "SSO_URL";
+    public static final String SSO_CLIENT = "SSO_CLIENT";
+    public static final String SSO_SECRET = "SSO_SECRET";
+    public static final String SSO_USERNAME = "SSO_USERNAME";
+    public static final String SSO_PASSWORD = "SSO_PASSWORD";
+
+    public static final String BUSINESS_CENTRAL_SSO_CLIENT = "BUSINESS_CENTRAL_SSO_CLIENT";
+    public static final String BUSINESS_CENTRAL_SSO_SECRET = "BUSINESS_CENTRAL_SSO_SECRET";
+    public static final String KIE_SERVER_SSO_CLIENT = "KIE_SERVER_SSO_CLIENT";
+    public static final String KIE_SERVER_SSO_SECRET = "KIE_SERVER_SSO_SECRET";
+    public static final String KIE_SERVER1_SSO_CLIENT = "KIE_SERVER1_SSO_CLIENT";
+    public static final String KIE_SERVER1_SSO_SECRET = "KIE_SERVER1_SSO_SECRET";
+    public static final String KIE_SERVER2_SSO_CLIENT = "KIE_SERVER2_SSO_CLIENT";
+    public static final String KIE_SERVER2_SSO_SECRET = "KIE_SERVER2_SSO_SECRET";
+    // SSO_REALM
 }

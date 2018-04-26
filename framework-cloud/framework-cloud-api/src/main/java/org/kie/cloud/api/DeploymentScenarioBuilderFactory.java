@@ -19,10 +19,12 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePer
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentSSOScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterKieServerDatabaseSSOScenarioBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
@@ -34,6 +36,8 @@ public interface DeploymentScenarioBuilderFactory {
 
     WorkbenchKieServerScenarioBuilder getWorkbenchKieServerScenarioBuilder();
     WorkbenchKieServerPersistentScenarioBuilder getWorkbenchKieServerPersistentScenarioBuilder();
+    WorkbenchKieServerPersistentSSOScenarioBuilder getWorkbenchKieServerPersistentSSOScenarioBuilder();
+    WorkbenchRuntimeSmartRouterKieServerDatabaseSSOScenarioBuilder getWorkbenchRuntimeSmartRouterKieServerDatabaseSSOScenarioBuilder();
     WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder();
     KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder();
     KieServerWithDatabaseScenarioBuilder getKieServerWithMySqlScenarioBuilder();

@@ -14,23 +14,22 @@
  */
 package org.kie.cloud.integrationtests.https;
 
+import cz.xtf.http.HttpClient;
+import cz.xtf.tuple.Tuple.Pair;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.entity.ContentType;
 import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,13 +39,14 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentSSOScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.common.util.HttpsUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.KieServerConstants;
@@ -76,6 +76,15 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerHttpsIntegrationTest.class);
 
+    private static final String SECURED_URL_PREFIX = "secured-";
+    private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
+
+    private static final String BUSINESS_CENTRAL_NAME = "rhpamcentr";
+    private static final String KIE_SERVER_NAME = "kieserver";
+
+    private static final String BUSINESS_CENTRAL_HOSTNAME = BUSINESS_CENTRAL_NAME + DeploymentConstants.getDefaultDomainSuffix();
+    private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
+
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
@@ -104,12 +113,21 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .withKieServer(kieServerSettings)
                 .build();
 
+        WorkbenchKieServerPersistentSSOScenario workbenchKieServerPersistentSSOScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentSSOScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                .build();
+
         return Arrays.asList(new Object[][]{
             {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario},
             {"KIE Server", kieServerScenario},
             {"KIE Server + MySQL", kieServerMySqlScenario},
-            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario}
+            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario},
+            {"[SSO] Workbench + KIE Server - Persistent", workbenchKieServerPersistentSSOScenario}
         });
     }
 
@@ -126,15 +144,18 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
     @Test
     public void testKieServerInfo() {
         for (final KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
-            final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
-                    kieServerDeployment.getPassword());
-            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider);
-                 CloseableHttpResponse response = httpClient.execute(serverInforRequest(kieServerDeployment))) {
+            try {
+                Pair<String, Integer> responseAndCode;
+                String url = serverInforRequestUrl(kieServerDeployment);
 
-                Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                logger.debug("Test Kie Server info on url {}", url);
+                responseAndCode = HttpClient.get(url)
+                        .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
+                        .preemptiveAuth()
+                        .responseAndCode();
 
-                final String responseContent = HttpsUtils.readResponseContent(response);
-                ServiceResponse<KieServerInfo> kieServerInfoServiceResponse = marshaller.unmarshall(responseContent, ServiceResponse.class);
+                assertThat(responseAndCode.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                ServiceResponse<KieServerInfo> kieServerInfoServiceResponse = marshaller.unmarshall(responseAndCode.getFirst(), ServiceResponse.class);
                 KieServerInfo kieServerInfo = kieServerInfoServiceResponse.getResult();
                 Assertions.assertThat(kieServerInfo.getCapabilities()).contains(KieServerConstants.CAPABILITY_BRM);
             } catch (Exception e) {
@@ -147,20 +168,31 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
     @Test
     public void testDeployContainer() {
         for (final KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
-            final CredentialsProvider credentialsProvider = HttpsUtils.createCredentialsProvider(kieServerDeployment.getUsername(),
-                    kieServerDeployment.getPassword());
-            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient(credentialsProvider)) {
-                try (CloseableHttpResponse response = httpClient.execute(createContainerRequest(kieServerDeployment, CONTAINER_ID, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION))) {
-                    Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
-                }
+            try {
+                String urlPut = createContainerRequestUrl(kieServerDeployment, CONTAINER_ID);
 
-                try (CloseableHttpResponse response = httpClient.execute(getContainersRequest(kieServerDeployment))) {
-                    Assertions.assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                logger.debug("Test get Kie Server containers on url {}", urlPut);
+                Pair<String, Integer> responseAndCodePut = HttpClient.put(urlPut)
+                        .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
+                        .addHeader("Content-Type", "application/xml")
+                        .data(createContainerRequestContent(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION), ContentType.TEXT_XML)
+                        .preemptiveAuth()
+                        .responseAndCode();
 
-                    final String responseContent = HttpsUtils.readResponseContent(response);
-                    final List<String> containers = parseListContainersResponse(responseContent);
-                    Assertions.assertThat(containers).contains(CONTAINER_ID);
-                }
+                assertThat(responseAndCodePut.getSecond()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
+                assertThat(responseAndCodePut.getFirst()).contains("Container " + CONTAINER_ID + " successfully created");
+
+                String urlGet = getContainersRequestUrl(kieServerDeployment);
+
+                logger.debug("Test get Kie Server containers on url {}", urlGet);
+                Pair<String, Integer> responseAndCodeGet = HttpClient.get(urlGet)
+                        .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
+                        .preemptiveAuth()
+                        .responseAndCode();
+
+                assertThat(responseAndCodeGet.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                final List<String> containers = parseListContainersResponse(responseAndCodeGet.getFirst());
+                Assertions.assertThat(containers).contains(CONTAINER_ID);
             } catch (Exception e) {
                 logger.error("Unable to connect to KIE server REST API", e);
                 throw new RuntimeException("Unable to connect to KIE server REST API", e);
@@ -168,38 +200,48 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
         }
     }
 
-    private HttpGet serverInforRequest(KieServerDeployment kieServerDeployment) {
-        try {
-            final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_SERVER_INFO_REST_REQUEST_URL);
-            final HttpGet request = new HttpGet(url.toString());
-
-            return request;
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating request for KIE server info", e);
-        }
+    //RHPAM-1336
+    private String createSSOEnvVariable(String url) {
+        String[] urlParts = url.split(":");
+        return urlParts[0] + ":" + urlParts[1];
     }
 
-    private HttpPut createContainerRequest(KieServerDeployment kieServerDeployment, String containerName, String groupId, String artifactId, String version) {
+    private String serverInforRequestUrl(KieServerDeployment kieServerDeployment) {
         try {
-            final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINER_REQUEST_URL + "/" + containerName);
-            final HttpPut request = new HttpPut(url.toString());
-            request.setHeader("Content-Type", "application/xml");
-            request.setEntity(new StringEntity(createContainerRequestContent(containerName, groupId, artifactId, version)));
-
-            return request;
-        } catch (Exception e) {
+            if (testScenarioName.contains("SSO")) {
+                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().toString()) + "/" + KIE_SERVER_INFO_REST_REQUEST_URL;
+            } else {
+                final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_SERVER_INFO_REST_REQUEST_URL);
+                return url.toString();
+            }
+        } catch (MalformedURLException e) {
             throw new RuntimeException("Error creating request for creating of KIE server container", e);
         }
     }
 
-    private HttpGet getContainersRequest(KieServerDeployment kieServerDeployment) {
+    private String createContainerRequestUrl(KieServerDeployment kieServerDeployment, String containerName) {
         try {
-            final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINER_REQUEST_URL);
-            final HttpGet request = new HttpGet(url.toString());
-
-            return request;
+            if (testScenarioName.contains("SSO")) {
+                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().toString()) + "/" + KIE_CONTAINERS_REQUEST_URL + "/" + containerName;
+            } else {
+                final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINERS_REQUEST_URL + "/" + containerName);
+                return url.toString();
+            }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Error creating list container request", e);
+            throw new RuntimeException("Error creating request for creating of KIE server container", e);
+        }
+    }
+
+    private String getContainersRequestUrl(KieServerDeployment kieServerDeployment) {
+        try {
+            if (testScenarioName.contains("SSO")) {
+                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().toString()) + "/" + KIE_CONTAINERS_REQUEST_URL;
+            } else {
+                final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINERS_REQUEST_URL);
+                return url.toString();
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error creating request for creating of KIE server container", e);
         }
     }
 
@@ -212,9 +254,9 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .collect(Collectors.toList());
     }
 
-    private String createContainerRequestContent(String containerName, String groupId, String artifactId, String version) {
+    private String createContainerRequestContent(String groupId, String artifactId, String version) {
         KieContainerResource kieContainerResource = new KieContainerResource();
-        kieContainerResource.setReleaseId(new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION));
+        kieContainerResource.setReleaseId(new ReleaseId(groupId, artifactId, version));
         String requestContent = marshaller.marshall(kieContainerResource);
 
         return requestContent;

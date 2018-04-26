@@ -116,6 +116,12 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String KIE_APP_TEMPLATE_WORKBENCH = "kie.app.template.workbench";
 
+    public static final String KIE_APP_TEMPLATE_PROD_IMMUTABLE_MONITOR = "kie.app.template.prod.immutable.monitor";
+
+    public static final String SSO_APP_TEMPLATE ="sso.app.template";
+    public static final String SSO_APP_SECRETS = "sso.app.secrets";
+    public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
+
     public static String getOpenShiftUrl() {
         return System.getProperty(OPENSHIFT_URL);
     }
@@ -138,6 +144,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getKieImageStreams() {
         return System.getProperty(KIE_IMAGE_STREAMS);
+    }
+
+    public static String getSSOImageStreams() {
+        return System.getProperty(SSO_IMAGE_STREAMS);
     }
 
     public static String getKieApplicationName() {
