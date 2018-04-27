@@ -16,6 +16,7 @@
 package org.kie.cloud.integrationtests.probe;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -66,51 +67,49 @@ public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<W
     }
 
     private static final String UNDEPLOY_COMMAND = "/opt/eap/bin/jboss-cli.sh -c --command='undeploy ROOT.war'";
-    private static final Duration KILL_POD_TIME = Duration.ofSeconds(60);
+    private static final Duration KILL_POD_TIME = Duration.ofSeconds(600);
     private static final Logger logger = LoggerFactory.getLogger(LivenessProbeIntegrationTest.class);
 
     @Test
-    @Ignore
     public void testWorkbenchLivenessProbe() {
         WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployment();
         Instance workbenchInstance = workbenchDeployment.getInstances().get(0);
-        String brokenPodName = workbenchInstance.getName();
+        Instant originalStartedAt = workbenchInstance.startedAt();
         logger.info("Running undepoloy command '{}' for workbench", UNDEPLOY_COMMAND);
         workbenchInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
 
         logger.info("Waiting for liveness probe to kill workbench");
         TimeUtils.wait(KILL_POD_TIME,
                 () -> workbenchDeployment.getInstances().stream()
-                .noneMatch(instance -> instance.getName().equals(brokenPodName))
+                .allMatch(instance -> instance.isRunning() && instance.startedAt().isAfter(originalStartedAt))
         );
         workbenchDeployment.waitForScale();
 
         workbenchInstance = workbenchDeployment.getInstances().get(0);
-        String newPodName = workbenchInstance.getName();
+        Instant newStartedAt = workbenchInstance.startedAt();
 
-        Assertions.assertThat(newPodName).isNotEqualTo(brokenPodName);
+        Assertions.assertThat(newStartedAt).isAfter(originalStartedAt);
     }
 
     @Test
-    @Ignore
     public void testKieServerLivenessProbe() {
         KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployment();
         Instance kieServerInstance = kieServerDeployment.getInstances().get(0);
-        String brokenPodName = kieServerInstance.getName();
-        logger.info("Running undepoloy command '{}' for workbench", UNDEPLOY_COMMAND);
+        Instant originalStartedAt = kieServerInstance.startedAt();
+        logger.info("Running undepoloy command '{}' for Kie server", UNDEPLOY_COMMAND);
         kieServerInstance.runCommand("/bin/bash", "-c", UNDEPLOY_COMMAND);
 
         logger.info("Waiting for liveness probe to kill kie server");
         TimeUtils.wait(KILL_POD_TIME,
                 () -> kieServerDeployment.getInstances().stream()
-                .noneMatch(instance -> instance.getName().equals(brokenPodName))
+                .allMatch(instance -> instance.isRunning() && instance.startedAt().isAfter(originalStartedAt))
         );
         kieServerDeployment.waitForScale();
 
         kieServerInstance = kieServerDeployment.getInstances().get(0);
-        String newPodName = kieServerInstance.getName();
+        Instant newStartedAt = kieServerInstance.startedAt();
 
-        Assertions.assertThat(newPodName).isNotEqualTo(brokenPodName);
+        Assertions.assertThat(newStartedAt).isAfter(originalStartedAt);
     }
 
 }

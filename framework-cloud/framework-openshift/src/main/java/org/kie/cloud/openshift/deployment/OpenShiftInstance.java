@@ -17,7 +17,10 @@ package org.kie.cloud.openshift.deployment;
 
 import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
+import java.time.Instant;
+
 import cz.xtf.openshift.OpenShiftUtil;
+import io.fabric8.kubernetes.api.model.ContainerStateRunning;
 import io.fabric8.kubernetes.api.model.Pod;
 
 import org.kie.cloud.api.deployment.CommandExecutionResult;
@@ -51,6 +54,26 @@ public class OpenShiftInstance implements Instance {
 
     @Override public CommandExecutionResult runCommand(String... command) {
         return runCommandImpl(util.client().pods().withName(name), command);
+    }
+
+    @Override
+    public boolean isRunning() {
+        return getContainerRunningState() != null;
+    }
+
+    @Override
+    public Instant startedAt() throws IllegalStateException {
+        if (!isRunning()) {
+            throw new IllegalStateException("Instance is not in running state, started time not available.");
+        }
+
+        String startedAt = getContainerRunningState().getStartedAt();
+        return Instant.parse(startedAt);
+    }
+
+    private ContainerStateRunning getContainerRunningState() {
+        Pod pod = util.getPod(name);
+        return pod.getStatus().getContainerStatuses().get(0).getState().getRunning();
     }
 
     @Override

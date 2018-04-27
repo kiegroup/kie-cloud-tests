@@ -15,6 +15,8 @@
 
 package org.kie.cloud.api.deployment;
 
+import java.time.Instant;
+
 /**
  * Running instance of deployment representation in cloud environment. One
  * instance of deployed application. Application is configured in
@@ -40,6 +42,21 @@ public interface Instance {
     String getNamespace();
 
     CommandExecutionResult runCommand(String... command);
+
+    /**
+     * Return true if instance is currently running.
+     *
+     * @return True if instance is currently running.
+     */
+    boolean isRunning();
+
+    /**
+     * Return started time of currently running instance.
+     *
+     * @return Started time.
+     * @throws IllegalStateException In case instance is not running currently.
+     */
+    Instant startedAt() throws IllegalStateException;
 
     /**
      * Return cloud instance logs.
