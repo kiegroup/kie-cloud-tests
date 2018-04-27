@@ -22,13 +22,10 @@
     <openshift.password>redhat</openshift.password>
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
-    <!-- Templates and Secrets are specified in specific properties files. Path is relative to submodules of this module. -->
-    <kie.app.jbpm.secrets>${project.parent.build.resources[0].directory}/jbpm-app-secret.properties</kie.app.jbpm.secrets>
-    <kie.app.drools.secrets>${project.parent.build.resources[0].directory}/drools-app-secret.properties</kie.app.drools.secrets>
-    <kie.app.templates.jbpm.general>${project.parent.build.resources[0].directory}/templates-jbpm-general.properties</kie.app.templates.jbpm.general>
-    <kie.app.templates.jbpm.mysql>${project.parent.build.resources[0].directory}/templates-jbpm-mysql.properties</kie.app.templates.jbpm.mysql>
-    <kie.app.templates.jbpm.postgresql>${project.parent.build.resources[0].directory}/templates-jbpm-postgresql.properties</kie.app.templates.jbpm.postgresql>
-    <kie.app.templates.drools.general>${project.parent.build.resources[0].directory}/templates-drools-general.properties</kie.app.templates.drools.general>
+
+    <!-- Values of these properties are used to select property file with template urls from framework-openshift resources -->
+    <template.database/> <!-- valid values: general, postgresql, mysql-->
+    <template.product/> <!-- valid values: jbpm, drools-->
 
     <kie.app.name>myapp</kie.app.name>
 
@@ -87,22 +84,9 @@
               <openshift.master.url>${openshift.master.url}</openshift.master.url>
               <openshift.username>${openshift.username}</openshift.username>
               <openshift.password>${openshift.password}</openshift.password>
-              <kie.app.secret>${kie.app.secret}</kie.app.secret>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
-              <!-- All templates have to be passed as properties to failsafe plugin. -->
-              <kie.app.template.workbench>${kie.app.template.workbench}</kie.app.template.workbench>
-              <kie.app.template.workbench.kie-server>${kie.app.template.workbench.kie-server}</kie.app.template.workbench.kie-server>
-              <kie.app.template.workbench.kie-server.database>${kie.app.template.workbench.kie-server.database}</kie.app.template.workbench.kie-server.database>
-              <kie.app.template.workbench.kie-server.persistent>${kie.app.template.workbench.kie-server.persistent}</kie.app.template.workbench.kie-server.persistent>
-              <kie.app.template.kie-server>${kie.app.template.kie-server}</kie.app.template.kie-server>
-              <kie.app.template.kie-server-https-s2i>${kie.app.template.kie-server-https-s2i}</kie.app.template.kie-server-https-s2i>
-              <kie.app.template.kie-server-basic-s2i>${kie.app.template.kie-server-basic-s2i}</kie.app.template.kie-server-basic-s2i>
-              <kie.app.template.kie-server.database>${kie.app.template.kie-server.database}</kie.app.template.kie-server.database>
-              <kie.app.template.kie-server.database.external>${kie.app.template.kie-server.database.external}</kie.app.template.kie-server.database.external>
-              <kie.app.template.workbench-monitoring>${kie.app.template.workbench-monitoring}</kie.app.template.workbench-monitoring>
-              <kie.app.template.workbench-monitoring.smartrouter>${kie.app.template.workbench-monitoring.smartrouter}</kie.app.template.workbench-monitoring.smartrouter>
-              <kie.app.template.workbench-monitoring.smartrouter.two-kieservers.two-databases>${kie.app.template.workbench-monitoring.smartrouter.two-kieservers.two-databases}</kie.app.template.workbench-monitoring.smartrouter.two-kieservers.two-databases>
-              <kie.app.template.smartrouter>${kie.app.template.smartrouter}</kie.app.template.smartrouter>
+              <template.database>${template.database}</template.database>
+              <template.product>${template.product}</template.product>
               <db.hostname>${db.hostname}</db.hostname>
               <db.port>${db.port}</db.port>
               <db.name>${db.name}</db.name>
@@ -137,80 +121,15 @@
   <profiles>
     <profile>
       <id>drools</id>
+      <activation>
+        <property>
+          <name>template.product</name>
+          <value>drools</value>
+        </property>
+      </activation>
       <properties>
         <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.JBPMOnly</failsafe.excluded.groups>
       </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>properties-maven-plugin</artifactId>
-              <configuration>
-                <files combine.children="append">
-                  <file>${kie.app.templates.drools.general}</file>
-                  <file>${kie.app.drools.secrets}</file>
-                </files>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>jbpm</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>properties-maven-plugin</artifactId>
-              <configuration>
-                <files combine.children="append">
-                  <file>${kie.app.templates.jbpm.general}</file>
-                  <file>${kie.app.jbpm.secrets}</file>
-                </files>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>mysql</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>properties-maven-plugin</artifactId>
-              <configuration>
-                <files combine.children="append">
-                  <file>${kie.app.templates.jbpm.mysql}</file>
-                </files>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>postgresql</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>properties-maven-plugin</artifactId>
-              <configuration>
-                <files combine.children="append">
-                  <file>${kie.app.templates.jbpm.postgresql}</file>
-                </files>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <profile>
       <!-- Run just smoke tests to check basic functionality. -->
@@ -234,7 +153,7 @@
         <property>
           <name>custom.parameters.file</name>
         </property>
-            </activation>
+      </activation>
       <build>
         <pluginManagement>
           <plugins>
