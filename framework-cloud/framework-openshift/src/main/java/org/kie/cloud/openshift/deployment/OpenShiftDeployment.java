@@ -24,6 +24,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import cz.xtf.openshift.OpenShiftUtil;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -35,6 +38,7 @@ import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
@@ -157,7 +161,7 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     protected URL getHttpRouteUrl(String serviceName) {
         try {
-            return getRouteUri("http", serviceName).toURL();
+            return getRouteUri(Protocol.http, serviceName).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -165,19 +169,21 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     protected URL getHttpsRouteUrl(String serviceName) {
         try {
-            return getRouteUri("https", serviceName).toURL();
+            return getRouteUri(Protocol.https, serviceName).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
 
     protected URI getWebSocketRouteUri(String serviceName) {
-        return getRouteUri("ws", serviceName);
+        return getRouteUri(Protocol.ws, serviceName);
     }
 
-    private URI getRouteUri(String protocol, String serviceName) {
+    private URI getRouteUri(Protocol protocol, String serviceName) {
         URI uri;
         Service service = util.getService(serviceName);
+        Predicate<Route> httpsPredicate = n -> n.getSpec().getTls() != null;
+        Predicate<Route> httpPredicate = n -> n.getSpec().getTls() == null;
 
         String routeHost = null;
         if(service == null) {
@@ -185,13 +191,21 @@ public abstract class OpenShiftDeployment implements Deployment {
             String defaultRoutingSubdomain = DeploymentConstants.getDefaultDomainSuffix();
             routeHost = getServiceName() + "-" + getNamespace() + defaultRoutingSubdomain;
         } else {
-            Route route = util.getRoute(serviceName);
-            if (route == null) {
-                throw new RuntimeException("Route with name " + serviceName + " not found.");
+            List<Route> routes = util.getRoutes();
+            Optional<Route> route = routes.stream()
+                                          .filter(protocol == Protocol.https ? httpsPredicate : httpPredicate)
+                                          .filter(n -> n.getSpec().getTo().getName().equals(serviceName))
+                                          .findAny();
+            if (route.isPresent()) {
+                routeHost = route.get().getSpec().getHost();
+            } else {
+                String routeNames = routes.stream()
+                                          .map(n -> n.getMetadata().getName())
+                                          .collect(Collectors.joining(", "));
+                throw new RuntimeException(protocol + " route leading to service " + serviceName + " not found. Available routes " + routeNames);
             }
-            routeHost = route.getSpec().getHost();
         }
-        String uriValue = protocol + "://" + routeHost + ":" + retrievePort(protocol);
+        String uriValue = protocol.name() + "://" + routeHost + ":" + retrievePort(protocol);
 
         try {
             uri = new URI(uriValue.toString());
@@ -202,12 +216,12 @@ public abstract class OpenShiftDeployment implements Deployment {
         return uri;
     }
 
-    private String retrievePort(String protocol) {
+    private String retrievePort(Protocol protocol) {
         switch (protocol) {
-            case "http":
-            case "ws":
+            case http:
+            case ws:
                 return "80";
-            case "https":
+            case https:
                 return "443";
             default:
                 throw new IllegalArgumentException("Unrecognized protocol '" + protocol + "'");

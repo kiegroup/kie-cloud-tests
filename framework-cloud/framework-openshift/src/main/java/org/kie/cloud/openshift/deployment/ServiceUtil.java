@@ -25,35 +25,20 @@ import io.fabric8.kubernetes.api.model.Service;
 public class ServiceUtil {
 
     private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhpamcentr|-rhdmcentr)");
-    private static final Pattern SECURE_WORKBENCH_REGEXP = Pattern.compile("secure-.*(-rhpamcentr|-rhdmcentr)");
     private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhpamcentrmon");
-    private static final Pattern SECURE_WORKBENCH_MONITORING_REGEXP = Pattern.compile("secure-.*-rhpamcentrmon");
     private static final Pattern KIE_SERVER_REGEXP = Pattern.compile("(?!secure-).*(-execserv|-kieserver)");
-    private static final Pattern SECURE_KIE_SERVER_REGEXP = Pattern.compile("secure-.*(-execserv|-kieserver)");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
 
     public static String getWorkbenchServiceName(OpenShiftUtil util) {
         return getServiceName(util, WORKBENCH_REGEXP);
     }
 
-    public static String getWorkbenchSecureServiceName(OpenShiftUtil util) {
-        return getServiceName(util, SECURE_WORKBENCH_REGEXP);
-    }
-
     public static String getWorkbenchMonitoringServiceName(OpenShiftUtil util) {
         return getServiceName(util, WORKBENCH_MONITORING_REGEXP);
     }
 
-    public static String getWorkbenchMonitoringSecureServiceName(OpenShiftUtil util) {
-        return getServiceName(util, SECURE_WORKBENCH_MONITORING_REGEXP);
-    }
-
     public static String getKieServerServiceName(OpenShiftUtil util, String suffix) {
         return getServiceName(util, Pattern.compile(KIE_SERVER_REGEXP.pattern() + suffix));
-    }
-
-    public static String getKieServerSecureServiceName(OpenShiftUtil util, String suffix) {
-        return getServiceName(util, Pattern.compile(SECURE_KIE_SERVER_REGEXP.pattern() + suffix));
     }
 
     public static String getDatabaseServiceName(OpenShiftUtil util, String suffix) {
