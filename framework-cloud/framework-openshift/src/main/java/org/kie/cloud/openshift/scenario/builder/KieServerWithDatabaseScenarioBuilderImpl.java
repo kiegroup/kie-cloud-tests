@@ -21,6 +21,7 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.KieServerWithDatabaseScenarioImpl;
 
@@ -31,6 +32,7 @@ public class KieServerWithDatabaseScenarioBuilderImpl implements KieServerWithDa
     public KieServerWithDatabaseScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override

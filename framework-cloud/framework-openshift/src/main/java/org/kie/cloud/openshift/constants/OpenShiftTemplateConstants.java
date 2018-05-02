@@ -83,4 +83,6 @@ public class OpenShiftTemplateConstants {
     public static final String ARTIFACT_DIR = "ARTIFACT_DIR";
 
     public static final String SECRET_NAME = "SECRET_NAME";
+    public static final String BUSINESS_CENTRAL_HTTPS_SECRET = "BUSINESS_CENTRAL_HTTPS_SECRET";
+    public static final String KIE_SERVER_HTTPS_SECRET = "KIE_SERVER_HTTPS_SECRET";
 }
