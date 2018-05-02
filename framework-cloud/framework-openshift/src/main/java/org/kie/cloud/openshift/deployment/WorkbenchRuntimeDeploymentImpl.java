@@ -30,7 +30,6 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
     private String password;
 
     private String serviceName;
-    private String secureServiceName;
 
     public WorkbenchRuntimeDeploymentImpl(Project project) {
         super(project);
@@ -45,7 +44,7 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
 
     @Override public URL getSecureUrl() {
         if (secureUrl == null) {
-            secureUrl = getHttpsRouteUrl(getSecureServiceName());
+            secureUrl = getHttpsRouteUrl(getServiceName());
         }
         return secureUrl;
     }
@@ -83,17 +82,6 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
 
     public void setServiceName(String applicationName) {
         this.serviceName = applicationName + "-rhpamcentrmon";
-    }
-
-    public String getSecureServiceName() {
-        if (secureServiceName == null) {
-            secureServiceName = ServiceUtil.getWorkbenchMonitoringSecureServiceName(getOpenShiftUtil());
-        }
-        return secureServiceName;
-    }
-
-    public void setSecureServiceName(String applicationName) {
-        this.secureServiceName = "secure-" + applicationName + "-rhpamcentrmon";
     }
 
     @Override public void waitForScale() {

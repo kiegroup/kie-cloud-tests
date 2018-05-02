@@ -30,7 +30,6 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
     private String password;
 
     private String serviceName;
-    private String secureServiceName;
 
     public WorkbenchDeploymentImpl(Project project) {
         super(project);
@@ -45,7 +44,7 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
 
     @Override public URL getSecureUrl() {
         if (secureUrl == null) {
-            secureUrl = getHttpsRouteUrl(getSecureServiceName());
+            secureUrl = getHttpsRouteUrl(getServiceName());
         }
         return secureUrl;
     }
@@ -79,13 +78,6 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
             serviceName = ServiceUtil.getWorkbenchServiceName(getOpenShiftUtil());
         }
         return serviceName;
-    }
-
-    public String getSecureServiceName() {
-        if (secureServiceName == null) {
-            secureServiceName = ServiceUtil.getWorkbenchSecureServiceName(getOpenShiftUtil());
-        }
-        return secureServiceName;
     }
 
     @Override public void waitForScale() {
