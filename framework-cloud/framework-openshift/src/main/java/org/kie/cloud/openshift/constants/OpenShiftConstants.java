@@ -137,6 +137,13 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(KIE_APP_NAME);
     }
 
+    /**
+     * @return Name of the secret containing keystore file for HTTPS communication.
+     */
+    public static String getKieApplicationSecretName() {
+        return "kie-app-secret";
+    }
+
     @Override
     public void initConfigProperties() {
         // init XTF configuration for OpenShift

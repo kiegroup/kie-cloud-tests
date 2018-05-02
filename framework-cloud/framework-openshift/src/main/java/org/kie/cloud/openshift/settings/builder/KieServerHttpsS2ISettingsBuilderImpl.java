@@ -17,6 +17,7 @@ package org.kie.cloud.openshift.settings.builder;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
@@ -30,6 +31,7 @@ public class KieServerHttpsS2ISettingsBuilderImpl extends KieServerS2ISettingsBu
 
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override

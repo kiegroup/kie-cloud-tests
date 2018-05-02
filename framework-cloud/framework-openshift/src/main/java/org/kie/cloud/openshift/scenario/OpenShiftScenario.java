@@ -54,11 +54,8 @@ public abstract class OpenShiftScenario implements DeploymentScenario {
         logger.info("Creating project " + projectName);
         project = OpenShiftController.createProject(projectName);
 
-        logger.info("Creating Business Central secrets from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftTemplateConstants.SECRET_NAME, "businesscentral-app-secret"));
-
-        logger.info("Creating Kie server secrets from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftTemplateConstants.SECRET_NAME, "kieserver-app-secret"));
+        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftTemplateConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
 
         logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
         project.createResources(OpenShiftConstants.getKieImageStreams());
