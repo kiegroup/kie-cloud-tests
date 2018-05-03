@@ -5,14 +5,14 @@ import java.util.Arrays;
 class TemplateSelector {
 
     enum Database {
-        postgresql,
-        mysql,
-        general
+        POSTGRESQL,
+        MYSQL,
+        GENERAL
     }
 
     enum Product {
-        drools,
-        jbpm
+        DROOLS,
+        JBPM
     }
 
     static Database getDatabase() {
@@ -26,7 +26,7 @@ class TemplateSelector {
     private static <E extends Enum<E>> E enumConstantFromSystemProperty(String key, Class<E> enumClass) {
         final String value = System.getProperty(key);
         return Arrays.stream(enumClass.getEnumConstants())
-                .filter(e -> e.name().equals(value))
+                .filter(e -> e.name().equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         String.format("Invalid value of system property %s='%s' (must be one of %s)"

@@ -11,11 +11,17 @@ class OpenShiftTemplatePropertiesLoader {
 
     private static final Logger log = LoggerFactory.getLogger(OpenShiftTemplatePropertiesLoader.class);
 
-    private static Properties templateUrlProperties;
+    private OpenShiftTemplatePropertiesLoader() {
+        // Util class
+    }
 
-    static Properties load() {
-        templateUrlProperties = new Properties();
+    private static final Properties templateUrlProperties = new Properties();
+
+    static {
         loadTemplatePropertiesFromResources();
+    }
+
+    public static Properties getProperties() {
         return templateUrlProperties;
     }
 
@@ -30,8 +36,8 @@ class OpenShiftTemplatePropertiesLoader {
         addPropertiesFromResource(dbSpecificTemplates);
 
         // TODO ugly - we ALWAYS have to load general templates, even if DB is postgres/mysql
-        if (database != TemplateSelector.Database.general) {
-            String generalTemplates = String.format("templates-%s-%s.properties", product.name(), TemplateSelector.Database.general);
+        if (database != TemplateSelector.Database.GENERAL) {
+            String generalTemplates = String.format("templates-%s-%s.properties", product.name(), TemplateSelector.Database.GENERAL);
             addPropertiesFromResource(generalTemplates);
         }
 

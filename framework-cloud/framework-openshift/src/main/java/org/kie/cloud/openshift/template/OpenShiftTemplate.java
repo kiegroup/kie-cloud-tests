@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 
@@ -41,7 +40,7 @@ public enum OpenShiftTemplate {
     // Special template containing secret file.
     SECRET(OpenShiftConstants.KIE_APP_SECRET);
 
-    private static final Properties templateProperties = OpenShiftTemplatePropertiesLoader.load();
+    private static final Properties templateProperties = OpenShiftTemplatePropertiesLoader.getProperties();
 
     private final String propertyKey;
 
@@ -67,7 +66,7 @@ public enum OpenShiftTemplate {
         // Allow override from command line
         String fromSystemProperty = System.getProperty(propertyKey);
         String fromResources = templateProperties.getProperty(propertyKey);
-        String urlString = StringUtils.isEmpty(fromSystemProperty) ? fromResources : fromSystemProperty;
+        String urlString = fromSystemProperty == null || fromSystemProperty.isEmpty() ? fromResources : fromSystemProperty;
 
         try {
             return new URL(urlString);
