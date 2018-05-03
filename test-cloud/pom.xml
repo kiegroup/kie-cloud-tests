@@ -57,6 +57,7 @@
 
   <modules>
     <module>test-cloud-remote</module>
+    <module>test-cloud-template</module>
   </modules>
 
   <build>
@@ -74,6 +75,17 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemProperties>
+              <template.database>${template.database}</template.database>
+              <template.project>${template.project}</template.project>
+            </systemProperties>
+            <trimStackTrace>false</trimStackTrace>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
