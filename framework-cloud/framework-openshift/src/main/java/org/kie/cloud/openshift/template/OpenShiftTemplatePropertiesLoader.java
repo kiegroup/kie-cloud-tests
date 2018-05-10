@@ -26,7 +26,7 @@ class OpenShiftTemplatePropertiesLoader {
     }
 
     private static void loadTemplatePropertiesFromResources() {
-        final TemplateSelector.Product product = TemplateSelector.getProduct();
+        final TemplateSelector.Project product = TemplateSelector.getProject();
         final TemplateSelector.Database database = TemplateSelector.getDatabase();
 
         String secretConfigFile = product.name() + "-app-secret.properties";

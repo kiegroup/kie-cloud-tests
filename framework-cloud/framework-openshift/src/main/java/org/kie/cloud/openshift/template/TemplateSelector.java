@@ -10,7 +10,7 @@ class TemplateSelector {
         GENERAL
     }
 
-    enum Product {
+    enum Project {
         DROOLS,
         JBPM
     }
@@ -19,8 +19,8 @@ class TemplateSelector {
         return enumConstantFromSystemProperty("template.database", Database.class);
     }
 
-    static Product getProduct() {
-        return enumConstantFromSystemProperty("template.product", Product.class);
+    static Project getProject() {
+        return enumConstantFromSystemProperty("template.project", Project.class);
     }
 
     private static <E extends Enum<E>> E enumConstantFromSystemProperty(String key, Class<E> enumClass) {

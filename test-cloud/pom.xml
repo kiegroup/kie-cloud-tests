@@ -25,7 +25,7 @@
 
     <!-- Values of these properties are used to select property file with template urls from framework-openshift resources -->
     <template.database/> <!-- valid values: general, postgresql, mysql-->
-    <template.product/> <!-- valid values: jbpm, drools-->
+    <template.project/> <!-- valid values: jbpm, drools-->
 
     <kie.app.name>myapp</kie.app.name>
 
@@ -86,7 +86,7 @@
               <openshift.password>${openshift.password}</openshift.password>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <template.database>${template.database}</template.database>
-              <template.product>${template.product}</template.product>
+              <template.project>${template.project}</template.project>
               <db.hostname>${db.hostname}</db.hostname>
               <db.port>${db.port}</db.port>
               <db.name>${db.name}</db.name>
@@ -123,7 +123,7 @@
       <id>drools</id>
       <activation>
         <property>
-          <name>template.product</name>
+          <name>template.project</name>
           <value>drools</value>
         </property>
       </activation>
