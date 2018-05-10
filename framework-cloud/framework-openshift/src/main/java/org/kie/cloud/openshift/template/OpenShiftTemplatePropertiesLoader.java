@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.template;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ class OpenShiftTemplatePropertiesLoader {
         loadTemplatePropertiesFromResources();
     }
 
-    public static Properties getProperties() {
+    static Properties getProperties() {
         return templateUrlProperties;
     }
 
@@ -29,15 +30,15 @@ class OpenShiftTemplatePropertiesLoader {
         final TemplateSelector.Project product = TemplateSelector.getProject();
         final TemplateSelector.Database database = TemplateSelector.getDatabase();
 
-        String secretConfigFile = product.name() + "-app-secret.properties";
-        String dbSpecificTemplates = String.format("templates-%s-%s.properties", product.name(), database.name());
+        String secretConfigFile = product + "-app-secret.properties";
+        String dbSpecificTemplates = String.format("templates-%s-%s.properties", product, database);
 
         addPropertiesFromResource(secretConfigFile);
         addPropertiesFromResource(dbSpecificTemplates);
 
         // TODO ugly - we ALWAYS have to load general templates, even if DB is postgres/mysql
         if (database != TemplateSelector.Database.GENERAL) {
-            String generalTemplates = String.format("templates-%s-%s.properties", product.name(), TemplateSelector.Database.GENERAL);
+            String generalTemplates = String.format("templates-%s-%s.properties", product, TemplateSelector.Database.GENERAL);
             addPropertiesFromResource(generalTemplates);
         }
 
@@ -47,10 +48,17 @@ class OpenShiftTemplatePropertiesLoader {
 
     private static void addPropertiesFromResource(String resourceFilename) {
         try (InputStream is = OpenShiftTemplatePropertiesLoader.class.getResourceAsStream(resourceFilename)) {
+            if (is == null) {
+                throw new NoSuchFileException(resourceFilename);
+            }
             Properties properties = new Properties();
             properties.load(is);
             templateUrlProperties.putAll(properties);
-            log.info("Loaded {} properties from {}", properties.size(), resourceFilename);
+            log.info("Loaded {} propert{} from {}",
+                    properties.size(),
+                    properties.size() == 1 ? "y" : "ies",
+                    resourceFilename
+            );
         } catch (IOException e) {
             throw new RuntimeException("Failed to load properties from " + resourceFilename, e);
         }

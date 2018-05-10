@@ -7,12 +7,22 @@ class TemplateSelector {
     enum Database {
         POSTGRESQL,
         MYSQL,
-        GENERAL
+        GENERAL;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
 
     enum Project {
         DROOLS,
-        JBPM
+        JBPM;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
 
     static Database getDatabase() {
