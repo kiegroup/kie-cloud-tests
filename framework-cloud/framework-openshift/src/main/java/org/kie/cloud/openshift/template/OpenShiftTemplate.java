@@ -11,12 +11,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.template;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -39,20 +40,22 @@ public enum OpenShiftTemplate {
     // Special template containing secret file.
     SECRET(OpenShiftConstants.KIE_APP_SECRET);
 
-    private String templateSystemPropertyKey;
+    private static final Properties templateProperties = OpenShiftTemplatePropertiesLoader.getProperties();
+
+    private final String propertyKey;
 
     /**
-     * @param templateSystemProperty System property key for URL pointing to template location.
+     * @param propertyKey property key for URL pointing to template location.
      */
-    private OpenShiftTemplate(String templateSystemPropertyKey) {
-        this.templateSystemPropertyKey = templateSystemPropertyKey;
+    OpenShiftTemplate(String propertyKey) {
+        this.propertyKey = propertyKey;
     }
 
     /**
      * @return System property where template URL is stored.
      */
-    public String getTemplateSystemPropertyKey() {
-        return templateSystemPropertyKey;
+    private String getPropertyKey() {
+        return propertyKey;
     }
 
     /**
@@ -60,12 +63,15 @@ public enum OpenShiftTemplate {
      * @throws MissingResourceException If template is missing or template URL is malformed.
      */
     public URL getTemplateUrl() throws MissingResourceException {
-        String templateSystemPropertyValue = System.getProperty(templateSystemPropertyKey);
+        // Allow override from command line
+        String fromSystemProperty = System.getProperty(propertyKey);
+        String fromResources = templateProperties.getProperty(propertyKey);
+        String urlString = fromSystemProperty == null || fromSystemProperty.isEmpty() ? fromResources : fromSystemProperty;
 
         try {
-            return new URL(templateSystemPropertyValue);
+            return new URL(urlString);
         } catch (MalformedURLException e) {
-            throw new MissingResourceException("Template referenced by system property " + templateSystemPropertyKey + " with value '" + templateSystemPropertyValue + "' cannot be processed.", e);
+            throw new MissingResourceException("Invalid URL '" + urlString + "' specified by property " + propertyKey, e);
         }
     }
 }
