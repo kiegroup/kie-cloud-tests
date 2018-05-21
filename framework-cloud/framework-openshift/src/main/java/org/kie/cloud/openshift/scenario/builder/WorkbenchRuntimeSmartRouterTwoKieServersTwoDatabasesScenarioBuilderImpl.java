@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.scenario.builder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +55,12 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder
     @Override
     public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withSmartRouterId(String smartRouterId) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_ID, smartRouterId);
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval) {
+        envVariables.put(OpenShiftTemplateConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, Long.toString(timerServiceDataStoreRefreshInterval.toMillis()));
         return this;
     }
 }
