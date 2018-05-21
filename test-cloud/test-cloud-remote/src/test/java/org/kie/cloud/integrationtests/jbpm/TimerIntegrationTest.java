@@ -17,70 +17,95 @@ package org.kie.cloud.integrationtests.jbpm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.maven.MavenDeployer;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
-import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-public class TimerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
+public class TimerIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
+
+    private static final Kjar DEPLOYED_KJAR = Kjar.TIMER;
+    private static final String CONTAINER_SUCCESSFULLY_STARTED = "Container cont-id (for release id " + DEPLOYED_KJAR.toString() + ") successfully started";
+    private static final String NODE_INSTANCE_NAME = "PrintingNode";
 
     private KieServerControllerClient kieControllerClient;
 
     @Override
-    protected WorkbenchKieServerPersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder().build();
+    protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(3))
+                .build();
+    }
+
+    @BeforeClass
+    public static void buildKjar() {
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEPLOYED_KJAR.getName()).getFile());
     }
 
     @Before
     public void setUp() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + TIMER_PROJECT_NAME).getFile());
-
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), TIMER_PROJECT_NAME);
-
-        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
     }
 
     @Test
-    @Ignore("Activate when GUVNOR-3361 is fixed.")
     public void testTimerStartEvent() throws Exception {
-        QueryServicesClient queryClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
+        QueryServicesClient queryClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerOneDeployment());
+        ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerOneDeployment());
 
-        deploymentScenario.getKieServerDeployment().scale(3);
-        deploymentScenario.getKieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerOneDeployment().scale(3);
+        deploymentScenario.getKieServerOneDeployment().waitForScale();
 
-        KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, TIMER_PROJECT_NAME, TIMER_PROJECT_VERSION, KieContainerStatus.STARTED);
+        KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment()).getServerInfo().getResult();
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, DEPLOYED_KJAR.getGroupId(), DEPLOYED_KJAR.getName(), DEPLOYED_KJAR.getVersion(), KieContainerStatus.STARTED);
 
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
-        List<Integer> completedOnly = Arrays.asList(org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED);
+        waitUntilKieServerLogsContain(deploymentScenario.getKieServerOneDeployment(), CONTAINER_SUCCESSFULLY_STARTED);
 
-        // Wait for 15 seconds. The processes should be started in 10 seconds, 5 seconds are a reserve.
-        Thread.sleep(15_000L);
+        Long pid = processClient.startProcess(CONTAINER_ID, TIMER_PROCESS_ID);
+        KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, pid);
 
-        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(CONTAINER_ID, completedOnly, 0, 10, "Id", false);
-        assertThat(startedInstances).hasSize(3);
+        List<NodeInstance> nodeInstances = queryClient.findCompletedNodeInstances(pid, 0, 100).stream()
+                                                                                              .filter(n -> n.getName().equals(NODE_INSTANCE_NAME))
+                                                                                              .sorted((n1,n2) -> n1.getDate().compareTo(n2.getDate()))
+                                                                                              .collect(Collectors.toList());
+        assertThat(nodeInstances).hasSize(3);
 
-        long thirdInstance = startedInstances.get(0).getDate().getTime();
-        long secondInstance = startedInstances.get(1).getDate().getTime();
-        long firstInstance = startedInstances.get(2).getDate().getTime();
+        long firstInstance = nodeInstances.get(0).getDate().getTime();
+        long secondInstance = nodeInstances.get(1).getDate().getTime();
+        long thirdInstance = nodeInstances.get(2).getDate().getTime();
 
         long distance1 = thirdInstance - secondInstance;
         long distance2 = secondInstance - firstInstance;
 
         assertThat(distance1).isBetween(4000L, 6000L);
         assertThat(distance2).isBetween(4000L, 6000L);
+    }
+
+    private void waitUntilKieServerLogsContain(KieServerDeployment kieServerDeployment, String logMessage) {
+        for (Instance kieServerInstance : kieServerDeployment.getInstances()) {
+            TimeUtils.wait(Duration.ofSeconds(30), Duration.ofSeconds(1), () -> kieServerInstance.getLogs().contains(logMessage));
+        }
     }
 }

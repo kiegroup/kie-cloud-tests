@@ -40,9 +40,6 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String CLOUD_BALANCE_PROJECT_SNAPSHOT_NAME = "cloudbalance-snapshot";
     protected static final String CLOUD_BALANCE_PROJECT_SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
 
-    protected static final String TIMER_PROJECT_NAME = "timer-project";
-    protected static final String TIMER_PROJECT_VERSION = "1.0.0.Final";
-
     protected static final String RULE_PROJECT_NAME = "rule-project";
     protected static final String RULE_PROJECT_VERSION = "1.0.0-SNAPSHOT";
 
@@ -61,6 +58,7 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String LONG_SCRIPT_PROCESS_ID = "definition-project.longScript";
     protected static final String SIMPLE_RULEFLOW_PROCESS_ID = "simple-ruleflow";
     protected static final String LOG_PROCESS_ID = "definition-project.logProcess";
+    protected static final String TIMER_PROCESS_ID = "timer-start";
 
     protected static final String SIGNAL_NAME = "signal1";
     protected static final String SIGNAL_2_NAME = "signal2";

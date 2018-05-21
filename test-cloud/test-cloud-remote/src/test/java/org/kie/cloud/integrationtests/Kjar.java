@@ -20,7 +20,7 @@ public enum Kjar {
     DEFINITION_SNAPSHOT("org.kie.server.testing", "definition-project-snapshot", "1.0.0-SNAPSHOT"),
     DEFINITION_101_SNAPSHOT("org.kie.server.testing", "definition-project-snapshot", "1.0.1-SNAPSHOT"),
     CLOUD_BALANCE_SNAPSHOT("org.kie.server.testing", "cloudbalance-snapshot", "1.0.0-SNAPSHOT"),
-    TIMER("org.kie.server.testing", "timer-project", "1.0.0.Final"),
+    TIMER("org.kie.server.testing", "timer-project", "1.0.0-SNAPSHOT"),
     RULE_SNAPSHOT("org.kie.server.testing", "rule-project", "1.0.0-SNAPSHOT"),
     HELLO_RULES_SNAPSHOT("org.kie.server.testing", "hello-rules-snapshot", "1.0.0-SNAPSHOT"),
     USERTASK("org.kie.server.testing", "usertask-project", "1.0.0.Final"),

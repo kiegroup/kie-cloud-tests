@@ -15,6 +15,8 @@
 
 package org.kie.cloud.api.scenario.builder;
 
+import java.time.Duration;
+
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 
 /**
@@ -40,4 +42,11 @@ public interface WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBui
      * @return Builder with configured Smart router id.
      */
     WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withSmartRouterId(String smartRouterId);
+
+    /**
+     * Return setup builder with specified timer service data store refresh interval.
+     * @param timerServiceDataStoreRefreshInterval timer service data store refresh interval.
+     * @return Builder with configured timer service data store refresh interval.
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval);
 }
