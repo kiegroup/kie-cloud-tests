@@ -14,9 +14,9 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
-import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.guvnor.rest.client.ProjectResponse;
@@ -30,13 +30,16 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
@@ -49,17 +52,19 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 @RunWith(Parameterized.class)
-public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public WorkbenchKieServerScenario workbenchKieServerScenario;
+    public DeploymentScenario workbenchKieServerScenario;
 
     private WorkbenchClient workbenchClient;
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
+
+    private WorkbenchDeployment workbenchDeployment;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -68,28 +73,33 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
         WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                 .build();
 
+        ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
+                .build();
+
         return Arrays.asList(new Object[][]{
-            {"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario}
+            {"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario},
+            {"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario},
         });
     }
 
     @Override
-    protected WorkbenchKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return workbenchKieServerScenario;
     }
 
     @Before
     public void setUp() {
-        workbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
-        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        workbenchDeployment = deploymentScenario.getWorkbenchDeployments().get(0);
+        workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
     }
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        String repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         String kieServerLocation = serverInfo.getLocation();
@@ -97,29 +107,29 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
 
         verifyOneServerTemplateWithContainer(kieServerLocation, CONTAINER_ID);
 
-        scaleToZeroAndToOne(deploymentScenario.getWorkbenchDeployment());
+        scaleToZeroAndToOne(workbenchDeployment);
 
         verifyOneServerTemplateWithContainer(kieServerLocation, CONTAINER_ID);
     }
 
     @Test
     public void testWorkbenchProjectPersistence() {
-        workbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+        workbenchClient.createSpace(SPACE_NAME, workbenchDeployment.getUsername());
         workbenchClient.createProject(SPACE_NAME, DEFINITION_PROJECT_NAME, PROJECT_GROUP_ID, DEFINITION_PROJECT_VERSION);
 
         assertSpaceAndProjectExists(SPACE_NAME, DEFINITION_PROJECT_NAME);
 
-        scaleToZeroAndToOne(deploymentScenario.getWorkbenchDeployment());
+        scaleToZeroAndToOne(workbenchDeployment);
 
         assertSpaceAndProjectExists(SPACE_NAME, DEFINITION_PROJECT_NAME);
         workbenchClient.deployProject(SPACE_NAME, DEFINITION_PROJECT_NAME);
 
-        scaleToZeroAndToOne(deploymentScenario.getWorkbenchDeployment());
+        scaleToZeroAndToOne(workbenchDeployment);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
 
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployments().get(0), CONTAINER_ID);
 
         ServiceResponse<KieContainerResourceList> containersResponse = kieServerClient.listContainers();
         assertThat(containersResponse.getType()).isEqualTo(ResponseType.SUCCESS);

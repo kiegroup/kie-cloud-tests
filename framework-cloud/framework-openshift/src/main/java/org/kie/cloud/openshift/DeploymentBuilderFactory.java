@@ -17,6 +17,7 @@ package org.kie.cloud.openshift;
 
 import cz.xtf.openshift.OpenShiftUtil;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
@@ -28,6 +29,7 @@ import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
+import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
@@ -75,6 +77,11 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     @Override
     public KieServerWithDatabaseScenarioBuilder getKieServerWithDatabaseScenarioBuilder() {
         return new KieServerWithDatabaseScenarioBuilderImpl();
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder() {
+        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl();
     }
 
     @Override
