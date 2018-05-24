@@ -82,7 +82,12 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractCloudIntegrat
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        KieServerWithDatabaseScenario kieServerDatabaseScenario = deploymentScenarioFactory.getKieServerWithDatabaseScenarioBuilder()
+        KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                .build();
+
+        KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .build();
@@ -98,7 +103,8 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractCloudIntegrat
 
         return Arrays.asList(new Object[][]{
             {"KIE Server", kieServerScenario},
-            {"KIE Server + Database", kieServerDatabaseScenario},
+            {"KIE Server + MySQL", kieServerMySqlScenario},
+            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario},
         });
     }
 

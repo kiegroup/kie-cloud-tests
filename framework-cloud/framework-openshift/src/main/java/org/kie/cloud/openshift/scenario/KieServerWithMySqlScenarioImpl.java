@@ -37,7 +37,7 @@ import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerWithDatabaseScenarioImpl extends OpenShiftScenario implements KieServerWithDatabaseScenario {
+public class KieServerWithMySqlScenarioImpl extends OpenShiftScenario implements KieServerWithDatabaseScenario {
 
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
@@ -46,7 +46,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftScenario impleme
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public KieServerWithDatabaseScenarioImpl(Map<String, String> envVariables) {
+    public KieServerWithMySqlScenarioImpl(Map<String, String> envVariables) {
         this.envVariables = envVariables;
     }
 
@@ -62,9 +62,9 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftScenario impleme
     @Override public void deploy() {
         super.deploy();
 
-        logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE.getTemplateUrl().toString());
+        logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_MYSQL.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
-        project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_DATABASE.getTemplateUrl(), envVariables);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_MYSQL.getTemplateUrl(), envVariables);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());

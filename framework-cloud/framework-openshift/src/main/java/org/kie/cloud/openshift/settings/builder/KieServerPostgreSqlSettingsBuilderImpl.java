@@ -25,12 +25,12 @@ import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 
-public class KieServerDatabaseSettingsBuilderImpl implements KieServerSettingsBuilder {
+public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettingsBuilder {
 
     private Map<String, String> envVariables;
-    private final OpenShiftTemplate appTemplate = OpenShiftTemplate.KIE_SERVER_DATABASE;
+    private final OpenShiftTemplate appTemplate = OpenShiftTemplate.KIE_SERVER_POSTGRESQL;
 
-    public KieServerDatabaseSettingsBuilderImpl() {
+    public KieServerPostgreSqlSettingsBuilderImpl() {
         envVariables = new HashMap<>();
 
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());

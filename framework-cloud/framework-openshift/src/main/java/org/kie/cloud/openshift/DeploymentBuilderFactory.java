@@ -32,14 +32,16 @@ import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.KieServerWithDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.KieServerWithMySqlScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.KieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.ControllerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerDatabaseSettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.KieServerMySqlSettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.KieServerPostgreSqlSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderImpl;
@@ -77,8 +79,13 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     }
 
     @Override
-    public KieServerWithDatabaseScenarioBuilder getKieServerWithDatabaseScenarioBuilder() {
-        return new KieServerWithDatabaseScenarioBuilderImpl();
+    public KieServerWithDatabaseScenarioBuilder getKieServerWithMySqlScenarioBuilder() {
+        return new KieServerWithMySqlScenarioBuilderImpl();
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder getKieServerWithPostgreSqlScenarioBuilder() {
+        return new KieServerWithPostgreSqlScenarioBuilderImpl();
     }
 
     @Override
@@ -97,8 +104,13 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     }
 
     @Override
-    public KieServerSettingsBuilder getKieServerDatabaseSettingsBuilder() {
-        return new KieServerDatabaseSettingsBuilderImpl();
+    public KieServerSettingsBuilder getKieServerMySqlSettingsBuilder() {
+        return new KieServerMySqlSettingsBuilderImpl();
+    }
+
+    @Override
+    public KieServerSettingsBuilder getKieServerPostgreSqlSettingsBuilder() {
+        return new KieServerPostgreSqlSettingsBuilderImpl();
     }
 
     @Override
