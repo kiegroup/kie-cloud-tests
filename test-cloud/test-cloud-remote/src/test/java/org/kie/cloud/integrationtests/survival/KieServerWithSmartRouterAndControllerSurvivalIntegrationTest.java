@@ -104,7 +104,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
                 .withSmartRouterExternalUrl("http://" + SMART_ROUTER_HOSTNAME + ":" + PORT)
                 .build();
 
-        kieServerSettings = deploymentScenarioFactory.getKieServerDatabaseSettingsBuilder()
+        kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
                 .withApplicationName(KIE_SERVER_NAME)
                 .withHostame(KIE_SERVER_HOSTNAME)
                 .withAdminUser(DeploymentConstants.getWorkbenchUser(), DeploymentConstants.getWorkbenchPassword())

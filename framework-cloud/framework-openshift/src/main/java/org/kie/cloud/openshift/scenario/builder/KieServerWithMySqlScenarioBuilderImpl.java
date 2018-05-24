@@ -23,13 +23,13 @@ import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.scenario.KieServerWithDatabaseScenarioImpl;
+import org.kie.cloud.openshift.scenario.KieServerWithMySqlScenarioImpl;
 
-public class KieServerWithDatabaseScenarioBuilderImpl implements KieServerWithDatabaseScenarioBuilder {
+public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
 
-    public KieServerWithDatabaseScenarioBuilderImpl() {
+    public KieServerWithMySqlScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
@@ -37,7 +37,7 @@ public class KieServerWithDatabaseScenarioBuilderImpl implements KieServerWithDa
 
     @Override
     public KieServerWithDatabaseScenario build() {
-        return new KieServerWithDatabaseScenarioImpl(envVariables);
+        return new KieServerWithMySqlScenarioImpl(envVariables);
     }
 
     @Override

@@ -4,17 +4,6 @@ import java.util.Arrays;
 
 class TemplateSelector {
 
-    enum Database {
-        POSTGRESQL,
-        MYSQL,
-        GENERAL;
-
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-    }
-
     enum Project {
         DROOLS,
         JBPM;
@@ -23,10 +12,6 @@ class TemplateSelector {
         public String toString() {
             return name().toLowerCase();
         }
-    }
-
-    static Database getDatabase() {
-        return enumConstantFromSystemProperty("template.database", Database.class);
     }
 
     static Project getProject() {

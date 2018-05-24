@@ -84,7 +84,11 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
-        KieServerWithDatabaseScenario kieServerDatabaseScenario = deploymentScenarioFactory.getKieServerWithDatabaseScenarioBuilder()
+        KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
@@ -104,7 +108,8 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
             {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario},
             {"KIE Server", kieServerScenario},
-            {"KIE Server + Database", kieServerDatabaseScenario}
+            {"KIE Server + MySQL", kieServerMySqlScenario},
+            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario}
         });
     }
 

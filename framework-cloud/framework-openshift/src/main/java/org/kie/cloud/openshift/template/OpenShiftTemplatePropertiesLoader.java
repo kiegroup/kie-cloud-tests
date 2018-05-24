@@ -28,19 +28,12 @@ class OpenShiftTemplatePropertiesLoader {
 
     private static void loadTemplatePropertiesFromResources() {
         final TemplateSelector.Project product = TemplateSelector.getProject();
-        final TemplateSelector.Database database = TemplateSelector.getDatabase();
 
         String secretConfigFile = product + "-app-secret.properties";
-        String dbSpecificTemplates = String.format("templates-%s-%s.properties", product, database);
+        String projectSpecificTemplate = String.format("templates-%s.properties", product);
 
         addPropertiesFromResource(secretConfigFile);
-        addPropertiesFromResource(dbSpecificTemplates);
-
-        // TODO ugly - we ALWAYS have to load general templates, even if DB is postgres/mysql
-        if (database != TemplateSelector.Database.GENERAL) {
-            String generalTemplates = String.format("templates-%s-%s.properties", product, TemplateSelector.Database.GENERAL);
-            addPropertiesFromResource(generalTemplates);
-        }
+        addPropertiesFromResource(projectSpecificTemplate);
 
         // Load custom signle testing templates
         addPropertiesFromResource("single-jbpm-templates.properties");

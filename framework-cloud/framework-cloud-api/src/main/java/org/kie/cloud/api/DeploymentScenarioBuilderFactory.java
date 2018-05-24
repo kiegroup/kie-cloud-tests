@@ -36,13 +36,15 @@ public interface DeploymentScenarioBuilderFactory {
     WorkbenchKieServerPersistentScenarioBuilder getWorkbenchKieServerPersistentScenarioBuilder();
     WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder();
     KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder();
-    KieServerWithDatabaseScenarioBuilder getKieServerWithDatabaseScenarioBuilder();
+    KieServerWithDatabaseScenarioBuilder getKieServerWithMySqlScenarioBuilder();
+    KieServerWithDatabaseScenarioBuilder getKieServerWithPostgreSqlScenarioBuilder();
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder();
     GenericScenarioBuilder getGenericScenarioBuilder();
 
     ControllerSettingsBuilder getControllerSettingsBuilder();
     KieServerSettingsBuilder getKieServerSettingsBuilder();
-    KieServerSettingsBuilder getKieServerDatabaseSettingsBuilder();
+    KieServerSettingsBuilder getKieServerMySqlSettingsBuilder();
+    KieServerSettingsBuilder getKieServerPostgreSqlSettingsBuilder();
     KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder();
     WorkbenchSettingsBuilder getWorkbenchSettingsBuilder();
     WorkbenchMonitoringSettingsBuilder getWorkbenchMonitoringSettingsBuilder();
