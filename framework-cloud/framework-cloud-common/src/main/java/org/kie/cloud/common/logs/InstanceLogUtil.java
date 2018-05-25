@@ -16,15 +16,18 @@
 package org.kie.cloud.common.logs;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InstanceLogUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(InstanceLogUtil.class);
 
     private static final String INSTANCES_LOGS_OUTPUT_DIRECTORY = "instance.logs";
     private static final String DEFAULT_LOG_OUTPUT_DIRECTORY = "instances";
@@ -43,8 +46,8 @@ public class InstanceLogUtil {
         File logFile = new File(outputDirectory, instance.getName() + LOG_SUFFIX);
         try {
             FileUtils.write(logFile, instance.getLogs(), "UTF-8");
-        } catch (IOException e) {
-            throw new RuntimeException("Error writting instance logs", e);
+        } catch (Exception e) {
+            logger.error("Error writting instance logs", e);
         }
     }
 
