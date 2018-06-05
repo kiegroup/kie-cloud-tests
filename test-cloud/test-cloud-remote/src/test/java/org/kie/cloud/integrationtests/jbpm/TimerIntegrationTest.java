@@ -56,7 +56,7 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
     protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(3))
+                .withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(1))
                 .build();
     }
 
@@ -99,8 +99,8 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
         long distance1 = thirdInstance - secondInstance;
         long distance2 = secondInstance - firstInstance;
 
-        assertThat(distance1).isBetween(4000L, 6000L);
-        assertThat(distance2).isBetween(4000L, 6000L);
+        assertThat(distance1).isBetween(3000L, 7000L);
+        assertThat(distance2).isBetween(3000L, 7000L);
     }
 
     private void waitUntilKieServerLogsContain(KieServerDeployment kieServerDeployment, String logMessage) {
