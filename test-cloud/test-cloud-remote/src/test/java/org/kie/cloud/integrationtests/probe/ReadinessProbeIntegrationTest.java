@@ -127,6 +127,7 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
 
         checkBCLoginScreenAvailable();
         logger.debug("Check that workbench REST is available");
+        workbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
         workbenchClient.createSpace(SPACE_SECOND_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
         spaces = workbenchClient.getSpaces();
         Assertions.assertThat(spaces.stream().anyMatch(x -> x.getName().equals(SPACE_SECOND_NAME))).isTrue();
