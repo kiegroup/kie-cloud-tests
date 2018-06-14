@@ -49,6 +49,14 @@ Can be found in framework-git, class org.kie.cloud.git.constants.GitConstants
 | github.username     |        | Username for logging into GitHub      |
 | github.password     |        | Password for logging into GitHub      |
 
+#### Gogs
+
+| \<specific-params\> | Value  |  Meaning                              |
+| ------------------- | ------ | ------------------------------------- |
+| git.provider        | Gogs   |                                       |
+| gogs.username       |        | Username for logging into Gogs        |
+| gogs.password       |        | Password for logging into Gogs        |
+
 ### Maven properties
 
 Can be found in framework-maven, class org.kie.cloud.maven.constants.MavenConstants

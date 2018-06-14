@@ -16,7 +16,6 @@
 package org.kie.cloud.git.github;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -30,11 +29,16 @@ public class GitHubGitProvider extends AbstractGitProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubGitProvider.class);
 
-    private GitHubClient client;
+    private final GitHubClient client;
+
+    public GitHubGitProvider(String user, String password) {
+        client = new GitHubClient();
+        client.setCredentials(GitConstants.getGitHubUser(), GitConstants.getGitHubPassword());
+    }
 
     @Override
     public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
-        String repositoryName = repositoryPrefixName + "-" + UUID.randomUUID().toString().substring(0, 4);
+        String repositoryName = generateRepositoryName(repositoryPrefixName);
 
         try {
             RepositoryService service = new RepositoryService(client);
@@ -45,7 +49,8 @@ public class GitHubGitProvider extends AbstractGitProvider {
             repository = service.createRepository(repository);
             String httpUrl = repository.getSshUrl();
 
-            pushToGitRepository(httpUrl, repositoryPath);
+            pushToGitRepository(httpUrl, repositoryPath, GitConstants.getGitHubUser(),
+                    GitConstants.getGitHubPassword());
         } catch (Exception e) {
             logger.error("Error while preparing GitHub project " + repositoryName, e);
             throw new RuntimeException("Error while preparing GitHub project " + repositoryName, e);
@@ -74,11 +79,5 @@ public class GitHubGitProvider extends AbstractGitProvider {
             logger.error("Error while retrieving GitHub project URL from " + repositoryName, e);
             throw new RuntimeException("Error while retrieving GitHub project URL from " + repositoryName, e);
         }
-    }
-
-    @Override
-    public void init() {
-        client = new GitHubClient();
-        client.setCredentials(GitConstants.getGitHubUser(), GitConstants.getGitHubPassword());
     }
 }

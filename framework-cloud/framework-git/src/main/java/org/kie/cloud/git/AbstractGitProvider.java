@@ -16,6 +16,7 @@
 package org.kie.cloud.git;
 
 import java.io.File;
+import java.util.UUID;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
@@ -23,25 +24,41 @@ import org.eclipse.jgit.api.RemoteRemoveCommand;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.kie.cloud.git.constants.GitConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractGitProvider implements GitProvider {
 
-    protected void pushToGitRepository(String httpUrl, String repositoryPath) throws Exception {
-        Git git = Git.init().setDirectory(new File(repositoryPath)).call();
+    private static final Logger logger = LoggerFactory.getLogger(AbstractGitProvider.class);
 
-        RemoteAddCommand remoteAdd = git.remoteAdd();
-        remoteAdd.setName("origin");
-        remoteAdd.setUri(new URIish(httpUrl));
-        remoteAdd.call();
-        git.add().addFilepattern(".").call();
-        git.commit().setMessage("Initial commit").call();
+    protected String generateRepositoryName(String repositoryPrefixName) {
+        final String repositoryName = repositoryPrefixName + "-" + UUID.randomUUID().toString().substring(0, 4);
+        logger.debug("Repository name {} was generated", repositoryName);
 
-        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(GitConstants.getGitLabUser(), GitConstants.getGitLabPassword());
-        git.push().setCredentialsProvider(credentialsProvider).setRemote("origin").setPushAll().call();
+        return repositoryName;
+    }
 
-        RemoteRemoveCommand remoteRemove = git.remoteRemove();
-        remoteRemove.setName("origin");
-        remoteRemove.call();
+    protected void pushToGitRepository(String httpUrl, String repositoryPath,
+            String username, String password) {
+        try {
+            Git git = Git.init().setDirectory(new File(repositoryPath)).call();
+
+            RemoteAddCommand remoteAdd = git.remoteAdd();
+            remoteAdd.setName("origin");
+            remoteAdd.setUri(new URIish(httpUrl));
+            remoteAdd.call();
+            git.add().addFilepattern(".").call();
+            git.commit().setMessage("Initial commit").call();
+
+            CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
+            git.push().setCredentialsProvider(credentialsProvider).setRemote("origin").setPushAll().call();
+
+            RemoteRemoveCommand remoteRemove = git.remoteRemove();
+            remoteRemove.setName("origin");
+            remoteRemove.call();
+        } catch (Exception e) {
+            logger.error("Error pushing to remote repository {}", httpUrl);
+            throw new RuntimeException("Error pushing to remote repository" + httpUrl, e);
+        }
     }
 }

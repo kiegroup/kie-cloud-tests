@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +61,8 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
     @Parameter(value = 1)
     public DeploymentScenario workbenchKieServerScenario;
 
+    private String repositoryName;
+
     private WorkbenchClient workbenchClient;
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -95,9 +98,17 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegratio
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
     }
 
+    @After
+    public void tearDown() {
+        if (repositoryName != null) {
+            gitProvider.deleteGitRepository(repositoryName);
+            repositoryName = null;
+        }
+    }
+
     @Test
     public void testWorkbenchControllerPersistence() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
 

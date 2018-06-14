@@ -13,19 +13,18 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.git;
+package org.kie.cloud.git.gitlab;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.git.GitProviderFactory;
 
-import org.kie.cloud.api.constants.ConfigurationInitializer;
-import org.kie.cloud.git.constants.GitConstants;
-import org.kie.cloud.git.github.GitHubGitProvider;
-import org.kie.cloud.git.gitlab.GitLabGitProvider;
-import org.kie.cloud.git.gogs.GogsGitProvider;
+public class GitLabGitProviderFactory implements GitProviderFactory {
 
-public interface GitProviderFactory {
+    @Override public String providerType() {
+        return "GitLab";
+    }
 
-    String providerType();
-    GitProvider createGitProvider();
+    @Override public GitProvider createGitProvider() {
+        return new GitLabGitProvider();
+    }
 }

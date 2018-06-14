@@ -25,6 +25,7 @@ import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.git.GitProvider;
 import org.kie.cloud.git.GitProviderFactory;
+import org.kie.cloud.git.GitProviderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,8 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
 
     private final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-    protected final GitProvider gitProvider = GitProviderFactory.getGitProvider();
+    protected final GitProviderService gitProviderService = new GitProviderService();
+    protected final GitProvider gitProvider = gitProviderService.createGitProvider();
     protected T deploymentScenario;
 
     @Before
@@ -98,10 +100,6 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     public void cleanEnvironment() {
         if (deploymentScenario != null) {
             deploymentScenario.undeploy();
-
-            if (gitProvider != null) {
-                gitProvider.deleteGitRepository(deploymentScenario.getNamespace());
-            }
         }
     }
 

@@ -22,7 +22,11 @@ import cz.xtf.git.GitProject;
 
 public class GitLabGitProvider extends AbstractGitProvider {
 
-    private GitLabUtil gitLabUtil;
+    private final GitLabUtil gitLabUtil;
+
+    public GitLabGitProvider() {
+        gitLabUtil = new GitLabUtil();
+    }
 
     @Override
     public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
@@ -38,10 +42,5 @@ public class GitLabGitProvider extends AbstractGitProvider {
     @Override
     public String getRepositoryUrl(String repositoryName) {
         return gitLabUtil.getProjectUrl(repositoryName);
-    }
-
-    @Override
-    public void init() {
-        gitLabUtil = new GitLabUtil();
     }
 }

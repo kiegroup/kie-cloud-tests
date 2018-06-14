@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.SoftAssertions;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -79,6 +80,8 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
     private ProcessServicesClient kieServerProcessClient;
     private ProcessServicesClient smartRouterProcessClient;
 
+    private String repositoryName;
+
     private final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
 
     private final String CONTROLLER_HOSTNAME = RANDOM_URL_PREFIX + CONTROLLER_NAME + DeploymentConstants.getDefaultDomainSuffix();
@@ -124,7 +127,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @Before
     public void setUp() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + DEFINITION_PROJECT_NAME);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + DEFINITION_PROJECT_NAME);
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
 
@@ -135,6 +138,11 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
         kieServerProcessClient = kieServerClient.getServicesClient(ProcessServicesClient.class);
         smartRouterProcessClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
+    }
+
+    @After
+    public void tearDown() {
+        gitProvider.deleteGitRepository(repositoryName);
     }
 
     @Test
