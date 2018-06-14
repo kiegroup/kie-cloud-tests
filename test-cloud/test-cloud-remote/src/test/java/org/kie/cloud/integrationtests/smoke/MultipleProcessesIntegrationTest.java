@@ -3,6 +3,7 @@ package org.kie.cloud.integrationtests.smoke;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -27,6 +28,8 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
 
     private KieServerControllerClient kieControllerClient;
 
+    private String repositoryName;
+
     private KieServicesClient kieServerClient;
     private ProcessServicesClient processClient;
     private UserTaskServicesClient taskClient;
@@ -38,7 +41,7 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
 
     @Before
     public void setUp() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
@@ -46,6 +49,11 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
+    }
+
+    @After
+    public void tearDown() {
+        gitProvider.deleteGitRepository(repositoryName);
     }
 
     @Test

@@ -15,6 +15,7 @@
 
 package org.kie.cloud.git;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProvider;
@@ -22,11 +23,18 @@ import org.kie.cloud.git.github.GitHubGitProvider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class GitProviderFactoryTest {
+public class GitProviderServiceTest {
+
+    private GitProviderService gitProviderService;
+
+    @Before
+    public void initService() {
+        gitProviderService = new GitProviderService();
+    }
 
     @Test
     public void testGetNotDefinedGitProvider() {
-        Throwable thrown = catchThrowable(() -> GitProviderFactory.getGitProvider());
+        Throwable thrown = catchThrowable(() -> gitProviderService.createGitProvider());
         assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("No GIT provider defined.");
     }
 
@@ -35,7 +43,7 @@ public class GitProviderFactoryTest {
         System.setProperty(GitConstants.GIT_PROVIDER, "not-existing-provider");
 
         try {
-            Throwable thrown = catchThrowable(() -> GitProviderFactory.getGitProvider());
+            Throwable thrown = catchThrowable(() -> gitProviderService.createGitProvider());
             assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("GIT provider with name not-existing-provider not found");
         } finally {
             System.clearProperty(GitConstants.GIT_PROVIDER);
@@ -47,7 +55,7 @@ public class GitProviderFactoryTest {
         System.setProperty(GitConstants.GIT_PROVIDER, "GitHub");
 
         try {
-            assertThat(GitProviderFactory.getGitProvider()).isInstanceOf(GitHubGitProvider.class);
+            assertThat(gitProviderService.createGitProvider()).isInstanceOf(GitHubGitProvider.class);
         } finally {
             System.clearProperty(GitConstants.GIT_PROVIDER);
         }

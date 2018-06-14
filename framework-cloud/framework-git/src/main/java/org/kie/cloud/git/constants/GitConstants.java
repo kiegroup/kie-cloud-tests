@@ -16,6 +16,8 @@
 package org.kie.cloud.git.constants;
 
 import org.kie.cloud.api.constants.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GitConstants implements Constants {
 
@@ -27,6 +29,12 @@ public class GitConstants implements Constants {
 
     public static final String GITHUB_USER = "github.username";
     public static final String GITHUB_PASSWORD = "github.password";
+
+    public static final String GOGS_URL = "gogs.url";
+    public static final String GOGS_USER = "gogs.username";
+    public static final String GOGS_PASSWORD = "gogs.password";
+
+    private static final Logger logger = LoggerFactory.getLogger(GitConstants.class);
 
     public static String getGitProvider() {
         return System.getProperty(GIT_PROVIDER);
@@ -50,6 +58,27 @@ public class GitConstants implements Constants {
 
     public static String getGitHubPassword() {
         return System.getProperty(GITHUB_PASSWORD);
+    }
+
+    public static String getGogsUrl() {
+        return System.getProperty(GOGS_URL);
+    }
+
+    public static String getGogsUser() {
+        return System.getProperty(GOGS_USER);
+    }
+
+    public static String getGogsPassword() {
+        return System.getProperty(GOGS_PASSWORD);
+    }
+
+    public static String readMandatoryParameter(String value, String parameterName) {
+        if (value == null) {
+            logger.error("Parameter {} must be specified", parameterName);
+            throw new RuntimeException("Parameter " + parameterName + " must be specified");
+        }
+
+        return value;
     }
 
     @Override

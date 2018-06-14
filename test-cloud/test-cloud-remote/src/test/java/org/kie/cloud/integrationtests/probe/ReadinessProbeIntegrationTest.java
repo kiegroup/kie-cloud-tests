@@ -69,6 +69,8 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
     @Parameter(value = 1)
     public WorkbenchKieServerScenario workbenchKieServerScenario;
 
+    String repositoryName;
+
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
@@ -105,6 +107,11 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
     public void tearDown() {
         if (httpKieServerClient != null) {
             httpKieServerClient.close();
+        }
+
+        if (repositoryName != null) {
+            gitProvider.deleteGitRepository(repositoryName);
+            repositoryName = null;
         }
     }
 

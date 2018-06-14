@@ -29,6 +29,9 @@
 
     <version.org.gitlab>1.2.8</version.org.gitlab>
     <version.org.eclipse.mylyn.github>2.1.5</version.org.eclipse.mylyn.github>
+    <version.http.core>4.4.9</version.http.core>
+    <version.http.client>4.5.5</version.http.client>
+    <version.jgit>4.11.0.201803080745-r</version.jgit>
 
     <version.cz.xtf>0.6</version.cz.xtf>
     <!-- Version adjustments due to mismatch between Kie BOM and XTF dependencies. -->
@@ -140,6 +143,21 @@
         <version>${version.org.gitlab}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>${version.http.core}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${version.http.client}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>fluent-hc</artifactId>
+        <version>${version.http.client}</version>
+      </dependency>
+      <dependency>
         <groupId>org.eclipse.mylyn.github</groupId>
         <artifactId>org.eclipse.egit.github.core</artifactId>
         <version>${version.org.eclipse.mylyn.github}</version>
@@ -159,6 +177,12 @@
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-verifier</artifactId>
         <version>${version.org.apache.maven.shared}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jgit</groupId>
+        <artifactId>org.eclipse.jgit</artifactId>
+        <version>${version.jgit}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

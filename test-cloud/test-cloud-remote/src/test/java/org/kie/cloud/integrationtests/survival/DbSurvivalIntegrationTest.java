@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -78,6 +79,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<KieS
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected QueryServicesClient queryServicesClient;
+
     private static final Logger logger = LoggerFactory.getLogger(DbSurvivalIntegrationTest.class);
 
     @Override

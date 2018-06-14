@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -46,6 +47,9 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected QueryServicesClient queryServicesClient;
+
+    private String repositoryName;
+
     private static final Logger logger = LoggerFactory.getLogger(ProcessFailoverIntegrationTest.class);
 
     private static final String variableKey = "name";
@@ -59,7 +63,7 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
 
     @Before
     public void setUp() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
@@ -68,6 +72,11 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
+    }
+
+    @After
+    public void tearDown() {
+        gitProvider.deleteGitRepository(repositoryName);
     }
 
     @Test
