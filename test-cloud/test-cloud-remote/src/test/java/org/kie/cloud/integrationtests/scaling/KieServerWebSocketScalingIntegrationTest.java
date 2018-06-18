@@ -75,7 +75,7 @@ public class KieServerWebSocketScalingIntegrationTest {
     private static final String DEFINITION_PROJECT_SNAPSHOT_NAME = "definition-project-snapshot";
     private static final String DEFINITION_PROJECT_SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
 
-    private static final String WEBSOCKET_CONNECTION = "Connection to Kie Controller over websocket is now open";
+    private static final String WEBSOCKET_CONNECTION = "Connection to Kie Controller over Web Socket is now open";
     private static final String STARTED_CONTAINER = "Container cont-id (for release id org.kie.server.testing:definition-project-snapshot:1.0.0-SNAPSHOT) successfully started";
 
     @BeforeClass
@@ -97,10 +97,9 @@ public class KieServerWebSocketScalingIntegrationTest {
             workbenchMonitoringScenario.deploy();
             workbenchDeployment = workbenchMonitoringScenario.getWorkbenchDeployments().get(0);
 
-            DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
+            DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
                     .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                    .withControllerProtocol(Protocol.ws)
-                    .withControllerConnection(workbenchDeployment.getWebSocketUri().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().getPort()))
+                    .withControllerConnection(Protocol.ws.name(), workbenchDeployment.getWebSocketUri().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().getPort()))
                     .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
                     .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                     .withKieServerSyncDeploy(true)
@@ -131,7 +130,6 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     @Test
     @Category(JBPMOnly.class)
-    @Ignore("[RHBA-638] Missing configuration for Controller in S2I templates")
     public void testConnectionBetweenDeployables() {
         scaleKieServerTo(3);
 
