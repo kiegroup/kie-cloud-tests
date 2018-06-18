@@ -19,62 +19,88 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
-import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.maven.MavenDeployer;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerDatabasePersistentScenario> {
+@RunWith(Parameterized.class)
+public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<KieServerWithDatabaseScenario> {
 
-    private KieServerControllerClient kieServerControllerClient;
+    @Parameter(value = 0)
+    public String testScenarioName;
+
+    @Parameter(value = 1)
+    public KieServerWithDatabaseScenario kieServerScenario;
+
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+        KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .build();
+
+        return Arrays.asList(new Object[][]{
+            {"KIE Server + MySQL", kieServerMySqlScenario},
+            // TODO: Disable PostgreSQL until the RHPAM-1252 is fixed.
+//            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario}
+        });
+    }
+
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected QueryServicesClient queryServicesClient;
     private static final Logger logger = LoggerFactory.getLogger(DbSurvivalIntegrationTest.class);
 
     @Override
-    protected WorkbenchKieServerDatabasePersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        throw new RuntimeException("No deployment scenario with persistent database currently available.");
+    protected KieServerWithDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return kieServerScenario;
+    }
+
+    @BeforeClass
+    public static void deployMavenProject() {
+        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before
     public void setUp() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
-
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
-
-        kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
-
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
+
+        kieServicesClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION)));
     }
 
     @Test
-    @Ignore("No deployment scenario with persistent database currently available.")
     public void reconnectionDbTest() {
-        logger.debug("Register Kie Container to Kie Server");
-        KieServerInfo serverInfo = kieServicesClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
-
         logger.debug("Start process instance");
         Long signalPid = processServicesClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
         assertThat(signalPid).isNotNull().isGreaterThan(0L);
@@ -89,7 +115,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<Work
 
         scaleDatabaseTo(1);
 
-        waitForKieServerResposne();
+        waitForKieServerResponse();
 
         logger.debug("Check started processes");
         assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
@@ -108,7 +134,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<Work
         deploymentScenario.getDatabaseDeployment().waitForScale();
     }
 
-    private void waitForKieServerResposne() {
+    private void waitForKieServerResponse() {
         LocalDateTime endTime = LocalDateTime.now().plusSeconds(30);
 
         while (LocalDateTime.now().isBefore(endTime)) {

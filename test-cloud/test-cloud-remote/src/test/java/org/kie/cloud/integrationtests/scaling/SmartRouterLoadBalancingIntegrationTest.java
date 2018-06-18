@@ -67,7 +67,6 @@ public class SmartRouterLoadBalancingIntegrationTest extends
     }
 
     @Test
-    @Ignore("https://issues.jboss.org/browse/RHPAM-740")
     public void testRouterLoadBalancing() {
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(
                 deploymentScenario.getWorkbenchRuntimeDeployment());
