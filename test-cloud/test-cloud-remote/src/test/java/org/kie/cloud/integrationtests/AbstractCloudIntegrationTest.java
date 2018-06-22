@@ -18,6 +18,8 @@ package org.kie.cloud.integrationtests;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
@@ -84,6 +86,9 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected final GitProvider gitProvider = GitProviderFactory.getGitProvider();
     protected T deploymentScenario;
 
+    @Rule
+    public TestName testName = new TestName();
+
     @Before
     public void initializeDeployment() {
         deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
@@ -92,6 +97,8 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
         for (int i = 0; i < SCENARIO_DEPLOYMENT_ATTEMPTS && !isDeployed; i++) {
             isDeployed = deployScenario();
         }
+
+        System.out.println("Test name is " + testName.getMethodName() + ", deployed in " + deploymentScenario.getNamespace());
     }
 
     @After
