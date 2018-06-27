@@ -18,7 +18,6 @@ package org.kie.cloud.openshift.deployment;
 import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -33,7 +32,7 @@ public class RouterUtil {
     private static final int ROUTER_CODE = 503;
     private static final String ROUTER_MESSAGE = "The application is currently not serving requests at this endpoint. It may not have been started or is still starting.";
     private static final long ROUTER_WAIT_ITERATION_TIME = 250;
-    private static final Duration ROUTER_WAIT_TIME = Duration.of(30, ChronoUnit.SECONDS);
+    private static final Duration ROUTER_WAIT_TIME = Duration.ofMinutes(5);
 
     private static final Logger logger = LoggerFactory.getLogger(RouterUtil.class);
 
