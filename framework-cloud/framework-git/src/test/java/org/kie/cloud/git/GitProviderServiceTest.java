@@ -35,7 +35,7 @@ public class GitProviderServiceTest {
     @Test
     public void testGetNotDefinedGitProvider() {
         Throwable thrown = catchThrowable(() -> gitProviderService.createGitProvider());
-        assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("No GIT provider defined.");
+        assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("Parameter git.provider must be specified");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class GitProviderServiceTest {
 
         try {
             Throwable thrown = catchThrowable(() -> gitProviderService.createGitProvider());
-            assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("GIT provider with name not-existing-provider not found");
+            assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("Unknown type of Git provider not-existing-provider");
         } finally {
             System.clearProperty(GitConstants.GIT_PROVIDER);
         }
@@ -53,11 +53,15 @@ public class GitProviderServiceTest {
     @Test
     public void testGetGitHubGitProvider() {
         System.setProperty(GitConstants.GIT_PROVIDER, "GitHub");
+        System.setProperty(GitConstants.GITHUB_USER, "GitHubUser");
+        System.setProperty(GitConstants.GITHUB_PASSWORD, "GitHubPass");
 
         try {
             assertThat(gitProviderService.createGitProvider()).isInstanceOf(GitHubGitProvider.class);
         } finally {
             System.clearProperty(GitConstants.GIT_PROVIDER);
+            System.clearProperty(GitConstants.GITHUB_USER);
+            System.clearProperty(GitConstants.GITHUB_PASSWORD);
         }
     }
 }
