@@ -164,7 +164,7 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     private void waitUntilKieServerLogsContain(String logMessage) {
         for (Instance kieServerInstance : kieServerDeployment.getInstances()) {
-            TimeUtils.wait(Duration.ofSeconds(15), Duration.ofSeconds(1), () -> kieServerInstance.getLogs().contains(logMessage));
+            TimeUtils.wait(Duration.ofMinutes(1), Duration.ofSeconds(1), () -> kieServerInstance.getLogs().contains(logMessage));
         }
     }
 
