@@ -25,8 +25,10 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
@@ -78,6 +80,9 @@ public class KieServerWebSocketScalingIntegrationTest {
     private static final String WEBSOCKET_CONNECTION = "Connection to Kie Controller over Web Socket is now open";
     private static final String STARTED_CONTAINER = "Container cont-id (for release id org.kie.server.testing:definition-project-snapshot:1.0.0-SNAPSHOT) successfully started";
 
+    @Rule
+    public TestName testName = new TestName();
+
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
@@ -94,6 +99,7 @@ public class KieServerWebSocketScalingIntegrationTest {
             workbenchMonitoringScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
                     .withMonitoring(workbenchMonitoringSettings)
                     .build();
+            workbenchMonitoringScenario.setLogFolderName(testName.getMethodName());
             workbenchMonitoringScenario.deploy();
             workbenchDeployment = workbenchMonitoringScenario.getWorkbenchDeployments().get(0);
 
@@ -107,6 +113,7 @@ public class KieServerWebSocketScalingIntegrationTest {
             kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
                     .withKieServer(kieServerSettings)
                     .build();
+            kieServerScenario.setLogFolderName(testName.getMethodName());
             kieServerScenario.deploy();
             kieServerDeployment = kieServerScenario.getKieServerDeployments().get(0);
         } catch (MissingResourceException e) {

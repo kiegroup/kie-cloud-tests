@@ -37,6 +37,21 @@ public interface DeploymentScenario {
     String getNamespace();
 
     /**
+     * Returns folder name which should be used for storing instance logs.
+     *
+     * @return Folder name which should be used for storing instance logs.
+     */
+    String getLogFolderName();
+
+    /**
+     * Configure name of custom folder where the scenario logs will be stored.
+     * By default the namespace value is used as log folder.
+     *
+     * @param logFolderName
+     */
+    void setLogFolderName(String logFolderName);
+
+    /**
      * Create and deploy deployment scenario.
      *
      * @throws MissingResourceException If scenario is missing any required resource.

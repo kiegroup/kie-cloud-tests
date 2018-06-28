@@ -33,12 +33,12 @@ public class InstanceLogUtil {
     private static final String DEFAULT_LOG_OUTPUT_DIRECTORY = "instances";
     private static final String LOG_SUFFIX = ".log";
 
-    public static void writeInstanceLogs(Instance instance) {
+    public static void writeInstanceLogs(Instance instance, String customLogFolderName) {
         File outputDirectory = new File(System.getProperty(INSTANCES_LOGS_OUTPUT_DIRECTORY, DEFAULT_LOG_OUTPUT_DIRECTORY));
         if (!outputDirectory.isDirectory()) {
             outputDirectory.mkdir();
         }
-        outputDirectory = new File(outputDirectory, instance.getNamespace());
+        outputDirectory = new File(outputDirectory, customLogFolderName);
         if (!outputDirectory.isDirectory()) {
             outputDirectory.mkdir();
         }
@@ -56,7 +56,7 @@ public class InstanceLogUtil {
             if (deployment != null) {
                 List<Instance> instances = deployment.getInstances();
                 for (Instance instance : instances) {
-                    writeInstanceLogs(instance);
+                    writeInstanceLogs(instance, deploymentScenario.getLogFolderName());
                 }
             }
         }

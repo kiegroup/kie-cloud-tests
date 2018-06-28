@@ -35,12 +35,26 @@ public abstract class OpenShiftScenario implements DeploymentScenario {
 
     protected String projectName;
     protected Project project;
+    private String logFolderName;
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
 
     @Override
     public String getNamespace() {
         return projectName;
+    }
+
+    @Override
+    public String getLogFolderName() {
+        if (logFolderName == null) {
+            return projectName;
+        }
+        return logFolderName;
+    }
+
+    @Override
+    public void setLogFolderName(String logFolderName) {
+        this.logFolderName = logFolderName;
     }
 
     @Override
