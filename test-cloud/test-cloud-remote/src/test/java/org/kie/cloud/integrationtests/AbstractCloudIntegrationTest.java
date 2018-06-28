@@ -18,13 +18,14 @@ package org.kie.cloud.integrationtests;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderFactory;
 import org.kie.cloud.git.GitProviderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,9 +87,13 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected final GitProvider gitProvider = gitProviderService.createGitProvider();
     protected T deploymentScenario;
 
+    @Rule
+    public TestName testName = new TestName();
+
     @Before
     public void initializeDeployment() {
         deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
+        deploymentScenario.setLogFolderName(testName.getMethodName());
 
         boolean isDeployed = false;
         for (int i = 0; i < SCENARIO_DEPLOYMENT_ATTEMPTS && !isDeployed; i++) {
