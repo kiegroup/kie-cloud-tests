@@ -54,6 +54,7 @@ Can be found in framework-git, class org.kie.cloud.git.constants.GitConstants
 | \<specific-params\> | Value  |  Meaning                              |
 | ------------------- | ------ | ------------------------------------- |
 | git.provider        | Gogs   |                                       |
+| gogs.url            |        | Url pointing to Gogs instance         |
 | gogs.username       |        | Username for logging into Gogs        |
 | gogs.password       |        | Password for logging into Gogs        |
 
