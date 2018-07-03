@@ -18,6 +18,8 @@ package org.kie.cloud.openshift.template;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -42,7 +44,7 @@ public enum OpenShiftTemplate {
     // Special template containing secret file.
     SECRET(OpenShiftConstants.KIE_APP_SECRET);
 
-    private static final Properties templateProperties = OpenShiftTemplatePropertiesLoader.getProperties();
+    private static final Properties templateProperties = filterOpenShiftTemplateProperties(OpenShiftTemplatePropertiesLoader.getProperties());
 
     private final String propertyKey;
 
@@ -75,5 +77,31 @@ public enum OpenShiftTemplate {
         } catch (MalformedURLException e) {
             throw new MissingResourceException("Invalid URL '" + urlString + "' specified by property " + propertyKey, e);
         }
+    }
+
+    /**
+     * Process OpenShift template properties and replace any variable with appropriate value. The value can be retrieved from another property in template properties.
+     *
+     * @param openShiftTemplateProperties Properties to be processed.
+     * @return Processed properties.
+     */
+    private static Properties filterOpenShiftTemplateProperties(Properties openShiftTemplateProperties) {
+        Pattern replaceTagPattern = Pattern.compile(".*\\$\\{(.*)\\}.*");
+        Properties processedProperties = new Properties();
+
+        openShiftTemplateProperties.forEach((k,v) -> {
+            String value = (String) v;
+            Matcher matcher = replaceTagPattern.matcher(value);
+            if(matcher.matches()) {
+                // If property tag is provided using system properties then it is replaced automatically when loading properties by Java.
+                // This step is used just in case the replacement is another property from loaded properties.
+                String propertyValue = openShiftTemplateProperties.getProperty(matcher.group(1));
+                processedProperties.put(k, value.replace("${" + matcher.group(1) + "}", propertyValue));
+            } else {
+                processedProperties.put(k, v);
+            }
+        });
+
+        return processedProperties;
     }
 }

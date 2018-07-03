@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kie.cloud.api.constants.ConfigurationInitializer;
 import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProviderFactory;
 import org.kie.cloud.git.gitlab.GitLabGitProviderFactory;
@@ -30,6 +31,10 @@ public class GitProviderService {
     private final Map<String, GitProviderFactory> providerFactories;
 
     private static final Logger logger = LoggerFactory.getLogger(GitProviderService.class);
+
+    static {
+        ConfigurationInitializer.initConfigProperties();
+    }
 
     public GitProviderService() {
         final Map<String, GitProviderFactory> providerFactories = new HashMap<>();
