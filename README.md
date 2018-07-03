@@ -7,8 +7,8 @@ Tests currently cover just Kie deployments deployed on OpenShift.
 
 How to run the tests on OpenShift:
 1. Start OpenShift - You can use any OpenShift instance, for example OpenShift started by [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md)
-1. Prepare your GIT provider (for example install and start GitLab). You can skip this point and use GitHub account.
-1. Run tests using the command ```mvn clean install -Popenshift <specific-params>```
+2. Prepare your GIT provider (for example install and start GitLab). You can skip this point and use GitHub account.
+3. Run tests using the command `mvn clean install -Popenshift <specific-params>`
 
 The following table lists all currently required and supported parameters:
 
@@ -30,7 +30,7 @@ Can be found in framework-openshift, class org.kie.cloud.openshift.constants.Ope
 ### GIT provider properties
 
 Choose one GIT provider.
-Can be found in framework-git, class org.kie.cloud.git.constants.GitConstants
+Supported providers can be found in framework-git, class org.kie.cloud.git.constants.GitConstants
 
 #### GitLab
 
@@ -86,15 +86,15 @@ Can be found in framework-cloud-api, class org.kie.cloud.api.deployment.constant
 Here you can find steps for installing and initializing Kie template to any OpenShift instance.
 
 1. Install oc tool (OpenShift client).
-2. ```oc login https://<openshif_master_url>:8443 --username=user --password=redhat```
+2. `oc login https://<openshift-ip>:8443 --username=user --password=redhat`
 Used to log into OpenShift instance (in this case running locally).
-3. ```oc new-project my-project```
+3. `oc new-project my-project`
 Create a new project where all resources and deployments will be placed.
-4. ```oc create -f https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json -n my-project```
+4. `oc create -f https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json -n my-project`
 Create application secrets.
-5. ```oc create -f <Image streams URL> -n my-project```
+5. `oc create -f <Image streams URL> -n my-project`
 Create image streams in your project. Replace "Image stream URL" with URL or file path to a file containing image streams.
-6. ```oc process -n my-project -f https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json -v IMAGE_STREAM_NAMESPACE=my-project -v KIE_ADMIN_USER=adminUser -v KIE_ADMIN_PWD=admin1! -v KIE_SERVER_CONTROLLER_USER=controllerUser -v KIE_SERVER_CONTROLLER_PWD=controller1! -v KIE_SERVER_USER=executionUser -v KIE_SERVER_PWD=execution1! | oc create -n my-project -f -```
+6. `oc process -n my-project -f https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json -v IMAGE_STREAM_NAMESPACE=my-project -v KIE_ADMIN_USER=adminUser -v KIE_ADMIN_PWD=admin1! -v KIE_SERVER_CONTROLLER_USER=controllerUser -v KIE_SERVER_CONTROLLER_PWD=controller1! -v KIE_SERVER_USER=executionUser -v KIE_SERVER_PWD=execution1! | oc create -n my-project -f -`
 Process the template, replacing parameters with specific values, and create all resources defined there in OpenShift project.
 
 ## Minishift
@@ -113,20 +113,20 @@ you need to do the following steps:
     Gogs and Nexus. Nexus admin user is preconfigured with username `admin` and
     password: `admin123`. User for Gogs needs to be configured manually.
 4. Register a new user in Gogs. Gogs is running on following url:
-    `http://<openshift-ip>.nip.io/user/sign_up`. Openshift IP can be found in the output of
+    `http://gogs-gogs.<openshift-ip>.nip.io/user/sign_up`. Openshift IP can be found in the output of
     `startMinishift.sh` script. First registered user automatically becomes Gogs administrator.
-     
+
 
 ### How to run tests
 You can use the following command to run tests on Minishift
 
 ```
-mvn clean install -Popenshift -Ddefault.domain.suffix=.<openshift-url>.nip.io
--Dgit.provider=Gogs -Dgogs.url=http://gogs-gogs.<openshift-url>.nip.io/ -Dgogs.username=root  -Dgogs.password=root
+mvn clean install -Popenshift -Ddefault.domain.suffix=.<openshift-ip>.nip.io
+-Dgit.provider=Gogs -Dgogs.url=http://gogs-gogs.<openshift-ip>.nip.io/ -Dgogs.username=root -Dgogs.password=root
 -Dkie.artifact.version=<kie.artifact.version>
 -Dkie.image.streams=<kie.image.streams>.yaml
--Dmaven.repo.password=admin123 -Dmaven.repo.url=http://nexus3-nexus.<openshift-url>.nip.io/repository/maven-snapshots
--Dmaven.repo.username=admin -Dmaven.test.failure.ignore=true -Dopenshift.master.url=https://<openshift-url>:8443
+-Dmaven.repo.password=admin123 -Dmaven.repo.url=http://nexus3-nexus.<openshift-ip>.nip.io/repository/maven-snapshots
+-Dmaven.repo.username=admin -Dmaven.test.failure.ignore=true -Dopenshift.master.url=https://<openshift-ip>:8443
 -Dopenshift.username=developer -Dopenshift.password=test -Dopenshift.namespace.prefix=test
 -Dtemplate.project=jbpm -DfailIfNoTests=false
 ```
