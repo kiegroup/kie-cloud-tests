@@ -95,3 +95,42 @@ Create application secrets.
 Create image streams in your project. Replace "Image stream URL" with URL or file path to a file containing image streams.
 6. ```oc process -n my-project -f https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite/bpmsuite70-full-mysql-persistent.json -v IMAGE_STREAM_NAMESPACE=my-project -v KIE_ADMIN_USER=adminUser -v KIE_ADMIN_PWD=admin1! -v KIE_SERVER_CONTROLLER_USER=controllerUser -v KIE_SERVER_CONTROLLER_PWD=controller1! -v KIE_SERVER_USER=executionUser -v KIE_SERVER_PWD=execution1! | oc create -n my-project -f -```
 Process the template, replacing parameters with specific values, and create all resources defined there in OpenShift project.
+
+## Minishift
+It is possible to run kie cloud test suite on [Minishift](https://github.com/minishift/minishift).
+Minishift is a tool that helps you run OpenShift locally by running a single-node OpenShift cluster inside a VM. To run
+Minishift you need virtualization environment such as Virtuablox.
+
+### Installation
+To start Minishift with environment which is needed for running tests from kie cloud test suite,
+you need to do the following steps:
+1. Download the latest version of [Minishift](https://github.com/minishift/minishift/releases) and copy it to your folder
+    with binaries (for example ~/bin)
+2. Download the latest version of [Openshift client](https://github.com/openshift/origin/releases) and copy it to your
+    folder with binaries (for example ~/bin)
+3. Run `startMinishift.sh` from `scripts/minishift` folder. It starts Minishift and runs containers with
+    Gogs and Nexus. Nexus admin user is preconfigured with username `admin` and
+    password: `admin123`. User for Gogs needs to be configured manually.
+4. Register a new user in Gogs. Gogs is running on following url:
+    `http://<openshift-ip>.nip.io/user/sign_up`. Openshift IP can be found in the output of
+    `startMinishift.sh` script. First registered user automatically becomes Gogs administrator.
+     
+
+### How to run tests
+You can use the following command to run tests on Minishift
+
+```
+mvn clean install -Popenshift -Ddefault.domain.suffix=.<openshift-url>.nip.io
+-Dgit.provider=Gogs -Dgogs.url=http://gogs-gogs.<openshift-url>.nip.io/ -Dgogs.username=root  -Dgogs.password=root
+-Dkie.artifact.version=<kie.artifact.version>
+-Dkie.image.streams=<kie.image.streams>.yaml
+-Dmaven.repo.password=admin123 -Dmaven.repo.url=http://nexus3-nexus.<openshift-url>.nip.io/repository/maven-snapshots
+-Dmaven.repo.username=admin -Dmaven.test.failure.ignore=true -Dopenshift.master.url=https://<openshift-url>:8443
+-Dopenshift.username=developer -Dopenshift.password=test -Dopenshift.namespace.prefix=test
+-Dtemplate.project=jbpm -DfailIfNoTests=false
+```
+
+### Stop Minishift and clean environment
+Stop MiniShift: `minishift stop`
+
+Delete Minishift VM: `minishift delete`
