@@ -25,11 +25,14 @@
     <kie.app.secret>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/secrets/bpmsuite-app-secret.json</kie.app.secret>
     <kie.app.workbench.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/decisioncentral-app-secret.yaml</kie.app.workbench.secret>
     <kie.app.kie-server.secret>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/kieserver-app-secret.yaml</kie.app.kie-server.secret>
+    <!-- Location for Kie application templates. Can be used to point tests to the location containing templates to be used for tests. -->
+    <kie.app.template.drools.url>https://raw.githubusercontent.com/jboss-container-images/rhdm-7-openshift-image/rhdm70-dev/templates</kie.app.template.drools.url>
+    <kie.app.template.jbpm.url>https://raw.githubusercontent.com/jboss-openshift/application-templates/bpmsuite-wip/bpmsuite</kie.app.template.jbpm.url>
     <!-- Templates are specified in specific properties files. Path is relative to submodules of this module. -->
-    <kie.app.templates.jbpm.general>${project.parent.build.resources[0].directory}/templates-jbpm-general.properties</kie.app.templates.jbpm.general>
-    <kie.app.templates.jbpm.mysql>${project.parent.build.resources[0].directory}/templates-jbpm-mysql.properties</kie.app.templates.jbpm.mysql>
-    <kie.app.templates.jbpm.postgresql>${project.parent.build.resources[0].directory}/templates-jbpm-postgresql.properties</kie.app.templates.jbpm.postgresql>
-    <kie.app.templates.drools.general>${project.parent.build.resources[0].directory}/templates-drools-general.properties</kie.app.templates.drools.general>
+    <kie.app.templates.jbpm.general>${project.parent.build.outputDirectory}/templates-jbpm-general.properties</kie.app.templates.jbpm.general>
+    <kie.app.templates.jbpm.mysql>${project.parent.build.outputDirectory}/templates-jbpm-mysql.properties</kie.app.templates.jbpm.mysql>
+    <kie.app.templates.jbpm.postgresql>${project.parent.build.outputDirectory}/templates-jbpm-postgresql.properties</kie.app.templates.jbpm.postgresql>
+    <kie.app.templates.drools.general>${project.parent.build.outputDirectory}/templates-drools-general.properties</kie.app.templates.drools.general>
 
     <kie.app.name>myapp</kie.app.name>
 
@@ -128,8 +131,33 @@
             </systemProperties>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>process-resources</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>resources</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
+    <resources>
+      <resource>
+        <directory>src/main/filtered-resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
   <profiles>
