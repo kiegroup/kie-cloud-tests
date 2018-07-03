@@ -52,6 +52,9 @@
     <failsafe.excluded.groups/>
 
     <kie.artifact.version>please-define-kie-artifact-version</kie.artifact.version> <!-- Version of Kie artifacts used in images. -->
+
+    <!-- Location for custom Kie application templates. Can be used to point tests to the location containing templates to be used for tests. -->
+    <kie.app.template.url/>
   </properties>
 
   <modules>
@@ -120,6 +123,7 @@
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
               <kie.artifact.version>${kie.artifact.version}</kie.artifact.version>
+              <kie.app.template.url>${kie.app.template.url}</kie.app.template.url>
             </systemProperties>
           </configuration>
         </plugin>
