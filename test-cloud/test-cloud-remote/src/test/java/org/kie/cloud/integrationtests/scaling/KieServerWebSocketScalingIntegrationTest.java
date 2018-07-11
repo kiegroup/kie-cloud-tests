@@ -24,7 +24,6 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -139,11 +138,13 @@ public class KieServerWebSocketScalingIntegrationTest {
     @Category(JBPMOnly.class)
     public void testConnectionBetweenDeployables() {
         scaleKieServerTo(3);
+        verifyServerDeploymentContainInstances(3);
 
         String kieServerId = getKieServerId(kieServerClient);
         waitUntilKieServerLogsContain(WEBSOCKET_CONNECTION);
         verifyKieServerLogsContain(WEBSOCKET_CONNECTION);
-        verifyServerTemplateContainsKieServers(kieServerId, 3);
+        // In case of WebSockets all Kie servers with same URL are registered under one server template instance
+        verifyServerTemplateContainsKieServers(kieServerId, 1);
 
         deployAndStartContainer();
 
@@ -179,6 +180,10 @@ public class KieServerWebSocketScalingIntegrationTest {
         Collection<ContainerSpec> containersSpec = kieControllerClient.getServerTemplate(serverTemplate).getContainersSpec();
         assertThat(containersSpec).hasSize(1);
         assertThat(containersSpec.iterator().next().getId()).isEqualTo(containerId);
+    }
+
+    private void verifyServerDeploymentContainInstances(int numberOfKieServerInstances) {
+        assertThat(kieServerDeployment.getInstances()).hasSize(numberOfKieServerInstances);
     }
 
     private void verifyServerTemplateContainsKieServers(String serverTemplate, int numberOfKieServers) {

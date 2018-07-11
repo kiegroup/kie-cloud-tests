@@ -23,6 +23,7 @@ import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -53,6 +54,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 @RunWith(Parameterized.class)
+@Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed.")
 public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
     @Parameter(value = 0)
