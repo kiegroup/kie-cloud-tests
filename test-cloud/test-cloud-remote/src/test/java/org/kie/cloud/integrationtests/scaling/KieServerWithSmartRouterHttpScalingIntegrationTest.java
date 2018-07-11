@@ -89,7 +89,8 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
 
         scaleKieServerTo(3);
 
-        verifyServerTemplateContainsKieServers(kieServerId, 3);
+        // In case of WebSockets (default option) all Kie servers with same URL are registered under one server template instance
+        verifyServerTemplateContainsKieServers(kieServerId, 1);
         verifySmartRouterContainsKieServers(kieServerId, 3);
 
         scaleKieServerTo(1);

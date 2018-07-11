@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -51,6 +52,7 @@ import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.client.KieServerControllerClient;
 
 @RunWith(Parameterized.class)
+@Ignore("Currently all templates are using WebSockets, generic scenario builder is not capable of configuring HTTP. Ignoring for now until new generic scenario builder is available.")
 public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
 
     @Parameterized.Parameter(value = 0)

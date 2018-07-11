@@ -20,10 +20,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
@@ -44,7 +44,6 @@ public class SmartRouterLoadBalancingIntegrationTest extends
         AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private KieServerControllerClient kieControllerClient;
-    private KieServicesClient kieServerClient;
     private KieServicesClient kieServerClientRouter;
 
     private static final int PROCESS_NUMBER = 100;
@@ -70,16 +69,9 @@ public class SmartRouterLoadBalancingIntegrationTest extends
     public void testRouterLoadBalancing() {
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(
                 deploymentScenario.getWorkbenchRuntimeDeployment());
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
 
-        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(),
-                CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME,
-                DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerOneDeployment(), CONTAINER_ID);
-
-        deploymentScenario.getKieServerOneDeployment().scale(2);
-        deploymentScenario.getKieServerOneDeployment().waitForScale();
+        deployContainerToServerTemplate(deploymentScenario.getKieServerOneDeployment());
+        deployContainerToServerTemplate(deploymentScenario.getKieServerTwoDeployment());
 
         kieServerClientRouter = KieServerClientProvider.getSmartRouterClient(
                 deploymentScenario.getSmartRouterDeployment(),
@@ -101,10 +93,21 @@ public class SmartRouterLoadBalancingIntegrationTest extends
             processServicesClient.startProcess(CONTAINER_ID, LOG_PROCESS_ID);
         }
 
-        List<Instance> kieServerInstances = deploymentScenario.getKieServerOneDeployment().getInstances();
-        for (Instance kieServerInstance : kieServerInstances) {
-            Assertions.assertThat(StringUtils.countMatches(kieServerInstance.getLogs(), LOG_MESSAGE))
-                    .isGreaterThan(PROCESS_NUMBER / 4);
+        for (KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
+            for (Instance kieServerInstance : kieServerDeployment.getInstances()) {
+                Assertions.assertThat(StringUtils.countMatches(kieServerInstance.getLogs(), LOG_MESSAGE))
+                        .isGreaterThan(PROCESS_NUMBER / 4);
+            }
         }
+    }
+
+    private void deployContainerToServerTemplate(KieServerDeployment deployment) {
+        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deployment);
+
+        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(),
+                CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME,
+                DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
+        KieServerClientProvider.waitForContainerStart(deployment, CONTAINER_ID);
     }
 }
