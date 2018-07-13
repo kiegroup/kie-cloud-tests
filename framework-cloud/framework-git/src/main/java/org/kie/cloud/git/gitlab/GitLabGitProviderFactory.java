@@ -17,6 +17,7 @@ package org.kie.cloud.git.gitlab;
 
 import org.kie.cloud.git.GitProvider;
 import org.kie.cloud.git.GitProviderFactory;
+import org.kie.cloud.git.constants.GitConstants;
 
 public class GitLabGitProviderFactory implements GitProviderFactory {
 
@@ -26,5 +27,14 @@ public class GitLabGitProviderFactory implements GitProviderFactory {
 
     @Override public GitProvider createGitProvider() {
         return new GitLabGitProvider();
+    }
+
+    @Override
+    public void initGitConfigurationProperties() {
+        System.setProperty("xtf.config.gitlab.url", GitConstants.readMandatoryParameter(GitConstants.GITLAB_URL));
+        System.setProperty("xtf.config.gitlab.username", GitConstants.readMandatoryParameter(GitConstants.GITLAB_USER));
+        System.setProperty("xtf.config.gitlab.password", GitConstants.readMandatoryParameter(GitConstants.GITLAB_PASSWORD));
+        System.setProperty("xtf.config.gitlab.group.enabled", "false");
+        System.setProperty("xtf.config.gitlab.token", "disabled");
     }
 }

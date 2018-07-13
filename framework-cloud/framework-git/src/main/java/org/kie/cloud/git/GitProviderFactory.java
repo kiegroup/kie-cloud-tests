@@ -15,17 +15,9 @@
 
 package org.kie.cloud.git;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.kie.cloud.api.constants.ConfigurationInitializer;
-import org.kie.cloud.git.constants.GitConstants;
-import org.kie.cloud.git.github.GitHubGitProvider;
-import org.kie.cloud.git.gitlab.GitLabGitProvider;
-import org.kie.cloud.git.gogs.GogsGitProvider;
-
 public interface GitProviderFactory {
 
     String providerType();
     GitProvider createGitProvider();
+    void initGitConfigurationProperties();
 }
