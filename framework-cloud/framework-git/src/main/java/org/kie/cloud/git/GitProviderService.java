@@ -32,9 +32,7 @@ public class GitProviderService {
 
     private static final Logger logger = LoggerFactory.getLogger(GitProviderService.class);
 
-    static {
-        ConfigurationInitializer.initConfigProperties();
-    }
+    private boolean isConfigurationInitialized = false;
 
     public GitProviderService() {
         final Map<String, GitProviderFactory> providerFactories = new HashMap<>();
@@ -53,15 +51,25 @@ public class GitProviderService {
     }
 
     public GitProvider createGitProvider() {
-        final String gitProviderName = GitConstants.readMandatoryParameter(GitConstants.getGitProvider(),
-                GitConstants.GIT_PROVIDER);
+        if (!isConfigurationInitialized) {
+            ConfigurationInitializer.initConfigProperties();
+            isConfigurationInitialized = true;
+        }
+        return getGitProviderFactory().createGitProvider();
+    }
+
+    public void initGitProviderConfigurationProperties() {
+        getGitProviderFactory().initGitConfigurationProperties();
+    }
+
+    private GitProviderFactory getGitProviderFactory() {
+        final String gitProviderName = GitConstants.readMandatoryParameter(GitConstants.GIT_PROVIDER);
         logger.debug("Initializing Git provider {}", gitProviderName);
         if (!providerFactories.containsKey(gitProviderName)) {
             logger.error("Unknown type of Git provider {}", gitProviderName);
             throw new RuntimeException("Unknown type of Git provider " + gitProviderName);
         }
 
-        final GitProviderFactory gitProviderFactory = providerFactories.get(gitProviderName);
-        return gitProviderFactory.createGitProvider();
+        return providerFactories.get(gitProviderName);
     }
 }

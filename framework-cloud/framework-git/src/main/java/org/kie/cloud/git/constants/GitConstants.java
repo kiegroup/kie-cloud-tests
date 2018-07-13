@@ -16,6 +16,7 @@
 package org.kie.cloud.git.constants;
 
 import org.kie.cloud.api.constants.Constants;
+import org.kie.cloud.git.GitProviderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,22 +73,22 @@ public class GitConstants implements Constants {
         return System.getProperty(GOGS_PASSWORD);
     }
 
-    public static String readMandatoryParameter(String value, String parameterName) {
-        if (value == null) {
-            logger.error("Parameter {} must be specified", parameterName);
-            throw new RuntimeException("Parameter " + parameterName + " must be specified");
-        }
+    public static String readMandatoryParameter(String systemPropertyName) {
+        verifySystemPropertyIsSet(systemPropertyName);
+        return System.getProperty(systemPropertyName);
+    }
 
-        return value;
+    public static void verifySystemPropertyIsSet(String systemPropertyName) {
+        String systemPropertyValue = System.getProperty(systemPropertyName);
+        if (systemPropertyValue == null || systemPropertyValue.isEmpty()) {
+            logger.error("Parameter {} must be specified", systemPropertyName);
+            throw new RuntimeException("Parameter " + systemPropertyName + " must be specified");
+        }
     }
 
     @Override
     public void initConfigProperties() {
-        // init XTF configuration for GitLab
-        System.setProperty("xtf.config.gitlab.url", getGitLabUrl());
-        System.setProperty("xtf.config.gitlab.username", getGitLabUser());
-        System.setProperty("xtf.config.gitlab.password", getGitLabPassword());
-        System.setProperty("xtf.config.gitlab.group.enabled", "false");
-        System.setProperty("xtf.config.gitlab.token", "disabled");
+        GitProviderService gitProviderService = new GitProviderService();
+        gitProviderService.initGitProviderConfigurationProperties();
     }
 }

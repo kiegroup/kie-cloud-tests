@@ -26,12 +26,16 @@ public class GogsGitProviderFactory implements GitProviderFactory {
     }
 
     @Override public GitProvider createGitProvider() {
-        final String url = GitConstants.readMandatoryParameter(GitConstants.getGogsUrl(), GitConstants.GOGS_URL);
-        final String username = GitConstants.readMandatoryParameter(GitConstants.getGogsUser(),
-                GitConstants.GOGS_USER);
-        final String password = GitConstants.readMandatoryParameter(GitConstants.getGogsPassword(),
-                GitConstants.GOGS_PASSWORD);
+        final String url = GitConstants.readMandatoryParameter(GitConstants.GOGS_URL);
+        final String username = GitConstants.readMandatoryParameter(GitConstants.GOGS_USER);
+        final String password = GitConstants.readMandatoryParameter(GitConstants.GOGS_PASSWORD);
 
         return new GogsGitProvider(url, username, password);
+    }
+
+    @Override public void initGitConfigurationProperties() {
+        GitConstants.verifySystemPropertyIsSet(GitConstants.GOGS_URL);
+        GitConstants.verifySystemPropertyIsSet(GitConstants.GOGS_USER);
+        GitConstants.verifySystemPropertyIsSet(GitConstants.GOGS_PASSWORD);
     }
 }

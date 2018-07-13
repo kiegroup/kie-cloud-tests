@@ -26,10 +26,15 @@ public class GitHubGitProviderFactory implements GitProviderFactory {
     }
 
     @Override public GitProvider createGitProvider() {
-        final String user = GitConstants.readMandatoryParameter(GitConstants.getGitHubUser(), GitConstants.GITHUB_USER);
-        final String password = GitConstants.readMandatoryParameter(GitConstants.getGitHubPassword(),
-                GitConstants.GITHUB_PASSWORD);
+        final String user = GitConstants.readMandatoryParameter(GitConstants.GITHUB_USER);
+        final String password = GitConstants.readMandatoryParameter(GitConstants.GITHUB_PASSWORD);
 
         return new GitHubGitProvider(user, password);
+    }
+
+    @Override
+    public void initGitConfigurationProperties() {
+        GitConstants.verifySystemPropertyIsSet(GitConstants.GITHUB_USER);
+        GitConstants.verifySystemPropertyIsSet(GitConstants.GITHUB_PASSWORD);
     }
 }
