@@ -98,9 +98,9 @@ parameters:
   value: openshift
   required: true
 - displayName: ImageStream Tag
-  description: A named pointer to an image in an image stream. Default is "1.1".
+  description: A named pointer to an image in an image stream. Default is "1.2".
   name: IMAGE_STREAM_TAG
-  value: "1.1"
+  value: "1.2"
   required: false
 - displayName: Standalone Controller Container Memory Limit
   description: Standalone Controller Container memory limit
