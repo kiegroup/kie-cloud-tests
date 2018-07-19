@@ -71,8 +71,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<KieS
 
         return Arrays.asList(new Object[][]{
             {"KIE Server + MySQL", kieServerMySqlScenario},
-            // TODO: Disable PostgreSQL until the RHPAM-1252 is fixed.
-//            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario}
+            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario}
         });
     }
 
