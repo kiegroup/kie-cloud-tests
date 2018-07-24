@@ -41,8 +41,10 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     }
 
     @Override
-    public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl) {
+    public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
 
