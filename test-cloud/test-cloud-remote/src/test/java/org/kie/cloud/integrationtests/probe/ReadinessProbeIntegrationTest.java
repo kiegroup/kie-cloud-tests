@@ -77,7 +77,7 @@ public class ReadinessProbeIntegrationTest extends AbstractCloudIntegrationTest<
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
         return Arrays.asList(new Object[][]{
