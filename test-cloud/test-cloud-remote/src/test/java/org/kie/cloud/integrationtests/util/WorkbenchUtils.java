@@ -23,6 +23,7 @@ import java.util.Map;
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
+import org.kie.cloud.integrationtests.Kjar;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.spec.Capability;
@@ -62,13 +63,13 @@ public class WorkbenchUtils {
         });
     }
 
-    public static void saveContainerSpec(KieServerControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
-        saveContainerSpec(kieControllerClient, serverTemplateId, serverTemplateName, containerId, containerAlias, groupId, artifactId, version, status, Collections.emptyMap());
+    public static void saveContainerSpec(KieServerControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, Kjar kjar, KieContainerStatus status) {
+        saveContainerSpec(kieControllerClient, serverTemplateId, serverTemplateName, containerId, containerAlias, kjar, status, Collections.emptyMap());
     }
 
-    public static void saveContainerSpec(KieServerControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
+    public static void saveContainerSpec(KieServerControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, Kjar kjar, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
         ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
-        ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
+        ReleaseId releasedId = new ReleaseId(kjar.getGroupId(), kjar.getName(), kjar.getVersion());
         ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);
         kieControllerClient.saveContainerSpec(serverTemplateId, containerSpec);
     }

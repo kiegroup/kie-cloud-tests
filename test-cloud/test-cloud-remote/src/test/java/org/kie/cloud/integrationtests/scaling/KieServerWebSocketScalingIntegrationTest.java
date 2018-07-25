@@ -41,6 +41,7 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -71,10 +72,6 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     private static final String CONTAINER_ID = "cont-id";
     private static final String CONTAINER_ALIAS = "cont-alias";
-
-    private static final String PROJECT_GROUP_ID = "org.kie.server.testing";
-    private static final String DEFINITION_PROJECT_SNAPSHOT_NAME = "definition-project-snapshot";
-    private static final String DEFINITION_PROJECT_SNAPSHOT_VERSION = "1.0.0-SNAPSHOT";
 
     private static final String WEBSOCKET_CONNECTION = "Connection to Kie Controller over Web Socket is now open";
     private static final String STARTED_CONTAINER = "Container cont-id (for release id org.kie.server.testing:definition-project-snapshot:1.0.0-SNAPSHOT) successfully started";
@@ -193,7 +190,7 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     private void deployAndStartContainer() {
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
     }
 
     private void scaleKieServerTo(int count) {

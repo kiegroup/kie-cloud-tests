@@ -36,6 +36,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResource;
@@ -151,7 +152,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
         logger.debug("Register Kie Container to Kie Server");
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(kieServerDeployment(), CONTAINER_ID);
         SmartRouterUtils.waitForContainerStart(smartRouterAdminClient, CONTAINER_ID);
         WorkbenchUtils.waitForContainerRegistration(kieControllerClient, SMART_ROUTER_ID, CONTAINER_ID);

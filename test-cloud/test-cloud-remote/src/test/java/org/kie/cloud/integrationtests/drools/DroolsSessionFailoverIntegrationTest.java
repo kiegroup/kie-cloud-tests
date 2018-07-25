@@ -37,6 +37,7 @@ import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDat
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -99,7 +100,7 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrati
     public void executeSimpleRuleFailoverTest() throws InterruptedException {
         logger.debug("Register Kie Container to Kie Server");
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, RULE_PROJECT_NAME, RULE_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.RULE_SNAPSHOT, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerOneDeployment(), CONTAINER_ID);
         WorkbenchUtils.waitForContainerRegistration(kieServerControllerClient, SMART_ROUTER_ID, CONTAINER_ID);
 

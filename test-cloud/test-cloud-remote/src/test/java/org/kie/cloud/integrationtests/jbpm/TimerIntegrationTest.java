@@ -79,7 +79,7 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
         deploymentScenario.getKieServerOneDeployment().waitForScale();
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment()).getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, DEPLOYED_KJAR.getGroupId(), DEPLOYED_KJAR.getName(), DEPLOYED_KJAR.getVersion(), KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, DEPLOYED_KJAR, KieContainerStatus.STARTED);
 
         waitUntilKieServerLogsContain(deploymentScenario.getKieServerOneDeployment(), CONTAINER_SUCCESSFULLY_STARTED);
 
