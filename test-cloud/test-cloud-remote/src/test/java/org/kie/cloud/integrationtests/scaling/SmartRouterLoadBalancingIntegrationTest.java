@@ -28,6 +28,7 @@ import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDat
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -106,8 +107,7 @@ public class SmartRouterLoadBalancingIntegrationTest extends
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(),
-                CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME,
-                DEFINITION_PROJECT_SNAPSHOT_VERSION, KieContainerStatus.STARTED);
+                CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deployment, CONTAINER_ID);
     }
 }

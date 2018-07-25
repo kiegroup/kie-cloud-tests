@@ -12,6 +12,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerStatus;
@@ -59,7 +60,7 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
     @Test
     public void testMultipleDifferentProcessesOnSameKieServer() {
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, PROJECT_GROUP_ID, DEFINITION_PROJECT_NAME, DEFINITION_PROJECT_VERSION, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION, KieContainerStatus.STARTED);
 
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
