@@ -42,6 +42,7 @@ import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
@@ -206,36 +207,36 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
 
         assertThat(smartQueryServicesClient.findProcessInstances(0, 10)).hasSize(6);
 
-        smartProcessServicesClient.signalProcessInstances(CONTAINER_ID_ABC, signalProcessInstances, SIGNAL_NAME, null);
-        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(2), SIGNAL_NAME, null);
-        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(3), SIGNAL_2_NAME, null);
+        smartProcessServicesClient.signalProcessInstances(CONTAINER_ID_ABC, signalProcessInstances, Constants.Signal.SIGNAL_NAME, null);
+        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(2), Constants.Signal.SIGNAL_NAME, null);
+        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(3), Constants.Signal.SIGNAL_2_NAME, null);
 
-        assertThat(smartTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(3);
+        assertThat(smartTaskServicesClient.findTasks(Constants.User.YODA, 0, 10)).hasSize(3);
 
-        smartProcessServicesClient.signal(CONTAINER_ID_ABC, SIGNAL_2_NAME, null);
+        smartProcessServicesClient.signal(CONTAINER_ID_ABC, Constants.Signal.SIGNAL_2_NAME, null);
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED), 0, 10)).hasSize(2);
 
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10)).hasSize(4);
-        List<TaskSummary> activeTasks = smartTaskServicesClient.findTasks(USER_YODA, 0, 10);
+        List<TaskSummary> activeTasks = smartTaskServicesClient.findTasks(Constants.User.YODA, 0, 10);
         assertThat(activeTasks).hasSize(1);
         assertThat(activeTasks.get(0).getContainerId()).isEqualTo(CONTAINER_ID_DEF);
         assertThat(activeTasks.get(0).getProcessInstanceId()).isEqualTo(signalProcessInstances.get(2));
 
-        smartTaskServicesClient.startTask(CONTAINER_ID_DEF, activeTasks.get(0).getId(), USER_YODA);
-        smartTaskServicesClient.completeTask(CONTAINER_ID_DEF, activeTasks.get(0).getId(), USER_YODA, Collections.emptyMap());
+        smartTaskServicesClient.startTask(CONTAINER_ID_DEF, activeTasks.get(0).getId(), Constants.User.YODA);
+        smartTaskServicesClient.completeTask(CONTAINER_ID_DEF, activeTasks.get(0).getId(), Constants.User.YODA, Collections.emptyMap());
 
         assertThat(smartQueryServicesClient.findProcessesByContainerId(CONTAINER_ID_GHI, 0, 10)).hasSize(2);
         smartProcessServicesClient.abortProcessInstance(CONTAINER_ID_GHI, signalProcessInstances.get(5));
 
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED), 0, 10)).hasSize(4);
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10)).hasSize(2);
-        assertThat(smartTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(0);
+        assertThat(smartTaskServicesClient.findTasks(Constants.User.YODA, 0, 10)).hasSize(0);
     }
 
     private List<Long> createSignalProcesses() {
         // Start 2 instance of SignalUserTask each process on each container
         return Stream.of(CONTAINER_ID_ABC, CONTAINER_ID_ABC, CONTAINER_ID_DEF, CONTAINER_ID_DEF, CONTAINER_ID_GHI, CONTAINER_ID_GHI)
-                .map(containerId -> smartProcessServicesClient.startProcess(containerId, SIGNALUSERTASK_PROCESS_ID))
+                .map(containerId -> smartProcessServicesClient.startProcess(containerId, Constants.ProcessId.SIGNALUSERTASK))
                 .collect(Collectors.toList());
     }
 }

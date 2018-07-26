@@ -51,20 +51,6 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String CONTAINER_ID = "cont-id";
     protected static final String CONTAINER_ALIAS = "cont-alias";
 
-    protected static final String USER_YODA = "yoda";
-
-    protected static final String USERTASK_PROCESS_ID = "definition-project.usertask";
-    protected static final String UPDATED_USERTASK_PROCESS_ID = "definition-project.updated-usertask";
-    protected static final String SIGNALTASK_PROCESS_ID = "definition-project.signaltask";
-    protected static final String SIGNALUSERTASK_PROCESS_ID = "definition-project.signalusertask";
-    protected static final String LONG_SCRIPT_PROCESS_ID = "definition-project.longScript";
-    protected static final String SIMPLE_RULEFLOW_PROCESS_ID = "simple-ruleflow";
-    protected static final String LOG_PROCESS_ID = "definition-project.logProcess";
-    protected static final String TIMER_PROCESS_ID = "timer-start";
-
-    protected static final String SIGNAL_NAME = "signal1";
-    protected static final String SIGNAL_2_NAME = "signal2";
-
     protected static final String WORKBENCH_LOGIN_SCREEN_TEXT = "Sign In";
 
     protected static final String SPACE_NAME = "mySpace";

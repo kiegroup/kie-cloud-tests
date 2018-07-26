@@ -31,6 +31,7 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -107,12 +108,12 @@ public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractCloudIn
         deployProject(kieServerClient1, CONTAINER_ID, Kjar.DEFINITION_SNAPSHOT);
         deployProject(kieServerClient2, CONTAINER_ID, Kjar.DEFINITION_SNAPSHOT);
 
-        verifyProcessAvailableInContainer(smartRouterClient, CONTAINER_ID, USERTASK_PROCESS_ID);
+        verifyProcessAvailableInContainer(smartRouterClient, CONTAINER_ID, Constants.ProcessId.USERTASK);
 
         deployProject(kieServerClient1, CONTAINER_ID_UPDATED, Kjar.DEFINITION_101_SNAPSHOT);
 
         for (int i = 0; i < RETRIES_NUMBER; i++) {
-            verifyProcessAvailableInContainer(smartRouterClient, CONTAINER_ID_UPDATED, UPDATED_USERTASK_PROCESS_ID);
+            verifyProcessAvailableInContainer(smartRouterClient, CONTAINER_ID_UPDATED, Constants.ProcessId.UPDATED_USERTASK);
         }
     }
 
@@ -122,7 +123,7 @@ public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractCloudIn
         deployProject(kieServerClient2, CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION_SNAPSHOT);
 
         for (int i = 0; i < RETRIES_NUMBER; i++) {
-            verifyProcessAvailableInContainer(smartRouterClient, CONTAINER_ALIAS, LOG_PROCESS_ID);
+            verifyProcessAvailableInContainer(smartRouterClient, CONTAINER_ALIAS, Constants.ProcessId.LOG);
         }
 
         assertThat(kieServerDeployment1.getInstances()).hasSize(1);

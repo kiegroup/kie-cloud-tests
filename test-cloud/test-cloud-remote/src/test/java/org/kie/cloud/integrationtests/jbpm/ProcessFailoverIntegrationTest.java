@@ -30,6 +30,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.KieContainerStatus;
@@ -91,7 +92,7 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
         Instance kieServerInstance = deploymentScenario.getKieServerDeployment().getInstances().iterator().next();
 
         logger.debug("Start process instance");
-        Long longScriptPid = processServicesClient.startProcess(CONTAINER_ID, LONG_SCRIPT_PROCESS_ID, Collections.emptyMap());
+        Long longScriptPid = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.LONG_SCRIPT, Collections.emptyMap());
         assertThat(longScriptPid).isNotNull().isGreaterThan(0L);
         assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
 
@@ -107,18 +108,18 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
         deploymentScenario.getKieServerDeployment().waitForScale();
 
         logger.debug("Send signal to try complete process. Not able yet.");
-        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, SIGNAL_2_NAME, null);
+        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_2_NAME, null);
 
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
         assertProcessVariable(longScriptPid, variableKey, variableValueOne);
 
         logger.debug("Send signal again to continue with process. It was rollbacked.");
-        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, SIGNAL_NAME, null);
+        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_NAME, null);
 
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
         assertProcessVariable(longScriptPid, variableKey, variableValueTwo);
 
-        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, SIGNAL_2_NAME, null);
+        processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_2_NAME, null);
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
 
         assertThat(deploymentScenario.getKieServerDeployment().getInstances().iterator().next()).isNotEqualTo(kieServerInstance);
@@ -128,7 +129,7 @@ public class ProcessFailoverIntegrationTest extends AbstractCloudIntegrationTest
         new Thread(() -> {
             try {
                 ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
-                processClient.signalProcessInstance(CONTAINER_ID, pid, SIGNAL_NAME, null);
+                processClient.signalProcessInstance(CONTAINER_ID, pid, Constants.Signal.SIGNAL_NAME, null);
             } catch (KieServicesHttpException e) {
                 // Expected
             }

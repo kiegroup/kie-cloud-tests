@@ -46,6 +46,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -140,13 +141,13 @@ public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTe
         ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
         UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployments().get(0));
 
-        Long userTaskPid = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
+        Long userTaskPid = processClient.startProcess(CONTAINER_ID, Constants.ProcessId.USERTASK);
         assertThat(userTaskPid).isNotNull();
 
-        List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 10);
+        List<TaskSummary> tasks = taskClient.findTasks(Constants.User.YODA, 0, 10);
         assertThat(tasks).isNotNull().hasSize(1);
 
-        taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
+        taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), Constants.User.YODA, null);
 
         ProcessInstance userTaskPi = processClient.getProcessInstance(CONTAINER_ID, userTaskPid);
         assertThat(userTaskPi).isNotNull();

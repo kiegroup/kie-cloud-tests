@@ -29,6 +29,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -86,12 +87,12 @@ public class SmartRouterLoadBalancingIntegrationTest extends
         QueryServicesClient queryServicesClient = kieServerClientRouter.getServicesClient(QueryServicesClient.class);
         List<ProcessDefinition> processDefinitions = queryServicesClient.findProcesses(0, 100);
         Assertions.assertThat(processDefinitions).isNotNull();
-        Assertions.assertThat(processDefinitions.stream().anyMatch(p -> p.getId().equals(LOG_PROCESS_ID)));
+        Assertions.assertThat(processDefinitions.stream().anyMatch(p -> p.getId().equals(Constants.ProcessId.LOG)));
 
         ProcessServicesClient processServicesClient = kieServerClientRouter.getServicesClient(
                 ProcessServicesClient.class);
         for (int i = 0; i < PROCESS_NUMBER; i++) {
-            processServicesClient.startProcess(CONTAINER_ID, LOG_PROCESS_ID);
+            processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.LOG);
         }
 
         for (KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
