@@ -38,6 +38,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -119,13 +120,13 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
         assertThat(containerReleaseId.getArtifactId()).isNotNull().isEqualTo(DEFINITION_PROJECT_NAME);
         assertThat(containerReleaseId.getVersion()).isNotNull().isEqualTo(DEFINITION_PROJECT_VERSION);
 
-        Long processId = processServicesClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
+        Long processId = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.USERTASK);
         assertThat(processId).isNotNull();
 
-        List<TaskSummary> tasks = taskServicesClient.findTasks(USER_YODA, 0, 10);
+        List<TaskSummary> tasks = taskServicesClient.findTasks(Constants.User.YODA, 0, 10);
         assertThat(tasks).isNotNull().hasSize(1);
 
-        taskServicesClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
+        taskServicesClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), Constants.User.YODA, null);
 
         ProcessInstance userTaskPi = processServicesClient.getProcessInstance(CONTAINER_ID, processId);
         assertThat(userTaskPi).isNotNull();

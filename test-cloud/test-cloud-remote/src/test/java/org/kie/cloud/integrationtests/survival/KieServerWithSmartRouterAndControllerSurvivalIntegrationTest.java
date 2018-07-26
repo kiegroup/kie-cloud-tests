@@ -37,6 +37,7 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResource;
@@ -167,11 +168,11 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
         verifyServerTemplateContainsContainer(SMART_ROUTER_ID, CONTAINER_ID);
 
         logger.debug("Start process instance");
-        Long kieServerSignalPid = kieServerProcessClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+        Long kieServerSignalPid = kieServerProcessClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
         assertThat(kieServerProcessClient.findProcessInstances(CONTAINER_ID, 0, 10)).isNotNull().hasSize(1);
 
         logger.debug("Start process instance");
-        Long smartRouterSignalPid = smartRouterProcessClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+        Long smartRouterSignalPid = smartRouterProcessClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
         assertThat(smartRouterProcessClient.findProcessInstances(CONTAINER_ID, 0, 10)).isNotNull().hasSize(2);
 
         logger.debug("Scale Kie server and Smart router to 0");
@@ -202,14 +203,14 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(processInstances).isNotNull().hasSize(2);
             softly.assertThat(processInstances.get(0).getId()).isEqualTo(kieServerSignalPid);
-            softly.assertThat(processInstances.get(0).getProcessId()).isEqualTo(SIGNALTASK_PROCESS_ID);
+            softly.assertThat(processInstances.get(0).getProcessId()).isEqualTo(Constants.ProcessId.SIGNALTASK);
             softly.assertThat(processInstances.get(0).getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
             softly.assertThat(processInstances.get(1).getId()).isEqualTo(smartRouterSignalPid);
-            softly.assertThat(processInstances.get(1).getProcessId()).isEqualTo(SIGNALTASK_PROCESS_ID);
+            softly.assertThat(processInstances.get(1).getProcessId()).isEqualTo(Constants.ProcessId.SIGNALTASK);
             softly.assertThat(processInstances.get(1).getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
         });
 
-        kieServerProcessClient.signal(CONTAINER_ID, SIGNAL_NAME, null);
+        kieServerProcessClient.signal(CONTAINER_ID, Constants.Signal.SIGNAL_NAME, null);
         assertThat(kieServerProcessClient.getProcessInstance(CONTAINER_ID, kieServerSignalPid).getState())
                 .isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
         assertThat(kieServerProcessClient.getProcessInstance(CONTAINER_ID, smartRouterSignalPid).getState())

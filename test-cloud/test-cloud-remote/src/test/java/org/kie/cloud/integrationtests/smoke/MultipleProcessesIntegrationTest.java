@@ -14,6 +14,7 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.Smoke;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
@@ -64,9 +65,9 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
 
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
-        Long userTaskPid = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
+        Long userTaskPid = processClient.startProcess(CONTAINER_ID, Constants.ProcessId.USERTASK);
         Assertions.assertThat(userTaskPid).isNotNull();
-        Long signalTaskPid = processClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+        Long signalTaskPid = processClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
         Assertions.assertThat(signalTaskPid).isNotNull();
 
         finishUserTaskProcess();
@@ -82,17 +83,17 @@ public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTe
     }
 
     private void finishUserTaskProcess() {
-        List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 10);
+        List<TaskSummary> tasks = taskClient.findTasks(Constants.User.YODA, 0, 10);
         Assertions.assertThat(tasks).isNotNull().hasSize(1);
 
-        taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
+        taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), Constants.User.YODA, null);
     }
 
     private void finishSignalTaskProcess(Long pid) {
         List<String> signals = processClient.getAvailableSignals(CONTAINER_ID, pid);
         Assertions.assertThat(signals).isNotNull().hasSize(1);
-        Assertions.assertThat(signals.get(0)).isEqualTo(SIGNAL_NAME);
+        Assertions.assertThat(signals.get(0)).isEqualTo(Constants.Signal.SIGNAL_NAME);
 
-        processClient.signal(CONTAINER_ID, SIGNAL_NAME, null);
+        processClient.signal(CONTAINER_ID, Constants.Signal.SIGNAL_NAME, null);
     }
 }

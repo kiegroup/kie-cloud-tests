@@ -37,6 +37,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.exception.KieServicesException;
@@ -103,7 +104,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<KieS
     @Test
     public void reconnectionDbTest() {
         logger.debug("Start process instance");
-        Long signalPid = processServicesClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+        Long signalPid = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
         assertThat(signalPid).isNotNull().isGreaterThan(0L);
         assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
 
@@ -111,7 +112,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<KieS
 
         logger.debug("Try to get process instances");
         assertThatThrownBy(() -> {
-            processServicesClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+            processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
         }).isInstanceOf(KieServicesException.class);
 
         scaleDatabaseTo(1);
@@ -122,7 +123,7 @@ public class DbSurvivalIntegrationTest extends AbstractCloudIntegrationTest<KieS
         assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
 
         logger.debug("Send signal and complete process");
-        processServicesClient.signal(CONTAINER_ID, SIGNAL_NAME, null);
+        processServicesClient.signal(CONTAINER_ID, Constants.Signal.SIGNAL_NAME, null);
 
         logger.debug("Check that prcoess is completed");
         assertThat(queryServicesClient.findProcessInstanceById(signalPid).getState()).isEqualTo(ProcessInstance.STATE_COMPLETED);

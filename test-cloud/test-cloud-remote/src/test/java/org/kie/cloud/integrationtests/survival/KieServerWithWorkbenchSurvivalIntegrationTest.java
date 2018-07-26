@@ -36,6 +36,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
@@ -100,7 +101,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
         logger.debug("Start process instance");
-        Long signalPid = processServicesClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+        Long signalPid = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
         assertThat(signalPid).isNotNull().isGreaterThan(0L);
         assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
 
@@ -114,7 +115,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloud
         checkServerTemplateInstanceCount(serverInfo.getServerId(), 1);
 
         logger.debug("Start new process instance");
-        Long newPid = processServicesClient.startProcess(CONTAINER_ID, SIGNALTASK_PROCESS_ID);
+        Long newPid = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
         assertThat(newPid).isNotNull().isGreaterThan(0L);
 
         logger.debug("Check started processes");

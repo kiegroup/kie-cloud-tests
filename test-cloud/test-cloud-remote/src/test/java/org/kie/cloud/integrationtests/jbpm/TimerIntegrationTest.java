@@ -32,6 +32,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
@@ -83,7 +84,7 @@ public class TimerIntegrationTest extends AbstractCloudIntegrationTest<Workbench
 
         waitUntilKieServerLogsContain(deploymentScenario.getKieServerOneDeployment(), CONTAINER_SUCCESSFULLY_STARTED);
 
-        Long pid = processClient.startProcess(CONTAINER_ID, TIMER_PROCESS_ID);
+        Long pid = processClient.startProcess(CONTAINER_ID, Constants.ProcessId.TIMER);
         KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, pid);
 
         List<NodeInstance> nodeInstances = queryClient.findCompletedNodeInstances(pid, 0, 100).stream()

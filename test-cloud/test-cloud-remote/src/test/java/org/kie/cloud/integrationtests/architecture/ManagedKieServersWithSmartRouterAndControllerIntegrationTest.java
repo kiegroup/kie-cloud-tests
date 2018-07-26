@@ -42,6 +42,7 @@ import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
@@ -260,55 +261,55 @@ public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extend
         Stream.of(kieServerABCQueryServicesClient, kieServerDEFQueryServicesClient, kieServerGHIQueryServicesClient)
                 .forEach(client -> assertThat(client.findProcessInstances(0, 10)).hasSize(2));
 
-        smartProcessServicesClient.signalProcessInstances(CONTAINER_ID_ABC, signalProcessInstances, SIGNAL_NAME, null);
-        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(2), SIGNAL_NAME, null);
-        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(3), SIGNAL_2_NAME, null);
-        kieServerGHIProcessServicesClient.signalProcessInstances(CONTAINER_ID_ABC, signalProcessInstances, SIGNAL_NAME, null);
+        smartProcessServicesClient.signalProcessInstances(CONTAINER_ID_ABC, signalProcessInstances, Constants.Signal.SIGNAL_NAME, null);
+        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(2), Constants.Signal.SIGNAL_NAME, null);
+        smartProcessServicesClient.signalProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(3), Constants.Signal.SIGNAL_2_NAME, null);
+        kieServerGHIProcessServicesClient.signalProcessInstances(CONTAINER_ID_ABC, signalProcessInstances, Constants.Signal.SIGNAL_NAME, null);
 
-        assertThat(smartTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(3);
-        assertThat(kieServerABCTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(2);
-        assertThat(kieServerDEFTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(1);
-        assertThat(kieServerGHITaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(2);
+        assertThat(smartTaskServicesClient.findTasks(Constants.User.YODA, 0, 10)).hasSize(3);
+        assertThat(kieServerABCTaskServicesClient.findTasks(Constants.User.YODA, 0, 10)).hasSize(2);
+        assertThat(kieServerDEFTaskServicesClient.findTasks(Constants.User.YODA, 0, 10)).hasSize(1);
+        assertThat(kieServerGHITaskServicesClient.findTasks(Constants.User.YODA, 0, 10)).hasSize(2);
 
-        smartProcessServicesClient.signal(CONTAINER_ID_ABC, SIGNAL_2_NAME, null);
+        smartProcessServicesClient.signal(CONTAINER_ID_ABC, Constants.Signal.SIGNAL_2_NAME, null);
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED), 0, 10)).hasSize(2);
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10)).hasSize(4);
 
-        kieServerDEFProcessServicesClient.signal(CONTAINER_ID_DEF, SIGNAL_2_NAME, null);
+        kieServerDEFProcessServicesClient.signal(CONTAINER_ID_DEF, Constants.Signal.SIGNAL_2_NAME, null);
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED), 0, 10)).hasSize(3);
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10)).hasSize(3);
 
-        List<TaskSummary> activeTasks = smartTaskServicesClient.findTasks(USER_YODA, 0, 10);
+        List<TaskSummary> activeTasks = smartTaskServicesClient.findTasks(Constants.User.YODA, 0, 10);
         assertThat(activeTasks).hasSize(2);
         assertThat(activeTasks.get(0).getContainerId()).isEqualTo(CONTAINER_ID_GHI);
         assertThat(activeTasks.get(0).getProcessInstanceId()).isEqualTo(signalProcessInstances.get(4));
         assertThat(activeTasks.get(1).getContainerId()).isEqualTo(CONTAINER_ID_GHI);
         assertThat(activeTasks.get(1).getProcessInstanceId()).isEqualTo(signalProcessInstances.get(5));
 
-        smartTaskServicesClient.startTask(CONTAINER_ID_GHI, activeTasks.get(0).getId(), USER_YODA);
-        kieServerGHITaskServicesClient.startTask(CONTAINER_ID_GHI, activeTasks.get(1).getId(), USER_YODA);
-        kieServerGHITaskServicesClient.completeTask(CONTAINER_ID_GHI, activeTasks.get(0).getId(), USER_YODA, Collections.emptyMap());
-        smartTaskServicesClient.completeTask(CONTAINER_ID_GHI, activeTasks.get(1).getId(), USER_YODA, Collections.emptyMap());
+        smartTaskServicesClient.startTask(CONTAINER_ID_GHI, activeTasks.get(0).getId(), Constants.User.YODA);
+        kieServerGHITaskServicesClient.startTask(CONTAINER_ID_GHI, activeTasks.get(1).getId(), Constants.User.YODA);
+        kieServerGHITaskServicesClient.completeTask(CONTAINER_ID_GHI, activeTasks.get(0).getId(), Constants.User.YODA, Collections.emptyMap());
+        smartTaskServicesClient.completeTask(CONTAINER_ID_GHI, activeTasks.get(1).getId(), Constants.User.YODA, Collections.emptyMap());
 
         assertThat(smartQueryServicesClient.findProcessesByContainerId(CONTAINER_ID_GHI, 0, 10)).hasSize(2);
         smartProcessServicesClient.abortProcessInstance(CONTAINER_ID_DEF, signalProcessInstances.get(3));
 
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED), 0, 10)).hasSize(6);
         assertThat(smartQueryServicesClient.findProcessInstancesByStatus(Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE), 0, 10)).hasSize(0);
-        assertThat(smartTaskServicesClient.findTasks(USER_YODA, 0, 10)).hasSize(0);
+        assertThat(smartTaskServicesClient.findTasks(Constants.User.YODA, 0, 10)).hasSize(0);
     }
 
     private List<Long> createSignalProcesses() {
         List<Long> signalProcessInstances = new ArrayList<>();
 
-        signalProcessInstances.add(smartProcessServicesClient.startProcess(CONTAINER_ID_ABC, SIGNALUSERTASK_PROCESS_ID));
-        signalProcessInstances.add(kieServerABCProcessServicesClient.startProcess(CONTAINER_ID_ABC, SIGNALUSERTASK_PROCESS_ID));
+        signalProcessInstances.add(smartProcessServicesClient.startProcess(CONTAINER_ID_ABC, Constants.ProcessId.SIGNALUSERTASK));
+        signalProcessInstances.add(kieServerABCProcessServicesClient.startProcess(CONTAINER_ID_ABC, Constants.ProcessId.SIGNALUSERTASK));
 
-        signalProcessInstances.add(smartProcessServicesClient.startProcess(CONTAINER_ID_DEF, SIGNALUSERTASK_PROCESS_ID));
-        signalProcessInstances.add(kieServerDEFProcessServicesClient.startProcess(CONTAINER_ID_DEF, SIGNALUSERTASK_PROCESS_ID));
+        signalProcessInstances.add(smartProcessServicesClient.startProcess(CONTAINER_ID_DEF, Constants.ProcessId.SIGNALUSERTASK));
+        signalProcessInstances.add(kieServerDEFProcessServicesClient.startProcess(CONTAINER_ID_DEF, Constants.ProcessId.SIGNALUSERTASK));
 
-        signalProcessInstances.add(smartProcessServicesClient.startProcess(CONTAINER_ID_GHI, SIGNALUSERTASK_PROCESS_ID));
-        signalProcessInstances.add(kieServerGHIProcessServicesClient.startProcess(CONTAINER_ID_GHI, SIGNALUSERTASK_PROCESS_ID));
+        signalProcessInstances.add(smartProcessServicesClient.startProcess(CONTAINER_ID_GHI, Constants.ProcessId.SIGNALUSERTASK));
+        signalProcessInstances.add(kieServerGHIProcessServicesClient.startProcess(CONTAINER_ID_GHI, Constants.ProcessId.SIGNALUSERTASK));
 
         return signalProcessInstances;
     }
