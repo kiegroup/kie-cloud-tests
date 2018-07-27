@@ -42,7 +42,7 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 
 @Category(Smoke.class)
 @RunWith(Parameterized.class)
-public class FireRulesSmokeIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+public class FireRulesSmokeIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(DroolsSessionFailoverIntegrationTest.class);
 

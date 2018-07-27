@@ -36,7 +36,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
@@ -54,7 +54,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 
 @RunWith(Parameterized.class)
 @Ignore("Currently all templates are using WebSockets, generic scenario builder is not capable of configuring HTTP. Ignoring for now until new generic scenario builder is available.")
-public class KieServerHttpScalingIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
 
     @Parameterized.Parameter(value = 0)
     public String testScenarioName;

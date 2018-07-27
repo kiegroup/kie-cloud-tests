@@ -39,7 +39,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -55,7 +55,7 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 @RunWith(Parameterized.class)
 @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed.")
-public class WorkbenchPersistenceIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;

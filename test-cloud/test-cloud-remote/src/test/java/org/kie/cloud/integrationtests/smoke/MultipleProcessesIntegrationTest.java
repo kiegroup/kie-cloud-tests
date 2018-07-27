@@ -11,7 +11,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.util.Constants;
@@ -26,7 +26,7 @@ import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
 @Category(Smoke.class)
-public class MultipleProcessesIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
+public class MultipleProcessesIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
     private KieServerControllerClient kieControllerClient;
 

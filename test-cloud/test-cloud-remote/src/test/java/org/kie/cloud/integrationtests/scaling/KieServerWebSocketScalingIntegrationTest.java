@@ -40,7 +40,6 @@ import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.TimeUtils;
@@ -59,7 +58,7 @@ import org.slf4j.LoggerFactory;
 
 public class KieServerWebSocketScalingIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(KieServerWebSocketScalingIntegrationTest.class);
 
     private GenericScenario workbenchMonitoringScenario;
     private GenericScenario kieServerScenario;

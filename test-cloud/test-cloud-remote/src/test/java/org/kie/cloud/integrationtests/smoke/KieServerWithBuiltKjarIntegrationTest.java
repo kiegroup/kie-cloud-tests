@@ -41,7 +41,7 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.maven.MavenDeployer;
@@ -55,7 +55,7 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 
 @Category(Smoke.class)
 @RunWith(Parameterized.class)
-public class KieServerWithBuiltKjarIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;

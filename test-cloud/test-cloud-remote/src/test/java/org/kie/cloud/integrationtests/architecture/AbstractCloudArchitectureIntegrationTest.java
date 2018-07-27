@@ -28,7 +28,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -42,7 +42,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 
-public abstract class AbstractCloudArchitectureIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public abstract class AbstractCloudArchitectureIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     protected static final String SMART_ROUTER_ID = "test-kie-router";
 
