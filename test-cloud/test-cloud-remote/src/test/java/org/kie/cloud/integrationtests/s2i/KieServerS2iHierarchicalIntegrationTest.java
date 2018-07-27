@@ -36,7 +36,7 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.Constants;
@@ -49,7 +49,7 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
 @RunWith(Parameterized.class)
-public class KieServerS2iHierarchicalIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;

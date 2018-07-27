@@ -29,7 +29,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.maven.MavenDeployer;
@@ -39,7 +39,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 
-public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     private static final int RETRIES_NUMBER = 5;
 

@@ -29,13 +29,13 @@ import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.server.client.KieServicesClient;
 
 @Category(Smoke.class)
-public class ImageVersionIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+public class ImageVersionIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {
 
     private static final String KIE_VERSION = DeploymentConstants.getKieArtifactVersion();
     private static final String KIE_API_ARTIFACT_NAME = "kie-api";

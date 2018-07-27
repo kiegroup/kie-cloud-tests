@@ -35,7 +35,7 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
@@ -55,7 +55,7 @@ import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class);
 

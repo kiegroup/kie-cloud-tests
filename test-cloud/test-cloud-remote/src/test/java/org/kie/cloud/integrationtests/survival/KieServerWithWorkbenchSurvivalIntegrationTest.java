@@ -34,7 +34,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -50,7 +50,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
+public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
     private KieServerControllerClient kieServerControllerClient;
 

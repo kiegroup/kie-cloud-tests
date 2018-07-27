@@ -40,7 +40,7 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.server.api.model.ReleaseId;
@@ -49,7 +49,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.SolverServicesClient;
 
 @RunWith(Parameterized.class)
-public class KieServerS2iOptaplannerIntegrationTest extends AbstractCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;

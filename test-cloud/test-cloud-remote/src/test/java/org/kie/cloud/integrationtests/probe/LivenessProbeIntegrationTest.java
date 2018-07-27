@@ -33,14 +33,14 @@ import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-public class LivenessProbeIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerScenario> {
+public class LivenessProbeIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;

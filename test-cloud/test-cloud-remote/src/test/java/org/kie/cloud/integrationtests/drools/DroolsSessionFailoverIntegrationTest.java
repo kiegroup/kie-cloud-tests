@@ -36,7 +36,7 @@ import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
@@ -51,7 +51,7 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DroolsSessionFailoverIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
+public class DroolsSessionFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(DroolsSessionFailoverIntegrationTest.class);
     private static final String SMART_ROUTER_ID = "test-kie-router";

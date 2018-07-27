@@ -15,22 +15,10 @@
 
 package org.kie.cloud.integrationtests;
 
-import org.junit.After;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.deployment.DeploymentTimeoutException;
-import org.kie.cloud.api.scenario.DeploymentScenario;
-import org.kie.cloud.api.scenario.MissingResourceException;
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario> {
+public abstract class AbstractCloudIntegrationTest {
 
     protected static final String PROJECT_GROUP_ID = "org.kie.server.testing";
     protected static final String DEFINITION_PROJECT_NAME = "definition-project";
@@ -60,57 +48,8 @@ public abstract class AbstractCloudIntegrationTest<T extends DeploymentScenario>
     protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
     protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
 
-    private static final int SCENARIO_DEPLOYMENT_ATTEMPTS = 3;
-
     // Path relative to target/classes folder
     protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractCloudIntegrationTest.class);
-
-    private final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-
-    protected final GitProviderService gitProviderService = new GitProviderService();
-    protected final GitProvider gitProvider = gitProviderService.createGitProvider();
-    protected T deploymentScenario;
-
-    @Rule
-    public TestName testName = new TestName();
-
-    @Before
-    public void initializeDeployment() {
-        deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
-        deploymentScenario.setLogFolderName(testName.getMethodName());
-
-        boolean isDeployed = false;
-        for (int i = 0; i < SCENARIO_DEPLOYMENT_ATTEMPTS && !isDeployed; i++) {
-            isDeployed = deployScenario();
-        }
-    }
-
-    @After
-    public void cleanEnvironment() {
-        if (deploymentScenario != null) {
-            deploymentScenario.undeploy();
-        }
-    }
-
-    /**
-     * @return True if deployment is successful.
-     */
-    private boolean deployScenario() {
-        try {
-            deploymentScenario.deploy();
-            return true;
-        } catch (MissingResourceException e) {
-            logger.warn("Skipping test because of missing resource.", e);
-            Assume.assumeNoException(e);
-        } catch (DeploymentTimeoutException e) {
-            logger.warn("Scenario didn't start in defined timeout, undeploying.", e);
-            cleanEnvironment();
-        }
-
-        return false;
-    }
-
-    protected abstract T createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory);
+    protected static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 }

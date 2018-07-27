@@ -25,8 +25,8 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.util.Constants;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -39,7 +39,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
-public class ExternalDatabaseIntegrationTest extends AbstractCloudIntegrationTest<KieServerWithExternalDatabaseScenario> {
+public class ExternalDatabaseIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerWithExternalDatabaseScenario> {
 
     private KieServicesClient kieServerClient;
 

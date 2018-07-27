@@ -43,7 +43,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.util.Constants;
@@ -62,7 +62,7 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 
 @RunWith(Parameterized.class)
 @Category(Smoke.class)
-public class ExternalMavenRepoIntegrationTest extends AbstractCloudIntegrationTest<DeploymentScenario> {
+public class ExternalMavenRepoIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;

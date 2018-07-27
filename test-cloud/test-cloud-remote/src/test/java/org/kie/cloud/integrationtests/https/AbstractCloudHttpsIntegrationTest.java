@@ -28,11 +28,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.util.HttpsUtils;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractCloudHttpsIntegrationTest<T extends DeploymentScenario> extends AbstractCloudIntegrationTest<T> {
+public abstract class AbstractCloudHttpsIntegrationTest<T extends DeploymentScenario> extends AbstractMethodIsolatedCloudIntegrationTest<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractCloudHttpsIntegrationTest.class);
 
