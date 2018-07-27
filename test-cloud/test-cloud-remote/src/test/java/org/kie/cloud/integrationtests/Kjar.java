@@ -22,6 +22,7 @@ public enum Kjar {
     CLOUD_BALANCE_SNAPSHOT("org.kie.server.testing", "cloudbalance-snapshot", "1.0.0-SNAPSHOT"),
     TIMER("org.kie.server.testing", "timer-project", "1.0.0-SNAPSHOT"),
     RULE_SNAPSHOT("org.kie.server.testing", "rule-project", "1.0.0-SNAPSHOT"),
+    HELLO_RULES("org.kie.server.testing", "hello-rules", "1.0.0.Final"),
     HELLO_RULES_SNAPSHOT("org.kie.server.testing", "hello-rules-snapshot", "1.0.0-SNAPSHOT"),
     USERTASK("org.kie.server.testing", "usertask-project", "1.0.0.Final"),
     STATELESS_SESSION("org.kie.server.testing", "stateless-session", "1.0.0.Final");
