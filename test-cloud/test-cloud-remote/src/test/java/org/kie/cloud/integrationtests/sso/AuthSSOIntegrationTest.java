@@ -21,16 +21,17 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.atIndex;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentSSOScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -47,10 +48,10 @@ import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-public class AuthSSOIntegrationTest extends AbstractCloudIntegrationTest<WorkbenchKieServerPersistentSSOScenario> {
+public class AuthSSOIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
-    private final String SECURED_URL_PREFIX = "secured-";
-    private final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
+    private static final String SECURED_URL_PREFIX = "secured-";
+    private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
 
     private static final String BUSINESS_CENTRAL_NAME = "rhpamcentr";
     private static final String KIE_SERVER_NAME = "kieserver";
@@ -58,11 +59,13 @@ public class AuthSSOIntegrationTest extends AbstractCloudIntegrationTest<Workben
     private static final String BUSINESS_CENTRAL_HOSTNAME = BUSINESS_CENTRAL_NAME + DeploymentConstants.getDefaultDomainSuffix();
     private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
 
+    private String repositoryName;
+
     @Override
-    protected WorkbenchKieServerPersistentSSOScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerPersistentSSOScenarioBuilder()
+    protected WorkbenchKieServerPersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+                .deploySSO(true)
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .withBusinessCentralMavenUser("mavenUser", "mavenUser1!")
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                 .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                 .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
@@ -78,7 +81,7 @@ public class AuthSSOIntegrationTest extends AbstractCloudIntegrationTest<Workben
 
     @Before
     public void setUp() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
@@ -88,6 +91,11 @@ public class AuthSSOIntegrationTest extends AbstractCloudIntegrationTest<Workben
         processClient = kieServerClient.getServicesClient(ProcessServicesClient.class);
         taskClient = kieServerClient.getServicesClient(UserTaskServicesClient.class);
         queryClient = kieServerClient.getServicesClient(QueryServicesClient.class);
+    }
+
+    @After
+    public void tearDown() {
+        gitProvider.deleteGitRepository(repositoryName);
     }
 
     @Test

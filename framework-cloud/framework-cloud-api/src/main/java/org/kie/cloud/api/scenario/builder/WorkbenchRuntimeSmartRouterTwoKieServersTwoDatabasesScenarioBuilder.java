@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.kie.cloud.api.scenario.builder;
 
 import java.time.Duration;
@@ -20,8 +19,10 @@ import java.time.Duration;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 
 /**
- * Cloud builder for Workbench runtime, Smart router and two Kie Servers with two databases in project. Built setup
- * for WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario
+ * Cloud builder for Workbench runtime, Smart router and two Kie Servers with
+ * two databases in project. Built setup for
+ * WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario
+ *
  * @see WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario
  */
 public interface WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
@@ -29,6 +30,7 @@ public interface WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBui
     /**
      * Return setup builder with additional configuration of external maven
      * repo.
+     *
      * @param repoUrl Maven repo URL.
      * @param repoUserName Maven repo user name.
      * @param repoPassword Maven repo user password.
@@ -38,15 +40,86 @@ public interface WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBui
 
     /**
      * Return setup builder with specified Smart router id.
+     *
      * @param smartRouterId Smart router id.
      * @return Builder with configured Smart router id.
      */
     WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withSmartRouterId(String smartRouterId);
 
     /**
-     * Return setup builder with specified timer service data store refresh interval.
-     * @param timerServiceDataStoreRefreshInterval timer service data store refresh interval.
-     * @return Builder with configured timer service data store refresh interval.
+     * Return setup builder with specified timer service data store refresh
+     * interval.
+     *
+     * @param timerServiceDataStoreRefreshInterval timer service data store
+     * refresh interval.
+     * @return Builder with configured timer service data store refresh
+     * interval.
      */
     WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval);
+
+    /**
+     * Return setup builder with additional configuration for SSO deployment.
+     *
+     * @param deploySSO Default value is 'false'. Set to 'true' to deploy SSO to
+     * the scenario.
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySSO(boolean deploySSO);
+
+    /**
+     * Return setup builder with Business Central user for the maven repository.
+     *
+     * @param user Business Central Maven repo user name.
+     * @param password Business Central Maven repo user password.
+     * @return Builder with configured Business Central Maven repo user.
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password);
+
+    /**
+     * Return setup builder with configure Workbench http hostname.
+     *
+     * @param http HTTP hostname for Workbench
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String http);
+
+    /**
+     * Return setup builder with configure Workbench https hostname.
+     *
+     * @param https HTTPS hostname for Workbench
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String https);
+
+    /**
+     * Return setup builder with configure Kie Server 1 http hostname.
+     *
+     * @param http HTTP hostname for Kie Server
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer1Hostname(String http);
+
+    /**
+     * Return setup builder with configure Kie Server 1 https hostname.
+     *
+     * @param https HTTPS hostname for Kie Server
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer1Hostname(String https);
+
+    /**
+     * Return setup builder with configure Kie Server 2 http hostname.
+     *
+     * @param http HTTP hostname for Kie Server
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer2Hostname(String http);
+
+    /**
+     * Return setup builder with configure Kie Server 2 https hostname.
+     *
+     * @param https HTTPS hostname for Kie Server
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String https);
 }

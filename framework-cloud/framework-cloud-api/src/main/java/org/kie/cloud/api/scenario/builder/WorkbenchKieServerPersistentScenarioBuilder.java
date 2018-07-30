@@ -27,4 +27,60 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
      * @return Builder with configured external maven repo.
      */
     WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    /**
+     * Return setup builder with additional configuration for SSO deployment.
+     *
+     * @param deploySSO Default value is 'false'. Set to 'true' to deploy SSO to
+     * the scenario.
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder deploySSO(boolean deploySSO);
+
+    /**
+     * Return setup builder with Business Central user for the maven repository.
+     *
+     * @param user Business Central Maven repo user name.
+     * @param password Business Central Maven repo user password.
+     * @return Builder with configured Business Central Maven repo user.
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withBusinessCentralMavenUser(String user, String password);
+
+    /**
+     * @param kieServerId kie-server id
+     * @return Builder with kie-server id set
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withKieServerId(String kieServerId);
+
+    /**
+     * Return setup builder with configure Workbench http hostname.
+     *
+     * @param http HTTP hostname for Workbench
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withHttpWorkbenchHostname(String http);
+
+    /**
+     * Return setup builder with configure Workbench https hostname.
+     *
+     * @param https HTTPS hostname for Workbench
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withHttpsWorkbenchHostname(String https);
+
+    /**
+     * Return setup builder with configure Kie Server http hostname.
+     *
+     * @param http HTTP hostname for Kie Server
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withHttpKieServerHostname(String http);
+
+    /**
+     * Return setup builder with configure Kie Server https hostname.
+     *
+     * @param https HTTPS hostname for Kie Server
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String https);
 }

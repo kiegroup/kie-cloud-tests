@@ -15,5 +15,14 @@
  */
 package org.kie.cloud.api.scenario;
 
+import org.kie.cloud.api.deployment.SSODeployment;
+
 public interface WorkbenchKieServerPersistentScenario extends WorkbenchKieServerScenario {
+    /**
+     * Return SSO deployment.
+     *
+     * @return SSODeployment
+     * @see SSODeployment
+     */
+    SSODeployment getSSODeployment();
 }

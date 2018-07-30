@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.openshift.scenario.builder;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -24,23 +25,42 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerPersistentScenarioImpl;
 
-
 public class WorkbenchKieServerPersistentScenarioBuilderImpl implements WorkbenchKieServerPersistentScenarioBuilder {
 
-    private Map<String, String> envVariables = new HashMap<>();
+    private final Map<String, String> envVariables = new HashMap<>();
+    private boolean deploySSO = false;
 
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
         envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
+    private Map<String, String> getSSOenvVariables() {
+        if (!deploySSO) {
+            return Collections.EMPTY_MAP;
+        }
+        Map<String, String> ssoEnvVariables = new HashMap<>();
+
+        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_ADMIN_USERNAME, DeploymentConstants.getSSOAdminUser());
+        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_ADMIN_PASSWORD, DeploymentConstants.getSSOAdminPassword());
+        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.gettSSORealm());
+        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_SERVICE_USERNAME, DeploymentConstants.getSSOServiceUser());
+        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_SERVICE_PASSWORD, DeploymentConstants.getSSOServicePassword());
+
+        return ssoEnvVariables;
+    }
+
     @Override
     public WorkbenchKieServerPersistentScenario build() {
-        return new WorkbenchKieServerPersistentScenarioImpl(envVariables);
+        return new WorkbenchKieServerPersistentScenarioImpl(envVariables, deploySSO, getSSOenvVariables());
     }
 
     @Override
@@ -48,6 +68,53 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder deploySSO(boolean deploySSO) {
+        this.deploySSO = deploySSO;
+        if (deploySSO) {
+            envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSSOServiceUser());
+            envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSSOServicePassword());
+        }
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withBusinessCentralMavenUser(String user, String password) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, user);
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, password);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withKieServerId(String kieServerId) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ID, kieServerId);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpWorkbenchHostname(String http) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, http);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpsWorkbenchHostname(String https) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, https);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpKieServerHostname(String http) {
+        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTP, http);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String https) {
+        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTPS, https);
         return this;
     }
 }

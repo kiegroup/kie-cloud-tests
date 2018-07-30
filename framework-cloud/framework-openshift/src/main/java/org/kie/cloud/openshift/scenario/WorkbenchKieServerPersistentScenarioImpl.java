@@ -25,6 +25,7 @@ import org.kie.cloud.api.deployment.ControllerDeployment;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SSODeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -34,24 +35,42 @@ import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.SSODeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario implements WorkbenchKieServerPersistentScenario {
+
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
+    private SSODeployment ssoDeployment;
 
     private Map<String, String> envVariables;
+    private boolean deploySSO;
+    private Map<String, String> ssoEnvVariables;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerPersistentScenarioImpl.class);
 
-    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables) {
+    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, boolean deploySSO, Map<String, String> ssoEnvVariables) {
         this.envVariables = envVariables;
+        this.deploySSO = deploySSO;
+        this.ssoEnvVariables = ssoEnvVariables;
     }
 
     @Override
     public void deploy() {
         super.deploy();
+
+        if (deploySSO) {
+            ssoDeployment = SSODeployer.deploy(project, envVariables, ssoEnvVariables);
+
+            envVariables.put(OpenShiftTemplateConstants.SSO_URL, SSODeployer.createSSOEnvVariable(ssoDeployment.getUrl().toString()));
+            envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.gettSSORealm());
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
+        }
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
@@ -92,7 +111,7 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
@@ -120,5 +139,10 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
     @Override
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public SSODeployment getSSODeployment() {
+        return ssoDeployment;
     }
 }

@@ -48,7 +48,6 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenario;
-import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentSSOScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.util.HttpsUtils;
@@ -95,7 +94,8 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
 
         ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder().build();
 
-        WorkbenchKieServerPersistentSSOScenario workbenchKieServerPersistentSSOScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentSSOScenarioBuilder()
+        WorkbenchKieServerPersistentScenario ssoWorkbenchKieServerPersistenScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+                .deploySSO(true)
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                 .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
@@ -103,11 +103,23 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                 .build();
 
+        WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario ssoWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+                .deploySSO(true)
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpKieServer1Hostname(RANDOM_URL_PREFIX + "mon-1-" + KIE_SERVER_HOSTNAME)
+                .withHttpsKieServer1Hostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-1-" + KIE_SERVER_HOSTNAME)
+                .withHttpKieServer2Hostname(RANDOM_URL_PREFIX + "mon-2-" + KIE_SERVER_HOSTNAME)
+                .withHttpsKieServer2Hostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-2-" + KIE_SERVER_HOSTNAME)
+                .build();
+
         return Arrays.asList(new Object[][]{
             {"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario},
             {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario},
-            {"[SSO] Workbench + KIE Server - Persistent", workbenchKieServerPersistentSSOScenario}
+            {"[SSO] Workbench + KIE Server - Persistent", ssoWorkbenchKieServerPersistenScenario},
+            {"[SSO] Workbench + Smart router + 2 KIE Servers + 2 Databases", ssoWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario}
         });
     }
 
