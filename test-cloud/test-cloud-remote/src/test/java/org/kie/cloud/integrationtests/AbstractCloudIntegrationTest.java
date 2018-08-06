@@ -17,6 +17,8 @@ package org.kie.cloud.integrationtests;
 
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.git.GitProviderService;
 
 public abstract class AbstractCloudIntegrationTest {
 
@@ -52,4 +54,7 @@ public abstract class AbstractCloudIntegrationTest {
     protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
     protected static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+    protected final GitProviderService gitProviderService = new GitProviderService();
+    protected final GitProvider gitProvider = gitProviderService.createGitProvider();
 }

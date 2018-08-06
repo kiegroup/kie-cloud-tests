@@ -118,5 +118,4 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER1_SSO_SECRET = "KIE_SERVER1_SSO_SECRET";
     public static final String KIE_SERVER2_SSO_CLIENT = "KIE_SERVER2_SSO_CLIENT";
     public static final String KIE_SERVER2_SSO_SECRET = "KIE_SERVER2_SSO_SECRET";
-    // SSO_REALM
 }

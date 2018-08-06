@@ -60,11 +60,9 @@ public interface WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBui
     /**
      * Return setup builder with additional configuration for SSO deployment.
      *
-     * @param deploySSO Default value is 'false'. Set to 'true' to deploy SSO to
-     * the scenario.
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySSO(boolean deploySSO);
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySso();
 
     /**
      * Return setup builder with Business Central user for the maven repository.
@@ -78,48 +76,48 @@ public interface WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBui
     /**
      * Return setup builder with configure Workbench http hostname.
      *
-     * @param http HTTP hostname for Workbench
+     * @param hostname HTTP hostname for Workbench
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String http);
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String hostname);
 
     /**
      * Return setup builder with configure Workbench https hostname.
      *
-     * @param https HTTPS hostname for Workbench
+     * @param hostname HTTPS hostname for Workbench
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String https);
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String hostname);
 
     /**
      * Return setup builder with configure Kie Server 1 http hostname.
      *
-     * @param http HTTP hostname for Kie Server
+     * @param hostname HTTP hostname for Kie Server
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer1Hostname(String http);
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer1Hostname(String hostname);
 
     /**
      * Return setup builder with configure Kie Server 1 https hostname.
      *
-     * @param https HTTPS hostname for Kie Server
+     * @param hostname HTTPS hostname for Kie Server
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer1Hostname(String https);
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer1Hostname(String hostname);
 
     /**
      * Return setup builder with configure Kie Server 2 http hostname.
      *
-     * @param http HTTP hostname for Kie Server
+     * @param hostname HTTP hostname for Kie Server
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer2Hostname(String http);
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer2Hostname(String hostname);
 
     /**
      * Return setup builder with configure Kie Server 2 https hostname.
      *
-     * @param https HTTPS hostname for Kie Server
+     * @param hostname HTTPS hostname for Kie Server
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String https);
+    WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String hostname);
 }

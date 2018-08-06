@@ -114,7 +114,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .build();
 
         WorkbenchKieServerPersistentScenario workbenchKieServerPersistentSSOScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                .deploySSO(true)
+                .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                 .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
@@ -123,7 +123,7 @@ public class KieServerHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .build();
 
         WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario ssoWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
-                .deploySSO(true)
+                .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
                 .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)

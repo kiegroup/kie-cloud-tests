@@ -21,14 +21,9 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.DeploymentScenario;
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderService;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 
 public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends DeploymentScenario> extends AbstractCloudIntegrationTest {
-
-    protected final GitProviderService gitProviderService = new GitProviderService();
-    protected final GitProvider gitProvider = gitProviderService.createGitProvider();
 
     protected T deploymentScenario;
 

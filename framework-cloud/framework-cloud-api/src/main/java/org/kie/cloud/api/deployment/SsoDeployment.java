@@ -13,16 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.api.scenario;
+package org.kie.cloud.api.deployment;
 
-import org.kie.cloud.api.deployment.SSODeployment;
+import java.net.URL;
 
-public interface WorkbenchKieServerPersistentSSOScenario extends WorkbenchKieServerPersistentScenario {
+/**
+ * SSO deplyoment representation in cloud.
+ */
+public interface SsoDeployment extends Deployment {
+
     /**
-     * Return SSO deployment.
+     * Get URL for SSO service (deployment).
      *
-     * @return SSODeployment
-     * @see SSODeployment
+     * @return SSO URL
      */
-    SSODeployment getSSODeployment();
+    URL getUrl();
+
+    /**
+     * Get SSO user name.
+     *
+     * @return SSO user name
+     */
+    String getUsername();
+
+    /**
+     * Get SSO user password.
+     *
+     * @return SSO user password
+     */
+    String getPassword();
 }

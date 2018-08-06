@@ -15,7 +15,6 @@
  */
 package org.kie.cloud.openshift.scenario.builder;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -43,24 +42,9 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
-    private Map<String, String> getSSOenvVariables() {
-        if (!deploySSO) {
-            return Collections.EMPTY_MAP;
-        }
-        Map<String, String> ssoEnvVariables = new HashMap<>();
-
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_ADMIN_USERNAME, DeploymentConstants.getSSOAdminUser());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_ADMIN_PASSWORD, DeploymentConstants.getSSOAdminPassword());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.gettSSORealm());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_SERVICE_USERNAME, DeploymentConstants.getSSOServiceUser());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_SERVICE_PASSWORD, DeploymentConstants.getSSOServicePassword());
-
-        return ssoEnvVariables;
-    }
-
     @Override
     public WorkbenchKieServerPersistentScenario build() {
-        return new WorkbenchKieServerPersistentScenarioImpl(envVariables, deploySSO, getSSOenvVariables());
+        return new WorkbenchKieServerPersistentScenarioImpl(envVariables, deploySSO);
     }
 
     @Override
@@ -72,12 +56,10 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder deploySSO(boolean deploySSO) {
-        this.deploySSO = deploySSO;
-        if (deploySSO) {
-            envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSSOServiceUser());
-            envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSSOServicePassword());
-        }
+    public WorkbenchKieServerPersistentScenarioBuilder deploySso() {
+        deploySSO = true;
+        envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
+        envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
         return this;
     }
 
@@ -95,26 +77,26 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withHttpWorkbenchHostname(String http) {
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, http);
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpWorkbenchHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, hostname);
         return this;
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withHttpsWorkbenchHostname(String https) {
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, https);
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, hostname);
         return this;
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withHttpKieServerHostname(String http) {
-        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTP, http);
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTP, hostname);
         return this;
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String https) {
-        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTPS, https);
+    public WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTPS, hostname);
         return this;
     }
 }

@@ -55,6 +55,8 @@
     <org.kie.workbench.pwd>adminUser1!</org.kie.workbench.pwd>
     <org.kie.server.controller.user>controllerUser</org.kie.server.controller.user>
     <org.kie.server.controller.pwd>controllerUser1!</org.kie.server.controller.pwd>
+    <org.kie.workbench.maven.user>mavenUser</org.kie.workbench.maven.user>
+    <org.kie.workbench.maven.pwd>mavenUser1!</org.kie.workbench.maven.pwd>
 
     <default.domain.suffix/>
 
@@ -129,6 +131,8 @@
               <org.kie.server.pwd>${org.kie.server.pwd}</org.kie.server.pwd>
               <org.kie.workbench.user>${org.kie.workbench.user}</org.kie.workbench.user>
               <org.kie.workbench.pwd>${org.kie.workbench.pwd}</org.kie.workbench.pwd>
+              <org.kie.workbench.maven.user>${org.kie.workbench.maven.user}</org.kie.workbench.maven.user>
+              <org.kie.workbench.maven.pwd>${org.kie.workbench.maven.pwd}</org.kie.workbench.maven.pwd>
               <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>

@@ -31,6 +31,9 @@ public class DeploymentConstants implements Constants {
     public static final String WORKBENCH_USER = "org.kie.workbench.user";
     public static final String WORKBENCH_PASSWORD = "org.kie.workbench.pwd";
 
+    public static final String WORKBENCH_MAVEN_USER = "org.kie.workbench.maven.user";
+    public static final String WORKBENCH_MAVEN_PASSWORD = "org.kie.workbench.maven.pwd";
+
     public static final String CONTROLLER_USER = "org.kie.server.controller.user";
     public static final String CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
 
@@ -67,6 +70,14 @@ public class DeploymentConstants implements Constants {
 
     public static String getWorkbenchPassword() {
         return System.getProperty(WORKBENCH_PASSWORD);
+    }
+
+    public static String getWorkbenchMavenUser() {
+        return System.getProperty(WORKBENCH_MAVEN_USER);
+    }
+
+    public static String getWorkbenchMavenPassword() {
+        return System.getProperty(WORKBENCH_MAVEN_PASSWORD);
     }
 
     public static String getControllerUser() {
@@ -109,23 +120,23 @@ public class DeploymentConstants implements Constants {
         return System.getProperty(HIBERNATE_PERSISTENCE_DIALECT);
     }
 
-    public static String getSSOAdminUser() {
+    public static String getSsoAdminUser() {
         return System.getProperty(SSO_ADMIN_USERNAME);
     }
 
-    public static String getSSOAdminPassword() {
+    public static String getSsoAdminPassword() {
         return System.getProperty(SSO_ADMIN_PASSWORD);
     }
 
-    public static String getSSOServiceUser() {
+    public static String getSsoServiceUser() {
         return System.getProperty(SSO_SERVICE_USERNAME);
     }
 
-    public static String getSSOServicePassword() {
+    public static String getSsoServicePassword() {
         return System.getProperty(SSO_SERVICE_PASSWORD);
     }
 
-    public static String gettSSORealm() {
+    public static String getSsoRealm() {
         return System.getProperty(SSO_REALM);
     }
     public static String getDefaultDomainSuffix() {

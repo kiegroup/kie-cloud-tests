@@ -16,17 +16,17 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import org.kie.cloud.api.deployment.SSODeployment;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.api.deployment.SsoDeployment;
 
-public class SSODeploymentImpl extends OpenShiftDeployment implements SSODeployment {
+public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeployment {
 
     private String serviceName;
     private URL url;
     private String username;
     private String password;
 
-    public SSODeploymentImpl(Project project) {
+    public SsoDeploymentImpl(Project project) {
         super(project);
     }
 

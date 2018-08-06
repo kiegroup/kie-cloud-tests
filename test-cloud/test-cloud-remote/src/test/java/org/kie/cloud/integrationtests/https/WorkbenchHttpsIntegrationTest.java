@@ -95,7 +95,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
         ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder().build();
 
         WorkbenchKieServerPersistentScenario ssoWorkbenchKieServerPersistenScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                .deploySSO(true)
+                .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                 .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
@@ -104,7 +104,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                 .build();
 
         WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario ssoWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
-                .deploySSO(true)
+                .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
                 .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
@@ -142,7 +142,7 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
                     logger.debug("Test login screen on url {}", urlString);
                     Pair<String, Integer> responseAndCode = HttpClient.get(urlString).responseAndCode();
                     assertThat(responseAndCode.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
-                    assertThat(responseAndCode.getFirst()).contains(DeploymentConstants.gettSSORealm());
+                    assertThat(responseAndCode.getFirst()).contains(DeploymentConstants.getSsoRealm());
 
                 } else {
                     logger.debug("Test login screen on url {}", url.toString());
