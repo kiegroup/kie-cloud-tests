@@ -21,9 +21,10 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
     /**
      * Return setup builder with additional configuration of external maven
      * repo.
-     *
      * @param repoUrl Maven repo URL.
+     * @param repoUserName Maven repo user name.
+     * @param repoPassword Maven repo user password.
      * @return Builder with configured external maven repo.
      */
-    WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl);
+    WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
 }

@@ -82,4 +82,9 @@ public interface Deployment {
      * @param timeoutValue Timeout value.
      */
     void setRouterTimeout(Duration timeoutValue);
+
+    /**
+     * This method resets a router timeout for the cloud deployment back to original value.
+     */
+    void resetRouterTimeout();
 }
