@@ -153,6 +153,20 @@ public abstract class OpenShiftDeployment implements Deployment {
             .done();
     }
 
+    @Override
+    public void resetRouterTimeout() {
+        // Route has a same name as its service.
+        String routeName = getServiceName();
+        util.client()
+            .routes()
+            .withName(routeName)
+            .edit()
+            .editMetadata()
+            .removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT)
+            .endMetadata()
+            .done();
+    }
+
     private Instance createInstance(Pod pod) {
         String instanceName = pod.getMetadata().getName();
 

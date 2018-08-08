@@ -44,9 +44,10 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl) {
+    public WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        // Maven username and password is currently hardcoded as KIE_ADMIN_USER and KIE_ADMIN_PWD until RHDM-319 is fixed.
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
 }

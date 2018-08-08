@@ -30,16 +30,16 @@ import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
 @Category(Smoke.class)
-public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudIntegrationTest {
+public class WorkbenchKieServerPersistentScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static WorkbenchKieServerScenario deploymentScenario;
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                                                       .build();
-        deploymentScenario.setLogFolderName(WorkbenchKieServerScenarioIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 

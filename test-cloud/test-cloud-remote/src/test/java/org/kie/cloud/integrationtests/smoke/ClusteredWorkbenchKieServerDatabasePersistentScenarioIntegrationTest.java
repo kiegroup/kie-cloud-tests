@@ -19,7 +19,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
@@ -30,16 +30,16 @@ import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
 @Category(Smoke.class)
-public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudIntegrationTest {
+public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
-    private static WorkbenchKieServerScenario deploymentScenario;
+    private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                                                       .build();
-        deploymentScenario.setLogFolderName(WorkbenchKieServerScenarioIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 

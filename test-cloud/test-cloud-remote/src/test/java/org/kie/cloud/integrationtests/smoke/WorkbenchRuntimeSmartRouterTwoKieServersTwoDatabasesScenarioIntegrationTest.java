@@ -19,7 +19,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
@@ -30,16 +30,16 @@ import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
 @Category(Smoke.class)
-public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudIntegrationTest {
+public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
-    private static WorkbenchKieServerScenario deploymentScenario;
+    private static WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario deploymentScenario;
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+        deploymentScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                                                       .build();
-        deploymentScenario.setLogFolderName(WorkbenchKieServerScenarioIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 
@@ -50,22 +50,20 @@ public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudInte
 
     @Test
     public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment());
+        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerOneDeployment());
+        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testProcess(deploymentScenario.getKieServerOneDeployment());
+        ProcessTestProvider.testProcess(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test
     public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
-    public void testDeployContainerFromWorkbench() {
-        FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerOneDeployment());
+        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerTwoDeployment());
     }
 }
