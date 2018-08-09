@@ -16,8 +16,10 @@
 package org.kie.cloud.git;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RemoteAddCommand;
 import org.eclipse.jgit.api.RemoteRemoveCommand;
@@ -41,7 +43,11 @@ public abstract class AbstractGitProvider implements GitProvider {
     protected void pushToGitRepository(String httpUrl, String repositoryPath,
             String username, String password) {
         try {
-            Git git = Git.init().setDirectory(new File(repositoryPath)).call();
+            File originalDirectory = new File(repositoryPath);
+            File tempDirectory = Files.createTempDirectory("openshift-git").toFile();
+            FileUtils.copyDirectory(originalDirectory, tempDirectory);
+
+            Git git = Git.init().setDirectory(tempDirectory).call();
 
             RemoteAddCommand remoteAdd = git.remoteAdd();
             remoteAdd.setName("origin");
