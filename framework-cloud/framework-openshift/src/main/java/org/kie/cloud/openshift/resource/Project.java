@@ -70,4 +70,12 @@ public interface Project extends AutoCloseable {
      * @param inputStream Input stream with resource list to be created
      */
     public void createResources(InputStream inputStream);
+
+    /**
+     * Create image stream in current project.
+     *
+     * @param imageStreamName Name of image stream
+     * @param imageTag Image tag used to resolve image,for example Docker tag.
+     */
+    public void createImageStream(String imageStreamName, String imageTag);
 }

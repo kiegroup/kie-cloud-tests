@@ -21,7 +21,9 @@ import java.net.URL;
 import java.util.Map;
 
 import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.openshift.builder.ImageStreamBuilder;
 import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
@@ -79,6 +81,12 @@ public class ProjectImpl implements Project {
     public void createResources(InputStream inputStream) {
         KubernetesList resourceList = util.client().lists().inNamespace(projectName).load(inputStream).get();
         util.client().lists().inNamespace(projectName).create(resourceList);
+    }
+
+    @Override
+    public void createImageStream(String imageStreamName, String imageTag) {
+        ImageStream driverImageStream = new ImageStreamBuilder(imageStreamName).fromExternalImage(imageTag).build();
+        util.createImageStream(driverImageStream);
     }
 
     public void close() {

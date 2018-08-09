@@ -16,23 +16,22 @@
 package org.kie.cloud.integrationtests.persistence;
 
 import static org.junit.Assume.assumeTrue;
+
 import java.util.List;
+
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
@@ -40,8 +39,6 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
 public class ExternalDatabaseIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerWithExternalDatabaseScenario> {
-
-    private KieServicesClient kieServerClient;
 
     @Override protected KieServerWithExternalDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         assumeTrue(isExternalDatabaseAllocated());
@@ -53,18 +50,6 @@ public class ExternalDatabaseIntegrationTest extends AbstractMethodIsolatedCloud
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-    }
-
-    @Before
-    public void setUp() {
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
-    public void testKieServerRunning() {
-        ServiceResponse<KieServerInfo> kieServerInfoServiceResponse = kieServerClient.getServerInfo();
-        List<String> capabilities = kieServerInfoServiceResponse.getResult().getCapabilities();
-        Assertions.assertThat(capabilities).isNotEmpty();
     }
 
     @Test
@@ -90,7 +75,7 @@ public class ExternalDatabaseIntegrationTest extends AbstractMethodIsolatedCloud
     }
 
     private boolean isExternalDatabaseAllocated() {
-        if (DeploymentConstants.getDatabaseHost().isEmpty()) {
+        if (DeploymentConstants.getDatabaseDriver().isEmpty()) {
             return false;
         } else {
             return true;

@@ -15,20 +15,13 @@
 
 package org.kie.cloud.openshift.scenario.builder;
 
-import static org.kie.cloud.api.deployment.constants.DeploymentConstants.getDatabaseDriver;
-import static org.kie.cloud.api.deployment.constants.DeploymentConstants.getDatabaseHost;
-import static org.kie.cloud.api.deployment.constants.DeploymentConstants.getDatabasePassword;
-import static org.kie.cloud.api.deployment.constants.DeploymentConstants.getDatabasePort;
-import static org.kie.cloud.api.deployment.constants.DeploymentConstants.getDatabaseUsername;
-import static org.kie.cloud.api.deployment.constants.DeploymentConstants.getExternalDatabaseName;
-import static org.kie.cloud.api.deployment.constants.DeploymentConstants.getHibernatePersistenceDialect;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.KieServerWithExternalDatabaseScenarioImpl;
 
@@ -39,15 +32,7 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl implements KieServ
     public KieServerWithExternalDatabaseScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOST, "-"); // Parameter is required by template
-
-        envVariables.put(OpenShiftTemplateConstants.DBE_SERVICE_HOST, getDatabaseHost());
-        envVariables.put(OpenShiftTemplateConstants.DBE_DRIVER, getDatabaseDriver());
-        envVariables.put(OpenShiftTemplateConstants.DBE_SERVICE_PORT, getDatabasePort());
-        envVariables.put(OpenShiftTemplateConstants.DBE_DATABASE, getExternalDatabaseName());
-        envVariables.put(OpenShiftTemplateConstants.DBE_USERNAME, getDatabaseUsername());
-        envVariables.put(OpenShiftTemplateConstants.DBE_PASSWORD, getDatabasePassword());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PERSISTENCE_DIALECT, getHibernatePersistenceDialect());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override

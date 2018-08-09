@@ -116,7 +116,11 @@
               <db.name>${db.name}</db.name>
               <db.username>${db.username}</db.username>
               <db.password>${db.password}</db.password>
+              <db.jdbc_url>${db.jdbc_url}</db.jdbc_url>
               <hibernate.dialect>${hibernate.dialect}</hibernate.dialect>
+              <db.driver>${db.driver}</db.driver>
+              <kie.jdbc.driver.binary.url>${kie.jdbc.driver.binary.url}</kie.jdbc.driver.binary.url>
+              <kie.jdbc.driver.scripts>${kie.jdbc.driver.scripts}</kie.jdbc.driver.scripts>
               <kie.app.name>${kie.app.name}</kie.app.name>
               <git.provider>${git.provider}</git.provider>
               <gitlab.url>${gitlab.url}</gitlab.url>
