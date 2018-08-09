@@ -44,6 +44,7 @@ public class DeploymentConstants implements Constants {
     public static final String EXTERNAL_DATABASE_NAME = "db.name";
     public static final String DATABASE_USERNAME = "db.username";
     public static final String DATABASE_PASSWORD = "db.password";
+    public static final String DATABASE_URL = "db.jdbc_url";
 
     public static final String SSO_ADMIN_USERNAME = "sso.admin.username";
     public static final String SSO_ADMIN_PASSWORD = "sso.admin.password";
@@ -114,6 +115,10 @@ public class DeploymentConstants implements Constants {
 
     public static String getDatabasePassword() {
         return System.getProperty(DATABASE_PASSWORD);
+    }
+
+    public static String getDatabaseUrl() {
+        return System.getProperty(DATABASE_URL);
     }
 
     public static String getHibernatePersistenceDialect() {

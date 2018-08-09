@@ -96,17 +96,6 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
     KieServerS2ISettingsBuilder withSmartRouterConnection(String serviceName);
 
     /**
-     * Return configured builder with external database connection. Values for
-     * external database are add by system properties.
-     *
-     * System properties for external database configuration: db.hostname,
-     * db.name, db.password, db.username.
-     *
-     * @return Builder
-     */
-    KieServerS2ISettingsBuilder withExternalDatabase();
-
-    /**
      * Return configured builder with Kie Container deployment.
      *
      * @param kieContainerDeployment Kie Container deployment.

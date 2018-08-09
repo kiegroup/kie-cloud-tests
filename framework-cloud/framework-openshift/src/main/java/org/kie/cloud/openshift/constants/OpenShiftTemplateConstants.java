@@ -61,13 +61,17 @@ public class OpenShiftTemplateConstants {
 
     public static final String IMAGE_STREAM_NAMESPACE = "IMAGE_STREAM_NAMESPACE";
     public static final String APPLICATION_NAME = "APPLICATION_NAME";
+    public static final String KIE_SERVER_IMAGE_STREAM_NAME = "KIE_SERVER_IMAGE_STREAM_NAME";
+    public static final String IMAGE_STREAM_TAG = "IMAGE_STREAM_TAG";
 
-    public static final String DBE_SERVICE_HOST = "DBE_SERVICE_HOST";
-    public static final String DBE_SERVICE_PORT = "DBE_SERVICE_PORT";
-    public static final String DBE_DRIVER = "DBE_DRIVER";
-    public static final String DBE_DATABASE = "DBE_DATABASE";
-    public static final String DBE_USERNAME = "DBE_USERNAME";
-    public static final String DBE_PASSWORD = "DBE_PASSWORD";
+    public static final String KIE_SERVER_EXTERNALDB_HOST = "KIE_SERVER_EXTERNALDB_HOST";
+    public static final String KIE_SERVER_EXTERNALDB_PORT = "KIE_SERVER_EXTERNALDB_PORT";
+    public static final String KIE_SERVER_EXTERNALDB_URL = "KIE_SERVER_EXTERNALDB_URL";
+    public static final String KIE_SERVER_EXTERNALDB_DRIVER = "KIE_SERVER_EXTERNALDB_DRIVER";
+    public static final String KIE_SERVER_EXTERNALDB_DIALECT = "KIE_SERVER_EXTERNALDB_DIALECT";
+    public static final String KIE_SERVER_EXTERNALDB_DB = "KIE_SERVER_EXTERNALDB_DB";
+    public static final String KIE_SERVER_EXTERNALDB_USER = "KIE_SERVER_EXTERNALDB_USER";
+    public static final String KIE_SERVER_EXTERNALDB_PWD = "KIE_SERVER_EXTERNALDB_PWD";
 
     public static final String CONTROLLER_HOSTNAME_HTTP = "CONTROLLER_HOSTNAME_HTTP";
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTP = "BUSINESS_CENTRAL_HOSTNAME_HTTP";

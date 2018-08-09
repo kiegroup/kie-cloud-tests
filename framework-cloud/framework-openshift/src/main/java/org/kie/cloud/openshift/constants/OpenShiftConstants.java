@@ -15,6 +15,9 @@
 
 package org.kie.cloud.openshift.constants;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 
 import org.kie.cloud.api.constants.Constants;
@@ -127,6 +130,16 @@ public class OpenShiftConstants implements Constants {
     public static final String SSO_APP_SECRETS = "sso.app.secrets";
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
 
+    /**
+     * File path pointing to folder containing JDBC driver scripts.
+     */
+    public static final String KIE_JDBC_DRIVER_SCRIPTS = "kie.jdbc.driver.scripts";
+
+    /**
+     * URL pointing to JDBC driver binary.
+     */
+    public static final String KIE_JDBC_DRIVER_BINARY_URL = "kie.jdbc.driver.binary.url";
+
     public static String getOpenShiftUrl() {
         return System.getProperty(OPENSHIFT_URL);
     }
@@ -159,6 +172,20 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(KIE_APP_NAME);
     }
 
+    public static File getKieJdbcDriverScriptsFolder() {
+        String kieJdbcDriverScriptsFolder = System.getProperty(KIE_JDBC_DRIVER_SCRIPTS);
+        return new File(kieJdbcDriverScriptsFolder);
+    }
+
+    public static URL getKieJdbcDriverBinaryUrl() {
+        String kieJdbcDriverBinaryUrl = System.getProperty(KIE_JDBC_DRIVER_BINARY_URL);
+        try {
+            return new URL(kieJdbcDriverBinaryUrl);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed URL of Kie server JDBC driver binary.", e);
+        }
+    }
+
     /**
      * @return Name of the secret containing keystore file for HTTPS communication.
      */
@@ -174,5 +201,7 @@ public class OpenShiftConstants implements Constants {
         System.setProperty("xtf.config.master.password", getOpenShiftPassword());
         System.setProperty("xtf.config.master.admin.username", getOpenShiftUserName());
         System.setProperty("xtf.config.master.admin.password", getOpenShiftPassword());
+        // TODO delete this when raising XTF version
+        System.setProperty("xtf.config.openshift.version", "3.9.41");
     }
 }

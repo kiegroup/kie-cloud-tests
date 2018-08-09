@@ -30,6 +30,7 @@ public class ServiceUtil {
     private static final Pattern KIE_SERVER_REGEXP = Pattern.compile("(?!secure-).*(-execserv|-kieserver)");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
     private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
+    private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
 
     public static String getControllerServiceName(OpenShiftUtil util) {
         return getServiceName(util, CONTROLLER_REGEXP);
@@ -53,6 +54,10 @@ public class ServiceUtil {
 
     public static String getDatabaseServiceName(OpenShiftUtil util, String suffix) {
         return getServiceName(util, Pattern.compile(DATABASE_REGEXP.pattern() + suffix));
+    }
+
+    public static String getDockerServiceName(OpenShiftUtil util) {
+        return getServiceName(util, DOCKER_REGEXP);
     }
 
     private static String getServiceName(OpenShiftUtil util, Pattern regexp) {
