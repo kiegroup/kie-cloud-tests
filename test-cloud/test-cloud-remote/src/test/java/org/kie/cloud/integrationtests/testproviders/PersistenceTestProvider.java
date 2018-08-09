@@ -39,13 +39,17 @@ public class PersistenceTestProvider {
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         String kieServerLocation = serverInfo.getLocation();
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerId, Kjar.DEFINITION, KieContainerStatus.STARTED);
+        try {
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerId, Kjar.DEFINITION, KieContainerStatus.STARTED);
 
-        verifyOneServerTemplateWithContainer(kieControllerClient, kieServerLocation, containerId);
+            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerLocation, containerId);
 
-        scaleToZeroAndBackToOne(deploymentScenario.getWorkbenchDeployment());
+            scaleToZeroAndBackToOne(deploymentScenario.getWorkbenchDeployment());
 
-        verifyOneServerTemplateWithContainer(kieControllerClient, kieServerLocation, containerId);
+            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerLocation, containerId);
+        } finally {
+            kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
+        }
     }
 
     private static void scaleToZeroAndBackToOne(Deployment deployment) {

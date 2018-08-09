@@ -77,21 +77,25 @@ public class ProcessTestProvider {
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
 
-        Long userTaskPid = processClient.startProcess(containerId, Constants.ProcessId.USERTASK);
-        assertThat(userTaskPid).isNotNull();
-        Long signalTaskPid = processClient.startProcess(containerId, Constants.ProcessId.SIGNALTASK);
-        assertThat(signalTaskPid).isNotNull();
+        try {
+            Long userTaskPid = processClient.startProcess(containerId, Constants.ProcessId.USERTASK);
+            assertThat(userTaskPid).isNotNull();
+            Long signalTaskPid = processClient.startProcess(containerId, Constants.ProcessId.SIGNALTASK);
+            assertThat(signalTaskPid).isNotNull();
 
-        finishUserTaskProcess(taskClient, containerId);
-        finishSignalTaskProcess(processClient, containerId, signalTaskPid);
+            finishUserTaskProcess(taskClient, containerId);
+            finishSignalTaskProcess(processClient, containerId, signalTaskPid);
 
-        ProcessInstance userTaskPi = processClient.getProcessInstance(containerId, userTaskPid);
-        assertThat(userTaskPi).isNotNull();
-        assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
+            ProcessInstance userTaskPi = processClient.getProcessInstance(containerId, userTaskPid);
+            assertThat(userTaskPi).isNotNull();
+            assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
 
-        ProcessInstance signalTaskPi = processClient.getProcessInstance(containerId, signalTaskPid);
-        assertThat(signalTaskPi).isNotNull();
-        assertThat(signalTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
+            ProcessInstance signalTaskPi = processClient.getProcessInstance(containerId, signalTaskPid);
+            assertThat(signalTaskPi).isNotNull();
+            assertThat(signalTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
+        } finally {
+            kieServerClient.disposeContainer(containerId);
+        }
     }
 
     private static void finishUserTaskProcess(UserTaskServicesClient taskClient, String containerId) {

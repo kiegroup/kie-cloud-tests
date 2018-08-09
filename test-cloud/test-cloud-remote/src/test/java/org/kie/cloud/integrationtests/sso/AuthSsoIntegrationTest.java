@@ -69,7 +69,6 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     public void setUp() {
         repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
-
     }
 
     @After
@@ -78,6 +77,7 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     }
 
     @Test
+    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
         PersistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
