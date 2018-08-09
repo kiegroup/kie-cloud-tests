@@ -26,6 +26,16 @@
     <!-- Values of these properties are used to select property file with template urls from framework-openshift resources -->
     <template.project/> <!-- valid values: jbpm, drools-->
 
+    <!-- Properties to configure SSO -->
+    <sso.image.streams>https://raw.githubusercontent.com/jboss-openshift/application-templates/master/sso/sso72-image-stream.json</sso.image.streams>
+    <sso.app.secrets>https://raw.githubusercontent.com/jboss-openshift/application-templates/master/secrets/sso-app-secret.json</sso.app.secrets>
+    <sso.app.template>https://raw.githubusercontent.com/jboss-openshift/application-templates/master/sso/sso72-https.json</sso.app.template>
+    <sso.app.realm>demo</sso.app.realm>
+    <sso.admin.username>admin</sso.admin.username>
+    <sso.admin.password>admin</sso.admin.password>
+    <sso.service.username>serviceUser</sso.service.username>
+    <sso.service.password>serviceUser1!</sso.service.password>
+
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
@@ -45,6 +55,8 @@
     <org.kie.workbench.pwd>adminUser1!</org.kie.workbench.pwd>
     <org.kie.server.controller.user>controllerUser</org.kie.server.controller.user>
     <org.kie.server.controller.pwd>controllerUser1!</org.kie.server.controller.pwd>
+    <org.kie.workbench.maven.user>mavenUser</org.kie.workbench.maven.user>
+    <org.kie.workbench.maven.pwd>mavenUser1!</org.kie.workbench.maven.pwd>
 
     <default.domain.suffix/>
 
@@ -119,11 +131,21 @@
               <org.kie.server.pwd>${org.kie.server.pwd}</org.kie.server.pwd>
               <org.kie.workbench.user>${org.kie.workbench.user}</org.kie.workbench.user>
               <org.kie.workbench.pwd>${org.kie.workbench.pwd}</org.kie.workbench.pwd>
+              <org.kie.workbench.maven.user>${org.kie.workbench.maven.user}</org.kie.workbench.maven.user>
+              <org.kie.workbench.maven.pwd>${org.kie.workbench.maven.pwd}</org.kie.workbench.maven.pwd>
               <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
               <kie.artifact.version>${kie.artifact.version}</kie.artifact.version>
               <kie.app.template.url>${kie.app.template.url}</kie.app.template.url>
+              <sso.image.streams>${sso.image.streams}</sso.image.streams>
+              <sso.app.secrets>${sso.app.secrets}</sso.app.secrets>
+              <sso.app.template>${sso.app.template}</sso.app.template>
+              <sso.app.realm>${sso.app.realm}</sso.app.realm>
+              <sso.admin.username>${sso.admin.username}</sso.admin.username>
+              <sso.admin.password>${sso.admin.password}</sso.admin.password>
+              <sso.service.username>${sso.service.username}</sso.service.username>
+              <sso.service.password>${sso.service.password}</sso.service.password>
             </systemProperties>
           </configuration>
         </plugin>

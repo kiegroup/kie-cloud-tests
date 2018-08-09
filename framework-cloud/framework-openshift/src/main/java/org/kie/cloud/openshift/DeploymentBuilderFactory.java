@@ -11,8 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.cloud.openshift;
 
 import cz.xtf.openshift.OpenShiftUtil;
@@ -54,7 +53,8 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     public DeploymentBuilderFactory() {
     }
 
-    @Override public String getCloudAPIImplementationName() {
+    @Override
+    public String getCloudAPIImplementationName() {
         return CLOUD_API_IMPLEMENTATION_NAME;
     }
 

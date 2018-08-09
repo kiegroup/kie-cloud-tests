@@ -38,8 +38,10 @@ import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.kie.cloud.api.deployment.SsoDeployment;
 
 public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl extends OpenShiftScenario implements WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario {
 
@@ -49,19 +51,39 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
     private KieServerDeploymentImpl kieServerTwoDeployment;
     private DatabaseDeploymentImpl databaseOneDeployment;
     private DatabaseDeploymentImpl databaseTwoDeployment;
+    private SsoDeployment ssoDeployment;
 
     private Map<String, String> envVariables;
+    private boolean deploySSO;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl.class);
 
     public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(Map<String, String> envVariables) {
+        this(envVariables, false);
+    }
+
+    public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(Map<String, String> envVariables, boolean deploySSO) {
         this.envVariables = envVariables;
+        this.deploySSO = deploySSO;
     }
 
     @Override
     public void deploy() {
         super.deploy();
 
+        if (deploySSO) {
+            ssoDeployment = SsoDeployer.deploy(project, envVariables);
+
+            envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
+            envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_CLIENT, "kie-server1-client");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_SECRET, "kie-server1-secret");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_CLIENT, "kie-server2-client");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_SECRET, "kie-server2-secret");
+        }
+        
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftTemplate.CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl(), envVariables);
@@ -128,8 +150,13 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
     }
 
     @Override
+    public SsoDeployment getSsoDeployment() {
+        return ssoDeployment;
+    }
+
+    @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }

@@ -17,6 +17,8 @@ package org.kie.cloud.integrationtests;
 
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.git.GitProviderService;
 
 public abstract class AbstractCloudIntegrationTest {
 
@@ -46,10 +48,13 @@ public abstract class AbstractCloudIntegrationTest {
 
     protected static final String ORGANIZATIONAL_UNIT_REST_REQUEST = "rest/organizationalunits";
     protected static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
-    protected static final String KIE_CONTAINER_REQUEST_URL = "services/rest/server/containers";
+    protected static final String KIE_CONTAINERS_REQUEST_URL = "services/rest/server/containers";
 
     // Path relative to target/classes folder
     protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
     protected static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+    protected final GitProviderService gitProviderService = new GitProviderService();
+    protected final GitProvider gitProvider = gitProviderService.createGitProvider();
 }

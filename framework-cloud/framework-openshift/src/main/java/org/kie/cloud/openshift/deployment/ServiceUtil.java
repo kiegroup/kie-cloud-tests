@@ -29,9 +29,14 @@ public class ServiceUtil {
     private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhpamcentrmon");
     private static final Pattern KIE_SERVER_REGEXP = Pattern.compile("(?!secure-).*(-execserv|-kieserver)");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
+    private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
 
     public static String getControllerServiceName(OpenShiftUtil util) {
         return getServiceName(util, CONTROLLER_REGEXP);
+    }
+
+    public static String getSSOServiceName(OpenShiftUtil util) {
+        return getServiceName(util, SSO_REGEXP);
     }
 
     public static String getWorkbenchServiceName(OpenShiftUtil util) {

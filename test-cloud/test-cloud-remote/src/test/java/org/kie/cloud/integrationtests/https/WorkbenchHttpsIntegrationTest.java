@@ -11,8 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.cloud.integrationtests.https;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +28,9 @@ import javax.net.ssl.HttpsURLConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import cz.xtf.http.HttpClient;
+import cz.xtf.tuple.Tuple.Pair;
+import java.util.UUID;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -43,6 +45,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
@@ -70,6 +73,15 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
     private static final String SERVER_ID = "KieServerId";
     private static final String SERVER_NAME = "KieServer";
 
+    private static final String SECURED_URL_PREFIX = "secured-";
+    private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
+
+    private static final String BUSINESS_CENTRAL_NAME = "rhpamcentr";
+    private static final String KIE_SERVER_NAME = "kieserver";
+
+    private static final String BUSINESS_CENTRAL_HOSTNAME = BUSINESS_CENTRAL_NAME + DeploymentConstants.getDefaultDomainSuffix();
+    private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
+
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
@@ -82,11 +94,33 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
 
         ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder().build();
 
+        WorkbenchKieServerPersistentScenario ssoWorkbenchKieServerPersistenScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+                .deploySso()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                .build();
+
+        WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario ssoWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+                .deploySso()
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
+                .withHttpKieServer1Hostname(RANDOM_URL_PREFIX + "mon-1-" + KIE_SERVER_HOSTNAME)
+                .withHttpsKieServer1Hostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-1-" + KIE_SERVER_HOSTNAME)
+                .withHttpKieServer2Hostname(RANDOM_URL_PREFIX + "mon-2-" + KIE_SERVER_HOSTNAME)
+                .withHttpsKieServer2Hostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-2-" + KIE_SERVER_HOSTNAME)
+                .build();
+
         return Arrays.asList(new Object[][]{
             {"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario},
             {"Workbench + Smart router + 2 KIE Servers + 2 Databases", workbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario},
             {"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario},
-           });
+            {"[SSO] Workbench + KIE Server - Persistent", ssoWorkbenchKieServerPersistenScenario},
+            {"[SSO] Workbench + Smart router + 2 KIE Servers + 2 Databases", ssoWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario}
+        });
     }
 
     @Override
@@ -95,19 +129,28 @@ public class WorkbenchHttpsIntegrationTest extends AbstractCloudHttpsIntegration
     }
 
     @Test
-    public void testLoginScreen() throws InterruptedException {
+    public void testLoginScreen() {
         for (final WorkbenchDeployment workbenchDeployment : deploymentScenario.getWorkbenchDeployments()) {
             final URL url = workbenchDeployment.getSecureUrl();
             logger.debug("Test login screen on url {}", url.toString());
 
-            final HttpGet httpGet = new HttpGet(url.toString());
-            try (CloseableHttpClient httpClient = HttpsUtils.createHttpClient();
-                final CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                // Test that login screen is available
-                assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpsURLConnection.HTTP_OK);
+            try {
+                if (testScenarioName.contains("SSO")) {
+                    String[] urlParts = url.toString().split(":");
+                    String urlString = urlParts[0] + ":" + urlParts[1];
 
-                String responseContent = HttpsUtils.readResponseContent(response);
-                assertThat(responseContent).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
+                    logger.debug("Test login screen on url {}", urlString);
+                    Pair<String, Integer> responseAndCode = HttpClient.get(urlString).responseAndCode();
+                    assertThat(responseAndCode.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                    assertThat(responseAndCode.getFirst()).contains(DeploymentConstants.getSsoRealm());
+
+                } else {
+                    logger.debug("Test login screen on url {}", url.toString());
+                    Pair<String, Integer> responseAndCode = HttpClient.get(url.toString()).responseAndCode();
+                    assertThat(responseAndCode.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                    assertThat(responseAndCode.getFirst()).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
+                }
+
             } catch (IOException e) {
                 logger.error("Error in downloading workbench login screen using secure connection", e);
                 fail("Error in downloading workbench login screen using secure connection", e);

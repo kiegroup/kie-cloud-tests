@@ -34,6 +34,7 @@ public enum OpenShiftTemplate {
     KIE_SERVER(OpenShiftConstants.KIE_APP_TEMPLATE_KIE_SERVER),
     KIE_SERVER_POSTGRESQL(OpenShiftConstants.KIE_APP_TEMPLATE_KIE_SERVER_POSTGRESQL),
     KIE_SERVER_MYSQL(OpenShiftConstants.KIE_APP_TEMPLATE_KIE_SERVER_MYSQL),
+
     CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES(OpenShiftConstants.CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES),
     CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT(OpenShiftConstants.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT),
     CONSOLE(OpenShiftConstants.KIE_APP_TEMPLATE_CONSOLE),
@@ -41,8 +42,10 @@ public enum OpenShiftTemplate {
     WORKBENCH(OpenShiftConstants.KIE_APP_TEMPLATE_WORKBENCH),
     CONTROLLER(OpenShiftConstants.KIE_APP_TEMPLATE_CONTROLLER),
     SMARTROUTER(OpenShiftConstants.KIE_APP_TEMPLATE_SMARTROUTER),
+    SSO(OpenShiftConstants.SSO_APP_TEMPLATE),
     // Special template containing secret file.
-    SECRET(OpenShiftConstants.KIE_APP_SECRET);
+    SECRET(OpenShiftConstants.KIE_APP_SECRET),
+    SSO_SECRET(OpenShiftConstants.SSO_APP_SECRETS);
 
     private static final Properties templateProperties = filterOpenShiftTemplateProperties(OpenShiftTemplatePropertiesLoader.getProperties());
 

@@ -19,6 +19,7 @@ import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.SsoDeployment;
 
 /**
  * Representation of deployment scenario with Workbench and Kie server.
@@ -72,4 +73,12 @@ public interface WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario ex
      * @see DatabaseDeployment
      */
     DatabaseDeployment getDatabaseTwoDeployment();
+
+    /**
+     * Return SSO deployment.
+     *
+     * @return SsoDeployment
+     * @see SsoDeployment
+     */
+    SsoDeployment getSsoDeployment();
 }

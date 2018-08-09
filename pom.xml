@@ -34,6 +34,9 @@
     <version.jgit>4.11.0.201803080745-r</version.jgit>
 
     <version.cz.xtf>0.6</version.cz.xtf>
+    <version.org.keycloak>4.1.0.Final</version.org.keycloak>
+    <version.org.projectlombok>1.16.10</version.org.projectlombok>
+    <version.org.jboss.jboss-dmr>1.5.0.Final</version.org.jboss.jboss-dmr>
     <!-- Version adjustments due to mismatch between Kie BOM and XTF dependencies. -->
     <version.kubernetes-client>3.0.3</version.kubernetes-client>
     <version.kubernetes-model>2.0.4</version.kubernetes-model>
@@ -178,11 +181,31 @@
         <artifactId>maven-verifier</artifactId>
         <version>${version.org.apache.maven.shared}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.jgit</groupId>
         <artifactId>org.eclipse.jgit</artifactId>
         <version>${version.jgit}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${version.org.projectlombok}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.keycloak</groupId>
+        <artifactId>keycloak-admin-client</artifactId>
+        <version>${version.org.keycloak}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.keycloak</groupId>
+        <artifactId>keycloak-core</artifactId>
+        <version>${version.org.keycloak}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-dmr</artifactId>
+        <version>${version.org.jboss.jboss-dmr}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
