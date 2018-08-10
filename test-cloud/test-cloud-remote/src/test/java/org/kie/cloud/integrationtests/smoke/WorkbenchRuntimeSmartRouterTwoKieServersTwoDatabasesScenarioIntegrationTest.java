@@ -24,6 +24,8 @@ import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
+import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
+import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
@@ -65,5 +67,19 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioIntegra
     public void testSolverFromExternalMavenRepo() {
         OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerOneDeployment());
         OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerTwoDeployment());
+    }
+
+    @Test
+    public void testKieServerHttps() {
+        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerOneDeployment(), false);
+        HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerOneDeployment(), false);
+        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerTwoDeployment(), false);
+        HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerTwoDeployment(), false);
+    }
+
+    @Test
+    public void testWorkbenchHttps() {
+        HttpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
+        HttpsWorkbenchTestProvider.testControllerOperations(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
     }
 }
