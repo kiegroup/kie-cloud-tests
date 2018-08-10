@@ -24,6 +24,8 @@ import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
+import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
+import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
@@ -67,5 +69,17 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
     @Test
     public void testDeployContainerFromWorkbench() {
         FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testKieServerHttps() {
+        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
+        HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
+    }
+
+    @Test
+    public void testWorkbenchHttps() {
+        HttpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchDeployment(), false);
+        HttpsWorkbenchTestProvider.testControllerOperations(deploymentScenario.getWorkbenchDeployment(), false);
     }
 }
