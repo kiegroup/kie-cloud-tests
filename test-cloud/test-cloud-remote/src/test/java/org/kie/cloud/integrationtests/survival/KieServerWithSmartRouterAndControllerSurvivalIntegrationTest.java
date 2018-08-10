@@ -111,8 +111,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
         kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
                 .withApplicationName(KIE_SERVER_NAME)
-                // TODO: uncomment when the RHPAM-1357 is fixed
-//                .withHostame(KIE_SERVER_HOSTNAME)
+                .withHostame(KIE_SERVER_HOSTNAME)
                 .withAdminUser(DeploymentConstants.getWorkbenchUser(), DeploymentConstants.getWorkbenchPassword())
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .withControllerConnection("http", CONTROLLER_HOSTNAME, PORT)
