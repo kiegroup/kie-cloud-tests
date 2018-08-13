@@ -16,24 +16,22 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import org.kie.cloud.api.deployment.LdapDeployment;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.api.deployment.SsoDeployment;
 
-public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeployment {
+public class LdapDeploymentImpl extends OpenShiftDeployment implements LdapDeployment {
 
     private String serviceName;
     private URL url;
-    private String username;
-    private String password;
 
-    public SsoDeploymentImpl(Project project) {
+    public LdapDeploymentImpl(Project project) {
         super(project);
     }
 
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getSsoServiceName(getOpenShiftUtil());
+            serviceName = ServiceUtil.getLdapServiceName(getOpenShiftUtil());
         }
         return serviceName;
     }
@@ -44,32 +42,6 @@ public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeploym
             url = getHttpRouteUrl(serviceName);
         }
         return url;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public void waitForScale() {
-        super.waitForScale();
-        if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl());
-        }
     }
 
 }

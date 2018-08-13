@@ -36,6 +36,9 @@
     <sso.service.username>serviceUser</sso.service.username>
     <sso.service.password>serviceUser1!</sso.service.password>
 
+    <!-- Properties to configure LDAP -->
+    <ldap.image.streams/>
+
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
@@ -150,6 +153,7 @@
               <sso.admin.password>${sso.admin.password}</sso.admin.password>
               <sso.service.username>${sso.service.username}</sso.service.username>
               <sso.service.password>${sso.service.password}</sso.service.password>
+              <ldap.image.streams>${ldap.image.streams}</ldap.image.streams>
             </systemProperties>
           </configuration>
         </plugin>
