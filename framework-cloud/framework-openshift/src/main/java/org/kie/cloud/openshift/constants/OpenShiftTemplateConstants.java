@@ -107,7 +107,6 @@ public class OpenShiftTemplateConstants {
     public static final String SSO_SERVICE_USERNAME = "SSO_SERVICE_USERNAME";
     public static final String SSO_SERVICE_PASSWORD = "SSO_SERVICE_PASSWORD";
 
-    // env variables for kie images
     public static final String SSO_URL = "SSO_URL";
     public static final String SSO_CLIENT = "SSO_CLIENT";
     public static final String SSO_SECRET = "SSO_SECRET";
@@ -122,4 +121,26 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER1_SSO_SECRET = "KIE_SERVER1_SSO_SECRET";
     public static final String KIE_SERVER2_SSO_CLIENT = "KIE_SERVER2_SSO_CLIENT";
     public static final String KIE_SERVER2_SSO_SECRET = "KIE_SERVER2_SSO_SECRET";
+
+    public static final String AUTH_LDAP_URL = "AUTH_LDAP_URL";
+    public static final String AUTH_LDAP_BIND_DN = "AUTH_LDAP_BIND_DN";
+    public static final String AUTH_LDAP_BIND_CREDENTIAL = "AUTH_LDAP_BIND_CREDENTIAL";
+    public static final String AUTH_LDAP_JAAS_SECURITY_DOMAIN = "AUTH_LDAP_JAAS_SECURITY_DOMAIN";
+    public static final String AUTH_LDAP_BASE_CTX_DN = "AUTH_LDAP_BASE_CTX_DN";
+    public static final String AUTH_LDAP_BASE_FILTER = "AUTH_LDAP_BASE_FILTER";
+    public static final String AUTH_LDAP_SEARCH_SCOPE = "AUTH_LDAP_SEARCH_SCOPE";
+    public static final String AUTH_LDAP_SEARCH_TIME_LIMIT = "AUTH_LDAP_SEARCH_TIME_LIMIT";
+    public static final String AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE = "AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE";
+    public static final String AUTH_LDAP_PARSE_USERNAME = "AUTH_LDAP_PARSE_USERNAME";
+    public static final String AUTH_LDAP_USERNAME_BEGIN_STRING = "AUTH_LDAP_USERNAME_BEGIN_STRING";
+    public static final String AUTH_LDAP_USERNAME_END_STRING = "AUTH_LDAP_USERNAME_END_STRING";
+    public static final String AUTH_LDAP_ROLE_ATTRIBUTE_ID = "AUTH_LDAP_ROLE_ATTRIBUTE_ID";
+    public static final String AUTH_LDAP_ROLES_CTX_DN = "AUTH_LDAP_ROLES_CTX_DN";
+    public static final String AUTH_LDAP_ROLE_FILTER = "AUTH_LDAP_ROLE_FILTER";
+    public static final String AUTH_LDAP_ROLE_RECURSION = "AUTH_LDAP_ROLE_RECURSION";
+    public static final String AUTH_LDAP_DEFAULT_ROLE = "AUTH_LDAP_DEFAULT_ROLE";
+    public static final String AUTH_LDAP_ROLE_NAME_ATTRIBUTE_ID = "AUTH_LDAP_ROLE_NAME_ATTRIBUTE_ID";
+    public static final String AUTH_LDAP_PARSE_ROLE_NAME_FROM_DN = "AUTH_LDAP_PARSE_ROLE_NAME_FROM_DN";
+    public static final String AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN = "AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN";
+    public static final String AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK = "AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK";
 }

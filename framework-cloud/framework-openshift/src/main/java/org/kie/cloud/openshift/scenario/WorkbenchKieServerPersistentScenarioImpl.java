@@ -38,6 +38,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.kie.cloud.api.deployment.SsoDeployment;
+import org.kie.cloud.openshift.util.LdapDeployer;
 
 public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario implements WorkbenchKieServerPersistentScenario {
 
@@ -46,20 +47,26 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
     private SsoDeployment ssoDeployment;
 
     private Map<String, String> envVariables;
-    private boolean deploySSO;
+    private boolean deploySso;
+    private boolean deployLdap;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerPersistentScenarioImpl.class);
 
-    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, boolean deploySSO) {
+    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
+        this(envVariables, deploySso, false);
+    }
+
+    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, boolean deploySso, boolean deployLdap) {
         this.envVariables = envVariables;
-        this.deploySSO = deploySSO;
+        this.deploySso = deploySso;
+        this.deployLdap = deployLdap;
     }
 
     @Override
     public void deploy() {
         super.deploy();
 
-        if (deploySSO) {
+        if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project, envVariables);
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
@@ -68,6 +75,10 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
             envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
+        }
+
+        if (deployLdap) {
+            LdapDeployer.deploy(project);
         }
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl().toString());

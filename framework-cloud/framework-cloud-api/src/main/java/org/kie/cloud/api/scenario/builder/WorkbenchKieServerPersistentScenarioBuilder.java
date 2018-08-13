@@ -16,6 +16,7 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.settings.LdapSettings;
 
 public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchKieServerPersistentScenario> {
     /**
@@ -81,4 +82,12 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
      * @return Builder
      */
     WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String hostname);
+
+    /**
+     * Return setup builder with configured LDAP.
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
 }
