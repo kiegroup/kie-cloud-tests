@@ -25,6 +25,7 @@ import org.kie.cloud.api.deployment.ControllerDeployment;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.LdapDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -45,6 +46,7 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private SsoDeployment ssoDeployment;
+    private LdapDeployment ldapDeployment;
 
     private Map<String, String> envVariables;
     private boolean deploySso;
@@ -78,7 +80,10 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
         }
 
         if (deployLdap) {
-            LdapDeployer.deploy(project);
+            ldapDeployment = LdapDeployer.deploy(project);
+            if (!envVariables.containsKey(OpenShiftTemplateConstants.AUTH_LDAP_URL)) {
+                envVariables.put(OpenShiftTemplateConstants.AUTH_LDAP_URL, "ldap://" + ldapDeployment.getPodIp() + ":389");
+            }
         }
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl().toString());

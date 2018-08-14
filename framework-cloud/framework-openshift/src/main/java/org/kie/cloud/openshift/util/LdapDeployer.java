@@ -17,10 +17,8 @@ package org.kie.cloud.openshift.util;
 
 import cz.xtf.openshift.OpenShiftUtil;
 import cz.xtf.openshift.builder.PodBuilder;
-import cz.xtf.openshift.builder.RouteBuilder;
 import cz.xtf.openshift.builder.ServiceBuilder;
 import org.kie.cloud.api.deployment.LdapDeployment;
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.LdapDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
@@ -33,9 +31,9 @@ public class LdapDeployer {
     private static final String LDAP_LABEL = "test-ldap";
     private static final String LDAP_IMAGE = "rhba-qe-openldap";
     private static final String LDAP_SERVICE = "service-test-ldap";
-    private static final String LDAP_ROUTE = "route-test-ldap";
 
     public static LdapDeployment deploy(Project project) {
+        //TODO: use image stream or docker image location?
         logger.info("Creating LDAP image streams from " + OpenShiftConstants.getLdapImageStreams());
         project.createResources(OpenShiftConstants.getLdapImageStreams());
         OpenShiftUtil util = project.getOpenShiftUtil();
@@ -45,7 +43,7 @@ public class LdapDeployer {
                         .addLabel("name", LDAP_LABEL)
                         .container()
                         .fromImage(util.getImageStream(LDAP_IMAGE).getSpec().getTags().get(0).getFrom().getName())
-                        //                        .fromImage("bxms-binaries.usersys.redhat.com:5000/openldap:v3")
+                        //.fromImage("bxms-binaries.usersys.redhat.com:5000/openldap:v3")
                         .port(389)
                         .port(636)
                         .pod()
@@ -57,24 +55,26 @@ public class LdapDeployer {
                         .setContainerPort(389)
                         .setPort(389)
                         .build());
-        final String hostname = LDAP_LABEL + "-" + project.getName() + DeploymentConstants.getDefaultDomainSuffix();
-        util.createRoute(
-                new RouteBuilder(LDAP_ROUTE)
-                        .addLabel("name", LDAP_LABEL)
-                        .exposedAsHost(hostname)
-                        .forService(LDAP_SERVICE)
-                        .build());
 
-        LdapDeployment ldapDeployment = createLdapDeployment(project);
-
-//        logger.info("Waiting for LDAP deployment to become ready.");
-//        ldapDeployment.waitForScale();
-        return ldapDeployment;
+        return createLdapDeployment(project);
     }
 
     private static LdapDeployment createLdapDeployment(Project project) {
         LdapDeploymentImpl ldapDeploymnet = new LdapDeploymentImpl(project);
 
+        int seconds = 0;
+        logger.info("Waitng for LDAP pod start");
+        while (project.getOpenShiftUtil().getPod(LDAP_IMAGE).getStatus().getPhase().equals("Pending")) {
+            try {
+                Thread.sleep(1000L);
+                seconds++;
+            } catch (InterruptedException ex) {
+                logger.error("Timeout exception in wait for LDAP pod", ex);
+            }
+        }
+        logger.info("LDAP pod is running after {} seconds", seconds);
+
+        ldapDeploymnet.setPodIp(project.getOpenShiftUtil().getPod(LDAP_IMAGE).getStatus().getPodIP());
         return ldapDeploymnet;
     }
 

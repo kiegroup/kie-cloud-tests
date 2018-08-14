@@ -15,14 +15,13 @@
  */
 package org.kie.cloud.openshift.deployment;
 
-import java.net.URL;
 import org.kie.cloud.api.deployment.LdapDeployment;
 import org.kie.cloud.openshift.resource.Project;
 
 public class LdapDeploymentImpl extends OpenShiftDeployment implements LdapDeployment {
 
     private String serviceName;
-    private URL url;
+    private String podIp;
 
     public LdapDeploymentImpl(Project project) {
         super(project);
@@ -37,11 +36,12 @@ public class LdapDeploymentImpl extends OpenShiftDeployment implements LdapDeplo
     }
 
     @Override
-    public URL getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(serviceName);
-        }
-        return url;
+    public String getPodIp() {
+        return podIp;
+    }
+
+    public void setPodIp(String podIp) {
+        this.podIp = podIp;
     }
 
 }
