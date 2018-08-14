@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.api.deployment;
 
-import java.net.URL;
-
 /**
  *
  * LDAP deplyoment representation in cloud.
@@ -24,9 +22,9 @@ import java.net.URL;
 public interface LdapDeployment extends Deployment {
 
     /**
-     * Get URL for LDAP service (deployment).
+     * Get Ip of the Pod for LDAP service (deployment).
      *
-     * @return SSO URL
+     * @return Ldap Pod IP
      */
-    URL getUrl();
+    String getPodIp();
 }
