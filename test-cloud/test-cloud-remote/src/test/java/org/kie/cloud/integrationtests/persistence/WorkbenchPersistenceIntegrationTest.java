@@ -14,10 +14,20 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
+import cz.xtf.openshift.OpenShiftBinaryClient;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
@@ -32,6 +42,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenario;
@@ -41,6 +52,7 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -52,10 +64,14 @@ import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed.")
 public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkbenchPersistenceIntegrationTest.class);
 
     @Parameter(value = 0)
     public String testScenarioName;
@@ -150,6 +166,46 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         assertThat(containersResponse.getResult().getContainers().get(0).getContainerId()).isEqualTo(CONTAINER_ID);
     }
 
+    @Test
+    public void testGitHooksPersistence() {
+        // get git hook dir location
+        String gitHooksRemoteDir = "/opt/eap/standalone/data/bpmsuite/git/hooks"; //TODO for 7.1 bpmsuite -> kie
+
+        updateWorkbenchDeployment(gitHooksRemoteDir);
+
+        logger.debug("Filter instances for second deployment");
+        List<String> workbenchInstanceNames = workbenchDeployment.getInstances().stream().map(Instance::getName).filter(name -> name.contains("-2-")).collect(Collectors.toList());
+        if (workbenchInstanceNames.isEmpty()) {
+            throw new RuntimeException("Workbench was not correctly redeployed after update.");
+        }
+
+        logger.info("Copy git hooks to the pod");
+        Path localResourcesDir = Paths.get(ClassLoader.class.getResource("/git-hooks").getPath());
+        mkdir(workbenchInstanceNames.get(0), gitHooksRemoteDir);
+        rsync(workbenchInstanceNames.get(0), localResourcesDir, gitHooksRemoteDir, true);
+
+        String projectName = "testGitHooksPersistenceProject";
+        workbenchClient.createSpace(SPACE_NAME, workbenchDeployment.getUsername());
+        workbenchClient.createProject(SPACE_NAME, projectName, PROJECT_GROUP_ID, "1.0");
+        assertSpaceAndProjectExists(SPACE_NAME, projectName);
+
+        logger.debug("Copy output from git hook back to locat test resources dir");
+        rsync(workbenchInstanceNames.get(0), localResourcesDir, gitHooksRemoteDir, false);
+        long linesOfOutput = checkOutputFile(0);
+
+        scaleToZeroAndToOne(workbenchDeployment);
+
+        assertSpaceAndProjectExists(SPACE_NAME, projectName);
+        String newProjectName = "newTestGitHooksPersistenceProject";
+        workbenchClient.createProject(SPACE_NAME, newProjectName, PROJECT_GROUP_ID, "1.0");
+        assertSpaceAndProjectExists(SPACE_NAME, newProjectName);
+
+        logger.debug("Copy output from git hook back to locat test resources dir");
+        rsync(workbenchInstanceNames.get(0), localResourcesDir, gitHooksRemoteDir, false);
+        checkOutputFile(linesOfOutput);
+
+    }
+
     private void verifyOneServerTemplateWithContainer(String kieServerLocation, String containerId) {
         ServerTemplateList serverTemplates = kieControllerClient.listServerTemplates();
         assertThat(serverTemplates.getServerTemplates()).as("Number of server templates differ.").hasSize(1);
@@ -175,4 +231,69 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         deployment.scale(1);
         deployment.waitForScale();
     }
+
+    private long checkOutputFile(long previousLineCount) {
+        long newLineCount = 0;
+        try {
+            // TODO: check output of hooks scripts
+            // https://issues.jboss.org/browse/AF-1401 wait for fix included in 7.1
+            Files.lines(Paths.get(ClassLoader.class.getResource("/git-hooks/out.txt").getPath())).forEach((line) -> {
+                System.out.println(line);
+
+            });
+            newLineCount = Files.lines(Paths.get(ClassLoader.class.getResource("/git-hooks/out.txt").getPath())).count();
+        } catch (IOException ex) {
+            throw new RuntimeException("IOException wile reading output file.", ex);
+        }
+        assertThat(newLineCount).isGreaterThan(previousLineCount);
+        return newLineCount;
+    }
+
+    private void updateWorkbenchDeployment(String gitHooksRemoteDir) {
+        logger.info("Updating workbench deployment");
+        Map<String, String> updatedEnvVariables = new HashMap<>();
+        updatedEnvVariables.put(Constants.BusinessCentralImage.GIT_HOOKS_DIR, gitHooksRemoteDir);
+        workbenchDeployment.updateDeploymentConfig(updatedEnvVariables);
+
+        logger.info("Wait for Workbench redeployment");
+        try {
+            logger.debug("Wait for a few seconds to let OpenShift redeploy Workbench");
+            Thread.sleep(3000L);
+        } catch (InterruptedException ex) {
+            logger.warn("InterruptedException while waitng for OpenShift redeploy", ex);
+        }
+        workbenchDeployment.waitForScale();
+    }
+
+    // TODO: try to move commands to instances
+    private void mkdir(final String podName, final String remoteDir) {
+        OpenShiftBinaryClient oc = OpenShiftBinaryClient.getInstance();
+        oc.project(deploymentScenario.getNamespace());
+
+        // TODO: report git hooks dir is nor created when paramaeter GIT HOOKS is set
+        // https://issues.jboss.org/browse/RHPAM-1479
+        List<String> mkdirArg = new ArrayList<>();
+        mkdirArg.add("rsh");
+        mkdirArg.add(podName);
+        mkdirArg.add("mkdir");
+        mkdirArg.add("-p");
+        mkdirArg.add(remoteDir);
+        oc.executeCommand("rsh make remote dir failed", mkdirArg.toArray(new String[mkdirArg.size()]));
+    }
+
+    // oc rsync ./local/dir <pod-name>:/remote/dir
+    private void rsync(final String podName, final Path localDir, final String remoteDir, boolean toPod) {
+        OpenShiftBinaryClient oc = OpenShiftBinaryClient.getInstance();
+        oc.project(deploymentScenario.getNamespace());
+
+        List<String> args = new ArrayList<>();
+        args.add("rsync");
+
+        args.add(!toPod ? (podName + ":" + remoteDir + "/") : localDir.toFile()
+                .getAbsoluteFile().getPath() + "/");
+        args.add(toPod ? (podName + ":" + remoteDir + "/") : localDir.toFile()
+                .getAbsoluteFile().getPath() + "/");
+        oc.executeCommand("rsync has failed", args.toArray(new String[args.size()]));
+    }
+
 }
