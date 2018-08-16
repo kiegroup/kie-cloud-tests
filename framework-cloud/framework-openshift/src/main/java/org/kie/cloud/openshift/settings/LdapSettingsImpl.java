@@ -83,20 +83,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapUrl(String url) {
-        this.url = url;
-        return this;
-    }
-
-    @Override
     public String getLdapBindDn() {
         return bindDn;
-    }
-
-    @Override
-    public LdapSettings withLdapBindDn(String bindDn) {
-        this.bindDn = bindDn;
-        return this;
     }
 
     @Override
@@ -105,20 +93,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapBindCredential(String bindCredential) {
-        this.bindCredential = bindCredential;
-        return this;
-    }
-
-    @Override
     public String getLdapJaasSecurityDomain() {
         return jaasSecurityDomain;
-    }
-
-    @Override
-    public LdapSettings withLdapJaasSecurityDomain(String jaasSecurityDomain) {
-        this.jaasSecurityDomain = jaasSecurityDomain;
-        return this;
     }
 
     @Override
@@ -127,20 +103,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapBaseCtxDn(String baseCtxDn) {
-        this.baseCtxDn = baseCtxDn;
-        return this;
-    }
-
-    @Override
     public String getLdapBaseFilter() {
         return baseFilter;
-    }
-
-    @Override
-    public LdapSettings withLdapBaseFilter(String baseFilter) {
-        this.baseFilter = baseFilter;
-        return this;
     }
 
     @Override
@@ -149,20 +113,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapSearchScope(String searchScope) {
-        this.searchScope = searchScope;
-        return this;
-    }
-
-    @Override
     public String getLdapSearchTimeLimit() {
         return limit == null ? "" : limit.toString();
-    }
-
-    @Override
-    public LdapSettings withLdapSearchTimeLimit(Long limit) {
-        this.limit = limit;
-        return this;
     }
 
     @Override
@@ -171,20 +123,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapDistinguishedNameAttribute(String distinguishedNameAttribute) {
-        this.distinguishedNameAttribute = distinguishedNameAttribute;
-        return this;
-    }
-
-    @Override
     public String getLdapParseUsername() {
         return parseUsername == null ? "" : parseUsername.toString();
-    }
-
-    @Override
-    public LdapSettings withLdapParseUsername(Boolean parseUsername) {
-        this.parseUsername = parseUsername;
-        return this;
     }
 
     @Override
@@ -193,20 +133,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapUsernameBeginString(String usernameBegin) {
-        this.usernameBegin = usernameBegin;
-        return this;
-    }
-
-    @Override
     public String getLdapUsernameEndString() {
         return usernameEnd;
-    }
-
-    @Override
-    public LdapSettings withLdapUsernameEndString(String usernameEnd) {
-        this.usernameEnd = usernameEnd;
-        return this;
     }
 
     @Override
@@ -215,20 +143,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapRoleAttributeId(String roleAttributeId) {
-        this.roleAttributeId = roleAttributeId;
-        return this;
-    }
-
-    @Override
     public String getLdapRolesCtxDn() {
         return rolesCtxDn;
-    }
-
-    @Override
-    public LdapSettings withLdapRolesCtxDn(String rolesCtxDn) {
-        this.rolesCtxDn = rolesCtxDn;
-        return this;
     }
 
     @Override
@@ -237,20 +153,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapRoleFilter(String roleFilter) {
-        this.roleFilter = roleFilter;
-        return this;
-    }
-
-    @Override
     public String getLdapRoleRecursion() {
         return roleRecutsion == null ? "" : roleRecutsion.toString();
-    }
-
-    @Override
-    public LdapSettings withLdapRoleRecursion(Long roleRecutsion) {
-        this.roleRecutsion = roleRecutsion;
-        return this;
     }
 
     @Override
@@ -259,20 +163,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapDefaultRole(String defaultRole) {
-        this.defaultRole = defaultRole;
-        return this;
-    }
-
-    @Override
     public String getLdapRoleNameAttributeId() {
         return roleNameAttributeId;
-    }
-
-    @Override
-    public LdapSettings withLdapRoleNameAttributeId(String roleNameAttributeId) {
-        this.roleNameAttributeId = roleNameAttributeId;
-        return this;
     }
 
     @Override
@@ -281,20 +173,8 @@ public class LdapSettingsImpl implements LdapSettings {
     }
 
     @Override
-    public LdapSettings withLdapParseRoleNameFromDn(Boolean parseRoleNameFromDn) {
-        this.parseRoleNameFromDn = parseRoleNameFromDn;
-        return this;
-    }
-
-    @Override
     public String getLdapRoleAttributeIsDn() {
         return roleAttributeIsDn == null ? "" : roleAttributeIsDn.toString();
-    }
-
-    @Override
-    public LdapSettings withLdapRoleAttributeIsDn(Boolean roleAttributeIsDn) {
-        this.roleAttributeIsDn = roleAttributeIsDn;
-        return this;
     }
 
     @Override
@@ -302,10 +182,88 @@ public class LdapSettingsImpl implements LdapSettings {
         return referralUserAttributeIdToCheck;
     }
 
-    @Override
-    public LdapSettings withLdapReferralUserAttributeIdToCheck(String referralUserAttributeIdToCheck) {
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setBindDn(String bindDn) {
+        this.bindDn = bindDn;
+    }
+
+    public void setBindCredential(String bindCredential) {
+        this.bindCredential = bindCredential;
+    }
+
+    public void setJaasSecurityDomain(String jaasSecurityDomain) {
+        this.jaasSecurityDomain = jaasSecurityDomain;
+    }
+
+    public void setBaseCtxDn(String baseCtxDn) {
+        this.baseCtxDn = baseCtxDn;
+    }
+
+    public void setBaseFilter(String baseFilter) {
+        this.baseFilter = baseFilter;
+    }
+
+    public void setSearchScope(String searchScope) {
+        this.searchScope = searchScope;
+    }
+
+    public void setLimit(Long limit) {
+        this.limit = limit;
+    }
+
+    public void setDistinguishedNameAttribute(String distinguishedNameAttribute) {
+        this.distinguishedNameAttribute = distinguishedNameAttribute;
+    }
+
+    public void setParseUsername(Boolean parseUsername) {
+        this.parseUsername = parseUsername;
+    }
+
+    public void setUsernameBegin(String usernameBegin) {
+        this.usernameBegin = usernameBegin;
+    }
+
+    public void setUsernameEnd(String usernameEnd) {
+        this.usernameEnd = usernameEnd;
+    }
+
+    public void setRoleAttributeId(String roleAttributeId) {
+        this.roleAttributeId = roleAttributeId;
+    }
+
+    public void setRolesCtxDn(String rolesCtxDn) {
+        this.rolesCtxDn = rolesCtxDn;
+    }
+
+    public void setRoleFilter(String roleFilter) {
+        this.roleFilter = roleFilter;
+    }
+
+    public void setRoleRecutsion(Long roleRecutsion) {
+        this.roleRecutsion = roleRecutsion;
+    }
+
+    public void setDefaultRole(String defaultRole) {
+        this.defaultRole = defaultRole;
+    }
+
+    public void setRoleNameAttributeId(String roleNameAttributeId) {
+        this.roleNameAttributeId = roleNameAttributeId;
+    }
+
+    public void setParseRoleNameFromDn(Boolean parseRoleNameFromDn) {
+        this.parseRoleNameFromDn = parseRoleNameFromDn;
+    }
+
+    public void setRoleAttributeIsDn(Boolean roleAttributeIsDn) {
+        this.roleAttributeIsDn = roleAttributeIsDn;
+    }
+
+    public void setReferralUserAttributeIdToCheck(String referralUserAttributeIdToCheck) {
         this.referralUserAttributeIdToCheck = referralUserAttributeIdToCheck;
-        return this;
     }
 
 }

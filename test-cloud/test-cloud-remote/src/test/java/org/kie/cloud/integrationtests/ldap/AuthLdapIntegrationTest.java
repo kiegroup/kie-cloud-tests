@@ -40,7 +40,7 @@ public class AuthLdapIntegrationTest extends AbstractCloudIntegrationTest {
     @BeforeClass
     public static void initializeDeployment() {
 
-        LdapSettings ldapSettings = deploymentScenarioFactory.getLdapSettings()
+        LdapSettings ldapSettings = deploymentScenarioFactory.getLdapSettingsBuilder()
                 //.withLdapUrl("ldap://bxms-binaries.usersys.redhat.com:389")
                 .withLdapBindDn("cn=Manager,dc=example,dc=com")
                 .withLdapBindCredential("admin")
@@ -52,7 +52,8 @@ public class AuthLdapIntegrationTest extends AbstractCloudIntegrationTest {
                 .withLdapRolesCtxDn("ou=roles,dc=example,dc=com")
                 .withLdapRoleFilter("(memberOf={1})")
                 .withLdapRoleRecursion(1L)
-                .withLdapDefaultRole("guest");
+                .withLdapDefaultRole("guest")
+                .build();
 
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
