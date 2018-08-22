@@ -32,6 +32,7 @@ public interface LdapSettingsBuilder {
      * @param url LDAP Endpoint example: "ldap://myldap.example.com"
      * @return LdapSettingsBuilder
      */
+    @Deprecated
     LdapSettingsBuilder withLdapUrl(String url);
 
     /**

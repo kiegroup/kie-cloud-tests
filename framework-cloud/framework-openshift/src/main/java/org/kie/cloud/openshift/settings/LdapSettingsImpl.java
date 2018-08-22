@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.kie.cloud.api.settings.LdapSettings;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import static org.kie.cloud.openshift.constants.OpenShiftTemplateConstants.*;
 
 public class LdapSettingsImpl implements LdapSettings {
@@ -44,6 +45,10 @@ public class LdapSettingsImpl implements LdapSettings {
     private Boolean parseRoleNameFromDn;
     private Boolean roleAttributeIsDn;
     private String referralUserAttributeIdToCheck;
+
+    public LdapSettingsImpl() {
+        url = OpenShiftConstants.getLdapUrl();
+    }
 
     @Override
     public Map<String, String> getEnvVariables() {

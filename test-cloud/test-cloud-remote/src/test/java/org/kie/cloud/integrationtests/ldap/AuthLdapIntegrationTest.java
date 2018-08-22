@@ -41,7 +41,6 @@ public class AuthLdapIntegrationTest extends AbstractCloudIntegrationTest {
     public static void initializeDeployment() {
 
         LdapSettings ldapSettings = deploymentScenarioFactory.getLdapSettingsBuilder()
-                //.withLdapUrl("ldap://bxms-binaries.usersys.redhat.com:389")
                 .withLdapBindDn("cn=Manager,dc=example,dc=com")
                 .withLdapBindCredential("admin")
                 .withLdapBaseCtxDn("ou=people,dc=example,dc=com")
@@ -75,6 +74,7 @@ public class AuthLdapIntegrationTest extends AbstractCloudIntegrationTest {
     }
 
     @Test
+    @Category(JBPMOnly.class)
     public void testMultipleDifferentProcessesOnSameKieServer() {
         ProcessTestProvider.testMultipleDifferentProcesses(deploymentScenario.getKieServerDeployment());
     }

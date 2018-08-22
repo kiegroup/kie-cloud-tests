@@ -33,6 +33,7 @@ public class LdapSettingsBuilderImpl implements LdapSettingsBuilder {
     }
 
     @Override
+    @Deprecated
     public LdapSettingsBuilder withLdapUrl(String url) {
         ldapSettings.setUrl(url);
         return this;
