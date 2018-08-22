@@ -31,7 +31,6 @@ public class ServiceUtil {
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
     private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
-    private static final Pattern LDAP_REGEXP = Pattern.compile(".*-ldap");
 
     public static String getControllerServiceName(OpenShiftUtil util) {
         return getServiceName(util, CONTROLLER_REGEXP);
@@ -39,10 +38,6 @@ public class ServiceUtil {
 
     public static String getSsoServiceName(OpenShiftUtil util) {
         return getServiceName(util, SSO_REGEXP);
-    }
-
-    public static String getLdapServiceName(OpenShiftUtil util) {
-        return getServiceName(util, LDAP_REGEXP);
     }
 
     public static String getWorkbenchServiceName(OpenShiftUtil util) {

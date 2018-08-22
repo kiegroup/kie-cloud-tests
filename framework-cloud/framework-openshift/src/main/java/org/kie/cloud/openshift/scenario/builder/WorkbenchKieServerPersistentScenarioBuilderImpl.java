@@ -29,7 +29,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
 
     private final Map<String, String> envVariables = new HashMap<>();
     private boolean deploySSO = false;
-    private boolean deployLdap = false;
 
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
@@ -46,7 +45,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
 
     @Override
     public WorkbenchKieServerPersistentScenario build() {
-        return new WorkbenchKieServerPersistentScenarioImpl(envVariables, deploySSO, deployLdap);
+        return new WorkbenchKieServerPersistentScenarioImpl(envVariables, deploySSO);
     }
 
     @Override
@@ -105,7 +104,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
         envVariables.putAll(ldapSettings.getEnvVariables());
-        deployLdap = true;
         return this;
     }
 }
