@@ -30,6 +30,7 @@ import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
+import org.kie.cloud.integrationtests.util.LdapSettingsConstants;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
@@ -41,17 +42,17 @@ public class AuthLdapIntegrationTest extends AbstractCloudIntegrationTest {
     public static void initializeDeployment() {
 
         LdapSettings ldapSettings = deploymentScenarioFactory.getLdapSettingsBuilder()
-                .withLdapBindDn("cn=Manager,dc=example,dc=com")
-                .withLdapBindCredential("admin")
-                .withLdapBaseCtxDn("ou=people,dc=example,dc=com")
-                .withLdapBaseFilter("(uid={0})")
-                .withLdapSearchScope("SUBTREE_SCOPE")
-                .withLdapSearchTimeLimit(10000L)
-                .withLdapRoleAttributeId("cn")
-                .withLdapRolesCtxDn("ou=roles,dc=example,dc=com")
-                .withLdapRoleFilter("(memberOf={1})")
-                .withLdapRoleRecursion(1L)
-                .withLdapDefaultRole("guest")
+                .withLdapBindDn(LdapSettingsConstants.BIND_DN)
+                .withLdapBindCredential(LdapSettingsConstants.BIND_CREDENTIAL)
+                .withLdapBaseCtxDn(LdapSettingsConstants.BASE_CTX_DN)
+                .withLdapBaseFilter(LdapSettingsConstants.BASE_FILTER)
+                .withLdapSearchScope(LdapSettingsConstants.SEARCH_SCOPE)
+                .withLdapSearchTimeLimit(LdapSettingsConstants.SEARCH_TIME_LIMIT)
+                .withLdapRoleAttributeId(LdapSettingsConstants.ROLE_ATTRIBUTE_ID)
+                .withLdapRolesCtxDn(LdapSettingsConstants.ROLES_CTX_DN)
+                .withLdapRoleFilter(LdapSettingsConstants.ROLE_FILTER)
+                .withLdapRoleRecursion(LdapSettingsConstants.ROLE_RECURSION)
+                .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE)
                 .build();
 
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
