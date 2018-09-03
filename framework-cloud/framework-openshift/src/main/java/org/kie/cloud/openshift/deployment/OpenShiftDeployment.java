@@ -29,13 +29,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import cz.xtf.openshift.OpenShiftUtil;
-import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.Route;
 
 import java.time.Duration;
-import java.util.Map;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
@@ -167,19 +165,6 @@ public abstract class OpenShiftDeployment implements Deployment {
             .removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT)
             .endMetadata()
             .done();
-    }
-
-    @Override
-    public void updateDeploymentConfig(Map<String, String> updatedEnvVariables) {
-        // TODO: fix it here https://github.com/xtf-cz/xtf/blob/master/utilities/src/main/java/cz/xtf/openshift/OpenShiftUtil.java#L436
-        // PR opened https://github.com/xtf-cz/xtf/pull/146
-        Map<String, String> workbenchDeploymentEnvVars = util.getDeploymentConfig(getServiceName())
-                .getSpec().getTemplate().getSpec().getContainers().get(0)
-                .getEnv().stream().collect(Collectors.toMap(EnvVar::getName, (envVar) -> {
-                    return envVar.getValue() != null ? envVar.getValue() : "";
-                }));
-        workbenchDeploymentEnvVars.putAll(updatedEnvVariables);
-        util.updateDeploymentConfigEnvVars(getServiceName(), workbenchDeploymentEnvVars);
     }
 
     private Instance createInstance(Pod pod) {

@@ -108,4 +108,10 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
     }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withGitHooksDir(String dir) {
+        envVariables.put(OpenShiftTemplateConstants.GIT_HOOKS_DIR, dir);
+        return this;
+    }
 }

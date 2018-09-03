@@ -28,4 +28,11 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @return Builder with configured external maven repo.
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    /**
+     * Return setup builder with configured Git hooks dir.
+     * @param dir GIT_HOOKS_DIR
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitHooksDir(String dir);
 }

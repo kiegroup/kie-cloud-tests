@@ -35,8 +35,4 @@ public class Constants {
     public class User {
         public static final String YODA = "yoda";
     }
-
-    public class BusinessCentralImage {
-        public static final String GIT_HOOKS_DIR = "GIT_HOOKS_DIR";
-    }
 }

@@ -23,6 +23,8 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_ADMIN_USER = "KIE_ADMIN_USER";
     public static final String KIE_ADMIN_PWD = "KIE_ADMIN_PWD";
 
+    public static final String GIT_HOOKS_DIR = "GIT_HOOKS_DIR";
+
     public static final String KIE_SERVER_USER = "KIE_SERVER_USER";
     public static final String KIE_SERVER_PWD = "KIE_SERVER_PWD";
     public static final String KIE_SERVER_HOST = "KIE_SERVER_HOST";
