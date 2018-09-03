@@ -24,7 +24,6 @@ import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioB
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
-import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -41,7 +40,6 @@ import org.kie.cloud.openshift.scenario.builder.KieServerWithPostgreSqlScenarioB
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
-import org.kie.cloud.openshift.settings.LdapSettingsImpl;
 import org.kie.cloud.openshift.settings.builder.ControllerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerMySqlSettingsBuilderImpl;
@@ -152,11 +150,6 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     @Override
     public LdapSettingsBuilder getLdapSettingsBuilder() {
         return new LdapSettingsBuilderImpl();
-    }
-
-    @Override
-    public LdapSettings getLdapSettings() {
-        return new LdapSettingsImpl();
     }
 
     @Override

@@ -23,7 +23,6 @@ import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioB
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
-import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -55,7 +54,6 @@ public interface DeploymentScenarioBuilderFactory {
     SmartRouterSettingsBuilder getSmartRouterSettingsBuilder();
 
     LdapSettingsBuilder getLdapSettingsBuilder();
-    LdapSettings getLdapSettings();
 
     void deleteNamespace(String namespace);
 }
