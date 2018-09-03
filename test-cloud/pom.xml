@@ -37,7 +37,7 @@
     <sso.service.password>serviceUser1!</sso.service.password>
 
     <!-- Properties to configure LDAP -->
-    <ldap.url>ldap://master.openshiftdomain:30389</ldap.url>
+    <ldap.url/>
 
     <kie.app.name>myapp</kie.app.name>
 
