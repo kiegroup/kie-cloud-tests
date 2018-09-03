@@ -2,9 +2,9 @@ package org.kie.cloud.openshift.template;
 
 import java.util.Arrays;
 
-class TemplateSelector {
+public class TemplateSelector {
 
-    enum Project {
+    public enum Project {
         DROOLS,
         JBPM;
 
@@ -14,7 +14,7 @@ class TemplateSelector {
         }
     }
 
-    static Project getProject() {
+    public static Project getProject() {
         return enumConstantFromSystemProperty("template.project", Project.class);
     }
 

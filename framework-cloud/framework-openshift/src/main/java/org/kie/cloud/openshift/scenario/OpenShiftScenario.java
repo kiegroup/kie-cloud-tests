@@ -24,6 +24,7 @@ import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
@@ -71,8 +72,8 @@ public abstract class OpenShiftScenario implements DeploymentScenario {
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftTemplateConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
 
-        logger.info("Creating image streams from " + OpenShiftConstants.getKieImageStreams());
-        project.createResources(OpenShiftConstants.getKieImageStreams());
+        logger.info("Creating image streams.");
+        ImageStreamProvider.createImageStreamsInProject(project);
     }
 
     @Override

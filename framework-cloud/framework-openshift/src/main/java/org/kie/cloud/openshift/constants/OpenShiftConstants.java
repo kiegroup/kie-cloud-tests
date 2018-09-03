@@ -130,6 +130,16 @@ public class OpenShiftConstants implements Constants {
     public static final String SSO_APP_SECRETS = "sso.app.secrets";
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
 
+    public static final String KIE_IMAGE_TAG_AMQ = "kie.image.tag.amq";
+    public static final String KIE_IMAGE_TAG_CONSOLE = "kie.image.tag.console";
+    public static final String KIE_IMAGE_TAG_CONTROLLER = "kie.image.tag.controller";
+    public static final String KIE_IMAGE_TAG_KIE_SERVER = "kie.image.tag.kie-server";
+    public static final String KIE_IMAGE_TAG_MYSQL = "kie.image.tag.mysql";
+    public static final String KIE_IMAGE_TAG_POSTGRESQL = "kie.image.tag.postgresql";
+    public static final String KIE_IMAGE_TAG_SMARTROUTER = "kie.image.tag.smartrouter";
+    public static final String KIE_IMAGE_TAG_WORKBENCH = "kie.image.tag.workbench";
+    public static final String KIE_IMAGE_TAG_WORKBENCH_INDEXING = "kie.image.tag.workbench.indexing";
+
     /**
      * File path pointing to folder containing JDBC driver scripts.
      */
