@@ -3,16 +3,16 @@ kind: Template
 apiVersion: v1
 metadata:
   annotations:
-    description: Application template for Red Hat Business Central 7.0 which includes just Business Central Monitoring
+    description: Application template for Red Hat Process Automation Manager 7.1  which includes just Standalone Controller
     iconClass: icon-jboss
     tags: rhpam,jboss,xpaas
     version: 1.4.0
-    openshift.io/display-name: Red Hat Business Central 7.0 Monitoring
-  name: rhpam70-businesscentral-monitoring
+    openshift.io/display-name: Red Hat Process Automation Manager 7.1 Standalone Controller
+  name: rhpam71-controller
 labels:
-  template: rhpam70-businesscentral-monitoring
+  template: rhpam71-controller
   xpaas: 1.4.0
-message: A new Business Central Monitoring applications have been created in your project. The username/password for accessing Business Central Monitoring interface is ${KIE_ADMIN_USER}/${KIE_ADMIN_PWD}.
+message: A new Standalone Controller applications have been created in your project. The username/password for accessing Standalone Controller interface is ${KIE_ADMIN_USER}/${KIE_ADMIN_PWD}.
 parameters:
 - displayName: Application Name
   description: The name for the application.
@@ -63,10 +63,30 @@ parameters:
   from: "[a-zA-Z]{6}[0-9]{1}!"
   generate: expression
   required: false
-- displayName: Business Central Custom http Route Hostname
+- displayName: KIE server controller protocol
+  description: KIE server controller protocol (Used to set the org.kie.server.controller system property)
+  name: KIE_SERVER_CONTROLLER_PROTOCOL
+  example: http
+  required: false
+- displayName: KIE server controller service
+  description: KIE server controller service (Used to set the org.kie.server.controller system property if host and port aren't set)
+  name: KIE_SERVER_CONTROLLER_SERVICE
+  value: ''
+  required: false
+- displayName: KIE server controller host
+  description: KIE server controller host (Used to set the org.kie.server.controller system property)
+  name: KIE_SERVER_CONTROLLER_HOST
+  example: my-app-controller-ocpuser.os.example.com
+  required: false
+- displayName: KIE server controller port
+  description: KIE server controller port (Used to set the org.kie.server.controller system property)
+  name: KIE_SERVER_CONTROLLER_PORT
+  example: '8080'
+  required: false
+- displayName: Standalone Controller Custom http Route Hostname
   description: 'Custom hostname for http service route.  Leave blank for default hostname,
-    e.g.: <application-name>-rhpamcentrmon-<project>.<default-domain-suffix>'
-  name: BUSINESS_CENTRAL_HOSTNAME_HTTP
+    e.g.: <application-name>-controller-<project>.<default-domain-suffix>'
+  name: CONTROLLER_HOSTNAME_HTTP
   value: ''
   required: false
 - displayName: ImageStream Namespace
@@ -78,20 +98,20 @@ parameters:
   value: openshift
   required: true
 - displayName: ImageStream Tag
-  description: A named pointer to an image in an image stream. Default is "1.2".
+  description: A named pointer to an image in an image stream. Default is "1.0".
   name: IMAGE_STREAM_TAG
-  value: "1.2"
+  value: "1.0"
   required: false
-- displayName: Business Central Container Memory Limit
-  description: Business Central Container memory limit
-  name: BUSINESS_CENTRAL_MEMORY_LIMIT
-  value: 2Gi
+- displayName: Standalone Controller Container Memory Limit
+  description: Standalone Controller Container memory limit
+  name: CONTROLLER_MEMORY_LIMIT
+  value: 1Gi
   required: false
 objects:
 - kind: ServiceAccount
   apiVersion: v1
   metadata:
-    name: "${APPLICATION_NAME}-rhpamcentrmon"
+    name: "${APPLICATION_NAME}-controller"
     labels:
       application: "${APPLICATION_NAME}"
 - kind: Service
@@ -101,30 +121,30 @@ objects:
     - port: 8080
       targetPort: 8080
     selector:
-      deploymentConfig: "${APPLICATION_NAME}-rhpamcentrmon"
+      deploymentConfig: "${APPLICATION_NAME}-controller"
   metadata:
-    name: "${APPLICATION_NAME}-rhpamcentrmon"
+    name: "${APPLICATION_NAME}-controller"
     labels:
       application: "${APPLICATION_NAME}"
     annotations:
-      description: The Business Central web server's http port.
+      description: The Standalone Controller web server's http port.
 - kind: Route
   apiVersion: v1
-  id: "${APPLICATION_NAME}-rhpamcentrmon-http"
+  id: "${APPLICATION_NAME}-controller-http"
   metadata:
-    name: "${APPLICATION_NAME}-rhpamcentrmon"
+    name: "${APPLICATION_NAME}-controller"
     labels:
       application: "${APPLICATION_NAME}"
     annotations:
-      description: Route for Business Central's http service.
+      description: Route for Standalone Controller's http service.
   spec:
-    host: "${BUSINESS_CENTRAL_HOSTNAME_HTTP}"
+    host: "${CONTROLLER_HOSTNAME_HTTP}"
     to:
-      name: "${APPLICATION_NAME}-rhpamcentrmon"
+      name: "${APPLICATION_NAME}-controller"
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
-    name: "${APPLICATION_NAME}-rhpamcentrmon"
+    name: "${APPLICATION_NAME}-controller"
     labels:
       application: "${APPLICATION_NAME}"
   spec:
@@ -135,31 +155,31 @@ objects:
       imageChangeParams:
         automatic: true
         containerNames:
-        - "${APPLICATION_NAME}-rhpamcentrmon"
+        - "${APPLICATION_NAME}-controller"
         from:
           kind: ImageStreamTag
           namespace: "${IMAGE_STREAM_NAMESPACE}"
-          name: "rhpam70-businesscentral-monitoring-openshift:${IMAGE_STREAM_TAG}"
+          name: "rhpam71-controller-openshift:${IMAGE_STREAM_TAG}"
     - type: ConfigChange
     replicas: 1
     selector:
-      deploymentConfig: "${APPLICATION_NAME}-rhpamcentrmon"
+      deploymentConfig: "${APPLICATION_NAME}-controller"
     template:
       metadata:
-        name: "${APPLICATION_NAME}-rhpamcentrmon"
+        name: "${APPLICATION_NAME}-controller"
         labels:
-          deploymentConfig: "${APPLICATION_NAME}-rhpamcentrmon"
+          deploymentConfig: "${APPLICATION_NAME}-controller"
           application: "${APPLICATION_NAME}"
       spec:
-        serviceAccountName: "${APPLICATION_NAME}-rhpamcentrmon"
+        serviceAccountName: "${APPLICATION_NAME}-controller"
         terminationGracePeriodSeconds: 60
         containers:
-        - name: "${APPLICATION_NAME}-rhpamcentrmon"
-          image: rhpam70-businesscentral-openshift
+        - name: "${APPLICATION_NAME}-controller"
+          image: rhpam71-controller-openshift
           imagePullPolicy: Always
           resources:
             limits:
-              memory: "${BUSINESS_CENTRAL_MEMORY_LIMIT}"
+              memory: "${CONTROLLER_MEMORY_LIMIT}"
           livenessProbe:
             exec:
               command:
@@ -193,9 +213,17 @@ objects:
           - name: ADMIN_PASSWORD
             value: "${ADMIN_PASSWORD}"
           - name: KIE_SERVER_CONTROLLER_PWD
-            value: ${KIE_SERVER_CONTROLLER_PWD}
+            value: "${KIE_SERVER_CONTROLLER_PWD}"
           - name: KIE_SERVER_CONTROLLER_USER
-            value: ${KIE_SERVER_CONTROLLER_USER}
+            value: "${KIE_SERVER_CONTROLLER_USER}"
+          - name: KIE_SERVER_CONTROLLER_PROTOCOL
+            value: "${KIE_SERVER_CONTROLLER_PROTOCOL}"
+          - name: KIE_SERVER_CONTROLLER_SERVICE
+            value: "${KIE_SERVER_CONTROLLER_SERVICE}"
+          - name: KIE_SERVER_CONTROLLER_HOST
+            value: "${KIE_SERVER_CONTROLLER_HOST}"
+          - name: KIE_SERVER_CONTROLLER_PORT
+            value: "${KIE_SERVER_CONTROLLER_PORT}"
           - name: PROBE_IMPL
             value: probe.eap.jolokia.EapProbe
           - name: PROBE_DISABLE_BOOT_ERRORS_CHECK

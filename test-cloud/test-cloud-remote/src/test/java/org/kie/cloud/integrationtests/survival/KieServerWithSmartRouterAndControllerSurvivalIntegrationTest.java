@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -148,6 +149,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
     }
 
     @Test
+    @Ignore("Timeout while deploying project to the BC")
     public void testScaleAllDeploymentsToZeroAndBackToOne() {
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
