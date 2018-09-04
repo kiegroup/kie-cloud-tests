@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.kie.cloud</groupId>
     <artifactId>test-cloud</artifactId>
-    <version>7.7.1-SNAPSHOT</version>
+    <version>7.11.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-cloud-template</artifactId>
