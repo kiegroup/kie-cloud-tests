@@ -60,15 +60,13 @@ public class SmartRouterUpdateRedirectionIntegrationTest extends AbstractMethodI
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         DeploymentSettings kieServer1 = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withKieServerSyncDeploy(true)
                 .withApplicationName("kie-server-1")
                 .withSmartRouterConnection(smartRouterHostname, smartRouterPort)
                 .build();
         DeploymentSettings kieServer2 = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withKieServerSyncDeploy(true)
                 .withApplicationName("kie-server-2")
                 .withSmartRouterConnection(smartRouterHostname, smartRouterPort)

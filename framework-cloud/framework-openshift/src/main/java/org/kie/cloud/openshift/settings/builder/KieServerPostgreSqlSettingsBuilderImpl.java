@@ -36,6 +36,8 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
     }
 
     @Override
@@ -119,14 +121,16 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
     }
 
     @Override
-    public KieServerSettingsBuilder withMavenRepoUrl(String url) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, url);
+    public KieServerSettingsBuilder withExternalMavenRepo(String repoUrl, String repoUser, String repoPassword) {
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUser);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
 
     @Override
     public KieServerSettingsBuilder withMavenRepoService(String serviceName) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_SERVICE, serviceName);
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_SERVICE, serviceName);
         return this;
     }
 
@@ -134,20 +138,6 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
     public KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
         envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
         envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
-        return this;
-    }
-
-    @Override
-    public KieServerSettingsBuilder withMavenRepoService(String service, String path) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_SERVICE, service);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PATH, path);
-        return this;
-    }
-
-    @Override
-    public KieServerSettingsBuilder withMavenRepoUser(String repoUser, String repoPassword) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUser);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
 

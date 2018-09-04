@@ -126,13 +126,6 @@ public class KieServerHttpsS2ISettingsBuilderImpl implements KieServerS2ISetting
     }
 
     @Override
-    public KieServerS2ISettingsBuilder withMavenRepoService(String service, String path) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_SERVICE, service);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PATH, path);
-        return this;
-    }
-
-    @Override
     public KieServerS2ISettingsBuilder withMavenRepoUser(String repoUser, String repoPassword) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUser);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);

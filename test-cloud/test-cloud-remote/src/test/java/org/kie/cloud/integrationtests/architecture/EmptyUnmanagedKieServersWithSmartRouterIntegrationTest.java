@@ -107,8 +107,7 @@ public class EmptyUnmanagedKieServersWithSmartRouterIntegrationTest extends Abst
                 .withHostame(RANDOM_URL_PREFIX + applicationName + DeploymentConstants.getDefaultDomainSuffix())
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .withSmartRouterConnection(RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME, PORT)
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
     }
 

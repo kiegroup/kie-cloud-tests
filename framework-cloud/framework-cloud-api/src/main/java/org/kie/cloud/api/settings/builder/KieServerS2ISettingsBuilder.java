@@ -119,7 +119,8 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
-     * @param artifactDirs Directories containing built kjars, separated by commas. For example "usertask-project/target,signaltask-project/target".
+     * @param artifactDirs Directories containing built kjars, separated by
+     * commas. For example "usertask-project/target,signaltask-project/target".
      * @return Builder
      */
     KieServerS2ISettingsBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs);
@@ -131,15 +132,6 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return Builder
      */
     KieServerS2ISettingsBuilder withMavenRepoUrl(String url);
-
-    /**
-     * Return configured builder with Maven repository set by service name.
-     *
-     * @param serviceName Service name (e.g. Business central deployment).
-     * @param path Path to maven repositoy (e.g. '/maven2/').
-     * @return Builder
-     */
-    KieServerS2ISettingsBuilder withMavenRepoService(String serviceName, String path);
 
     /**
      * Return configured builder with Maven user.
@@ -177,7 +169,8 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
     KieServerS2ISettingsBuilder withSecuredHostame(String https);
 
     /**
-     * Return configured builder with enabled drools classes filter for Kie server.
+     * Return configured builder with enabled drools classes filter for Kie
+     * server.
      *
      * @param droolsFilter set to true to enable drools classes filter.
      * @return Builder

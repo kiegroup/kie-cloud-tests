@@ -50,8 +50,7 @@ public class OpenShiftTemplateConstants {
 
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
-    public static final String MAVEN_REPO_SERVICE = "MAVEN_REPO_SERVICE";
-    public static final String MAVEN_REPO_PATH = "MAVEN_REPO_PATH";
+    public static final String BUSINESS_CENTRAL_MAVEN_SERVICE = "BUSINESS_CENTRAL_MAVEN_SERVICE";
     public static final String BUSINESS_CENTRAL_MAVEN_USERNAME = "BUSINESS_CENTRAL_MAVEN_USERNAME";
     public static final String BUSINESS_CENTRAL_MAVEN_PASSWORD = "BUSINESS_CENTRAL_MAVEN_PASSWORD";
 
