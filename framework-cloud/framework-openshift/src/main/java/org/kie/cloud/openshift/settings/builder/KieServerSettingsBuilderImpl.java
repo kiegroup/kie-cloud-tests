@@ -120,21 +120,16 @@ public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
     }
 
     @Override
-    public KieServerSettingsBuilder withMavenRepoUrl(String url) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, url);
+    public KieServerSettingsBuilder withExternalMavenRepo(String repoUrl, String repoUser, String repoPassword) {
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUser);
+        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
 
     @Override
     public KieServerSettingsBuilder withMavenRepoService(String service) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_SERVICE, service);
-        return this;
-    }
-
-    @Override
-    public KieServerSettingsBuilder withMavenRepoService(String service, String path) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_SERVICE, service);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PATH, path);
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_SERVICE, service);
         return this;
     }
 
@@ -142,13 +137,6 @@ public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
     public KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
         envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
         envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
-        return this;
-    }
-
-    @Override
-    public KieServerSettingsBuilder withMavenRepoUser(String repoUser, String repoPassword) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUser);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
     

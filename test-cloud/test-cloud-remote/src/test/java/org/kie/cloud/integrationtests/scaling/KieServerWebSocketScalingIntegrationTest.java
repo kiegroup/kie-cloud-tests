@@ -101,8 +101,7 @@ public class KieServerWebSocketScalingIntegrationTest {
             DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
                     .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                     .withControllerConnection(Protocol.ws.name(), workbenchDeployment.getWebSocketUri().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().getPort()))
-                    .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                    .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                     .withKieServerSyncDeploy(true)
                     .build();
             kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()

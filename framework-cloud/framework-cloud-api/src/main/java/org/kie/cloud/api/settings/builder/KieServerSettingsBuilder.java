@@ -124,12 +124,14 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
     KieServerSettingsBuilder withContainerDeployment(String kieContainerDeployment);
 
     /**
-     * Return configured builder with Maven repository.
+     * Return configured builder with External Maven repository.
      *
-     * @param url Address of the maven repository.
+     * @param repoUrl Address of the maven repository.
+     * @param repoUser External Maven user.
+     * @param repoPassword External Maven password.
      * @return Builder
      */
-    KieServerSettingsBuilder withMavenRepoUrl(String url);
+    KieServerSettingsBuilder withExternalMavenRepo(String repoUrl, String repoUser, String repoPassword);
 
     /**
      * Return configured builder with Maven repository set by service name.
@@ -140,15 +142,6 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
     KieServerSettingsBuilder withMavenRepoService(String serviceName);
 
     /**
-     * Return configured builder with Maven repository set by service name.
-     *
-     * @param serviceName Service name (e.g. Business central deployment).
-     * @param path Path to maven repositoy (e.g. '/maven2/').
-     * @return Builder
-     */
-    KieServerSettingsBuilder withMavenRepoService(String serviceName, String path);
-
-    /**
      * Return configured builder with Maven user for the Maven service.
      *
      * @param workbenchMavenUser
@@ -156,15 +149,6 @@ public interface KieServerSettingsBuilder extends SettingsBuilder<DeploymentSett
      * @return
      */
     KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword);
-
-    /**
-     * Return configured builder with Maven user.
-     *
-     * @param repoUser Maven user.
-     * @param repoPassword Maven password.
-     * @return Builder
-     */
-    KieServerSettingsBuilder withMavenRepoUser(String repoUser, String repoPassword);
 
     /**
      * Return configured builder with set Kie Server sync deploying.

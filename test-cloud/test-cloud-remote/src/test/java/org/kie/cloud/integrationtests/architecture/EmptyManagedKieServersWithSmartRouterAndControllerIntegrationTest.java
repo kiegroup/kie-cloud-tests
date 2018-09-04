@@ -137,8 +137,7 @@ public class EmptyManagedKieServersWithSmartRouterAndControllerIntegrationTest e
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .withSmartRouterConnection(RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME, PORT)
                 .withControllerConnection(RANDOM_URL_PREFIX + CONTROLLER_HOSTNAME, PORT)
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
     }
 

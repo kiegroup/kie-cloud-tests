@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -41,6 +40,7 @@ import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -67,9 +67,6 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
     private static final String KIE_SERVER_NAME = "kie-server";
 
     private static final String PORT = "80";
-
-    private static final String MAVEN_SERVICE_USER = "mavenUser";
-    private static final String MAVEN_SERVICE_PASSWORD = "mavenUser1!";
 
     private DeploymentSettings controllerSettings;
     private DeploymentSettings smartRouterSettings;
@@ -98,13 +95,12 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
         controllerSettings = deploymentScenarioFactory.getWorkbenchSettingsBuilder()
                 .withApplicationName(CONTROLLER_NAME)
                 .withHostame(CONTROLLER_HOSTNAME)
-                .withMavenRepoServiceUser(MAVEN_SERVICE_USER, MAVEN_SERVICE_PASSWORD)
                 .build();
 
         smartRouterSettings = deploymentScenarioFactory.getSmartRouterSettingsBuilder()
                 .withApplicationName(SMART_ROUTER_NAME)
                 .withSmartRouterID(SMART_ROUTER_ID)
-                .withControllerConnection(CONTROLLER_HOSTNAME, PORT)
+                .withControllerConnection(CONTROLLER_NAME + "-rhpamcentr")
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .withHostame(SMART_ROUTER_HOSTNAME)
                 .withSmartRouterExternalUrl("http://" + SMART_ROUTER_HOSTNAME + ":" + PORT)
@@ -115,10 +111,11 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
                 .withHostame(KIE_SERVER_HOSTNAME)
                 .withAdminUser(DeploymentConstants.getWorkbenchUser(), DeploymentConstants.getWorkbenchPassword())
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                .withControllerConnection("http", CONTROLLER_HOSTNAME, PORT)
-                .withSmartRouterConnection("http", SMART_ROUTER_HOSTNAME, PORT)
-                .withMavenRepoUrl("http://" + CONTROLLER_HOSTNAME + "/maven2/")
-                .withMavenRepoUser(MAVEN_SERVICE_USER, MAVEN_SERVICE_PASSWORD)
+                .withControllerConnection(CONTROLLER_NAME + "-rhpamcentr")
+                .withSmartRouterConnection(SMART_ROUTER_NAME + "-smartrouter")
+                .withMavenRepoService(CONTROLLER_NAME + "-rhpamcentr")
+                .withMavenRepoServiceUser(DeploymentConstants.getWorkbenchMavenUser(), DeploymentConstants.getWorkbenchMavenPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
 
         return deploymentScenarioFactory.getGenericScenarioBuilder()
@@ -130,7 +127,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @Before
     public void setUp() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + DEFINITION_PROJECT_NAME);
+        repositoryName = gitProvider.createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
 
@@ -149,7 +146,6 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
     }
 
     @Test
-    @Ignore("Timeout while deploying project to the BC")
     public void testScaleAllDeploymentsToZeroAndBackToOne() {
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 

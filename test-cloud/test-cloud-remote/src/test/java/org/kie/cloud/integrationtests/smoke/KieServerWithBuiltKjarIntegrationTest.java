@@ -93,8 +93,7 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
                 .build();
 
         DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .build();
         GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()

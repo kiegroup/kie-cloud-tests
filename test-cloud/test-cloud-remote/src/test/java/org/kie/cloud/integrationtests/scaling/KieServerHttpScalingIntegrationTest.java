@@ -79,8 +79,7 @@ public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedC
                 .withKieServerUser(DeploymentConstants.getKieServerUser(), DeploymentConstants.getKieServerPassword())
                 .build();
         DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
-                .withMavenRepoUrl(MavenConstants.getMavenRepoUrl())
-                .withMavenRepoUser(MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withControllerConnection("standalone-controller")
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .build();

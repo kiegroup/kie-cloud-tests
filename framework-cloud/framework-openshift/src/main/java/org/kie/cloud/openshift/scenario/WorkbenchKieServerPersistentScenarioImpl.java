@@ -94,7 +94,7 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
         logNodeNameOfAllInstances();
 
         // Used to track persistent volume content due to issues with volume cleanup
-        storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/bpmsuite");
+        storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/kie");
     }
 
     @Override
