@@ -17,26 +17,12 @@ package org.kie.cloud.openshift.database.external;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.driver.ExternalDriver;
-import org.kie.cloud.openshift.database.driver.SybaseExternalDriver;
+import org.kie.cloud.openshift.database.external.AbstractSybaseExternalDatabase;
 
-public class SybaseExternalDatabase implements ExternalDatabase {
-
-    private ExternalDriver driver = new SybaseExternalDriver();
-
-    @Override
-    public String getDriverName() {
-        return "sybase";
-    }
-
-    @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
+public class SybaseExternalDatabase extends AbstractSybaseExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

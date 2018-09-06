@@ -17,14 +17,14 @@ package org.kie.cloud.openshift.settings.builder;
 
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
-import org.kie.cloud.openshift.settings.LdapSettingsImpl;
+import org.kie.cloud.openshift.settings.AbstractLdapSettings;
 
-public class LdapSettingsBuilderImpl implements LdapSettingsBuilder {
+public class AbstractLdapSettingsBuilder implements LdapSettingsBuilder {
 
-    private LdapSettingsImpl ldapSettings;
+    private AbstractLdapSettings ldapSettings;
 
-    public LdapSettingsBuilderImpl() {
-        ldapSettings = new LdapSettingsImpl();
+    public AbstractLdapSettingsBuilder(AbstractLdapSettings ldapSettings) {
+        this.ldapSettings = ldapSettings;
     }
 
     @Override

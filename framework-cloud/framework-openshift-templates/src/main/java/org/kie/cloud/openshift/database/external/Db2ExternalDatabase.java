@@ -12,31 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
 package org.kie.cloud.openshift.database.external;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.database.external.AbstractDb2ExternalDatabase;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.driver.Db2ExternalDriver;
-import org.kie.cloud.openshift.database.driver.ExternalDriver;
 
-public class Db2ExternalDatabase implements ExternalDatabase {
-
-    private ExternalDriver driver = new Db2ExternalDriver();
-
-    @Override
-    public String getDriverName() {
-        return "db2";
-    }
-
-    @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
+public class Db2ExternalDatabase extends AbstractDb2ExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

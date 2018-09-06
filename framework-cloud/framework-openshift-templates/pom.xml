@@ -24,7 +24,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
-      <artifactId>framework-cloud-openshift</artifactId>
+      <artifactId>framework-openshift</artifactId>
     </dependency>
 
     <dependency>
