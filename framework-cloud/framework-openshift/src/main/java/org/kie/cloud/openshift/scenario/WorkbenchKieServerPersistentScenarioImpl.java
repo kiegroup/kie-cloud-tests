@@ -46,20 +46,20 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
     private SsoDeployment ssoDeployment;
 
     private Map<String, String> envVariables;
-    private boolean deploySSO;
+    private boolean deploySso;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerPersistentScenarioImpl.class);
 
-    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, boolean deploySSO) {
+    public WorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
         this.envVariables = envVariables;
-        this.deploySSO = deploySSO;
+        this.deploySso = deploySso;
     }
 
     @Override
     public void deploy() {
         super.deploy();
 
-        if (deploySSO) {
+        if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project, envVariables);
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));

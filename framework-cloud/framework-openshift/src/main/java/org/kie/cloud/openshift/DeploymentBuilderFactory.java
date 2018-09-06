@@ -27,6 +27,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServe
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
+import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
@@ -44,6 +45,7 @@ import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilder
 import org.kie.cloud.openshift.settings.builder.KieServerMySqlSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerPostgreSqlSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.LdapSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchSettingsBuilderImpl;
@@ -143,6 +145,11 @@ public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactor
     @Override
     public SmartRouterSettingsBuilder getSmartRouterSettingsBuilder() {
         return new SmartRouterSettingsBuilderImpl();
+    }
+
+    @Override
+    public LdapSettingsBuilder getLdapSettingsBuilder() {
+        return new LdapSettingsBuilderImpl();
     }
 
     @Override

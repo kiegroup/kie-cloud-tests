@@ -26,6 +26,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServe
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
+import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
@@ -51,6 +52,8 @@ public interface DeploymentScenarioBuilderFactory {
     WorkbenchSettingsBuilder getWorkbenchSettingsBuilder();
     WorkbenchMonitoringSettingsBuilder getWorkbenchMonitoringSettingsBuilder();
     SmartRouterSettingsBuilder getSmartRouterSettingsBuilder();
+
+    LdapSettingsBuilder getLdapSettingsBuilder();
 
     void deleteNamespace(String namespace);
 }

@@ -42,8 +42,8 @@ public class SsoDeployer {
 
         logger.info("Creating SSO secrets from " + OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toString());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SSO_SECRET.getTemplateUrl(), Collections.emptyMap());
-        logger.info("Creating SSO image streams from " + OpenShiftConstants.getSSOImageStreams());
-        project.createResources(OpenShiftConstants.getSSOImageStreams());
+        logger.info("Creating SSO image streams from " + OpenShiftConstants.getSsoImageStreams());
+        project.createResources(OpenShiftConstants.getSsoImageStreams());
 
         logger.info("Processing template and createing resources from " + OpenShiftTemplate.SSO.getTemplateUrl().toString());
         Map<String, String> ssoEnvVariables = new HashMap<>();

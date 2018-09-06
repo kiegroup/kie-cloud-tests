@@ -150,6 +150,11 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String KIE_JDBC_DRIVER_BINARY_URL = "kie.jdbc.driver.binary.url";
 
+    /**
+     * URL pointing to running LDAP.
+     */
+    public static final String LDAP_URL = "ldap.url";
+
     public static String getOpenShiftUrl() {
         return System.getProperty(OPENSHIFT_URL);
     }
@@ -174,8 +179,12 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(KIE_IMAGE_STREAMS);
     }
 
-    public static String getSSOImageStreams() {
+    public static String getSsoImageStreams() {
         return System.getProperty(SSO_IMAGE_STREAMS);
+    }
+
+    public static String getLdapUrl() {
+        return System.getProperty(LDAP_URL);
     }
 
     public static String getKieApplicationName() {

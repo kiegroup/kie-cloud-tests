@@ -36,7 +36,7 @@ public class ServiceUtil {
         return getServiceName(util, CONTROLLER_REGEXP);
     }
 
-    public static String getSSOServiceName(OpenShiftUtil util) {
+    public static String getSsoServiceName(OpenShiftUtil util) {
         return getServiceName(util, SSO_REGEXP);
     }
 
