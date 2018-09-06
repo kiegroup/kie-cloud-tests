@@ -21,21 +21,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.database.external.ExternalDatabase;
 
-public class ExternalDatabaseProvider {
+public class TemplateExternalDatabaseProvider {
 
     private static Collection<ExternalDatabase> availableExternalDatabases = new ArrayList<>();
 
     static {
-        // TODO fix external db provider
-
-//        availableExternalDatabases.add(new Db2ExternalDatabase());
-//        availableExternalDatabases.add(new MariaDbExternalDatabase());
-//        availableExternalDatabases.add(new MssqlExternalDatabase());
-//        availableExternalDatabases.add(new MySqlExternalDatabase());
-//        availableExternalDatabases.add(new OracleExternalDatabase());
-//        availableExternalDatabases.add(new PostgreSqlExternalDatabase());
-//        availableExternalDatabases.add(new SybaseExternalDatabase());
+        availableExternalDatabases.add(new Db2ExternalDatabase());
+        availableExternalDatabases.add(new MariaDbExternalDatabase());
+        availableExternalDatabases.add(new MssqlExternalDatabase());
+        availableExternalDatabases.add(new MySqlExternalDatabase());
+        availableExternalDatabases.add(new OracleExternalDatabase());
+        availableExternalDatabases.add(new PostgreSqlExternalDatabase());
+        availableExternalDatabases.add(new SybaseExternalDatabase());
     }
 
     public static ExternalDatabase getExternalDatabase() {

@@ -118,6 +118,11 @@
           <artifactId>framework-openshift</artifactId>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.kie.cloud</groupId>
+          <artifactId>framework-openshift-templates</artifactId>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
     </profile>
     <profile>

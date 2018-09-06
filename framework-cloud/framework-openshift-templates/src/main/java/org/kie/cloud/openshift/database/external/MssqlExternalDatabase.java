@@ -17,26 +17,12 @@ package org.kie.cloud.openshift.database.external;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.driver.ExternalDriver;
-import org.kie.cloud.openshift.database.driver.MariaDbExternalDriver;
+import org.kie.cloud.openshift.database.external.AbstractMssqlExternalDatabase;
 
-public class MariaDbExternalDatabase implements ExternalDatabase {
-
-    private ExternalDriver driver = new MariaDbExternalDriver();
-
-    @Override
-    public String getDriverName() {
-        return "mariadb";
-    }
-
-    @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
+public class MssqlExternalDatabase extends AbstractMssqlExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {
