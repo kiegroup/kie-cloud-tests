@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
-import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.SsoDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.kie.cloud.api.deployment.SsoDeployment;
+import org.kie.cloud.openshift.constants.SsoTemplateConstants;
 
 public class SsoDeployer {
 
@@ -47,12 +47,12 @@ public class SsoDeployer {
 
         logger.info("Processing template and createing resources from " + OpenShiftTemplate.SSO.getTemplateUrl().toString());
         Map<String, String> ssoEnvVariables = new HashMap<>();
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_ADMIN_USERNAME, DeploymentConstants.getSsoAdminUser());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_ADMIN_PASSWORD, DeploymentConstants.getSsoAdminPassword());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_SERVICE_USERNAME, DeploymentConstants.getSsoServiceUser());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.SSO_SERVICE_PASSWORD, DeploymentConstants.getSsoServicePassword());
-        ssoEnvVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
+        ssoEnvVariables.put(SsoTemplateConstants.SSO_ADMIN_USERNAME, DeploymentConstants.getSsoAdminUser());
+        ssoEnvVariables.put(SsoTemplateConstants.SSO_ADMIN_PASSWORD, DeploymentConstants.getSsoAdminPassword());
+        ssoEnvVariables.put(SsoTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
+        ssoEnvVariables.put(SsoTemplateConstants.SSO_SERVICE_USERNAME, DeploymentConstants.getSsoServiceUser());
+        ssoEnvVariables.put(SsoTemplateConstants.SSO_SERVICE_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        ssoEnvVariables.put(SsoTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SSO.getTemplateUrl(), ssoEnvVariables);
 
         logger.info("Waiting for SSO deployment to become ready.");
@@ -84,16 +84,16 @@ public class SsoDeployer {
         ssoApi.createRole(ADMIN);
         ssoApi.createRole(KIE_SERVER);
         ssoApi.createRole(REST_ALL);
-        ssoApi.createUser(envVariables.getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()),
-                envVariables.getOrDefault(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()),
+        ssoApi.createUser(DeploymentConstants.getWorkbenchUser(),
+                DeploymentConstants.getWorkbenchPassword(),
                 Arrays.asList(ADMIN, KIE_SERVER, REST_ALL));
-        ssoApi.createUser(envVariables.getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()),
-                envVariables.getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword()),
+        ssoApi.createUser(DeploymentConstants.getControllerUser(),
+                DeploymentConstants.getControllerPassword(),
                 Arrays.asList(KIE_SERVER, REST_ALL));
-        ssoApi.createUser(envVariables.getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()),
-                envVariables.getOrDefault(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword()),
+        ssoApi.createUser(DeploymentConstants.getKieServerUser(),
+                DeploymentConstants.getKieServerPassword(),
                 Arrays.asList(KIE_SERVER));
-        ssoApi.createUser(envVariables.getOrDefault(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser()),
-                envVariables.getOrDefault(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword()));
+        ssoApi.createUser(DeploymentConstants.getWorkbenchMavenUser(),
+                DeploymentConstants.getWorkbenchMavenPassword());
     }
 }

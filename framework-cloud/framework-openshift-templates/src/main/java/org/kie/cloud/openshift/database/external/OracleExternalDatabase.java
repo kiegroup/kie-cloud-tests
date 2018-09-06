@@ -17,26 +17,14 @@ package org.kie.cloud.openshift.database.external;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.database.external.AbstractOracleExternalDatabase;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.driver.ExternalDriver;
-import org.kie.cloud.openshift.database.driver.OracleExternalDriver;
 
-public class OracleExternalDatabase implements ExternalDatabase {
 
-    private ExternalDriver driver = new OracleExternalDriver();
+public class OracleExternalDatabase extends AbstractOracleExternalDatabase {
 
-    @Override
-    public String getDriverName() {
-        return "oracle";
-    }
-
-    @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

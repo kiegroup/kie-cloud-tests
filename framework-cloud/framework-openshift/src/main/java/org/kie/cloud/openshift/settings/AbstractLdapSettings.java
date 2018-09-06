@@ -20,9 +20,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
-import static org.kie.cloud.openshift.constants.OpenShiftTemplateConstants.*;
 
-public class LdapSettingsImpl implements LdapSettings {
+public abstract class AbstractLdapSettings implements LdapSettings {
 
     private String url;
     private String bindDn;
@@ -46,40 +45,8 @@ public class LdapSettingsImpl implements LdapSettings {
     private Boolean roleAttributeIsDn;
     private String referralUserAttributeIdToCheck;
 
-    public LdapSettingsImpl() {
+    public AbstractLdapSettings() {
         url = OpenShiftConstants.getLdapUrl();
-    }
-
-    @Override
-    public Map<String, String> getEnvVariables() {
-        Map<String, String> envVariables = new HashMap<>();
-
-        envVariables.put(AUTH_LDAP_URL, getLdapUrl());
-        envVariables.put(AUTH_LDAP_BIND_DN, getLdapBindDn());
-        envVariables.put(AUTH_LDAP_BIND_CREDENTIAL, getLdapBindCredential());
-        envVariables.put(AUTH_LDAP_JAAS_SECURITY_DOMAIN, getLdapJaasSecurityDomain());
-        envVariables.put(AUTH_LDAP_BASE_CTX_DN, getLdapBaseCtxDn());
-        envVariables.put(AUTH_LDAP_BASE_FILTER, getLdapBaseFilter());
-        envVariables.put(AUTH_LDAP_SEARCH_SCOPE, getLdapSearchScope());
-        envVariables.put(AUTH_LDAP_SEARCH_TIME_LIMIT, getLdapSearchTimeLimit());
-        envVariables.put(AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE, getLdapDistinguishedNameAttribute());
-        envVariables.put(AUTH_LDAP_PARSE_USERNAME, getLdapParseUsername());
-        envVariables.put(AUTH_LDAP_USERNAME_BEGIN_STRING, getLdapUsernameBeginString());
-        envVariables.put(AUTH_LDAP_USERNAME_END_STRING, getLdapUsernameEndString());
-        envVariables.put(AUTH_LDAP_ROLE_ATTRIBUTE_ID, getLdapRoleAttributeId());
-        envVariables.put(AUTH_LDAP_ROLES_CTX_DN, getLdapRolesCtxDn());
-        envVariables.put(AUTH_LDAP_ROLE_FILTER, getLdapRoleFilter());
-        envVariables.put(AUTH_LDAP_ROLE_RECURSION, getLdapRoleRecursion());
-        envVariables.put(AUTH_LDAP_DEFAULT_ROLE, getLdapDefaultRole());
-        envVariables.put(AUTH_LDAP_ROLE_NAME_ATTRIBUTE_ID, getLdapRoleNameAttributeId());
-        envVariables.put(AUTH_LDAP_PARSE_ROLE_NAME_FROM_DN, getLdapParseRoleNameFromDn());
-        envVariables.put(AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN, getLdapRoleAttributeId());
-        envVariables.put(AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK, getLdapReferralUserAttributeIdToCheck());
-
-        return envVariables.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
-                .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
     }
 
     @Override

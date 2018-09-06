@@ -17,26 +17,12 @@ package org.kie.cloud.openshift.database.external;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.database.external.AbstractPostgreSqlExternalDatabase;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.driver.ExternalDriver;
-import org.kie.cloud.openshift.database.driver.MssqlExternalDriver;
 
-public class MssqlExternalDatabase implements ExternalDatabase {
-
-    private ExternalDriver driver = new MssqlExternalDriver();
-
-    @Override
-    public String getDriverName() {
-        return "mssql";
-    }
-
-    @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
+public class PostgreSqlExternalDatabase extends AbstractPostgreSqlExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

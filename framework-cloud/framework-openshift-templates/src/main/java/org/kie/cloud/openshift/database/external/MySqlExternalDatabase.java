@@ -17,23 +17,12 @@ package org.kie.cloud.openshift.database.external;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.database.external.AbstractMySqlExternalDatabase;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.driver.ExternalDriver;
 
-public class MySqlExternalDatabase implements ExternalDatabase {
-
-    @Override
-    public String getDriverName() {
-        return "mysql";
-    }
-
-    @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.empty();
-    }
+public class MySqlExternalDatabase extends AbstractMySqlExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {
