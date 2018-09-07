@@ -21,10 +21,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.entity.ContentType;
 import org.kie.cloud.git.AbstractGitProvider;
 import org.apache.http.client.fluent.Request;
-import org.kie.cloud.git.constants.GitConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,16 +58,15 @@ public class GogsGitProvider extends AbstractGitProvider {
 
     @Override public void deleteGitRepository(String repositoryName) {
         try {
-            final int statusCode = Request.Delete(deleteRepositoryUrl(repositoryName))
+            final StatusLine statusLine = Request.Delete(deleteRepositoryUrl(repositoryName))
                     .addHeader(HttpHeaders.AUTHORIZATION, authHeaderValue())
                     .execute()
                     .returnResponse()
-                    .getStatusLine()
-                    .getStatusCode();
+                    .getStatusLine();
 
-            if (statusCode != HttpStatus.SC_NO_CONTENT) {
-                logger.error("Bad status code while deleting Gogs project {}", statusCode);
-                throw new RuntimeException("Bad status code while deleting Gogs project " + statusCode);
+            if (statusLine.getStatusCode() != HttpStatus.SC_NO_CONTENT) {
+                logger.error("Bad status code '{}' while deleting Gogs project, error message '{}'", statusLine.getStatusCode(), statusLine.getReasonPhrase());
+                throw new RuntimeException("Bad status code '" + statusLine.getStatusCode() + "' while deleting Gogs project, error message '" + statusLine.getReasonPhrase() + "'");
             }
         } catch (Exception e) {
             logger.error("Error while deleting Git repository {}", repositoryName);
@@ -90,17 +89,16 @@ public class GogsGitProvider extends AbstractGitProvider {
 
     private void createRepository(String repositoryName) {
         try {
-            final int statusCode = Request.Post(createRepositoryUrl())
+            final StatusLine statusLine = Request.Post(createRepositoryUrl())
                     .addHeader(HttpHeaders.AUTHORIZATION, authHeaderValue())
                     .bodyString("{ \"name\" : \""+ repositoryName + "\" }", ContentType.APPLICATION_JSON)
                     .execute()
                     .returnResponse()
-                    .getStatusLine()
-                    .getStatusCode();
+                    .getStatusLine();
 
-            if (statusCode != HttpStatus.SC_CREATED) {
-                logger.error("Bad status code while preparing Gogs project {}", statusCode);
-                throw new RuntimeException("Bad status code while preparing Gogs project " + statusCode);
+            if (statusLine.getStatusCode() != HttpStatus.SC_CREATED) {
+                logger.error("Bad status code '{}' while preparing Gogs project, error message '{}'", statusLine.getStatusCode(), statusLine.getReasonPhrase());
+                throw new RuntimeException("Bad status code '" + statusLine.getStatusCode() + "' while preparing Gogs project, error message '" + statusLine.getReasonPhrase() + "'");
             }
         } catch (Exception e) {
             logger.error("Error while creating Git repository {}", repositoryName);
