@@ -1,1 +1,1 @@
-org.kie.cloud.openshift.DeploymentBuilderFactory
+org.kie.cloud.openshift.TemplatesDeploymentBuilderFactory
