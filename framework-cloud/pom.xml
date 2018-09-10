@@ -23,6 +23,7 @@
     <module>framework-git</module>
     <module>framework-maven</module>
     <module>framework-openshift</module>
+    <module>framework-openshift-apb</module>
     <module>framework-openshift-templates</module>
     <module>framework-openshift-operator</module>
   </modules>
