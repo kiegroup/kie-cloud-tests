@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello Kie server CORS</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="hello.js"></script>
+    </head>
+
+    <body>
+        <div>
+            Kie server URL: <input type="text" id="kie-server-url" name="kie-server-url" size="100"><br>
+            Username: <input type="text" id="username" name="username"><br>
+            Password: <input type="text" id="password" name="password"><br>
+            <input type="submit" value="Send request" onClick="getSubmitResponse();">
+            <p>The response content is: </p>
+            <p class="server-content"></p>
+        </div>
+    </body>
+</html>
