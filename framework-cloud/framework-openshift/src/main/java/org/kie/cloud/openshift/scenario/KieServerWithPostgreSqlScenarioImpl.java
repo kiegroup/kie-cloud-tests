@@ -64,6 +64,7 @@ public class KieServerWithPostgreSqlScenarioImpl extends OpenShiftScenario imple
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_POSTGRESQL.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
+        envVariables.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, project.getName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_POSTGRESQL.getTemplateUrl(), envVariables);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
