@@ -50,4 +50,10 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
         return this;
     }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitHooksDir(String dir) {
+        envVariables.put(OpenShiftTemplateConstants.GIT_HOOKS_DIR, dir);
+        return this;
+    }
 }
