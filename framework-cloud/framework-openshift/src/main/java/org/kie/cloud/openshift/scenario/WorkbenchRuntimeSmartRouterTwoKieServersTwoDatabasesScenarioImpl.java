@@ -86,6 +86,7 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
         
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
+        envVariables.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftTemplate.CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl(), envVariables);
 
         workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);

@@ -64,6 +64,7 @@ public class KieServerWithMySqlScenarioImpl extends OpenShiftScenario implements
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_MYSQL.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
+        envVariables.put(OpenShiftTemplateConstants.MYSQL_IMAGE_STREAM_NAMESPACE, project.getName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_MYSQL.getTemplateUrl(), envVariables);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
