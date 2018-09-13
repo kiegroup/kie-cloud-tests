@@ -83,7 +83,6 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1361. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1361")
     public void testMultipleDifferentProcessesOnSameKieServer() {
         ProcessTestProvider.testMultipleDifferentProcesses(deploymentScenario.getKieServerDeployment());
     }

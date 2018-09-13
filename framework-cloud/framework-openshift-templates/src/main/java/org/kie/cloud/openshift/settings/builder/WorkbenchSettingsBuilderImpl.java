@@ -25,6 +25,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
 
@@ -40,10 +41,15 @@ public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
-
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        if (ActiveTestProfile.isJbpm()) {
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        } else if (ActiveTestProfile.isDrools()) {
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        }
     }
 
     @Override
@@ -80,20 +86,33 @@ public class WorkbenchSettingsBuilderImpl implements WorkbenchSettingsBuilder {
 
     @Override
     public WorkbenchSettingsBuilder withHostame(String http) {
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, http);
+        if (ActiveTestProfile.isJbpm()) {
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, http);
+        } else if (ActiveTestProfile.isDrools()) {
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HOSTNAME_HTTP, http);
+        }
         return this;
     }
 
     @Override
     public WorkbenchSettingsBuilder withSecuredHostame(String https) {
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, https);
+        if (ActiveTestProfile.isJbpm()) {
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, https);
+        } else if (ActiveTestProfile.isDrools()) {
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HOSTNAME_HTTPS, https);
+        }
         return this;
     }
 
     @Override
     public WorkbenchSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
+        if (ActiveTestProfile.isJbpm()) {
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
+        } else if (ActiveTestProfile.isDrools()) {
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
+        }
         return this;
     }
 }

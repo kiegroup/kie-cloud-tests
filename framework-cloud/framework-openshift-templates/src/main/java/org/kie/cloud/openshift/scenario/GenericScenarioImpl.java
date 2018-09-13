@@ -147,6 +147,8 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
 
         logger.info("Processing template and creating resources from " + deploymentSettings.getDeploymentScriptUrl());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
+        envVariables.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, projectName);
+        envVariables.put(OpenShiftTemplateConstants.MYSQL_IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(deploymentSettings.getDeploymentScriptUrl(), envVariables);
     }
 

@@ -140,13 +140,13 @@ public class KieServerHttpsS2ISettingsBuilderImpl implements KieServerS2ISetting
 
     @Override
     public KieServerS2ISettingsBuilder withHostame(String http) {
-        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTP, http);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTP, http);
         return this;
     }
 
     @Override
     public KieServerS2ISettingsBuilder withSecuredHostame(String https) {
-        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTPS, https);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTPS, https);
         return this;
     }
 

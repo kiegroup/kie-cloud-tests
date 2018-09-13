@@ -38,6 +38,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.kie.cloud.api.deployment.SsoDeployment;
+import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario implements WorkbenchKieServerPersistentScenario {
 
@@ -64,8 +65,14 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftScenario 
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
+            if (ActiveTestProfile.isJbpm()) {
+                envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
+                envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
+            } else if (ActiveTestProfile.isDrools()) {
+                envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_SSO_CLIENT, "decision-central-client");
+                envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_SSO_SECRET, "decision-central-secret");
+            }
+
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
         }

@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.constants;
 
@@ -55,6 +55,9 @@ public class OpenShiftTemplateConstants {
     public static final String BUSINESS_CENTRAL_MAVEN_SERVICE = "BUSINESS_CENTRAL_MAVEN_SERVICE";
     public static final String BUSINESS_CENTRAL_MAVEN_USERNAME = "BUSINESS_CENTRAL_MAVEN_USERNAME";
     public static final String BUSINESS_CENTRAL_MAVEN_PASSWORD = "BUSINESS_CENTRAL_MAVEN_PASSWORD";
+    public static final String DECISION_CENTRAL_MAVEN_SERVICE = "DECISION_CENTRAL_MAVEN_SERVICE";
+    public static final String DECISION_CENTRAL_MAVEN_USERNAME = "DECISION_CENTRAL_MAVEN_USERNAME";
+    public static final String DECISION_CENTRAL_MAVEN_PASSWORD = "DECISION_CENTRAL_MAVEN_PASSWORD";
 
     public static final String MAVEN_REPO_URL = "MAVEN_REPO_URL";
     public static final String MAVEN_REPO_USERNAME = "MAVEN_REPO_USERNAME";
@@ -77,13 +80,15 @@ public class OpenShiftTemplateConstants {
     public static final String CONTROLLER_HOSTNAME_HTTP = "CONTROLLER_HOSTNAME_HTTP";
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTP = "BUSINESS_CENTRAL_HOSTNAME_HTTP";
     public static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";
-    public static final String EXECUTION_SERVER_HOSTNAME_HTTP = "EXECUTION_SERVER_HOSTNAME_HTTP";
-    public static final String EXECUTION_SERVER_HOSTNAME_HTTPS = "EXECUTION_SERVER_HOSTNAME_HTTPS";
+    public static final String DECISION_CENTRAL_HOSTNAME_HTTP = "DECISION_CENTRAL_HOSTNAME_HTTP";
+    public static final String DECISION_CENTRAL_HOSTNAME_HTTPS = "DECISION_CENTRAL_HOSTNAME_HTTPS";
+    public static final String KIE_SERVER_HOSTNAME_HTTP = "KIE_SERVER_HOSTNAME_HTTP";
+    public static final String KIE_SERVER_HOSTNAME_HTTPS = "KIE_SERVER_HOSTNAME_HTTPS";
     public static final String SMART_ROUTER_HOSTNAME_HTTP = "SMART_ROUTER_HOSTNAME_HTTP";
-    public static final String EXECUTION_SERVER1_HOSTNAME_HTTP = "EXECUTION_SERVER1_HOSTNAME_HTTP";
-    public static final String EXECUTION_SERVER1_HOSTNAME_HTTPS = "EXECUTION_SERVER1_HOSTNAME_HTTPS";
-    public static final String EXECUTION_SERVER2_HOSTNAME_HTTP = "EXECUTION_SERVER2_HOSTNAME_HTTP";
-    public static final String EXECUTION_SERVER2_HOSTNAME_HTTPS = "EXECUTION_SERVER2_HOSTNAME_HTTPS";
+    public static final String KIE_SERVER1_HOSTNAME_HTTP = "KIE_SERVER1_HOSTNAME_HTTP";
+    public static final String KIE_SERVER1_HOSTNAME_HTTPS = "KIE_SERVER1_HOSTNAME_HTTPS";
+    public static final String KIE_SERVER2_HOSTNAME_HTTP = "KIE_SERVER2_HOSTNAME_HTTP";
+    public static final String KIE_SERVER2_HOSTNAME_HTTPS = "KIE_SERVER2_HOSTNAME_HTTPS";
 
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "KIE_SERVER_CONTAINER_DEPLOYMENT";
 
@@ -97,6 +102,7 @@ public class OpenShiftTemplateConstants {
     public static final String ARTIFACT_DIR = "ARTIFACT_DIR";
 
     public static final String BUSINESS_CENTRAL_HTTPS_SECRET = "BUSINESS_CENTRAL_HTTPS_SECRET";
+    public static final String DECISION_CENTRAL_HTTPS_SECRET = "DECISION_CENTRAL_HTTPS_SECRET";
     public static final String KIE_SERVER_HTTPS_SECRET = "KIE_SERVER_HTTPS_SECRET";
 
     public static final String TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL = "TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL";
@@ -115,6 +121,8 @@ public class OpenShiftTemplateConstants {
 
     public static final String BUSINESS_CENTRAL_SSO_CLIENT = "BUSINESS_CENTRAL_SSO_CLIENT";
     public static final String BUSINESS_CENTRAL_SSO_SECRET = "BUSINESS_CENTRAL_SSO_SECRET";
+    public static final String DECISION_CENTRAL_SSO_CLIENT = "DECISION_CENTRAL_SSO_CLIENT";
+    public static final String DECISION_CENTRAL_SSO_SECRET = "DECISION_CENTRAL_SSO_SECRET";
     public static final String KIE_SERVER_SSO_CLIENT = "KIE_SERVER_SSO_CLIENT";
     public static final String KIE_SERVER_SSO_SECRET = "KIE_SERVER_SSO_SECRET";
     public static final String KIE_SERVER1_SSO_CLIENT = "KIE_SERVER1_SSO_CLIENT";
@@ -146,4 +154,8 @@ public class OpenShiftTemplateConstants {
 
     public static final String MYSQL_IMAGE_STREAM_NAMESPACE = "MYSQL_IMAGE_STREAM_NAMESPACE";
     public static final String POSTGRESQL_IMAGE_STREAM_NAMESPACE = "POSTGRESQL_IMAGE_STREAM_NAMESPACE";
+
+    public static final String AMQ_IMAGE_STREAM_NAMESPACE = "AMQ_IMAGE_STREAM_NAMESPACE";
+    public static final String AMQ_IMAGE_STREAM_NAME = "AMQ_IMAGE_STREAM_NAME";
+    public static final String AMQ_IMAGE_STREAM_TAG = "AMQ_IMAGE_STREAM_TAG";
 }
