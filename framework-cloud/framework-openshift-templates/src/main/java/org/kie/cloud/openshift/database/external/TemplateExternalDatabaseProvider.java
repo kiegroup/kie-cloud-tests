@@ -21,8 +21,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.database.external.ExternalDatabase;
 
-public class ExternalDatabaseProvider {
+public class TemplateExternalDatabaseProvider {
 
     private static Collection<ExternalDatabase> availableExternalDatabases = new ArrayList<>();
 

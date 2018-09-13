@@ -31,6 +31,7 @@ import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
+import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
@@ -50,11 +51,11 @@ import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchSettingsBuilderImpl;
 
-public class DeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
+public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
 
-    private static final String CLOUD_API_IMPLEMENTATION_NAME = "openshift";
+    private static final String CLOUD_API_IMPLEMENTATION_NAME = "openshift-templates";
 
-    public DeploymentBuilderFactory() {
+    public TemplatesDeploymentBuilderFactory() {
     }
 
     @Override

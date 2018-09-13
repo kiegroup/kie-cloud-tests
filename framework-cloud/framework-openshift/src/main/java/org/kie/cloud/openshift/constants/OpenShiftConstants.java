@@ -41,6 +41,7 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String KIE_APP_NAME = "kie.app.name";
 
+    public static final String SECRET_NAME = "SECRET_NAME";
     /**
      * URL pointing to OpenShift resource file containing keystore for HTTPS communication.
      */
