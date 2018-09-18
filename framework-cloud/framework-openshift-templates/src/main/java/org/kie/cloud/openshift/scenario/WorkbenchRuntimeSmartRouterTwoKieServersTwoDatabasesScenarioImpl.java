@@ -42,6 +42,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.kie.cloud.api.deployment.SsoDeployment;
+import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl extends OpenShiftScenario implements WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario {
 
@@ -76,14 +77,19 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
+            if (ActiveTestProfile.isJbpm()) {
+                envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
+                envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
+            } else if (ActiveTestProfile.isDrools()) {
+                envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_SSO_CLIENT, "decision-central-client");
+                envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_SSO_SECRET, "decision-central-secret");
+            }
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_CLIENT, "kie-server1-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_SECRET, "kie-server1-secret");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_CLIENT, "kie-server2-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_SECRET, "kie-server2-secret");
         }
-        
+
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         envVariables.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, projectName);

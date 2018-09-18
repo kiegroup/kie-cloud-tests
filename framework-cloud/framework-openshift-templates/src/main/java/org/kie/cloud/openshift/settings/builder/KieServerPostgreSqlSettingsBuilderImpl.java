@@ -24,6 +24,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettingsBuilder {
 
@@ -36,8 +37,13 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
+        if (ActiveTestProfile.isJbpm()) {
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
+        } else if (ActiveTestProfile.isDrools()) {
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
+        }
     }
 
     @Override
@@ -130,14 +136,23 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
 
     @Override
     public KieServerSettingsBuilder withMavenRepoService(String serviceName) {
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_SERVICE, serviceName);
+        if (ActiveTestProfile.isJbpm()) {
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_SERVICE, serviceName);
+        } else if (ActiveTestProfile.isDrools()) {
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_SERVICE, serviceName);
+        }
         return this;
     }
 
     @Override
     public KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
+        if (ActiveTestProfile.isJbpm()) {
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
+            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
+        } else if (ActiveTestProfile.isDrools()) {
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
+            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
+        }
         return this;
     }
 
@@ -161,13 +176,13 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
 
     @Override
     public KieServerSettingsBuilder withHostame(String http) {
-        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTP, http);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTP, http);
         return this;
     }
 
     @Override
     public KieServerSettingsBuilder withSecuredHostame(String https) {
-        envVariables.put(OpenShiftTemplateConstants.EXECUTION_SERVER_HOSTNAME_HTTPS, https);
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTPS, https);
         return this;
     }
 

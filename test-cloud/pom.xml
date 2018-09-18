@@ -67,6 +67,8 @@
 
     <!-- This property can be overridden to exclude specific test category according to specific needs. -->
     <failsafe.excluded.groups/>
+    <!-- This property can be overridden to specific which type of tests are runnin. -->
+    <active.test.profile>jbpm</active.test.profile>
 
     <kie.artifact.version>please-define-kie-artifact-version</kie.artifact.version> <!-- Version of Kie artifacts used in images. -->
 
@@ -156,6 +158,7 @@
               <sso.service.username>${sso.service.username}</sso.service.username>
               <sso.service.password>${sso.service.password}</sso.service.password>
               <ldap.url>${ldap.url}</ldap.url>
+              <active.test.profile>${active.test.profile}</active.test.profile>
             </systemProperties>
           </configuration>
         </plugin>
@@ -174,6 +177,7 @@
       </activation>
       <properties>
         <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.JBPMOnly</failsafe.excluded.groups>
+        <active.test.profile>drools</active.test.profile>
       </properties>
     </profile>
     <profile>

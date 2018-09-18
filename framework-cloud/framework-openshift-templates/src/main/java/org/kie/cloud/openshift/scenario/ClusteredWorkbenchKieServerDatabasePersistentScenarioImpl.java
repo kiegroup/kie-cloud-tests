@@ -72,6 +72,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
+        envVariables.put(OpenShiftTemplateConstants.AMQ_IMAGE_STREAM_NAMESPACE, project.getName());
         envVariables.put(OpenShiftTemplateConstants.MYSQL_IMAGE_STREAM_NAMESPACE, project.getName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl(), envVariables);
 
