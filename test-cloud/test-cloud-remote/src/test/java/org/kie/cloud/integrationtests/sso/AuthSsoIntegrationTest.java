@@ -23,9 +23,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.smoke.WorkbenchKieServerPersistentScenarioIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
@@ -83,6 +85,7 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     }
 
     @Test
+    @Category(JBPMOnly.class)
     public void testMultipleDifferentProcessesOnSameKieServer() {
         ProcessTestProvider.testMultipleDifferentProcesses(deploymentScenario.getKieServerDeployment());
     }
