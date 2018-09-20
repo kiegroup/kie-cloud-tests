@@ -52,12 +52,13 @@ public class OpenShiftTemplateConstants {
 
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
-    public static final String BUSINESS_CENTRAL_MAVEN_SERVICE = "BUSINESS_CENTRAL_MAVEN_SERVICE";
-    public static final String BUSINESS_CENTRAL_MAVEN_USERNAME = "BUSINESS_CENTRAL_MAVEN_USERNAME";
-    public static final String BUSINESS_CENTRAL_MAVEN_PASSWORD = "BUSINESS_CENTRAL_MAVEN_PASSWORD";
-    public static final String DECISION_CENTRAL_MAVEN_SERVICE = "DECISION_CENTRAL_MAVEN_SERVICE";
-    public static final String DECISION_CENTRAL_MAVEN_USERNAME = "DECISION_CENTRAL_MAVEN_USERNAME";
-    public static final String DECISION_CENTRAL_MAVEN_PASSWORD = "DECISION_CENTRAL_MAVEN_PASSWORD";
+    // Intentionally not public. Use ProjectSpecificPropertyNames to get proper variant based on product profile
+    static final String BUSINESS_CENTRAL_MAVEN_SERVICE = "BUSINESS_CENTRAL_MAVEN_SERVICE";
+    static final String BUSINESS_CENTRAL_MAVEN_USERNAME = "BUSINESS_CENTRAL_MAVEN_USERNAME";
+    static final String BUSINESS_CENTRAL_MAVEN_PASSWORD = "BUSINESS_CENTRAL_MAVEN_PASSWORD";
+    static final String DECISION_CENTRAL_MAVEN_SERVICE = "DECISION_CENTRAL_MAVEN_SERVICE";
+    static final String DECISION_CENTRAL_MAVEN_USERNAME = "DECISION_CENTRAL_MAVEN_USERNAME";
+    static final String DECISION_CENTRAL_MAVEN_PASSWORD = "DECISION_CENTRAL_MAVEN_PASSWORD";
 
     public static final String MAVEN_REPO_URL = "MAVEN_REPO_URL";
     public static final String MAVEN_REPO_USERNAME = "MAVEN_REPO_USERNAME";
@@ -77,11 +78,12 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_EXTERNALDB_USER = "KIE_SERVER_EXTERNALDB_USER";
     public static final String KIE_SERVER_EXTERNALDB_PWD = "KIE_SERVER_EXTERNALDB_PWD";
 
+    // Intentionally not public. Use ProjectSpecificPropertyNames to get proper variant based on product profile
+    static final String BUSINESS_CENTRAL_HOSTNAME_HTTP = "BUSINESS_CENTRAL_HOSTNAME_HTTP";
+    static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";
+    static final String DECISION_CENTRAL_HOSTNAME_HTTP = "DECISION_CENTRAL_HOSTNAME_HTTP";
+    static final String DECISION_CENTRAL_HOSTNAME_HTTPS = "DECISION_CENTRAL_HOSTNAME_HTTPS";
     public static final String CONTROLLER_HOSTNAME_HTTP = "CONTROLLER_HOSTNAME_HTTP";
-    public static final String BUSINESS_CENTRAL_HOSTNAME_HTTP = "BUSINESS_CENTRAL_HOSTNAME_HTTP";
-    public static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";
-    public static final String DECISION_CENTRAL_HOSTNAME_HTTP = "DECISION_CENTRAL_HOSTNAME_HTTP";
-    public static final String DECISION_CENTRAL_HOSTNAME_HTTPS = "DECISION_CENTRAL_HOSTNAME_HTTPS";
     public static final String KIE_SERVER_HOSTNAME_HTTP = "KIE_SERVER_HOSTNAME_HTTP";
     public static final String KIE_SERVER_HOSTNAME_HTTPS = "KIE_SERVER_HOSTNAME_HTTPS";
     public static final String SMART_ROUTER_HOSTNAME_HTTP = "SMART_ROUTER_HOSTNAME_HTTP";
@@ -119,10 +121,11 @@ public class OpenShiftTemplateConstants {
     public static final String SSO_USERNAME = "SSO_USERNAME";
     public static final String SSO_PASSWORD = "SSO_PASSWORD";
 
-    public static final String BUSINESS_CENTRAL_SSO_CLIENT = "BUSINESS_CENTRAL_SSO_CLIENT";
-    public static final String BUSINESS_CENTRAL_SSO_SECRET = "BUSINESS_CENTRAL_SSO_SECRET";
-    public static final String DECISION_CENTRAL_SSO_CLIENT = "DECISION_CENTRAL_SSO_CLIENT";
-    public static final String DECISION_CENTRAL_SSO_SECRET = "DECISION_CENTRAL_SSO_SECRET";
+    // Intentionally not public. Use ProjectSpecificPropertyNames to get proper variant based on product profile
+    static final String BUSINESS_CENTRAL_SSO_CLIENT = "BUSINESS_CENTRAL_SSO_CLIENT";
+    static final String BUSINESS_CENTRAL_SSO_SECRET = "BUSINESS_CENTRAL_SSO_SECRET";
+    static final String DECISION_CENTRAL_SSO_CLIENT = "DECISION_CENTRAL_SSO_CLIENT";
+    static final String DECISION_CENTRAL_SSO_SECRET = "DECISION_CENTRAL_SSO_SECRET";
     public static final String KIE_SERVER_SSO_CLIENT = "KIE_SERVER_SSO_CLIENT";
     public static final String KIE_SERVER_SSO_SECRET = "KIE_SERVER_SSO_SECRET";
     public static final String KIE_SERVER1_SSO_CLIENT = "KIE_SERVER1_SSO_CLIENT";

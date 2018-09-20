@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.scenario;
 
@@ -20,29 +20,30 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.kie.cloud.api.deployment.ControllerDeployment;
 
+import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.template.ProjectProfile;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.kie.cloud.api.deployment.SsoDeployment;
-import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl extends OpenShiftScenario implements WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario {
 
@@ -55,6 +56,7 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
     private SsoDeployment ssoDeployment;
 
     private Map<String, String> envVariables;
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySSO;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl.class);
@@ -77,13 +79,11 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
-            if (ActiveTestProfile.isJbpm()) {
-                envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
-                envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET, "business-central-secret");
-            } else if (ActiveTestProfile.isDrools()) {
-                envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_SSO_CLIENT, "decision-central-client");
-                envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_SSO_SECRET, "decision-central-secret");
-            }
+
+            ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
+            envVariables.put(propertyNames.workbenchSsoClient(), projectProfile.getWorkbenchName() + "-client");
+            envVariables.put(propertyNames.workbenchSsoSecret(), projectProfile.getWorkbenchName() + "-secret");
+
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_CLIENT, "kie-server1-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_SECRET, "kie-server1-secret");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_CLIENT, "kie-server2-client");
@@ -200,7 +200,7 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
 
     @Override
     public List<WorkbenchDeployment> getWorkbenchDeployments() {
-        return Arrays.asList(workbenchRuntimeDeployment);
+        return Collections.singletonList(workbenchRuntimeDeployment);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl ex
 
     @Override
     public List<SmartRouterDeployment> getSmartRouterDeployments() {
-        return Arrays.asList(smartRouterDeployment);
+        return Collections.singletonList(smartRouterDeployment);
     }
 
     @Override

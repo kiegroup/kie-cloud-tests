@@ -27,15 +27,14 @@ class OpenShiftTemplatePropertiesLoader {
     }
 
     private static void loadTemplatePropertiesFromResources() {
-        final TemplateSelector.Project product = TemplateSelector.getProject();
-
-        String secretConfigFile = product + "-app-secret.properties";
-        String projectSpecificTemplate = String.format("templates-%s.properties", product);
+        final ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
+        String secretConfigFile = projectProfile + "-app-secret.properties";
+        String projectSpecificTemplate = String.format("templates-%s.properties", projectProfile);
 
         addPropertiesFromResource(secretConfigFile);
         addPropertiesFromResource(projectSpecificTemplate);
 
-        // Load custom signle testing templates
+        // Load custom single testing templates
         addPropertiesFromResource("single-jbpm-templates.properties");
     }
 
@@ -48,9 +47,9 @@ class OpenShiftTemplatePropertiesLoader {
             properties.load(is);
             templateUrlProperties.putAll(properties);
             log.info("Loaded {} propert{} from {}",
-                    properties.size(),
-                    properties.size() == 1 ? "y" : "ies",
-                    resourceFilename
+                     properties.size(),
+                     properties.size() == 1 ? "y" : "ies",
+                     resourceFilename
             );
         } catch (IOException e) {
             throw new RuntimeException("Failed to load properties from " + resourceFilename, e);

@@ -23,12 +23,13 @@ import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDat
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl;
-import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl implements WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySSO = false;
 
     public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl() {
@@ -40,12 +41,8 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
-        }
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(propertyNames.workbenchHttpsSecret(), OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override
@@ -83,34 +80,20 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder
 
     @Override
     public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, user);
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, password);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, user);
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, password);
-        }
-
+        envVariables.put(propertyNames.workbenchMavenUserName(), user);
+        envVariables.put(propertyNames.workbenchMavenPassword(), password);
         return this;
     }
 
     @Override
     public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String hostname) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, hostname);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HOSTNAME_HTTP, hostname);
-        }
+        envVariables.put(propertyNames.workbenchHostnameHttp(), hostname);
         return this;
     }
 
     @Override
     public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, hostname);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HOSTNAME_HTTPS, hostname);
-        }
+        envVariables.put(propertyNames.workbenchHostnameHttps(), hostname);
         return this;
     }
 
@@ -137,5 +120,4 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_HOSTNAME_HTTPS, hostname);
         return this;
     }
-
 }

@@ -21,7 +21,7 @@ import io.fabric8.openshift.api.model.ImageStreamBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.Image;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.template.TemplateSelector;
+import org.kie.cloud.openshift.template.ProjectProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,6 @@ public class ImageStreamProvider {
     /**
      * Creates image streams in project which will be used by OpenShift template.
      * In case image stream URL is passed as system property then it is used, otherwise image streams are generated from image tag system properties.
-     *
      * @param project Project where image streams will be deployed to.
      */
     public static void createImageStreamsInProject(Project project) {
@@ -55,12 +54,12 @@ public class ImageStreamProvider {
     }
 
     private static void createImagesFromImageStreamTags(Project project) {
-        if (TemplateSelector.getProject() == TemplateSelector.Project.DROOLS) {
-            logger.info("Creating image streams for drools project.");
+        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
+        logger.info("Creating image streams for {} project.", projectProfile);
+        if (projectProfile == ProjectProfile.DROOLS) {
             createImageStreamForImage(project, Image.WORKBENCH);
             createImageStreamForImage(project, Image.KIE_SERVER);
-        } else {
-            logger.info("Creating image streams for jbpm project.");
+        } else if (projectProfile == ProjectProfile.JBPM) {
             createImageStreamForImage(project, Image.AMQ);
             createImageStreamForImage(project, Image.CONSOLE);
             createImageStreamForImage(project, Image.CONTROLLER);
