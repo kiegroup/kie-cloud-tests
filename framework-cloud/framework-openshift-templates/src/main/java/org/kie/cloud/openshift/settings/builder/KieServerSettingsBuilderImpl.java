@@ -23,18 +23,17 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
-import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
 
-    private Map<String, String> envVariables;
+    private Map<String, String> envVariables = new HashMap<>();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private final OpenShiftTemplate appTemplate = OpenShiftTemplate.KIE_SERVER;
 
     public KieServerSettingsBuilderImpl() {
-        envVariables = new HashMap<>();
-
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
@@ -130,28 +129,17 @@ public class KieServerSettingsBuilderImpl implements KieServerSettingsBuilder {
 
     @Override
     public KieServerSettingsBuilder withMavenRepoService(String service) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_SERVICE, service);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_SERVICE, service);
-        }
-
+        envVariables.put(propertyNames.workbenchMavenService(), service);
         return this;
     }
 
     @Override
     public KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
-        }
-
+        envVariables.put(propertyNames.workbenchMavenUserName(), workbenchMavenUser);
+        envVariables.put(propertyNames.workbenchMavenPassword(), workbenchMavenPassword);
         return this;
     }
-    
+
     @Override
     public KieServerSettingsBuilder withKieServerSyncDeploy(boolean syncDeploy) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SYNC_DEPLOY, Boolean.toString(syncDeploy));

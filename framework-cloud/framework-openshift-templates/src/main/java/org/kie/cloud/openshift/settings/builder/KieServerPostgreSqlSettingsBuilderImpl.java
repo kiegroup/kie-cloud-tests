@@ -17,33 +17,28 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.settings.DeploymentSettingsImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
-import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettingsBuilder {
 
-    private Map<String, String> envVariables;
+    private Map<String, String> envVariables = new HashMap<>();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private final OpenShiftTemplate appTemplate = OpenShiftTemplate.KIE_SERVER_POSTGRESQL;
 
     public KieServerPostgreSqlSettingsBuilderImpl() {
-        envVariables = new HashMap<>();
-
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, DeploymentConstants.getWorkbenchMavenUser());
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
-        }
+        envVariables.put(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchMavenUser());
+        envVariables.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchMavenPassword());
     }
 
     @Override
@@ -136,23 +131,14 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
 
     @Override
     public KieServerSettingsBuilder withMavenRepoService(String serviceName) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_SERVICE, serviceName);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_SERVICE, serviceName);
-        }
+        envVariables.put(propertyNames.workbenchMavenService(), serviceName);
         return this;
     }
 
     @Override
     public KieServerSettingsBuilder withMavenRepoServiceUser(String workbenchMavenUser, String workbenchMavenPassword) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, workbenchMavenUser);
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, workbenchMavenPassword);
-        }
+        envVariables.put(propertyNames.workbenchMavenUserName(), workbenchMavenUser);
+        envVariables.put(propertyNames.workbenchMavenPassword(), workbenchMavenPassword);
         return this;
     }
 
@@ -191,5 +177,4 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, secret);
         return this;
     }
-
 }

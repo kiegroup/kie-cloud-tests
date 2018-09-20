@@ -17,18 +17,20 @@ package org.kie.cloud.openshift.scenario.builder;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerPersistentScenarioImpl;
-import org.kie.cloud.openshift.util.ActiveTestProfile;
 
 public class WorkbenchKieServerPersistentScenarioBuilderImpl implements WorkbenchKieServerPersistentScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySSO = false;
 
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
@@ -38,16 +40,12 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME , DeploymentConstants.getWorkbenchMavenUser());
-        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, DeploymentConstants.getWorkbenchMavenPassword());
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, DeploymentConstants.getWorkbenchUser());
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, DeploymentConstants.getWorkbenchPassword());
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
-        }
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchMavenUser());
+        envVariables.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchMavenPassword());
+        envVariables.put(propertyNames.workbenchMavenPassword(), OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override
@@ -73,13 +71,8 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withBusinessCentralMavenUser(String user, String password) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME, user);
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD, password);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME, user);
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD, password);
-        }
+        envVariables.put(propertyNames.workbenchMavenUserName(), user);
+        envVariables.put(propertyNames.workbenchMavenPassword(), password);
         return this;
     }
 
@@ -91,21 +84,13 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withHttpWorkbenchHostname(String hostname) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTP, hostname);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HOSTNAME_HTTP, hostname);
-        }
+        envVariables.put(propertyNames.workbenchHostnameHttp(), hostname);
         return this;
     }
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
-        if (ActiveTestProfile.isJbpm()) {
-            envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_HOSTNAME_HTTPS, hostname);
-        } else if (ActiveTestProfile.isDrools()) {
-            envVariables.put(OpenShiftTemplateConstants.DECISION_CENTRAL_HOSTNAME_HTTPS, hostname);
-        }
+        envVariables.put(propertyNames.workbenchHostnameHttps(), hostname);
         return this;
     }
 
