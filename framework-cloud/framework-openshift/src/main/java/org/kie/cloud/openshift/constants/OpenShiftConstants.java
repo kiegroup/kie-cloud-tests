@@ -27,6 +27,8 @@ public class OpenShiftConstants implements Constants {
     public static final String OPENSHIFT_URL = "openshift.master.url";
     public static final String OPENSHIFT_USER = "openshift.username";
     public static final String OPENSHIFT_PASSWORD = "openshift.password";
+    public static final String OPENSHIFT_ADMIN_USER = "openshift.admin.username";
+    public static final String OPENSHIFT_ADMIN_PASSWORD = "openshift.admin.password";
 
     /**
      * Project name prefix - to simplify identification of projects created in OpenShift.
@@ -173,6 +175,14 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(OPENSHIFT_PASSWORD);
     }
 
+    public static String getOpenShiftAdminUserName() {
+        return System.getProperty(OPENSHIFT_ADMIN_USER);
+    }
+
+    public static String getOpenShiftAdminPassword() {
+        return System.getProperty(OPENSHIFT_ADMIN_PASSWORD);
+    }
+
     public static Optional<String> getNamespacePrefix() {
         return Optional.ofNullable(System.getProperty(NAMESPACE_PREFIX));
     }
@@ -224,8 +234,8 @@ public class OpenShiftConstants implements Constants {
         System.setProperty("xtf.config.master.url", getOpenShiftUrl());
         System.setProperty("xtf.config.master.username", getOpenShiftUserName());
         System.setProperty("xtf.config.master.password", getOpenShiftPassword());
-        System.setProperty("xtf.config.master.admin.username", getOpenShiftUserName());
-        System.setProperty("xtf.config.master.admin.password", getOpenShiftPassword());
+        System.setProperty("xtf.config.master.admin.username", getOpenShiftAdminUserName() != null ? getOpenShiftAdminUserName() : getOpenShiftUserName());
+        System.setProperty("xtf.config.master.admin.password", getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
         // TODO delete this when raising XTF version
         System.setProperty("xtf.config.openshift.version", "3.9.41");
     }
