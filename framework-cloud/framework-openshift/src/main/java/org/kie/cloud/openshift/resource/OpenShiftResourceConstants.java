@@ -27,7 +27,7 @@ public class OpenShiftResourceConstants {
     // Deployment config constants
     public static final String DEPLOYMENT_TRIGGER_CONFIG_CHANGE = "ConfigChange";
     public static final long DEPLOYMENT_CONFIG_CREATION_TIMEOUT = 60 * 1000L; // 1 minute
-    public static final String DEPLOYMENT_CONFIG_LABEL = "deploymentConfig";
+    public static final String DEPLOYMENT_CONFIG_LABEL = "deploymentconfig";
 
     // Route constants
     public static final String ROUTE_REDIRECT_COMPONENT_TYPE = "Service";
