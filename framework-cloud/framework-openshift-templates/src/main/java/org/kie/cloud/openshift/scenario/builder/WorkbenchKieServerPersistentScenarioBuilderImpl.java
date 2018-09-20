@@ -45,7 +45,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
         envVariables.put(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchMavenUser());
         envVariables.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchMavenPassword());
-        envVariables.put(propertyNames.workbenchMavenPassword(), OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(propertyNames.workbenchHttpsSecret(), OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override
