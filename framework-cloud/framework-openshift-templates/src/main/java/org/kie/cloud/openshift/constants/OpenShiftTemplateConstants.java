@@ -103,8 +103,9 @@ public class OpenShiftTemplateConstants {
     public static final String CONTEXT_DIR = "CONTEXT_DIR";
     public static final String ARTIFACT_DIR = "ARTIFACT_DIR";
 
-    public static final String BUSINESS_CENTRAL_HTTPS_SECRET = "BUSINESS_CENTRAL_HTTPS_SECRET";
-    public static final String DECISION_CENTRAL_HTTPS_SECRET = "DECISION_CENTRAL_HTTPS_SECRET";
+    // Intentionally not public. Use ProjectSpecificPropertyNames to get proper variant based on product profile
+    static final String BUSINESS_CENTRAL_HTTPS_SECRET = "BUSINESS_CENTRAL_HTTPS_SECRET";
+    static final String DECISION_CENTRAL_HTTPS_SECRET = "DECISION_CENTRAL_HTTPS_SECRET";
     public static final String KIE_SERVER_HTTPS_SECRET = "KIE_SERVER_HTTPS_SECRET";
 
     public static final String TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL = "TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL";
