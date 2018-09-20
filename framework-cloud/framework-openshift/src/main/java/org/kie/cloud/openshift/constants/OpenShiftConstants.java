@@ -102,6 +102,11 @@ public class OpenShiftConstants implements Constants {
     public static final String CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES = "kie.app.template.clustered-workbench-monitoring.smartrouter.two-kieservers.two-databases";
 
     /**
+     * URL pointing to OpenShift template file containing clustered Workbench and Kie server.
+     */
+    public static final String CLUSTERED_WORKBENCH_KIE_SERVER_PERSISTENT = "kie.app.template.clustered-workbench.kieserver";
+
+    /**
      * URL pointing to OpenShift template file containing clustered Workbench, Kie server and database.
      */
     public static final String CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT = "kie.app.template.clustered-workbench.kieserver.database";
