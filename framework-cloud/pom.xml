@@ -24,5 +24,6 @@
     <module>framework-maven</module>
     <module>framework-openshift</module>
     <module>framework-openshift-templates</module>
+    <module>framework-openshift-operator</module>
   </modules>
 </project>

@@ -130,6 +130,11 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
+        <groupId>org.kie.cloud</groupId>
+        <artifactId>framework-openshift-operator</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-integ-tests-common</artifactId>
         <version>${version.org.kie}</version>
