@@ -55,6 +55,5 @@ public abstract class AbstractCloudIntegrationTest {
 
     protected static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-    protected final GitProviderService gitProviderService = new GitProviderService();
-    protected final GitProvider gitProvider = gitProviderService.createGitProvider();
+    protected static final GitProvider gitProvider = new GitProviderService().createGitProvider();
 }

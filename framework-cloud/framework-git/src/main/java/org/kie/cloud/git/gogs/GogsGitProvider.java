@@ -88,6 +88,7 @@ public class GogsGitProvider extends AbstractGitProvider {
     }
 
     private synchronized void createRepository(String repositoryName) {
+        logger.info("Creating Git repository {}", repositoryName);
         try {
             final StatusLine statusLine = Request.Post(createRepositoryUrl())
                     .addHeader(HttpHeaders.AUTHORIZATION, authHeaderValue())
