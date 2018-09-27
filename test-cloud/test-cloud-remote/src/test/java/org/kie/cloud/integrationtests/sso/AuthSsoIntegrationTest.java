@@ -92,6 +92,7 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     }
 
     @Test
+    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
         ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
                 deploymentScenario.getKieServerDeployment());
