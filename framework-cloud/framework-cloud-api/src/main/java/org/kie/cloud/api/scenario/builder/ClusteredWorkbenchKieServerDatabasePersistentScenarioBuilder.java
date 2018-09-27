@@ -35,4 +35,11 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @return Builder
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitHooksDir(String dir);
+
+    /**
+     * Return setup builder with additional configuration for SSO deployment.
+     *
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso();
 }

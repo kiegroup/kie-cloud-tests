@@ -28,6 +28,7 @@ import org.kie.cloud.openshift.scenario.KieServerWithMySqlScenarioImpl;
 public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private boolean deploySso = false;
 
     public KieServerWithMySqlScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
@@ -37,7 +38,7 @@ public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatab
 
     @Override
     public KieServerWithDatabaseScenario build() {
-        return new KieServerWithMySqlScenarioImpl(envVariables);
+        return new KieServerWithMySqlScenarioImpl(envVariables, deploySso);
     }
 
     @Override
@@ -59,4 +60,12 @@ public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatab
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTAINER_DEPLOYMENT, kieContainerDeployment);
         return this;
     }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder deploySso() {
+        deploySso = true;
+        envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
+        envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+	}
 }

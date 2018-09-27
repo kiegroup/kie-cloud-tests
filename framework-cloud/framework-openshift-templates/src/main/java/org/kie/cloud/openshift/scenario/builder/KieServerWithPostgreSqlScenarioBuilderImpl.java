@@ -28,6 +28,7 @@ import org.kie.cloud.openshift.scenario.KieServerWithPostgreSqlScenarioImpl;
 public class KieServerWithPostgreSqlScenarioBuilderImpl implements KieServerWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private boolean deploySso = false;
 
     public KieServerWithPostgreSqlScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
@@ -37,7 +38,7 @@ public class KieServerWithPostgreSqlScenarioBuilderImpl implements KieServerWith
 
     @Override
     public KieServerWithDatabaseScenario build() {
-        return new KieServerWithPostgreSqlScenarioImpl(envVariables);
+        return new KieServerWithPostgreSqlScenarioImpl(envVariables, deploySso);
     }
 
     @Override
@@ -57,6 +58,14 @@ public class KieServerWithPostgreSqlScenarioBuilderImpl implements KieServerWith
     @Override
     public KieServerWithDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTAINER_DEPLOYMENT, kieContainerDeployment);
+        return this;
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder deploySso() {
+        deploySso = true;
+        envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
+        envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
         return this;
     }
 }

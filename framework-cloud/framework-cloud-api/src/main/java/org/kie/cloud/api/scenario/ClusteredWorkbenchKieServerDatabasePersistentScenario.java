@@ -17,6 +17,7 @@ package org.kie.cloud.api.scenario;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 /**
@@ -47,4 +48,12 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenario extends D
      * @see DatabaseDeployment
      */
     DatabaseDeployment getDatabaseDeployment();
+
+    /**
+     * Return SSO deployment.
+     *
+     * @return SsoDeployment
+     * @see SsoDeployment
+     */
+    SsoDeployment getSsoDeployment();
 }

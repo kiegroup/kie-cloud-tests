@@ -17,6 +17,7 @@ package org.kie.cloud.api.scenario;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.SsoDeployment;
 
 /**
  * Representation of deployment scenario with Kie server and external database.
@@ -38,4 +39,12 @@ public interface KieServerWithDatabaseScenario extends DeploymentScenario {
      * @see DatabaseDeployment
      */
     DatabaseDeployment getDatabaseDeployment();
+
+    /**
+     * Return SSO deployment.
+     *
+     * @return SsoDeployment
+     * @see SsoDeployment
+     */
+    SsoDeployment getSsoDeployment();
 }

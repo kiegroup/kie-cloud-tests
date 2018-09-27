@@ -41,4 +41,11 @@ public interface KieServerWithDatabaseScenarioBuilder extends DeploymentScenario
      * @return Builder with configured Kie container deployment
      */
     KieServerWithDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment);
+
+    /**
+     * Return setup builder with additional configuration for SSO deployment.
+     *
+     * @return Builder
+     */
+    KieServerWithDatabaseScenarioBuilder deploySso();
 }

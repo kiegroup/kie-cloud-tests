@@ -29,6 +29,7 @@ import org.kie.cloud.openshift.scenario.ClusteredWorkbenchKieServerDatabasePersi
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private boolean deploySso = false;
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
@@ -43,7 +44,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenario build() {
-        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(envVariables);
+        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(envVariables, deploySso);
     }
 
     @Override
@@ -57,6 +58,14 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitHooksDir(String dir) {
         envVariables.put(OpenShiftTemplateConstants.GIT_HOOKS_DIR, dir);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso() {
+        deploySso = true;
+        envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
+        envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
         return this;
     }
 }

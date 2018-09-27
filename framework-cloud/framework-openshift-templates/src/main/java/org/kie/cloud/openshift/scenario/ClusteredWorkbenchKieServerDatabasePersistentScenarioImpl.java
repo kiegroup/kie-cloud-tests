@@ -26,15 +26,19 @@ import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,13 +47,21 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
+    private SsoDeployment ssoDeployment;
 
     private Map<String, String> envVariables;
+    private boolean deploySso;
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(Map<String, String> envVariables) {
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
         this.envVariables = envVariables;
+        this.deploySso = deploySso;
+    }
+
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(Map<String, String> envVariables) {
+        this(envVariables, false);
     }
 
     @Override
@@ -69,6 +81,20 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
 
     @Override public void deploy() {
         super.deploy();
+
+        if (deploySso) {
+            ssoDeployment = SsoDeployer.deploy(project, envVariables);
+
+            envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
+            envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
+
+            ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
+            envVariables.put(propertyNames.workbenchSsoClient(), projectProfile.getWorkbenchName() + "-client");
+            envVariables.put(propertyNames.workbenchSsoSecret(), projectProfile.getWorkbenchName() + "-secret");
+
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
+        }
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
@@ -101,7 +127,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     }
 
     @Override public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
@@ -125,4 +151,9 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
     }
+
+    @Override
+    public SsoDeployment getSsoDeployment() {
+        return ssoDeployment;
+	}
 }
