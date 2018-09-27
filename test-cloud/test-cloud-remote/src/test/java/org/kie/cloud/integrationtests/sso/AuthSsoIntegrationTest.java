@@ -30,6 +30,7 @@ import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.smoke.WorkbenchKieServerPersistentScenarioIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
+import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -88,5 +89,11 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
         ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testCreateAndDeployProject() {
+        ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
+                deploymentScenario.getKieServerDeployment());
     }
 }
