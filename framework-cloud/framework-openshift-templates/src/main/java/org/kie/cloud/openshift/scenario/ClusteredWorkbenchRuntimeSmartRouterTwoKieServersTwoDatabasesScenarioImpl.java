@@ -75,7 +75,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         super.deploy();
 
         if (deploySso) {
-            ssoDeployment = SsoDeployer.deploy(project, envVariables);
+            ssoDeployment = SsoDeployer.deploy(project);
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
