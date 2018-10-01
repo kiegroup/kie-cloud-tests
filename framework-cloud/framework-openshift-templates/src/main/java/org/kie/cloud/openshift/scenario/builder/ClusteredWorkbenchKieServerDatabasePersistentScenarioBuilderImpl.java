@@ -30,6 +30,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     private final Map<String, String> envVariables = new HashMap<>();
     private boolean deploySso = false;
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
@@ -66,6 +67,30 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
         deploySso = true;
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpWorkbenchHostname(String hostname) {
+        envVariables.put(propertyNames.workbenchHostnameHttp(), hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
+        envVariables.put(propertyNames.workbenchHostnameHttps(), hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTP, hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpsKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTPS, hostname);
         return this;
     }
 }

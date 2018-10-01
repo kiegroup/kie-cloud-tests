@@ -42,4 +42,37 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @return Builder
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso();
+
+    /**
+     * Return setup builder with configure Workbench http hostname.
+     *
+     * @param hostname HTTP hostname for Workbench
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpWorkbenchHostname(String hostname);
+
+    /**
+     * Return setup builder with configure Workbench https hostname.
+     *
+     * @param hostname HTTPS hostname for Workbench
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpsWorkbenchHostname(String hostname);
+
+    /**
+     * Return setup builder with configure Kie Server http hostname.
+     *
+     * @param hostname HTTP hostname for Kie Server
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpKieServerHostname(String hostname);
+
+    /**
+     * Return setup builder with configure Kie Server https hostname.
+     *
+     * @param hostname HTTPS hostname for Kie Server
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpsKieServerHostname(String hostname);
+
 }
