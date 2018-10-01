@@ -68,4 +68,13 @@ public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<Generi
      * @return Builder
      */
     GenericScenarioBuilder withController(DeploymentSettings controllerSettings);
+
+    /**
+     * Return scenario Builder with added SSO deployment into scenario. Make sure
+     * you have correctly set up environment variables for all deployments settings.
+     * Call this method if you want to deploy SSO.
+     * 
+     * @return Builder
+     */
+    GenericScenarioBuilder withSso();
 }
