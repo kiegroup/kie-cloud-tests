@@ -58,7 +58,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test

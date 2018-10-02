@@ -75,12 +75,6 @@ public class AuthLdapIntegrationTest extends AbstractCloudIntegrationTest {
     }
 
     @Test
-    @Category(JBPMOnly.class)
-    public void testMultipleDifferentProcessesOnSameKieServer() {
-        ProcessTestProvider.testMultipleDifferentProcesses(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
     public void testRulesFromExternalMavenRepo() {
         FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment());
     }
@@ -88,7 +82,7 @@ public class AuthLdapIntegrationTest extends AbstractCloudIntegrationTest {
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test

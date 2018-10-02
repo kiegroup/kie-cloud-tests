@@ -86,7 +86,7 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     @Test
     @Category(JBPMOnly.class)
-    public void testMultipleDifferentProcessesOnSameKieServer() {
-        ProcessTestProvider.testMultipleDifferentProcesses(deploymentScenario.getKieServerDeployment());
+    public void testProcessFromExternalMavenRepo() {
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
     }
 }
