@@ -57,8 +57,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerOneDeployment());
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerTwoDeployment());
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerOneDeployment());
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test

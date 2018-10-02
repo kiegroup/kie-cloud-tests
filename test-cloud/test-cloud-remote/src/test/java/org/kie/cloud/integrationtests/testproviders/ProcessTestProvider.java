@@ -42,8 +42,13 @@ public class ProcessTestProvider {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
-    public static void testProcess(KieServerDeployment kieServerDeployment) {
-        String containerId = "testProcess";
+    public static void testProcesses(KieServerDeployment kieServerDeployment) {
+        testProcessWithUserTask(kieServerDeployment);
+        testProcessWithSignal(kieServerDeployment);
+    }
+
+    private static void testProcessWithUserTask(KieServerDeployment kieServerDeployment) {
+        String containerId = "testProcessWithUserTask";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
@@ -59,7 +64,7 @@ public class ProcessTestProvider {
             assertThat(userTaskPid).isNotNull();
 
             List<TaskSummary> tasks = taskClient.findTasks(Constants.User.YODA, 0, TASKS_PAGE_SIZE);
-            assertThat(tasks).isNotNull().hasSize(tasksCount + 1);
+            assertThat(tasks).hasSize(tasksCount + 1);
 
             taskClient.completeAutoProgress(containerId, tasks.get(0).getId(), Constants.User.YODA, null);
 
@@ -71,30 +76,23 @@ public class ProcessTestProvider {
         }
     }
 
-    public static void testMultipleDifferentProcesses(KieServerDeployment kieServerDeployment) {
-        String containerId = "testMultipleDifferentProcesses";
+    private static void testProcessWithSignal(KieServerDeployment kieServerDeployment) {
+        String containerId = "testProcessWithSignal";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
         ProcessServicesClient processClient = kieServerClient.getServicesClient(ProcessServicesClient.class);
-        UserTaskServicesClient taskClient = kieServerClient.getServicesClient(UserTaskServicesClient.class);
 
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
 
-        int tasksCount = taskClient.findTasks(Constants.User.YODA, 0, TASKS_PAGE_SIZE).size();
-
         try {
-            Long userTaskPid = processClient.startProcess(containerId, Constants.ProcessId.USERTASK);
-            assertThat(userTaskPid).isNotNull();
             Long signalTaskPid = processClient.startProcess(containerId, Constants.ProcessId.SIGNALTASK);
             assertThat(signalTaskPid).isNotNull();
 
-            finishUserTaskProcess(taskClient, containerId, tasksCount);
-            finishSignalTaskProcess(processClient, containerId, signalTaskPid);
+            List<String> signals = processClient.getAvailableSignals(containerId, signalTaskPid);
+            assertThat(signals).hasSize(1).contains(Constants.Signal.SIGNAL_NAME, atIndex(0));
 
-            ProcessInstance userTaskPi = processClient.getProcessInstance(containerId, userTaskPid);
-            assertThat(userTaskPi).isNotNull();
-            assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
+            processClient.signal(containerId, Constants.Signal.SIGNAL_NAME, null);
 
             ProcessInstance signalTaskPi = processClient.getProcessInstance(containerId, signalTaskPid);
             assertThat(signalTaskPi).isNotNull();
@@ -102,21 +100,5 @@ public class ProcessTestProvider {
         } finally {
             kieServerClient.disposeContainer(containerId);
         }
-    }
-
-    private static void finishUserTaskProcess(UserTaskServicesClient taskClient, String containerId, int tasksCount) {
-        List<TaskSummary> tasks = taskClient.findTasks(Constants.User.YODA, 0, TASKS_PAGE_SIZE);
-        assertThat(tasks).hasSize(tasksCount + 1);
-
-        taskClient.completeAutoProgress(containerId, tasks.get(0).getId(), Constants.User.YODA, null);
-    }
-
-    private static void finishSignalTaskProcess(ProcessServicesClient processClient, String containerId, Long pid) {
-        List<String> signals = processClient.getAvailableSignals(containerId, pid);
-        assertThat(signals)
-                .hasSize(1)
-                .contains(Constants.Signal.SIGNAL_NAME, atIndex(0));
-
-        processClient.signal(containerId, Constants.Signal.SIGNAL_NAME, null);
     }
 }

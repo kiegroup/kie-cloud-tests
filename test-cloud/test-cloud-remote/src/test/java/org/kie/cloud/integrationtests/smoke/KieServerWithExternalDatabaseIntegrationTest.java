@@ -61,7 +61,7 @@ public class KieServerWithExternalDatabaseIntegrationTest extends AbstractCloudI
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test

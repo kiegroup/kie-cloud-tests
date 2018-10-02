@@ -57,7 +57,7 @@ public class KieServerWithPostgreSqlScenarioIntegrationTest extends AbstractClou
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
