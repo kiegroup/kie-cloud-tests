@@ -5,6 +5,10 @@ Tests currently cover just Kie deployments deployed on OpenShift.
 
 ## Test execution
 
+The tests can be executed against [OpenShift templates](https://github.com/jboss-container-images/rhpam-7-openshift-image) or [OpenShift Operator](https://github.com/kiegroup/kie-cloud-operator). Deployment option is selected based on Maven profile:
+- openshift - Will use OpenShift templates
+- openshift-operator - Will use OpenShift Operator.
+
 How to run the tests on OpenShift:
 1. Start OpenShift - You can use any OpenShift instance, for example OpenShift started by [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md)
 2. Prepare your GIT provider (for example install and start GitLab). You can skip this point and use GitHub account.
@@ -21,6 +25,8 @@ Can be found in framework-openshift, class org.kie.cloud.openshift.constants.Ope
 | openshift.master.url       |                | URL pointing to OpenShift, for example https://127.0.0.1:8443 |
 | openshift.username         | user           | Username for logging into OpenShift                           |
 | openshift.password         | redhat         | Password for logging into OpenShift                           |
+| openshift.admin.username   |                | Username for logging into OpenShift as Administrator          |
+| openshift.admin.password   |                | Password for logging into OpenShift as Administrator          |
 | openshift.namespace.prefix |                | Prefix of Openshift project name                              |
 | kie.image.streams          |                | URL pointing to file with image stream definitions            |
 | kie.app.secret             | \<GitHub URL\> | URL pointing to file with secrets                             |
