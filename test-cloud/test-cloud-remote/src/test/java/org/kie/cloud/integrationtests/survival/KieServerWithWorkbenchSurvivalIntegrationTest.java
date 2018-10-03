@@ -30,12 +30,14 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerStatus;
@@ -50,6 +52,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Category(JBPMOnly.class)
 public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
     private KieServerControllerClient kieServerControllerClient;
