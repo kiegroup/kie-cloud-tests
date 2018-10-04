@@ -40,7 +40,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
         envVariables.put(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchMavenUser());
-        envVariables.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchPassword());
+        envVariables.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchMavenPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
 
         ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
