@@ -56,7 +56,7 @@ public class KieServerWithMySqlSsoIntegrationTest extends AbstractCloudIntegrati
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcess(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
