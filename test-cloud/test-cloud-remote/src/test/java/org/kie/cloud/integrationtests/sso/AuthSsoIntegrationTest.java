@@ -30,6 +30,9 @@ import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.smoke.WorkbenchKieServerPersistentScenarioIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
+import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
+import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
+import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -67,17 +70,6 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
-    @Before
-    public void setUp() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
-    }
-
-    @After
-    public void tearDown() {
-        gitProvider.deleteGitRepository(repositoryName);
-    }
-
     @Test
     @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
@@ -88,5 +80,27 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
         ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
+    public void testCreateAndDeployProject() {
+        ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
+                deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testRulesFromExternalMavenRepo() {
+        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testSolverFromExternalMavenRepo() {
+        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testDeployContainerFromWorkbench() {
+        FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
     }
 }
