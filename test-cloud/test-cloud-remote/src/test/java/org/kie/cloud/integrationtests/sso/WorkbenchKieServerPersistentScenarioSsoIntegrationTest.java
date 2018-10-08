@@ -22,20 +22,25 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
+import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
+import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
+import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
-public class ClusteredAuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
+public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
-    private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
+    private static WorkbenchKieServerScenario deploymentScenario;
 
     private static final String SECURED_URL_PREFIX = "secured-";
     private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
@@ -46,7 +51,7 @@ public class ClusteredAuthSsoIntegrationTest extends AbstractCloudIntegrationTes
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
+        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                 .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
@@ -54,13 +59,19 @@ public class ClusteredAuthSsoIntegrationTest extends AbstractCloudIntegrationTes
                 .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                 .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                 .build();
-        deploymentScenario.setLogFolderName(ClusteredAuthSsoIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 
     @AfterClass
     public static void cleanEnvironment() {
         ScenarioDeployer.undeployScenario(deploymentScenario);
+    }
+
+    @Test
+    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
+    public void testWorkbenchControllerPersistence() {
+        PersistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
 
     @Test
@@ -89,5 +100,21 @@ public class ClusteredAuthSsoIntegrationTest extends AbstractCloudIntegrationTes
     @Test
     public void testDeployContainerFromWorkbench() {
         FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testKieServerHttps() {
+        for (KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
+            HttpsKieServerTestProvider.testKieServerInfo(kieServerDeployment, true);
+            HttpsKieServerTestProvider.testDeployContainer(kieServerDeployment, true);
+        }
+    }
+
+    @Test
+    public void testWorkbenchHttps() {
+        for (WorkbenchDeployment workbenchDeployment : deploymentScenario.getWorkbenchDeployments()) {
+            HttpsWorkbenchTestProvider.testLoginScreen(workbenchDeployment, true);
+            HttpsWorkbenchTestProvider.testControllerOperations(workbenchDeployment, true);
+        }
     }
 }

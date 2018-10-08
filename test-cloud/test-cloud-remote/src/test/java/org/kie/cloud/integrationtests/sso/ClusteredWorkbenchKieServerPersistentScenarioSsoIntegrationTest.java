@@ -23,20 +23,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
-import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
-public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
+public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
-    private static WorkbenchKieServerScenario deploymentScenario;
+    private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
 
     private static final String SECURED_URL_PREFIX = "secured-";
     private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
@@ -47,7 +46,7 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                 .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
@@ -55,19 +54,13 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
                 .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                 .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                 .build();
-        deploymentScenario.setLogFolderName(AuthSsoIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 
     @AfterClass
     public static void cleanEnvironment() {
         ScenarioDeployer.undeployScenario(deploymentScenario);
-    }
-
-    @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
-    public void testWorkbenchControllerPersistence() {
-        PersistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
 
     @Test
