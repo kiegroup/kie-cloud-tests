@@ -31,7 +31,7 @@
     <!--     <sso.image.streams>https://raw.githubusercontent.com/jboss-openshift/application-templates/master/sso/sso72-image-stream.json</sso.image.streams> -->
     <sso.image.streams>https://raw.githubusercontent.com/jboss-openshift/application-templates/ose-v1.4.15/sso/sso72-image-stream.json</sso.image.streams>
     <sso.app.secrets>https://raw.githubusercontent.com/jboss-openshift/application-templates/master/secrets/sso-app-secret.json</sso.app.secrets>
-    <sso.app.template>https://raw.githubusercontent.com/jboss-openshift/application-templates/master/sso/sso72-https.json</sso.app.template>
+    <sso.app.template>https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/sso72-dev/templates/sso72-https.json</sso.app.template>
     <sso.app.realm>demo</sso.app.realm>
     <sso.admin.username>admin</sso.admin.username>
     <sso.admin.password>admin</sso.admin.password>
