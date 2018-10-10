@@ -84,9 +84,10 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
             envVariables.put(propertyNames.workbenchSsoClient(), projectProfile.getWorkbenchName() + "-client");
             envVariables.put(propertyNames.workbenchSsoSecret(), projectProfile.getWorkbenchName() + "-secret");
 
-            //TODO create SSO client for both Kie Servers
-            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
-            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_CLIENT, "kie-server1-client");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_SSO_SECRET, "kie-server1-secret");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_CLIENT, "kie-server2-client");
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_SECRET, "kie-server2-secret");
         }
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl().toString());

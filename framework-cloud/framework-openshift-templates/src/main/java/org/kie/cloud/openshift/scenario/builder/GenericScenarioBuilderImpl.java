@@ -27,7 +27,6 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
 
     @Override
     public GenericScenario build() {
-        //return new GenericScenarioImpl(kieServerSettingsList, workbenchSettingsList, monitoringSettingsList, smartRouterSettingsList, controllerSettingsList, deploySso);
         return new GenericScenarioImpl(scenarioSettings);
     }
 
