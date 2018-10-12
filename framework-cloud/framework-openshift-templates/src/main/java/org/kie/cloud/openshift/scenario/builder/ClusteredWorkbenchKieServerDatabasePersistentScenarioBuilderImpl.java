@@ -21,6 +21,7 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
+import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
@@ -95,6 +96,12 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpsKieServerHostname(String hostname) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTPS, hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+        envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
     }
 }

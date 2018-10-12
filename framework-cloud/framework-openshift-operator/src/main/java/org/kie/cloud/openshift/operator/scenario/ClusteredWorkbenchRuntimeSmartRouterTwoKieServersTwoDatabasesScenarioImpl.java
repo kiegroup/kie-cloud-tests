@@ -144,6 +144,11 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Override
+    public SsoDeployment getSsoDeployment() {
+        throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+    @Override
     public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment));
         deployments.removeAll(Collections.singleton(null));

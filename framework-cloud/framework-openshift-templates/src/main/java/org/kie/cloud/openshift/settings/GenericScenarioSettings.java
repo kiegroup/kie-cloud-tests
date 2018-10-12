@@ -19,12 +19,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.LdapSettings;
 
 public class GenericScenarioSettings {
 
     private List<DeploymentSettings> kieServerSettingsList, workbenchSettingsList, monitoringSettingsList,
             smartRouterSettingsList, controllerSettingsList;
     private boolean deploySso;
+    private LdapSettings ldapSettings;
 
     public GenericScenarioSettings() {
         kieServerSettingsList = new ArrayList<>();
@@ -65,6 +67,11 @@ public class GenericScenarioSettings {
         return this;
     }
 
+    public GenericScenarioSettings addLdapSettings(LdapSettings ldapSettings) {
+        this.ldapSettings=ldapSettings;
+        return this;
+    }
+
     public GenericScenarioSettings deploySso(boolean deploySso) {
         this.deploySso = deploySso;
         return this;
@@ -92,6 +99,10 @@ public class GenericScenarioSettings {
 
     public boolean getDeploySso() {
         return deploySso;
+    }
+
+    public LdapSettings getLdapSettings() {
+        return ldapSettings;
     }
 
     public List<DeploymentSettings> getAllSettings() {

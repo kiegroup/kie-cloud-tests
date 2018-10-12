@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.scenario.builder;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.scenario.GenericScenarioImpl;
 import org.kie.cloud.openshift.settings.GenericScenarioSettings;
 
@@ -69,6 +70,12 @@ public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
     @Override
     public GenericScenarioBuilder withSso() {
         scenarioSettings.deploySso(true);
+        return this;
+    }
+
+    @Override
+    public GenericScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+        scenarioSettings.addLdapSettings(ldapSettings);
         return this;
     }
 
