@@ -185,7 +185,9 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
         deployments.addAll(kieServerDeployments);
         deployments.addAll(smartRouterDeployments);
         deployments.addAll(controllerDeployments);
-        deployments.add(ssoDeployment);
+        if (ssoDeployment != null) {
+            deployments.add(ssoDeployment);
+        }
         return deployments;
     }
 
