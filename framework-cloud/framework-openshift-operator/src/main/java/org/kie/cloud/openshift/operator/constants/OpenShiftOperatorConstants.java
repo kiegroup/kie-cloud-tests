@@ -39,6 +39,11 @@ public class OpenShiftOperatorConstants implements Constants {
      */
     public static final String KIE_APP_OPERATOR_DEPLOYMENTS_WORKBENCH_KIE_SERVER = "kie.app.operator.deployments.workbench.kie-server";
 
+    /**
+     * URL pointing to Operator deployment file containing clustered Monitoring console with clustered Smart router and two Kie servers with two databases.
+     */
+    public static final String KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT = "kie.app.operator.deployments.clustered-workbench-monitoring.smartrouter.two-kieservers.two-databases";
+
     @Override
     public void initConfigProperties() {
         // nothing to init here

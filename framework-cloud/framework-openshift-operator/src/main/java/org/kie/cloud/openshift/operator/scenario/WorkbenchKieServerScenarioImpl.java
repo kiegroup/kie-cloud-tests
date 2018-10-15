@@ -69,6 +69,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario im
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername("executionUser");
         kieServerDeployment.setPassword("RedHat");
+        kieServerDeployment.setServiceSuffix("-0");
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();

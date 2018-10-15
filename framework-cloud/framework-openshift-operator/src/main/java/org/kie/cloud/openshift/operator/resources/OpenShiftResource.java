@@ -27,6 +27,7 @@ import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
  */
 public enum OpenShiftResource {
     WORKBENCH_KIE_SERVER(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_WORKBENCH_KIE_SERVER),
+    CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT),
     // Configuration resources.
     CRD(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_CRD),
     RBAC(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_RBAC),
