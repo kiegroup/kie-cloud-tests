@@ -48,4 +48,20 @@ public interface KieServerWithDatabaseScenarioBuilder extends DeploymentScenario
      * @return Builder
      */
     KieServerWithDatabaseScenarioBuilder deploySso();
+
+    /**
+     * Return setup builder with configure Kie Server http hostname.
+     *
+     * @param hostname HTTP hostname for Kie Server
+     * @return Builder
+     */
+    KieServerWithDatabaseScenarioBuilder withHttpKieServerHostname(String hostname);
+
+    /**
+     * Return setup builder with configure Kie Server https hostname.
+     *
+     * @param hostname HTTPS hostname for Kie Server
+     * @return Builder
+     */
+    KieServerWithDatabaseScenarioBuilder withHttpsKieServerHostname(String hostname);
 }

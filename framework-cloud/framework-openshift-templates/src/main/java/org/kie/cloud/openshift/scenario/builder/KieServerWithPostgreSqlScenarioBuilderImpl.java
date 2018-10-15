@@ -70,4 +70,16 @@ public class KieServerWithPostgreSqlScenarioBuilderImpl implements KieServerWith
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
         return this;
     }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withHttpKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTP, hostname);
+        return this;
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withHttpsKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTPS, hostname);
+        return this;
+    }
 }

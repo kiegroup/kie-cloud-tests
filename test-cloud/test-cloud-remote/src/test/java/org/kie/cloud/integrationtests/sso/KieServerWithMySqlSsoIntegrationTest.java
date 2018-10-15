@@ -15,10 +15,13 @@
 
 package org.kie.cloud.integrationtests.sso;
 
+import java.util.UUID;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
@@ -33,11 +36,18 @@ public class KieServerWithMySqlSsoIntegrationTest extends AbstractCloudIntegrati
 
     private static KieServerWithDatabaseScenario deploymentScenario;
 
+    private static final String SECURED_URL_PREFIX = "secured-";
+    private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
+    private static final String KIE_SERVER_NAME = "kieserver";
+    private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
+
     @BeforeClass
     public static void initializeDeployment() {
         deploymentScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
                                                       .deploySso()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                                                      .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                                                      .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                                                       .build();
         deploymentScenario.setLogFolderName(KieServerWithMySqlSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
