@@ -37,7 +37,7 @@ public class SsoDeployer {
     private static final String SSO_REALM = DeploymentConstants.getSsoRealm();
     private static final String ADMIN = "admin", KIE_SERVER = "kie-server", REST_ALL = "rest-all";
 
-    public static SsoDeployment deploy(Project project, Map<String, String> envVariables) {
+    public static SsoDeployment deploy(Project project) {
         SsoDeployment ssoDeployment = createSsoDeployment(project);
 
         logger.info("Creating SSO secrets from " + OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toString());
@@ -58,7 +58,7 @@ public class SsoDeployer {
         logger.info("Waiting for SSO deployment to become ready.");
         ssoDeployment.waitForScale();
 
-        createRolesAndUsers(ssoDeployment.getUrl().toString() + "/auth", SSO_REALM, envVariables);
+        createRolesAndUsers(ssoDeployment.getUrl().toString() + "/auth", SSO_REALM);
 
         return ssoDeployment;
     }
@@ -77,7 +77,7 @@ public class SsoDeployer {
         return urlParts[0] + ":" + urlParts[1] + "/auth";
     }
 
-    private static void createRolesAndUsers(String authUrl, String realm, Map<String, String> envVariables) {
+    private static void createRolesAndUsers(String authUrl, String realm) {
         logger.info("Creating roles and users in SSO at URL {} in Realm {}", authUrl, realm);
         SsoApi ssoApi = SsoApiFactory.getRestApi(authUrl, realm);
 

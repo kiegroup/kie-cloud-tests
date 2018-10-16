@@ -49,4 +49,11 @@ public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesSc
      * @return Builder with configured timer service data store refresh interval.
      */
     ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval);
+
+    /**
+     * Return setup builder with additional configuration for SSO deployment.
+     *
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySso();
 }

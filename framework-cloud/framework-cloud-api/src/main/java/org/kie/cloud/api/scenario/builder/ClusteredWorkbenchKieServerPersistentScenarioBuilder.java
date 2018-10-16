@@ -35,4 +35,11 @@ public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends De
      * @return Builder
      */
     ClusteredWorkbenchKieServerPersistentScenarioBuilder withGitHooksDir(String dir);
+
+    /**
+     * Return setup builder with additional configuration for SSO deployment.
+     *
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerPersistentScenarioBuilder deploySso();
 }
