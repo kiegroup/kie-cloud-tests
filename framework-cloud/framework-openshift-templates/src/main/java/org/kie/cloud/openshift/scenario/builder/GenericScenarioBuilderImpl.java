@@ -15,62 +15,61 @@
  */
 package org.kie.cloud.openshift.scenario.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.openshift.scenario.GenericScenarioImpl;
+import org.kie.cloud.openshift.settings.GenericScenarioSettings;
 
 public class GenericScenarioBuilderImpl implements GenericScenarioBuilder {
 
-    private List<DeploymentSettings>
-            kieServerSettingsList = new ArrayList<>(),
-            workbenchSettingsList = new ArrayList<>(),
-            monitoringSettingsList = new ArrayList<>(),
-            smartRouterSettingsList = new ArrayList<>(),
-            controllerSettingsList = new ArrayList<>();
+    GenericScenarioSettings scenarioSettings = new GenericScenarioSettings();
 
     @Override
     public GenericScenario build() {
-        return new GenericScenarioImpl(kieServerSettingsList, workbenchSettingsList, monitoringSettingsList, smartRouterSettingsList, controllerSettingsList);
+        return new GenericScenarioImpl(scenarioSettings);
     }
 
     @Override
     public GenericScenarioBuilder withKieServer(DeploymentSettings kieServerSettings) {
-        kieServerSettingsList.add(kieServerSettings);
+        scenarioSettings.addKieServer(kieServerSettings);
         return this;
     }
 
     @Override
     public GenericScenarioBuilder withKieServer(DeploymentSettings... kieServersSettings) {
-        kieServerSettingsList.addAll(Arrays.asList(kieServersSettings));
+        scenarioSettings.addKieServers(kieServersSettings);
         return this;
     }
 
     @Override
     public GenericScenarioBuilder withWorkbench(DeploymentSettings workbenchSettings) {
-        workbenchSettingsList.add(workbenchSettings);
+        scenarioSettings.addWorkbench(workbenchSettings);
         return this;
     }
 
     @Override
     public GenericScenarioBuilder withMonitoring(DeploymentSettings workbenchSettings) {
-        monitoringSettingsList.add(workbenchSettings);
+        scenarioSettings.addMonitoring(workbenchSettings);
         return this;
     }
 
     @Override
     public GenericScenarioBuilder withSmartRouter(DeploymentSettings smartRouterSettings) {
-        smartRouterSettingsList.add(smartRouterSettings);
+        scenarioSettings.addSmartRouter(smartRouterSettings);
         return this;
     }
 
     @Override
     public GenericScenarioBuilder withController(DeploymentSettings controllerSettings) {
-        controllerSettingsList.add(controllerSettings);
+        scenarioSettings.addController(controllerSettings);
         return this;
     }
+
+    @Override
+    public GenericScenarioBuilder withSso() {
+        scenarioSettings.deploySso(true);
+        return this;
+    }
+
 }

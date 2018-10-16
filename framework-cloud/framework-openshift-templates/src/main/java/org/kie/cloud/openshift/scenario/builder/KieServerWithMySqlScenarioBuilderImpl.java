@@ -28,16 +28,19 @@ import org.kie.cloud.openshift.scenario.KieServerWithMySqlScenarioImpl;
 public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private boolean deploySso = false;
 
     public KieServerWithMySqlScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override
     public KieServerWithDatabaseScenario build() {
-        return new KieServerWithMySqlScenarioImpl(envVariables);
+        return new KieServerWithMySqlScenarioImpl(envVariables, deploySso);
     }
 
     @Override
@@ -57,6 +60,26 @@ public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatab
     @Override
     public KieServerWithDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTAINER_DEPLOYMENT, kieContainerDeployment);
+        return this;
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder deploySso() {
+        deploySso = true;
+        envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
+        envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+	}
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withHttpKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTP, hostname);
+        return this;
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withHttpsKieServerHostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTPS, hostname);
         return this;
     }
 }

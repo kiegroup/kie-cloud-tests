@@ -17,27 +17,25 @@ package org.kie.cloud.integrationtests.sso;
 
 import java.util.UUID;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.smoke.WorkbenchKieServerPersistentScenarioIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
+import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
+import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
+import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
-import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.constants.MavenConstants;
 
-public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
+public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
-    private static WorkbenchKieServerScenario deploymentScenario;
+    private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
 
     private static final String SECURED_URL_PREFIX = "secured-";
     private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
@@ -46,11 +44,9 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
     private static final String BUSINESS_CENTRAL_HOSTNAME = BUSINESS_CENTRAL_NAME + DeploymentConstants.getDefaultDomainSuffix();
     private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
 
-    private String repositoryName;
-
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                 .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
@@ -58,7 +54,7 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
                 .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                 .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                 .build();
-        deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 
@@ -67,26 +63,31 @@ public class AuthSsoIntegrationTest extends AbstractCloudIntegrationTest {
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
-    @Before
-    public void setUp() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
-    }
-
-    @After
-    public void tearDown() {
-        gitProvider.deleteGitRepository(repositoryName);
-    }
-
-    @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
-    public void testWorkbenchControllerPersistence() {
-        PersistenceTestProvider.testControllerPersistence(deploymentScenario);
-    }
-
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
         ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
+    public void testCreateAndDeployProject() {
+        ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
+                deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testRulesFromExternalMavenRepo() {
+        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testSolverFromExternalMavenRepo() {
+        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment());
+    }
+
+    @Test
+    public void testDeployContainerFromWorkbench() {
+        FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
     }
 }
