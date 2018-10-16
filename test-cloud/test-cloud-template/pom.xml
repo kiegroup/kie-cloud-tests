@@ -15,6 +15,10 @@
   <name>KIE :: Cloud :: Tests :: Template Tests</name>
   <description>Test suite collecting various tests against Kie product templates.</description>
 
+  <properties>
+    <skipTests>true</skipTests>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.cloud</groupId>
@@ -34,4 +38,13 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>openshift</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+  </profiles>
 </project>
