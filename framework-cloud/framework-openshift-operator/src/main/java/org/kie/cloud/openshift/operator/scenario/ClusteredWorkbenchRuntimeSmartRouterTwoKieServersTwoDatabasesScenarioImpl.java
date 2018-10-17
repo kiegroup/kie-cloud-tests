@@ -29,6 +29,7 @@ import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
@@ -131,6 +132,11 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     public DatabaseDeployment getDatabaseOneDeployment() {
         return databaseOneDeployment;
     }
+
+    @Override
+    public SsoDeployment getSsoDeployment() {
+        throw new UnsupportedOperationException("Not implemented yet");
+	}
 
     @Override
     public DatabaseDeployment getDatabaseTwoDeployment() {
