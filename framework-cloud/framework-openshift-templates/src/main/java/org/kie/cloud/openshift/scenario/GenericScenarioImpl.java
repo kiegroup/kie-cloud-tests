@@ -129,8 +129,8 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
 
         if (scenarioSettings.getLdapSettings() != null) {
             scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
-                Map<String, String> envVatiables = deploymentSettings.getEnvVariables();
-                envVatiables.putAll(scenarioSettings.getLdapSettings().getEnvVariables());
+                Map<String, String> envVariables = deploymentSettings.getEnvVariables();
+                envVariables.putAll(scenarioSettings.getLdapSettings().getEnvVariables());
             });
         }
 

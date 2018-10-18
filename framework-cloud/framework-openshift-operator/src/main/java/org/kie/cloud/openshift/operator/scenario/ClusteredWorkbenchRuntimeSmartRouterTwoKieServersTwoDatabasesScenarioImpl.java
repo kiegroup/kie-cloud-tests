@@ -134,11 +134,6 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Override
-    public SsoDeployment getSsoDeployment() {
-        throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-    @Override
     public DatabaseDeployment getDatabaseTwoDeployment() {
         return databaseTwoDeployment;
     }
