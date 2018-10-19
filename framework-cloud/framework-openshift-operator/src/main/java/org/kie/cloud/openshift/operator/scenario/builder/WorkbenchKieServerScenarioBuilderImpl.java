@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.operator.scenario.builder;
 
+import java.time.Duration;
+
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerScenarioImpl;
@@ -42,6 +44,31 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
 
     @Override
     public WorkbenchKieServerScenarioBuilder withKieServerId(String kieServerId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowCredentials(boolean allowCredentials) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowHeaders(String... allowedHeaders) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowMethods(String... allowedMethods) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowOrigin(String url) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlMaxAge(Duration maxAge) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

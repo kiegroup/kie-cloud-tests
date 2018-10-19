@@ -15,8 +15,11 @@
 
 package org.kie.cloud.openshift.scenario.builder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
@@ -51,6 +54,39 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     @Override
     public WorkbenchKieServerScenarioBuilder withKieServerId(String kieServerId) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ID, kieServerId);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowCredentials(boolean allowCredentials) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ACCESS_CONTROL_ALLOW_CREDENTIALS, Boolean.toString(allowCredentials));
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowHeaders(String... allowedHeaders) {
+        String allowedHeadersValue = Stream.of(allowedHeaders).collect(Collectors.joining(", "));
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ACCESS_CONTROL_ALLOW_HEADERS, allowedHeadersValue);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowMethods(String... allowedMethods) {
+        String allowedMethodsValue = Stream.of(allowedMethods).collect(Collectors.joining(", "));
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ACCESS_CONTROL_ALLOW_METHODS, allowedMethodsValue);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlAllowOrigin(String url) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ACCESS_CONTROL_ALLOW_ORIGIN, url);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withAccessControlMaxAge(Duration maxAge) {
+        String maxAgeInSeconds = Long.toString(maxAge.getSeconds());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ACCESS_CONTROL_MAX_AGE, maxAgeInSeconds);
         return this;
     }
 }
