@@ -3,14 +3,14 @@ kind: Template
 apiVersion: v1
 metadata:
   annotations:
-    description: Application template for Process Automation Manager 7.1 which include Smart Router.
+    description: Application template for Process Automation Manager 7.2 which include Smart Router.
     iconClass: icon-jboss
     tags: rhpam,jboss,xpaas
     version: 1.4.0
-    openshift.io/display-name: Red Hat Process Automation Manager 7.1 Smart router
-  name: rhpam71-smartrouter
+    openshift.io/display-name: Red Hat Process Automation Manager 7.2 Smart router
+  name: rhpam72-smartrouter
 labels:
-  template: rhpam71-smartrouter
+  template: rhpam72-smartrouter
   xpaas: 1.4.0
 message: A new Red Hat Process Automation Manager Smart Router applications have been created in your project.
 parameters:
@@ -141,7 +141,7 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: "${IMAGE_STREAM_NAMESPACE}"
-          name: "rhpam71-smartrouter-openshift:${IMAGE_STREAM_TAG}"
+          name: "rhpam72-smartrouter-openshift:${IMAGE_STREAM_TAG}"
     - type: ConfigChange
     replicas: 1
     selector:
@@ -156,7 +156,7 @@ objects:
         terminationGracePeriodSeconds: 60
         containers:
         - name: "${APPLICATION_NAME}-smartrouter"
-          image: rhpam71-smartrouter-openshift
+          image: rhpam72-smartrouter-openshift
           imagePullPolicy: Always
           resources:
             limits:
