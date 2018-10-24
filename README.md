@@ -1,6 +1,6 @@
 # kie-cloud-tests
 Cloud (OpenShift) integration tests for KIE projects.
-
+ 
 Tests currently cover just Kie deployments deployed on OpenShift.
 
 ## Test execution
