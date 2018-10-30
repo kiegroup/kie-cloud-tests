@@ -5,14 +5,14 @@ metadata:
   annotations:
     iconClass: icon-jboss
     tags: rhpam,jboss,authoring
-    version: "1.0"
+    version: "1.1"
     openshift.io/display-name: Red Hat Process Automation Manager 7.1 Business Central
     description: Application template for a Red Hat Process Automation Manager 7.1 Business Central
     template.openshift.io/bindable: "false"
   name: rhpam71-authoring
 labels:
   template: rhpam71-businesscentral
-  rhpam: "1.0"
+  rhpam: "1.1"
 message: |-
           A new persistent Process Automation Manager application have been created in your project.
           The username/password for accessing the Business Central interface is
@@ -107,9 +107,9 @@ parameters:
   value: openshift
   required: true
 - displayName: ImageStream Tag
-  description: A named pointer to an image in an image stream. Default is "1.0".
+  description: A named pointer to an image in an image stream. Default is "1.1".
   name: IMAGE_STREAM_TAG
-  value: "1.0"
+  value: "1.1"
   required: true
 - displayName: Maven repository URL
   description: Fully qualified URL to a Maven repository or service.
