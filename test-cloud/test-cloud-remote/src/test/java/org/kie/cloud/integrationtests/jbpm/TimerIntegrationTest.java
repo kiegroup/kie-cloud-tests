@@ -15,8 +15,6 @@
 
 package org.kie.cloud.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +25,7 @@ import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
@@ -45,7 +43,9 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final Kjar DEPLOYED_KJAR = Kjar.TIMER;
     private static final String CONTAINER_SUCCESSFULLY_STARTED = "Container cont-id (for release id " + DEPLOYED_KJAR.toString() + ") successfully started";
@@ -54,8 +54,8 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
     private KieServerControllerClient kieControllerClient;
 
     @Override
-    protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+    protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(1))
                 .build();

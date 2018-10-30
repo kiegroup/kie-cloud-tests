@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.scaling;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -24,7 +22,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
@@ -47,7 +45,9 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 
-public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
     private static final String SMART_ROUTER_ID = "test-kie-router";
 
     private KieServerControllerClient kieControllerClient;
@@ -55,8 +55,8 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
     private KieServerRouterClient smartRouterAdminClient;
 
     @Override
-    protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+    protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withSmartRouterId(SMART_ROUTER_ID)
                 .build();
