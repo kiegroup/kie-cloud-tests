@@ -30,6 +30,7 @@ import org.kie.cloud.openshift.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoK
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySso = false;
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl() {
@@ -73,6 +74,49 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         deploySso = true;
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password) {
+        envVariables.put(propertyNames.workbenchMavenUserName(), user);
+        envVariables.put(propertyNames.workbenchMavenPassword(), password);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String hostname) {
+        envVariables.put(propertyNames.workbenchHostnameHttp(), hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
+        envVariables.put(propertyNames.workbenchHostnameHttps(), hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer1Hostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_HOSTNAME_HTTP, hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer1Hostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER1_HOSTNAME_HTTPS, hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer2Hostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_HOSTNAME_HTTP, hostname);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String hostname) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_HOSTNAME_HTTPS, hostname);
         return this;
     }
 }

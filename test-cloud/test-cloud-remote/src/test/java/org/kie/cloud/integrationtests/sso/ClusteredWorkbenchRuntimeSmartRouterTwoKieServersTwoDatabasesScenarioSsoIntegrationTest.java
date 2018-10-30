@@ -24,7 +24,7 @@ import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
@@ -35,7 +35,7 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
-public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
+public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final String SECURED_URL_PREFIX = "secured-";
     private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
@@ -46,11 +46,11 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioSsoInte
     private static final String BUSINESS_CENTRAL_HOSTNAME = BUSINESS_CENTRAL_NAME + DeploymentConstants.getDefaultDomainSuffix();
     private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
 
-    private static WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario deploymentScenario;
+    private static ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario deploymentScenario;
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .deploySso()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + "mon-" + BUSINESS_CENTRAL_HOSTNAME)
@@ -60,7 +60,7 @@ public class WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioSsoInte
                 .withHttpKieServer2Hostname(RANDOM_URL_PREFIX + "mon-2-" + KIE_SERVER_HOSTNAME)
                 .withHttpsKieServer2Hostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + "mon-2-" + KIE_SERVER_HOSTNAME)
                 .build();
-        deploymentScenario.setLogFolderName(WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioSsoIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 

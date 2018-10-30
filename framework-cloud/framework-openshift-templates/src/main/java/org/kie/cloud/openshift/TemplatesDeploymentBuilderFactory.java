@@ -24,7 +24,6 @@ import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -32,7 +31,6 @@ import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
 import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
-import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
@@ -42,7 +40,6 @@ import org.kie.cloud.openshift.scenario.builder.KieServerWithMySqlScenarioBuilde
 import org.kie.cloud.openshift.scenario.builder.KieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.ControllerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerMySqlSettingsBuilderImpl;
@@ -78,11 +75,6 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder() {
         return new ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl();
-    }
-
-    @Override
-    public WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder() {
-        return new WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl();
     }
 
     @Override

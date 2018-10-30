@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.drools;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,7 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
@@ -51,7 +49,9 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DroolsSessionFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class DroolsSessionFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(DroolsSessionFailoverIntegrationTest.class);
     private static final String SMART_ROUTER_ID = "test-kie-router";
@@ -72,8 +72,8 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractMethodIsolated
     private static final String SLOW_RULE = "Slow rule executed";
 
     @Override
-    protected WorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+    protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withSmartRouterId(SMART_ROUTER_ID)
                 .build();

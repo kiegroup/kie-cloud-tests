@@ -56,4 +56,61 @@ public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesSc
      * @return Builder
      */
     ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySso();
+
+    /**
+     * Return setup builder with Business Central user for the maven repository.
+     *
+     * @param user Business Central Maven repo user name.
+     * @param password Business Central Maven repo user password.
+     * @return Builder with configured Business Central Maven repo user.
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password);
+
+    /**
+     * Return setup builder with configure Workbench http hostname.
+     *
+     * @param hostname HTTP hostname for Workbench
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String hostname);
+
+    /**
+     * Return setup builder with configure Workbench https hostname.
+     *
+     * @param hostname HTTPS hostname for Workbench
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String hostname);
+
+    /**
+     * Return setup builder with configure Kie Server 1 http hostname.
+     *
+     * @param hostname HTTP hostname for Kie Server
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer1Hostname(String hostname);
+
+    /**
+     * Return setup builder with configure Kie Server 1 https hostname.
+     *
+     * @param hostname HTTPS hostname for Kie Server
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer1Hostname(String hostname);
+
+    /**
+     * Return setup builder with configure Kie Server 2 http hostname.
+     *
+     * @param hostname HTTP hostname for Kie Server
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer2Hostname(String hostname);
+
+    /**
+     * Return setup builder with configure Kie Server 2 https hostname.
+     *
+     * @param hostname HTTPS hostname for Kie Server
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String hostname);
 }
