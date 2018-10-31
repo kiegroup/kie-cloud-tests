@@ -16,13 +16,16 @@
 package org.kie.cloud.openshift.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +45,34 @@ public class ProcessExecutor implements AutoCloseable {
      * @param command Command to be executed.
      */
     public void executeProcessCommand(String command) {
+        Consumer<String> outputConsumer = s -> logger.info(s);
+        executeProcessCommand(command, outputConsumer);
+    }
+
+    /**
+     * Execute command and wait until command is finished. Output and error streams are redirected to the temporary file.
+     *
+     * @param command Command to be executed.
+     * @return Temp file containing process output.
+     */
+    public File executeProcessCommandToTempFile(String command) {
+        try {
+            File tempFile = File.createTempFile("openshift", ".yaml");
+            try (PrintWriter out = new PrintWriter(tempFile)) {
+                Consumer<String> outputConsumer = s -> out.println(s);
+                executeProcessCommand(command, outputConsumer);
+            }
+            return tempFile;
+        } catch (IOException e) {
+            throw new RuntimeException("Error while creating temp file.", e);
+        }
+    }
+
+    private void executeProcessCommand(String command, Consumer<String> outputConsumer) {
         try {
             Process process = Runtime.getRuntime().exec(command);
-            Future<?> osFuture = executorService.submit(new ProcessOutputReader(process.getInputStream()));
-            Future<?> esFuture = executorService.submit(new ProcessOutputReader(process.getErrorStream()));
+            Future<?> osFuture = executorService.submit(new ProcessOutputReader(process.getInputStream(), outputConsumer));
+            Future<?> esFuture = executorService.submit(new ProcessOutputReader(process.getErrorStream(), outputConsumer));
 
             process.waitFor();
             osFuture.get();
@@ -62,9 +89,11 @@ public class ProcessExecutor implements AutoCloseable {
 
     private final class ProcessOutputReader implements Runnable {
         private InputStream fromStream;
+        Consumer<String> outputConsumer;
 
-        private ProcessOutputReader(InputStream fromStream) {
+        private ProcessOutputReader(InputStream fromStream, Consumer<String> outputConsumer) {
             this.fromStream = fromStream;
+            this.outputConsumer = outputConsumer;
         }
 
         @Override
@@ -75,7 +104,7 @@ public class ProcessExecutor implements AutoCloseable {
                 br = new BufferedReader(isr);
                 String line = null;
                 while ((line = br.readLine()) != null) {
-                    logger.info(line);
+                    outputConsumer.accept(line);
                 }
 
             } catch (IOException ioe) {
