@@ -50,14 +50,6 @@ public interface Project extends AutoCloseable {
     public void processTemplateAndCreateResources(URL templateUrl, Map<String, String> envVariables);
 
     /**
-     * Process template and create all resources defined there.
-     *
-     * @param templateInputStream Input stream with template to be processed
-     * @param envVariables Map of environment variables to override default values from the template
-     */
-    public void processTemplateAndCreateResources(InputStream templateInputStream, Map<String, String> envVariables);
-
-    /**
      * Create all resources defined in resource URL.
      *
      * @param resourceUrl URL of resource list to be created

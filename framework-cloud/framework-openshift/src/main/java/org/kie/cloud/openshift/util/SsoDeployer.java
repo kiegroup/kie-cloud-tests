@@ -15,21 +15,21 @@
  */
 package org.kie.cloud.openshift.util;
 
-import cz.xtf.sso.api.SsoApi;
-import cz.xtf.sso.api.SsoApiFactory;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import cz.xtf.sso.api.SsoApi;
+import cz.xtf.sso.api.SsoApiFactory;
+import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.constants.SsoTemplateConstants;
 import org.kie.cloud.openshift.deployment.SsoDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.kie.cloud.api.deployment.SsoDeployment;
-import org.kie.cloud.openshift.constants.SsoTemplateConstants;
 
 public class SsoDeployer {
 
@@ -41,7 +41,7 @@ public class SsoDeployer {
         SsoDeployment ssoDeployment = createSsoDeployment(project);
 
         logger.info("Creating SSO secrets from " + OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toString());
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SSO_SECRET.getTemplateUrl(), Collections.emptyMap());
+        project.createResources(OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toExternalForm());
         logger.info("Creating SSO image streams from " + OpenShiftConstants.getSsoImageStreams());
         project.createResources(OpenShiftConstants.getSsoImageStreams());
 
