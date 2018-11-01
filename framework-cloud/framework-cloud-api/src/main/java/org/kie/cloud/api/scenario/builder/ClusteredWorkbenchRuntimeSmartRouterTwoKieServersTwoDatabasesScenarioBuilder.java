@@ -18,6 +18,7 @@ package org.kie.cloud.api.scenario.builder;
 import java.time.Duration;
 
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
+import org.kie.cloud.api.settings.LdapSettings;
 
 /**
  * Cloud builder for clustered Workbench runtime, Smart router and two Kie Servers with two databases in project. Built setup
@@ -56,6 +57,15 @@ public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesSc
      * @return Builder
      */
     ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySso();
+
+    /**
+     *
+     * Return setup builder with configured LDAP.
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with Business Central user for the maven repository.
