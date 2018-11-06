@@ -17,6 +17,7 @@ package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.LdapSettings;
 
 public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<GenericScenario> {
 
@@ -77,4 +78,14 @@ public interface GenericScenarioBuilder extends DeploymentScenarioBuilder<Generi
      * @return Builder
      */
     GenericScenarioBuilder withSso();
+
+    /**
+     *
+     * Return scenario builder with added configured for LDAP. Make sure you have
+     * correctly set up environment variables for all deployments settings.
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder
+     */
+    GenericScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
 }

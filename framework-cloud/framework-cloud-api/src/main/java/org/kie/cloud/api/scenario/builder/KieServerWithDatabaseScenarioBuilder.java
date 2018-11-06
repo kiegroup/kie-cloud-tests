@@ -16,6 +16,7 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
+import org.kie.cloud.api.settings.LdapSettings;
 
 public interface KieServerWithDatabaseScenarioBuilder extends DeploymentScenarioBuilder<KieServerWithDatabaseScenario> {
 
@@ -64,4 +65,13 @@ public interface KieServerWithDatabaseScenarioBuilder extends DeploymentScenario
      * @return Builder
      */
     KieServerWithDatabaseScenarioBuilder withHttpsKieServerHostname(String hostname);
+
+    /**
+     *
+     * Return setup builder with configured LDAP.
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder
+     */
+    KieServerWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
 }

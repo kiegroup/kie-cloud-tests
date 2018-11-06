@@ -127,6 +127,13 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
 
         }
 
+        if (scenarioSettings.getLdapSettings() != null) {
+            scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
+                Map<String, String> envVariables = deploymentSettings.getEnvVariables();
+                envVariables.putAll(scenarioSettings.getLdapSettings().getEnvVariables());
+            });
+        }
+
         for (DeploymentSettings workbenchSettings : scenarioSettings.getWorkbenchSettingsList()) {
             deployTemplateWithSettings(project, workbenchSettings);
             workbenchDeployments.add(createWorkbenchDeployment(project, workbenchSettings));
