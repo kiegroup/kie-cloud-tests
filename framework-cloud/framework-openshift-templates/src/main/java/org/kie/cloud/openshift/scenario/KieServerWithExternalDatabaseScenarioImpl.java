@@ -26,11 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import cz.xtf.openshift.OpenShiftBinaryClient;
-import cz.xtf.wait.SimpleWaiter;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DockerDeployment;
@@ -47,7 +43,6 @@ import org.kie.cloud.openshift.database.external.TemplateExternalDatabaseProvide
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.DockerRegistryDeployer;
-import org.kie.cloud.openshift.util.OpenShiftTemplateProcessor;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +71,6 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
         externalDatabase.getExternalDriver().ifPresent(val -> {
             ExternalDriver externalDriver = externalDatabase.getExternalDriver().get();
-            String kieServerCustomImageStreamName = "kieserver-openshift-with-custom-driver";
 
             dockerDeployment = DockerRegistryDeployer.deploy(project);
 
@@ -86,9 +80,9 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
             installDriverImageToRegistry(dockerDeployment, externalDriver);
             createDriverImageStreams(dockerDeployment, externalDriver);
-            buildCustomKieServerImageStream(externalDriver, kieServerCustomImageStreamName);
 
-            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_IMAGE_STREAM_NAME, kieServerCustomImageStreamName);
+            envVariables.put(OpenShiftTemplateConstants.EXTENSIONS_IMAGE_NAMESPACE, project.getName());
+            envVariables.put(OpenShiftTemplateConstants.EXTENSIONS_IMAGE, externalDriver.getDockerTag());
         });
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl().toString());
@@ -165,29 +159,5 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
         String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl());
 
         project.createImageStream(imageStreamName, dockerTag);
-    }
-
-    private void buildCustomKieServerImageStream(ExternalDriver externalDriver, String kieServerCustomImageStreamName) {
-        logger.info("Build Kie server custom image with JDBC driver included.");
-        String buildName = externalDriver.getImageName();
-        String kieServerImageStreamName = OpenShiftTemplateProcessor.getParameterValue(OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL, OpenShiftTemplateConstants.KIE_SERVER_IMAGE_STREAM_NAME);
-        String kieServerImageStreamTag = OpenShiftTemplateProcessor.getParameterValue(OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL, OpenShiftTemplateConstants.IMAGE_STREAM_TAG);
-        String originalKieServerImageStream = project.getName() + "/" + kieServerImageStreamName + ":" + kieServerImageStreamTag;
-        String jdbcSourceImage = project.getName() + "/" + externalDriver.getImageName() + ":" + externalDriver.getImageVersion();
-        String targetKieServerImageStream = kieServerCustomImageStreamName + ":" + kieServerImageStreamTag;
-
-        OpenShiftBinaryClient.getInstance().project(project.getName());
-        OpenShiftBinaryClient.getInstance().executeCommand("Custom Kie server image build failed.", "new-build", "--name", buildName, "--image-stream=" + originalKieServerImageStream, "--source-image=" + jdbcSourceImage, "--source-image-path=" + externalDriver.getSourceImagePath(), "--to=" + targetKieServerImageStream, "-e", "CUSTOM_INSTALL_DIRECTORIES=" + externalDriver.getCustomInstallDirectories());
-
-        waitUntilBuildCompletes(buildName);
-    }
-
-    private void waitUntilBuildCompletes(String buildName) {
-        try {
-            new SimpleWaiter(() -> project.getOpenShiftUtil().getLatestBuild(buildName) != null).timeout(TimeUnit.MINUTES, 1).execute();
-            project.getOpenShiftUtil().waiters().hasBuildCompleted(project.getOpenShiftUtil().getLatestBuild(buildName).getMetadata().getName()).execute();
-        } catch (TimeoutException e) {
-            throw new RuntimeException("Error while waiting for the custom Kie server build to finish.", e);
-        }
     }
 }

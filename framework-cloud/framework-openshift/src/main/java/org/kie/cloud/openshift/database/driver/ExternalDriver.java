@@ -49,10 +49,15 @@ public interface ExternalDriver {
     String getSourceImagePath();
 
     /**
-     * @param dockerUrl URL to Docker registry.
      * @return Docker tag.
      */
-    String getDockerTag(URL dockerUrl);
+    String getDockerTag();
+
+    /**
+     * @param registryUrl URL to Docker registry.
+     * @return Docker tag with registry url.
+     */
+    String getDockerTag(URL registryUrl);
 
     /**
      * @param kieJdbcDriverScriptsFolder Folder containing all driver scripts.

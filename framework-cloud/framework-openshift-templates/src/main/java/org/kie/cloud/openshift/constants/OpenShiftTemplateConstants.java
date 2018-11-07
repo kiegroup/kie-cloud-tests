@@ -78,6 +78,9 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_EXTERNALDB_USER = "KIE_SERVER_EXTERNALDB_USER";
     public static final String KIE_SERVER_EXTERNALDB_PWD = "KIE_SERVER_EXTERNALDB_PWD";
 
+    public static final String EXTENSIONS_IMAGE_NAMESPACE = "EXTENSIONS_IMAGE_NAMESPACE";
+    public static final String EXTENSIONS_IMAGE = "EXTENSIONS_IMAGE";
+
     // Intentionally not public. Use ProjectSpecificPropertyNames to get proper variant based on product profile
     static final String BUSINESS_CENTRAL_HOSTNAME_HTTP = "BUSINESS_CENTRAL_HOSTNAME_HTTP";
     static final String BUSINESS_CENTRAL_HOSTNAME_HTTPS = "BUSINESS_CENTRAL_HOSTNAME_HTTPS";

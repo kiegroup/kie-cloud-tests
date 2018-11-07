@@ -25,8 +25,13 @@ public abstract class AbstractExternalDriver implements ExternalDriver {
     private static final String ARTIFACT_MVN_REPO_RELATIVE_PATH = "drivers";
 
     @Override
+    public String getDockerTag() {
+        return getImageName() + ":" + getImageVersion();
+    }
+
+    @Override
     public String getDockerTag(URL dockerUrl) {
-        return dockerUrl.getHost() + ":" + dockerUrl.getPort() + "/kie-server/" + getImageName() + ":" + getImageVersion();
+        return dockerUrl.getHost() + ":" + dockerUrl.getPort() + "/kie-server/" + getDockerTag();
     }
 
     @Override
