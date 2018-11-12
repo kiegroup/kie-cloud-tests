@@ -231,7 +231,5 @@ public class OpenShiftConstants implements Constants {
         System.setProperty("xtf.config.master.password", getOpenShiftPassword());
         System.setProperty("xtf.config.master.admin.username", getOpenShiftAdminUserName() != null ? getOpenShiftAdminUserName() : getOpenShiftUserName());
         System.setProperty("xtf.config.master.admin.password", getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
-        // TODO delete this when raising XTF version
-        System.setProperty("xtf.config.openshift.version", "3.9.41");
     }
 }
