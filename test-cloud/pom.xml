@@ -78,7 +78,6 @@
 
   <modules>
     <module>test-cloud-remote</module>
-    <module>test-cloud-template</module>
   </modules>
 
   <build>
