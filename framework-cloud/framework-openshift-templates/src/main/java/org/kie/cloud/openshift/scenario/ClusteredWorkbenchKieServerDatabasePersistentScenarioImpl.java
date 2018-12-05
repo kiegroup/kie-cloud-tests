@@ -114,14 +114,17 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
 
         databaseDeployment = new DatabaseDeploymentImpl(project);
 
+        logger.info("Waiting for Database deployment to become ready.");
+        databaseDeployment.waitForScale();
+
+        // TODO: Workaround for KIECLOUD-48, respin Kie server when database is ready
+        kieServerDeployment.deleteInstances(kieServerDeployment.getInstances());
+
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
-
-        logger.info("Waiting for Database deployment to become ready.");
-        databaseDeployment.waitForScale();
 
         logNodeNameOfAllInstances();
     }
