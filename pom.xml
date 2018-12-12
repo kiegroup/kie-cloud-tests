@@ -141,7 +141,7 @@
       </dependency>
       <dependency>
         <groupId>org.kie</groupId>
-        <artifactId>kie-wb-tests-rest</artifactId>
+        <artifactId>business-central-tests-rest</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
