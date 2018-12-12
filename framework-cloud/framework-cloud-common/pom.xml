@@ -60,7 +60,7 @@
     <!-- Workbench client -->
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-wb-tests-rest</artifactId>
+      <artifactId>business-central-tests-rest</artifactId>
     </dependency>
 
     <!-- HttpsUtils -->
