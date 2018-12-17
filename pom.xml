@@ -37,9 +37,6 @@
     <version.org.keycloak>4.1.0.Final</version.org.keycloak>
     <version.org.projectlombok>1.16.10</version.org.projectlombok>
     <version.org.jboss.jboss-dmr>1.5.0.Final</version.org.jboss.jboss-dmr>
-    <!-- Version adjustments due to mismatch between Kie BOM and XTF dependencies. -->
-    <version.kubernetes-client>3.0.3</version.kubernetes-client>
-    <version.kubernetes-model>2.0.4</version.kubernetes-model>
     <version.org.apache.maven.shared>1.5</version.org.apache.maven.shared>
     <version.org.apache.maven.failsafe>2.21.0</version.org.apache.maven.failsafe>
   </properties>
