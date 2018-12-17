@@ -15,8 +15,6 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,9 +31,15 @@ import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.server.client.KieServicesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Category(Smoke.class)
 public class ImageVersionIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageVersionIntegrationTest.class);
 
     private static final String KIE_VERSION = DeploymentConstants.getKieArtifactVersion();
     private static final String KIE_API_ARTIFACT_NAME = "kie-api";
@@ -66,7 +70,11 @@ public class ImageVersionIntegrationTest extends AbstractMethodIsolatedCloudInte
     private String getImageVersion(Deployment deployment) {
         CommandExecutionResult checkVersionCommand = deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH);
 
-        TimeUtils.wait(Duration.ofSeconds(3), Duration.ofSeconds(1), () -> checkVersionCommand.getOutput().contains(KIE_VERSION));
+        TimeUtils.wait(Duration.ofSeconds(10), Duration.ofSeconds(1), () -> {
+            System.out.println("*****" + checkVersionCommand.getOutput());
+            logger.info("*********" + checkVersionCommand.getOutput());
+            return checkVersionCommand.getOutput().contains(KIE_VERSION);
+        });
 
         return getArtifactVersion(checkVersionCommand.getOutput());
     }
