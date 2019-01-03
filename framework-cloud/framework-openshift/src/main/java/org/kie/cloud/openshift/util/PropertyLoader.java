@@ -66,21 +66,20 @@ public class PropertyLoader {
     /**
      * Process properties and replace any variable with appropriate value. The value can be retrieved from another property in properties.
      * Only the first tag in the property value is replaced.
-     *
      * @param properties Properties to be processed.
      * @return Processed properties.
      */
     private static Properties filterProperties(Properties properties) {
         Properties processedProperties = new Properties();
 
-        properties.forEach((k,v) -> {
+        properties.forEach((k, v) -> {
             String value = (String) v;
             Matcher matcher = REPLACE_TAG_PATTERN.matcher(value);
-            if(matcher.matches()) {
+            if (matcher.matches()) {
                 // If property tag is provided using system properties then it is replaced automatically when loading properties by Java.
                 // This step is used just in case the replacement is another property from loaded properties.
                 String replacingKey = matcher.group(1);
-                String replacingValue = properties.getProperty(replacingKey);
+                String replacingValue = getValueWithPossibleOverrideFromSystemProperty(replacingKey, properties);
                 validateReplacingValueDoesNotContainReplaceTag((String) k, replacingKey, replacingValue);
                 processedProperties.put(k, value.replace("${" + replacingKey + "}", replacingValue));
             } else {
@@ -91,11 +90,22 @@ public class PropertyLoader {
         return processedProperties;
     }
 
+    private static String getValueWithPossibleOverrideFromSystemProperty(String key, Properties properties) {
+        String sysPropValue = System.getProperty(key);
+        String propValue = properties.getProperty(key);
+        if (sysPropValue != null && !sysPropValue.isEmpty()) {
+            log.info("Overriding '{}' to value from system property '{}'", key, sysPropValue);
+            return sysPropValue;
+        } else {
+            return propValue;
+        }
+    }
+
     private static void validateReplacingValueDoesNotContainReplaceTag(String originalPropertyKey, String replacingPropertyKey, String replacingPropertyValue) {
         Matcher matcher = REPLACE_TAG_PATTERN.matcher(replacingPropertyValue);
-        if(matcher.matches()) {
+        if (matcher.matches()) {
             throw new RuntimeException("Detected indirect replacement. Value of property '" + originalPropertyKey + "' is being replaced by" +
-                                       "property '" + replacingPropertyKey + "', however value of replacing property '" + replacingPropertyValue + "' contains replacement tag.");
+                                               "property '" + replacingPropertyKey + "', however value of replacing property '" + replacingPropertyValue + "' contains replacement tag.");
         }
     }
 }
