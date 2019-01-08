@@ -28,6 +28,7 @@ public class ServiceUtil {
     private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhpamcentr|-rhdmcentr)");
     private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhpamcentrmon");
     private static final Pattern KIE_SERVER_REGEXP = Pattern.compile("(?!secure-).*(-execserv|-kieserver)");
+    private static final Pattern SMART_ROUTER_REGEXP = Pattern.compile("(?!secure-).*-smartrouter");
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
     private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
@@ -50,6 +51,10 @@ public class ServiceUtil {
 
     public static String getKieServerServiceName(OpenShiftUtil util, String suffix) {
         return getServiceName(util, Pattern.compile(KIE_SERVER_REGEXP.pattern() + suffix));
+    }
+
+    public static String getSmartRouterServiceName(OpenShiftUtil util) {
+        return getServiceName(util, SMART_ROUTER_REGEXP);
     }
 
     public static String getDatabaseServiceName(OpenShiftUtil util, String suffix) {

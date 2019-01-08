@@ -48,6 +48,10 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift resource file containing keystore for HTTPS communication.
      */
     public static final String KIE_APP_SECRET = "kie.app.secret";
+    /**
+     * URL pointing to OpenShift resource file containing keystore for HTTPS communication.
+     */
+    public static final String CUSTOM_TRUSTED_APP_SECRET = "custom.trusted.app.secret";
 
     /**
      * URL pointing to OpenShift resource file containing image streams with all available images.
@@ -133,6 +137,8 @@ public class OpenShiftConstants implements Constants {
     public static final String SSO_APP_SECRETS = "sso.app.secrets";
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
 
+    public static final String APB_IMAGE_STREAM_NAME = "apb.image.stream.name";
+
     public static final String KIE_IMAGE_TAG_AMQ = "kie.image.tag.amq";
     public static final String KIE_IMAGE_TAG_CONSOLE = "kie.image.tag.console";
     public static final String KIE_IMAGE_TAG_CONTROLLER = "kie.image.tag.controller";
@@ -186,12 +192,20 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(KIE_APP_SECRET);
     }
 
+    public static String getCustomTrustedAppSecret() {
+        return System.getProperty(CUSTOM_TRUSTED_APP_SECRET);
+    }
+
     public static String getKieImageStreams() {
         return System.getProperty(KIE_IMAGE_STREAMS);
     }
 
     public static String getSsoImageStreams() {
         return System.getProperty(SSO_IMAGE_STREAMS);
+    }
+
+    public static String getApbImageStreamName() {
+        return System.getProperty(APB_IMAGE_STREAM_NAME);
     }
 
     public static String getLdapUrl() {

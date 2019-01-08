@@ -43,6 +43,7 @@ public enum OpenShiftTemplate {
     SSO(OpenShiftConstants.SSO_APP_TEMPLATE),
     // Special template containing secret file.
     SECRET(OpenShiftConstants.KIE_APP_SECRET),
+    CUSTOM_TRUSTED_SECRET(OpenShiftConstants.CUSTOM_TRUSTED_APP_SECRET),
     SSO_SECRET(OpenShiftConstants.SSO_APP_SECRETS);
 
     private static final Properties templateProperties = OpenShiftTemplatePropertiesLoader.getProperties();

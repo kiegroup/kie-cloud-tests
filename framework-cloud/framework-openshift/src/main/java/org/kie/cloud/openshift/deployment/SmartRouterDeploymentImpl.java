@@ -39,6 +39,9 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
 
     @Override
     public String getServiceName() {
+        if(serviceName == null) {
+            serviceName = ServiceUtil.getSmartRouterServiceName(getOpenShiftUtil());
+        }
         return serviceName;
     }
 
