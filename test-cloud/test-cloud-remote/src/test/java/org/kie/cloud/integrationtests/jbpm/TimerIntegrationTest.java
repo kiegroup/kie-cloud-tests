@@ -15,6 +15,8 @@
 
 package org.kie.cloud.integrationtests.jbpm;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,8 +44,6 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 

@@ -25,12 +25,9 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import cz.xtf.http.HttpClient;
-import cz.xtf.tuple.Tuple.Pair;
 import org.apache.http.entity.ContentType;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.server.api.KieServerConstants;
@@ -45,6 +42,9 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cz.xtf.http.HttpClient;
+import cz.xtf.tuple.Tuple.Pair;
 
 public class HttpsKieServerTestProvider {
 

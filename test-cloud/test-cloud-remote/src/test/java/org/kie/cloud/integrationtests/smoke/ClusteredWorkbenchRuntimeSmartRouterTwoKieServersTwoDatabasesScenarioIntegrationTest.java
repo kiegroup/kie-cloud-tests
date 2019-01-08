@@ -86,6 +86,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Test
     public void testSmartRouter() {
+        //TODO failing because of RHPAM-1561
         SmartRouterTestProvider.testRouterLoadBalancing(deploymentScenario.getWorkbenchRuntimeDeployment(),
                 deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment(),
                 deploymentScenario.getKieServerTwoDeployment());

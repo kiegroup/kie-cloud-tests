@@ -74,6 +74,15 @@
 
     <!-- Location for custom Kie application templates. Can be used to point tests to the location containing templates to be used for tests. -->
     <kie.app.template.url/>
+
+    <!-- Custom trusted secret -->
+    <custom.trusted.app.secret/>
+    <custom.trusted.secret.name/>
+    <custom.trusted.keystore.alias/>
+    <custom.trusted.keystore.pwd/>
+
+    <!-- APB -->
+    <apb.image.stream.name/>
   </properties>
 
   <modules>
@@ -157,6 +166,11 @@
               <sso.service.username>${sso.service.username}</sso.service.username>
               <sso.service.password>${sso.service.password}</sso.service.password>
               <ldap.url>${ldap.url}</ldap.url>
+              <custom.trusted.app.secret>${custom.trusted.app.secret}</custom.trusted.app.secret>
+              <custom.trusted.secret.name>${custom.trusted.secret.name}</custom.trusted.secret.name>
+              <custom.trusted.keystore.alias>${custom.trusted.keystore.alias}</custom.trusted.keystore.alias>
+              <custom.trusted.keystore.pwd>${custom.trusted.keystore.pwd}</custom.trusted.keystore.pwd>
+              <apb.image.stream.name>${apb.image.stream.name}</apb.image.stream.name>
             </systemProperties>
           </configuration>
         </plugin>

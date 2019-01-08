@@ -16,6 +16,7 @@
 package org.kie.cloud.integrationtests.ldap;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,10 +25,10 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentS
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
+import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
+import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.integrationtests.util.LdapSettingsConstants;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -52,10 +53,14 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
                 .withLdapRoleRecursion(LdapSettingsConstants.ROLE_RECURSION)
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
 
+        try {
         deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                 .withLdapSettings(ldapSettings).withExternalMavenRepo(MavenConstants.getMavenRepoUrl(),
                         MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
+        } catch (UnsupportedOperationException ex) {
+            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+        }
         deploymentScenario.setLogFolderName(
                 ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);

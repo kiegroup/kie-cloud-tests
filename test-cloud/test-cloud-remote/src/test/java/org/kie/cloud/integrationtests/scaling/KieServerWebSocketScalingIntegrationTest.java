@@ -113,6 +113,9 @@ public class KieServerWebSocketScalingIntegrationTest {
         } catch (MissingResourceException e) {
             logger.warn("Skipping test because of missing resource.", e);
             Assume.assumeNoException(e);
+        } catch (UnsupportedOperationException e) {
+            logger.warn("Skipping test", e);
+            Assume.assumeNoException(e);
         }
 
         kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
