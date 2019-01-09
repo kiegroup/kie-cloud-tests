@@ -16,8 +16,8 @@
 package org.kie.cloud.common.provider;
 
 import java.time.Instant;
-import org.kie.cloud.api.deployment.ControllerDeployment;
 
+import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
@@ -26,13 +26,13 @@ import org.kie.server.controller.client.KieServerControllerClientFactory;
 public class KieServerControllerClientProvider {
 
     public static KieServerControllerClient getKieServerControllerClient(WorkbenchDeployment workbenchDeployment) {
-        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
+        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(workbenchDeployment.getUrl().orElseGet(workbenchDeployment.getSecureUrl()::get).toString() + "/rest/controller",
                 workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
         return kieServerControllerClient;
     }
 
     public static KieServerControllerClient getKieServerControllerClient(ControllerDeployment controllerDeployment) {
-        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(controllerDeployment.getUrl().toString() + "/rest/controller",
+        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(controllerDeployment.getUrl().get().toString() + "/rest/controller",
                 controllerDeployment.getUsername(), controllerDeployment.getPassword());
         return kieServerControllerClient;
     }

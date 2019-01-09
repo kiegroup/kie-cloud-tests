@@ -16,6 +16,7 @@
 package org.kie.cloud.api.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Controller deplyoment representation in cloud.
@@ -27,7 +28,7 @@ public interface ControllerDeployment extends Deployment {
      *
      * @return Workbench URL
      */
-    URL getUrl();
+    Optional<URL> getUrl();
 
     /**
      * Get Controller user name. Controller username is set by env. variable

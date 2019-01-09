@@ -15,9 +15,6 @@
  */
 package org.kie.cloud.openshift.settings;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 

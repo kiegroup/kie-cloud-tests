@@ -57,6 +57,10 @@ public class DeploymentConstants implements Constants {
 
     public static final String KIE_ARTIFACT_VERSION = "kie.artifact.version";
 
+    public static final String CUSTOM_TRUSTED_SECRET_NAME = "custom.trusted.secret.name";
+    public static final String CUSTOM_TRUSTED_KEYSTORE_ALIAS = "custom.trusted.keystore.alias";
+    public static final String CUSTOM_TRUSTED_KEYSTORE_PWD = "custom.trusted.keystore.pwd";
+
     public static String getKieServerUser() {
         return System.getProperty(KIE_SERVER_USER);
     }
@@ -150,6 +154,18 @@ public class DeploymentConstants implements Constants {
 
     public static String getKieArtifactVersion() {
         return System.getProperty(KIE_ARTIFACT_VERSION);
+    }
+
+    public static String getCustomTrustedSecretName() {
+        return System.getProperty(CUSTOM_TRUSTED_SECRET_NAME);
+    }
+
+    public static String getCustomTrustedKeystoreAlias() {
+        return System.getProperty(CUSTOM_TRUSTED_KEYSTORE_ALIAS);
+    }
+
+    public static String getCustomTrustedKeystorePwd() {
+        return System.getProperty(CUSTOM_TRUSTED_KEYSTORE_PWD);
     }
 
     @Override

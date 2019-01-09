@@ -17,15 +17,16 @@ package org.kie.cloud.openshift.deployment;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.openshift.resource.Project;
 
 public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements WorkbenchDeployment {
 
-    private URL url;
-    private URL secureUrl;
-    private URI webSocketUri;
+    private Optional<URL> url;
+    private Optional<URL> secureUrl;
+    private Optional<URI> webSocketUri;
     private String username;
     private String password;
 
@@ -35,21 +36,21 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
         super(project);
     }
 
-    @Override public URL getUrl() {
+    @Override public Optional<URL> getUrl() {
         if (url == null) {
             url = getHttpRouteUrl(getServiceName());
         }
         return url;
     }
 
-    @Override public URL getSecureUrl() {
+    @Override public Optional<URL> getSecureUrl() {
         if (secureUrl == null) {
             secureUrl = getHttpsRouteUrl(getServiceName());
         }
         return secureUrl;
     }
 
-    @Override public URI getWebSocketUri() {
+    @Override public Optional<URI> getWebSocketUri() {
         if (webSocketUri == null) {
             webSocketUri = getWebSocketRouteUri(getServiceName());
         }
@@ -83,7 +84,7 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
     @Override public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl());
+            RouterUtil.waitForRouter(getUrl().orElseGet(getSecureUrl()::get));
         }
     }
 }

@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.DockerDeployment;
 import org.kie.cloud.openshift.resource.Project;
@@ -23,7 +24,7 @@ import org.kie.cloud.openshift.resource.Project;
 public class DockerDeploymentImpl extends OpenShiftDeployment implements DockerDeployment {
 
     private String serviceName;
-    private URL url;
+    private Optional<URL> url;
 
     public DockerDeploymentImpl(Project project) {
         super(project);
@@ -38,7 +39,7 @@ public class DockerDeploymentImpl extends OpenShiftDeployment implements DockerD
     }
 
     @Override
-    public URL getUrl() {
+    public Optional<URL> getUrl() {
         if (url == null) {
             url = getHttpRouteUrl(getServiceName());
         }

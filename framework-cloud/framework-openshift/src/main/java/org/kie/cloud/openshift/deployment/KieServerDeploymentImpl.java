@@ -16,14 +16,15 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.openshift.resource.Project;
 
 public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieServerDeployment {
 
-    private URL url;
-    private URL secureUrl;
+    private Optional<URL> url;
+    private Optional<URL> secureUrl;
     private String username;
     private String password;
 
@@ -34,14 +35,14 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         super(project);
     }
 
-    @Override public URL getUrl() {
+    @Override public Optional<URL> getUrl() {
         if (url == null) {
             url = getHttpRouteUrl(getServiceName());
         }
         return url;
     }
 
-    @Override public URL getSecureUrl() {
+    @Override public Optional<URL> getSecureUrl() {
         if (secureUrl == null) {
             secureUrl = getHttpsRouteUrl(getServiceName());
         }
@@ -79,7 +80,7 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
     @Override public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl());
+            RouterUtil.waitForRouter(getUrl().orElseGet(getSecureUrl()::get));
         }
     }
 }
