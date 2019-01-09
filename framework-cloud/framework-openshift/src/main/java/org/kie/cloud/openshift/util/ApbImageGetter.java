@@ -35,7 +35,7 @@ public class ApbImageGetter {
 
     /**
      * OpenShift APB image stream name is set by property "apb.image.stream.name".
-     * Returns docker image name of apb image in namespece "openshift".
+     * Returns docker image name of apb image in namespace "openshift".
      * 
      * @return Name of docker image in OpenShift registry.
      */
