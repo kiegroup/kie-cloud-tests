@@ -16,6 +16,7 @@
 package org.kie.cloud.api.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Database deplyoment representation in cloud.
@@ -27,7 +28,7 @@ public interface DatabaseDeployment extends Deployment {
      *
      * @return Database URL.
      */
-    URL getUrl();
+    Optional<URL> getUrl();
 
     /**
      * Get Database user name.

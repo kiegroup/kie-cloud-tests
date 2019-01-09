@@ -21,7 +21,7 @@ import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 public class SmartRouterAdminClientProvider {
 
     public static KieServerRouterClient getSmartRouterClient(SmartRouterDeployment smartRouterDeployment) {
-        KieServerRouterClient smartRouterClient = new KieServerRouterClient(smartRouterDeployment.getUrl().toString());
+        KieServerRouterClient smartRouterClient = new KieServerRouterClient(smartRouterDeployment.getUrl().get().toString());
         return smartRouterClient;
     }
 }

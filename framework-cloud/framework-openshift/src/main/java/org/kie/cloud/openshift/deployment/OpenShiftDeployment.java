@@ -177,34 +177,37 @@ public abstract class OpenShiftDeployment implements Deployment {
         return new OpenShiftInstance(util, getNamespace(), instanceName);
     }
 
-    protected URL getHttpRouteUrl(String serviceName) {
-        try {
-            return getRouteUri(Protocol.http, serviceName).toURL();
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains(Protocol.http + " route leading to service " + serviceName + " not found")) {
-                logger.debug("Http route not found. Try to find Https route instead.");
-                return getHttpsRouteUrl(serviceName);
-            } else {
+    protected Optional<URL> getHttpRouteUrl(String serviceName) {
+        Optional<URI> uri = getRouteUri(Protocol.http, serviceName);
+        if (uri.isPresent()) {
+            try {
+                return Optional.ofNullable(uri.get().toURL());
+            } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+        } else {
+            return Optional.empty();
         }
     }
 
-    protected URL getHttpsRouteUrl(String serviceName) {
-        try {
-            return getRouteUri(Protocol.https, serviceName).toURL();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+    protected Optional<URL> getHttpsRouteUrl(String serviceName) {
+        Optional<URI> uri = getRouteUri(Protocol.https, serviceName);
+        if (uri.isPresent()) {
+            try {
+                return Optional.ofNullable(uri.get().toURL());
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return Optional.empty();
         }
     }
 
-    protected URI getWebSocketRouteUri(String serviceName) {
+    protected Optional<URI> getWebSocketRouteUri(String serviceName) {
         return getRouteUri(Protocol.ws, serviceName);
     }
 
-    private URI getRouteUri(Protocol protocol, String serviceName) {
+    private Optional<URI> getRouteUri(Protocol protocol, String serviceName) {
         URI uri;
         Service service = util.getService(serviceName);
         Predicate<Route> httpsPredicate = n -> n.getSpec().getTls() != null;
@@ -227,7 +230,9 @@ public abstract class OpenShiftDeployment implements Deployment {
                 String routeNames = routes.stream()
                                           .map(n -> n.getMetadata().getName())
                                           .collect(Collectors.joining(", "));
-                throw new RuntimeException(protocol + " route leading to service " + serviceName + " not found. Available routes " + routeNames);
+                logger.warn(protocol + " route leading to service " + serviceName + " not found. Available routes " + routeNames);
+                return Optional.empty();
+                //throw new RuntimeException(protocol + " route leading to service " + serviceName + " not found. Available routes " + routeNames);
             }
         }
         String uriValue = protocol.name() + "://" + routeHost + ":" + retrievePort(protocol);
@@ -238,7 +243,7 @@ public abstract class OpenShiftDeployment implements Deployment {
             throw new RuntimeException(e);
         }
 
-        return uri;
+        return Optional.of(uri);
     }
 
     private String retrievePort(Protocol protocol) {
