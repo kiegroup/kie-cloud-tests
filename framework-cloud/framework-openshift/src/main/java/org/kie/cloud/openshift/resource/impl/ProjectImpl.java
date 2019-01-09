@@ -131,25 +131,14 @@ public class ProjectImpl implements Project {
     }
 
     private String getApbCommand(List<String> args) {
-        String out = "";
-        out = args.stream().map((arg) -> arg + " ").reduce(out, String::concat);
-        return out;
+        return args.stream().collect(Collectors.joining(" "));
     }
 
     private String formatExtraVars(Map<String, String> extraVars) {
-        StringBuilder extraVarsArg = new StringBuilder("{");
-        extraVars.forEach((String key, String value) -> {
-            extraVarsArg.append("\"")
-                    .append(key)
-                    .append("\"")
-                    .append(":")
-                    .append("\"")
-                    .append(value)
-                    .append("\"")
-                    .append(", ");
-        });
-        extraVarsArg.replace(extraVarsArg.length() - 2, extraVarsArg.length() - 1, "}");
-        return extraVarsArg.toString();
+        return extraVars.entrySet()
+                        .stream()
+                        .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
+                        .collect(Collectors.joining(", ", "{", "}"));
     }
 
     @Override
