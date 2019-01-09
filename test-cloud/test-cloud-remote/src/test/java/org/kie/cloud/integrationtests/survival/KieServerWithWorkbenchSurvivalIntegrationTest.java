@@ -159,7 +159,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMetho
         Response response = null;
 
         try {
-            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl(), KIE_CONTAINERS_REQUEST_URL);
+            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl().orElseGet(deploymentScenario.getKieServerDeployment().getSecureUrl()::get), KIE_CONTAINERS_REQUEST_URL);
             WebTarget target = httpKieServerClient.target(url.toString());
             response = target.request().get();
             assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());

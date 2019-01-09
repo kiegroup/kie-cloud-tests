@@ -127,9 +127,9 @@ public class HttpsKieServerTestProvider {
     private static String serverInforRequestUrl(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
             if (ssoScenario) {
-                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().toString()) + "/" + KIE_SERVER_INFO_REST_REQUEST_URL;
+                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().get().toString()) + "/" + KIE_SERVER_INFO_REST_REQUEST_URL;
             } else {
-                final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_SERVER_INFO_REST_REQUEST_URL);
+                final URL url = new URL(kieServerDeployment.getSecureUrl().get(), KIE_SERVER_INFO_REST_REQUEST_URL);
                 return url.toString();
             }
         } catch (MalformedURLException e) {
@@ -140,9 +140,9 @@ public class HttpsKieServerTestProvider {
     private static String containerRequestUrl(KieServerDeployment kieServerDeployment, String containerName, boolean ssoScenario) {
         try {
             if (ssoScenario) {
-                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().toString()) + "/" + KIE_CONTAINERS_REQUEST_URL + "/" + containerName;
+                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().get().toString()) + "/" + KIE_CONTAINERS_REQUEST_URL + "/" + containerName;
             } else {
-                final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINERS_REQUEST_URL + "/" + containerName);
+                final URL url = new URL(kieServerDeployment.getSecureUrl().get(), KIE_CONTAINERS_REQUEST_URL + "/" + containerName);
                 return url.toString();
             }
         } catch (MalformedURLException e) {
@@ -153,9 +153,9 @@ public class HttpsKieServerTestProvider {
     private static String getContainersRequestUrl(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
             if (ssoScenario) {
-                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().toString()) + "/" + KIE_CONTAINERS_REQUEST_URL;
+                return createSSOEnvVariable(kieServerDeployment.getSecureUrl().get().toString()) + "/" + KIE_CONTAINERS_REQUEST_URL;
             } else {
-                final URL url = new URL(kieServerDeployment.getSecureUrl(), KIE_CONTAINERS_REQUEST_URL);
+                final URL url = new URL(kieServerDeployment.getSecureUrl().get(), KIE_CONTAINERS_REQUEST_URL);
                 return url.toString();
             }
         } catch (MalformedURLException e) {

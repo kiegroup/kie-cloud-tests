@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import cz.xtf.openshift.OpenShiftBinaryClient;
-import cz.xtf.wait.SimpleWaiter;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DockerDeployment;
@@ -51,6 +49,9 @@ import org.kie.cloud.openshift.util.OpenShiftTemplateProcessor;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cz.xtf.openshift.OpenShiftBinaryClient;
+import cz.xtf.wait.SimpleWaiter;
 
 public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario implements KieServerWithExternalDatabaseScenario {
 
@@ -148,8 +149,8 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
     private void installDriverImageToRegistry(DockerDeployment dockerDeployment, ExternalDriver externalDriver) {
         File kieJdbcDriverScriptsFolder = OpenShiftConstants.getKieJdbcDriverScriptsFolder();
-        String dockerImageBuildCommand = externalDriver.getDockerImageBuildCommand(kieJdbcDriverScriptsFolder, dockerDeployment.getUrl());
-        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl());
+        String dockerImageBuildCommand = externalDriver.getDockerImageBuildCommand(kieJdbcDriverScriptsFolder, dockerDeployment.getUrl().get());
+        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl().get());
 
         try (ProcessExecutor processExecutor = new ProcessExecutor()) {
             logger.info("Building JDBC driver image.");
@@ -162,7 +163,7 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
     private void createDriverImageStreams(DockerDeployment dockerDeployment, ExternalDriver externalDriver) {
         String imageStreamName = externalDriver.getImageName();
-        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl());
+        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl().get());
 
         project.createImageStream(imageStreamName, dockerTag);
     }

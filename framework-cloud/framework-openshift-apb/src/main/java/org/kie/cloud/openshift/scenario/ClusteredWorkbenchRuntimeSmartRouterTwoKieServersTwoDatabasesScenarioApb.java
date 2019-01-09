@@ -71,7 +71,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 
-            extraVars.put(OpenShiftApbConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
+            extraVars.put(OpenShiftApbConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().get().toString()));
             extraVars.put(OpenShiftApbConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
 
             extraVars.put(OpenShiftApbConstants.BUSINESS_CENTRAL_SSO_CLIENT, "business-central-client");
