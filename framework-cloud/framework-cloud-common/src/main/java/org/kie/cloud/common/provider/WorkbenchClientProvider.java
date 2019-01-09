@@ -22,7 +22,7 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 public class WorkbenchClientProvider {
 
     public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment) {
-        WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(),
+        WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().orElseGet(workbenchDeployment.getSecureUrl()::get).toString(),
                 workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
         return workbenchClient;
     }

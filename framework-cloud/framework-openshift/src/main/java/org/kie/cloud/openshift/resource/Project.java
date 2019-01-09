@@ -50,6 +50,13 @@ public interface Project extends AutoCloseable {
     public void processTemplateAndCreateResources(URL templateUrl, Map<String, String> envVariables);
 
     /**
+     * Process APB and create all resources defined there.
+     * @param image APB Image to be provision
+     * @param extraVars Map of extra vars to override default values from the APB image
+     */
+    public void processApbRun(String image, Map<String,String> extraVars);
+
+    /**
      * Create all resources defined in resource URL.
      *
      * @param resourceUrl URL of resource list to be created

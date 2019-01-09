@@ -52,7 +52,7 @@ public class KieServerClientProvider {
     }
 
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, Set<Class<?>> extraClasses, long clientTimeout) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieServerDeployment.getUrl().toString() + "/services/rest/server",
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(kieServerDeployment.getUrl().orElseGet(kieServerDeployment.getSecureUrl()::get).toString() + "/services/rest/server",
                 kieServerDeployment.getUsername(), kieServerDeployment.getPassword(), clientTimeout);
         configuration.addExtraClasses(extraClasses);
         KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
@@ -64,7 +64,7 @@ public class KieServerClientProvider {
     }
 
     public static KieServicesClient getSmartRouterClient(SmartRouterDeployment smartRouterDeployment, String userName, String password, long clientTimeout) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(smartRouterDeployment.getUrl().toString(),
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(smartRouterDeployment.getUrl().get().toString(),
                 userName, password, clientTimeout);
         List<String> capabilities = Arrays.asList(KieServerConstants.CAPABILITY_BPM,
                 KieServerConstants.CAPABILITY_BPM_UI,

@@ -16,13 +16,14 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.openshift.resource.Project;
 
 public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements SmartRouterDeployment {
 
-    private URL url;
+    private Optional<URL> url;
 
     private String serviceName;
 
@@ -30,7 +31,7 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
         super(project);
     }
 
-    @Override public URL getUrl() {
+    @Override public Optional<URL> getUrl() {
         if (url == null) {
             url = getHttpRouteUrl(serviceName);
         }
@@ -39,6 +40,9 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
 
     @Override
     public String getServiceName() {
+        if(serviceName == null) {
+            serviceName = ServiceUtil.getSmartRouterServiceName(getOpenShiftUtil());
+        }
         return serviceName;
     }
 
@@ -49,7 +53,7 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
     @Override public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl());
+            RouterUtil.waitForRouter(getUrl().get());
         }
     }
 }

@@ -16,12 +16,14 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import org.kie.cloud.openshift.resource.Project;
+import java.util.Optional;
+
 import org.kie.cloud.api.deployment.ControllerDeployment;
+import org.kie.cloud.openshift.resource.Project;
 
 public class ControllerDeploymentImpl extends OpenShiftDeployment implements ControllerDeployment {
 
-    private URL url;
+    private Optional<URL> url;
     private String username;
     private String password;
 
@@ -32,7 +34,7 @@ public class ControllerDeploymentImpl extends OpenShiftDeployment implements Con
     }
 
     @Override
-    public URL getUrl() {
+    public Optional<URL> getUrl() {
         if (url == null) {
             url = getHttpRouteUrl(getServiceName());
         }
@@ -69,7 +71,7 @@ public class ControllerDeploymentImpl extends OpenShiftDeployment implements Con
     public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl());
+            RouterUtil.waitForRouter(getUrl().get());
         }
     }
 }

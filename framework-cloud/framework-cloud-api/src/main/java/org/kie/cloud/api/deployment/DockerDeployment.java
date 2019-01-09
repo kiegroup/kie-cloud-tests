@@ -16,6 +16,7 @@
 package org.kie.cloud.api.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Docker deployment representation in cloud.
@@ -27,5 +28,5 @@ public interface DockerDeployment extends Deployment {
      *
      * @return Docker URL
      */
-    URL getUrl();
+    Optional<URL> getUrl();
 }
