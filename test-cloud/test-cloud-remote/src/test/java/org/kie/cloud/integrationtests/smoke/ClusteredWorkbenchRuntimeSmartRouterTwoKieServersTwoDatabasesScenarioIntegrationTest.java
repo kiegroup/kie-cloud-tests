@@ -17,6 +17,7 @@ package org.kie.cloud.integrationtests.smoke;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
@@ -85,6 +86,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Test
+    @Ignore
     public void testSmartRouter() {
         //TODO failing because of RHPAM-1561
         SmartRouterTestProvider.testRouterLoadBalancing(deploymentScenario.getWorkbenchRuntimeDeployment(),

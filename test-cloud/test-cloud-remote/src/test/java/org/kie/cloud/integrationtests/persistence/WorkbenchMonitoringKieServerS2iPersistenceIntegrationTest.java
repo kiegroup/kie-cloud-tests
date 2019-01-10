@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -45,6 +46,7 @@ import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.KieServerControllerClient;
 
+@Ignore
 public class WorkbenchMonitoringKieServerS2iPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     protected KieServicesClient kieServicesClient;
@@ -68,8 +70,7 @@ public class WorkbenchMonitoringKieServerS2iPersistenceIntegrationTest extends A
         DeploymentSettings kieServerS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder()
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
-                .withSmartRouterConnection("rhpam-immutable-mon-smartrouter")
-                //.withControllerConnection("rhpam-immutable-mon-rhpamcentrmon") //should not be hardcoded ! and connected to only smart router..
+                .withSmartRouterConnection("rhpam-immutable-mon-smartrouter") //TODO: get smart router service
                 .build();
 
         return deploymentScenarioFactory.getGenericScenarioBuilder()
@@ -81,6 +82,8 @@ public class WorkbenchMonitoringKieServerS2iPersistenceIntegrationTest extends A
         One mode:
 
         unmaneged- Kie Server S2I connected only to the smart router
+
+        //TODO: Run with fixed Smart Router  RHPAM-1561
         */
     }
 
