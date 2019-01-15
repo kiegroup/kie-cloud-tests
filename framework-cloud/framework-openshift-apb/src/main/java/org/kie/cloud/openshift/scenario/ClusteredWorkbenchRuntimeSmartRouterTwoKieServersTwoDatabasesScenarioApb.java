@@ -86,7 +86,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logger.info("Creating trusted secret");
         deployCustomTrustedSecret();
 
-        logger.info("Processesin APB image plan: " + extraVars.get(OpenShiftApbConstants.APB_PLAN_ID));
+        logger.info("Processing APB image plan: " + extraVars.get(OpenShiftApbConstants.APB_PLAN_ID));
         extraVars.put(OpenShiftApbConstants.IMAGE_STREAM_NAMESPACE, projectName);
         extraVars.put("namespace", projectName);
         extraVars.put("cluster", "openshift");
