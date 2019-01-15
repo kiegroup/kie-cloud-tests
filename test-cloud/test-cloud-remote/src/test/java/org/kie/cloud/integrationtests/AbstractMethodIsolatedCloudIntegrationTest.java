@@ -34,7 +34,7 @@ public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends Deplo
     @Before
     public void initializeDeployment() {
         try {
-        deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
+            deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
         } catch (UnsupportedOperationException ex) {
             Assume.assumeNoException(ex);
         }

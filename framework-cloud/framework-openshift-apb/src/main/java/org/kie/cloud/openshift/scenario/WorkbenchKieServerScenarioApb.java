@@ -71,7 +71,7 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario implements 
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setServiceSuffix("-0");
-        kieServerDeployment.setUsername(ApbConstants.DefaultUser.KIE_SERVER_USER);
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(ApbConstants.DefaultUser.PASSWORD);
 
         logger.info("Waiting for Workbench deployment to become ready.");

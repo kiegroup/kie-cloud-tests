@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.integrationtests.scaling;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -44,8 +46,6 @@ import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
     private static final String SMART_ROUTER_ID = "test-kie-router";
