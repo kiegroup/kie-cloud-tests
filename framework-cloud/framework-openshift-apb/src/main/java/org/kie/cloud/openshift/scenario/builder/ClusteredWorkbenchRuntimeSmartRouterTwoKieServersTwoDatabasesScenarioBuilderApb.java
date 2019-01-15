@@ -39,7 +39,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderApb() {
         // Required values to create persitence values.
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.MANAGED);
-        extraVars.put(OpenShiftApbConstants.APB_KIESERVER_DB_TYPE, ApbConstants.DbType.POSTGRE);
+        extraVars.put(OpenShiftApbConstants.APB_KIESERVER_DB_TYPE, ApbConstants.DbType.MYSQL);
         extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, "1.0");
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_SETS, "2");
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_REPLICAS, "2");
