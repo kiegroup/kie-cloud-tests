@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.cloud</groupId>
     <artifactId>framework-cloud</artifactId>
-    <version>7.11.1-SNAPSHOT</version>
+    <version>7.15.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>framework-openshift-apb</artifactId>
@@ -78,35 +78,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>skip-framework-openshift-tests</id>
-      <activation>
-        <property>
-          <name>!testFrameworkOpenshift</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
   <build>
     <resources>
