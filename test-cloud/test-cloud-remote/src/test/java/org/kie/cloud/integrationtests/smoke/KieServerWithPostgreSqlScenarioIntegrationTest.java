@@ -38,7 +38,6 @@ public class KieServerWithPostgreSqlScenarioIntegrationTest extends AbstractClou
 
     @BeforeClass
     public static void initializeDeployment() {
-        //TODO: apply for all tests
         try {
             deploymentScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())

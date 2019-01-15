@@ -49,10 +49,9 @@ public class WorkbenchMonitoringScenarioIntegrationTest extends AbstractMethodIs
 
         WorkbenchMonitoringSettingsBuilder workbenchMonitoringSettingsBuilder = deploymentScenarioFactory.getWorkbenchMonitoringSettingsBuilder();
 
-        return Arrays.asList(new Object[][]{
-            //TODO: mainly for ABP
-            {"Workbench monitoring + Smart router", workbenchMonitoringSettingsBuilder}
-        });
+        return Arrays.asList(new Object[][] {
+                // For ABP immutable workbench monitoring plan.
+                { "Workbench monitoring + Smart router", workbenchMonitoringSettingsBuilder } });
     }
 
     @Override
