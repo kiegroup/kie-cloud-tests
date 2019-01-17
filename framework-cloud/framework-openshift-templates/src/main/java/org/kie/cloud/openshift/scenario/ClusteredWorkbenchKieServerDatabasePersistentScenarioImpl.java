@@ -85,7 +85,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 
-            envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().get().toString()));
+            envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
 
             ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();

@@ -16,7 +16,6 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.DockerDeployment;
 import org.kie.cloud.openshift.resource.Project;
@@ -24,7 +23,7 @@ import org.kie.cloud.openshift.resource.Project;
 public class DockerDeploymentImpl extends OpenShiftDeployment implements DockerDeployment {
 
     private String serviceName;
-    private Optional<URL> url;
+    private URL url;
 
     public DockerDeploymentImpl(Project project) {
         super(project);
@@ -39,9 +38,9 @@ public class DockerDeploymentImpl extends OpenShiftDeployment implements DockerD
     }
 
     @Override
-    public Optional<URL> getUrl() {
+    public URL getUrl() {
         if (url == null) {
-            url = getHttpRouteUrl(getServiceName());
+            url = getHttpRouteUrl(getServiceName()).orElseThrow(() -> new RuntimeException("No Docker URL is available."));
         }
         return url;
     }

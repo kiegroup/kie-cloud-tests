@@ -74,7 +74,7 @@ public class KieServerWithPostgreSqlScenarioImpl extends OpenShiftScenario imple
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 
-            envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().get().toString()));
+            envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
 
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");

@@ -28,12 +28,19 @@ public interface KieServerDeployment extends Deployment {
      *
      * @return Kie Server URL
      */
-    Optional<URL> getUrl();
+    URL getUrl();
+
+    /**
+     * Get HTTP URL for Kie Server service (deployment).
+     *
+     * @return Kie Server URL
+     */
+    Optional<URL> getInsecureUrl();
 
     /**
      * Get HTTPS URL for Kie Server service (deployment).
      *
-     * @return Kie Server secure URL
+     * @return Kie Server URL
      */
     Optional<URL> getSecureUrl();
 

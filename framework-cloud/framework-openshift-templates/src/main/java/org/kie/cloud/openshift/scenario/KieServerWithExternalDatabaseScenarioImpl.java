@@ -149,8 +149,8 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
     private void installDriverImageToRegistry(DockerDeployment dockerDeployment, ExternalDriver externalDriver) {
         File kieJdbcDriverScriptsFolder = OpenShiftConstants.getKieJdbcDriverScriptsFolder();
-        String dockerImageBuildCommand = externalDriver.getDockerImageBuildCommand(kieJdbcDriverScriptsFolder, dockerDeployment.getUrl().get());
-        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl().get());
+        String dockerImageBuildCommand = externalDriver.getDockerImageBuildCommand(kieJdbcDriverScriptsFolder, dockerDeployment.getUrl());
+        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl());
 
         try (ProcessExecutor processExecutor = new ProcessExecutor()) {
             logger.info("Building JDBC driver image.");
@@ -163,7 +163,7 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario
 
     private void createDriverImageStreams(DockerDeployment dockerDeployment, ExternalDriver externalDriver) {
         String imageStreamName = externalDriver.getImageName();
-        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl().get());
+        String dockerTag = externalDriver.getDockerTag(dockerDeployment.getUrl());
 
         project.createImageStream(imageStreamName, dockerTag);
     }

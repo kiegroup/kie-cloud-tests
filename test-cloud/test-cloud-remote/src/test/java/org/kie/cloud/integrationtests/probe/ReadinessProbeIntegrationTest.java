@@ -175,7 +175,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
 
         WebTarget target;
         try {
-            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl().orElseGet(deploymentScenario.getKieServerDeployment().getSecureUrl()::get), KIE_CONTAINERS_REQUEST_URL);
+            URL url = new URL(deploymentScenario.getKieServerDeployment().getUrl(), KIE_CONTAINERS_REQUEST_URL);
             target = httpKieServerClient.target(url.toString());
         } catch (Exception e) {
             throw new RuntimeException("Error creating list container request.", e);
@@ -200,7 +200,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
 
     private void checkBCLoginScreenAvailable() {
         logger.debug("Check that workbench login screen is available");
-        URL url = deploymentScenario.getWorkbenchDeployment().getUrl().orElseGet(deploymentScenario.getWorkbenchDeployment().getSecureUrl()::get);
+        URL url = deploymentScenario.getWorkbenchDeployment().getUrl();
         HttpURLConnection httpURLConnection;
         try {
             httpURLConnection = (HttpURLConnection) url.openConnection();

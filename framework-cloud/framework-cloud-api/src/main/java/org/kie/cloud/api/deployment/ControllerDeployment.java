@@ -28,7 +28,21 @@ public interface ControllerDeployment extends Deployment {
      *
      * @return Workbench URL
      */
-    Optional<URL> getUrl();
+    URL getUrl();
+
+    /**
+     * Get HTTP URL for Controller service (deployment).
+     *
+     * @return Controller URL
+     */
+    Optional<URL> getInsecureUrl();
+
+    /**
+     * Get HTTPS URL for Controller service (deployment).
+     *
+     * @return Controller URL
+     */
+    Optional<URL> getSecureUrl();
 
     /**
      * Get Controller user name. Controller username is set by env. variable

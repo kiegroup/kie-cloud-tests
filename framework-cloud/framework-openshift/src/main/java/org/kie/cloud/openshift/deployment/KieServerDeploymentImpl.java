@@ -23,7 +23,7 @@ import org.kie.cloud.openshift.resource.Project;
 
 public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieServerDeployment {
 
-    private Optional<URL> url;
+    private Optional<URL> insecureUrl;
     private Optional<URL> secureUrl;
     private String username;
     private String password;
@@ -35,14 +35,21 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         super(project);
     }
 
-    @Override public Optional<URL> getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(getServiceName());
-        }
-        return url;
+    @Override
+    public URL getUrl() {
+        return getInsecureUrl().orElseGet(() -> getSecureUrl().orElseThrow(() -> new RuntimeException("No Kie server URL is available.")));
     }
 
-    @Override public Optional<URL> getSecureUrl() {
+    @Override
+    public Optional<URL> getInsecureUrl() {
+        if (insecureUrl == null) {
+            insecureUrl = getHttpRouteUrl(getServiceName());
+        }
+        return insecureUrl;
+    }
+
+    @Override
+    public Optional<URL> getSecureUrl() {
         if (secureUrl == null) {
             secureUrl = getHttpsRouteUrl(getServiceName());
         }
@@ -80,7 +87,7 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
     @Override public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl().orElseGet(getSecureUrl()::get));
+            RouterUtil.waitForRouter(getUrl());
         }
     }
 }

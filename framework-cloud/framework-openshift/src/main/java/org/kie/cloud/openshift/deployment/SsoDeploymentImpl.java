@@ -24,7 +24,8 @@ import org.kie.cloud.openshift.resource.Project;
 public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeployment {
 
     private String serviceName;
-    private Optional<URL> url;
+    private Optional<URL> insecureUrl;
+    private Optional<URL> secureUrl;
     private String username;
     private String password;
 
@@ -41,11 +42,24 @@ public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeploym
     }
 
     @Override
-    public Optional<URL> getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(serviceName);
+    public URL getUrl() {
+        return getInsecureUrl().orElseGet(() -> getSecureUrl().orElseThrow(() -> new RuntimeException("No SSO URL is available.")));
+    }
+
+    @Override
+    public Optional<URL> getInsecureUrl() {
+        if (insecureUrl == null) {
+            insecureUrl = getHttpRouteUrl(getServiceName());
         }
-        return url;
+        return insecureUrl;
+    }
+
+    @Override
+    public Optional<URL> getSecureUrl() {
+        if (secureUrl == null) {
+            secureUrl = getHttpsRouteUrl(getServiceName());
+        }
+        return secureUrl;
     }
 
     @Override
@@ -70,7 +84,7 @@ public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeploym
     public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl().get());
+            RouterUtil.waitForRouter(getUrl());
         }
     }
 
