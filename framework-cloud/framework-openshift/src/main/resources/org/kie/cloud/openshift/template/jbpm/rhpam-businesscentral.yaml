@@ -9,9 +9,9 @@ metadata:
     openshift.io/display-name: Red Hat Process Automation Manager 7.2 Business Central
     description: Application template for a Red Hat Process Automation Manager 7.2 Business Central
     template.openshift.io/bindable: "false"
-  name: rhpam72-authoring
+  name: rhpam${rhba.images.version.prefix}-authoring
 labels:
-  template: rhpam72-businesscentral
+  template: rhpam${rhba.images.version.prefix}-businesscentral
   rhpam: "1.0"
 message: |-
           A new persistent Process Automation Manager application have been created in your project.
@@ -236,7 +236,7 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: "${IMAGE_STREAM_NAMESPACE}"
-          name: "rhpam72-businesscentral-openshift:${IMAGE_STREAM_TAG}"
+          name: "rhpam${rhba.images.version.prefix}-businesscentral-openshift:${IMAGE_STREAM_TAG}"
     - type: ConfigChange
     replicas: 1
     selector:
@@ -252,7 +252,7 @@ objects:
         terminationGracePeriodSeconds: 60
         containers:
         - name: "${APPLICATION_NAME}-rhpamcentr"
-          image: rhpam72-businesscentral-openshift
+          image: rhpam${rhba.images.version.prefix}-businesscentral-openshift
           imagePullPolicy: Always
           resources:
             limits:

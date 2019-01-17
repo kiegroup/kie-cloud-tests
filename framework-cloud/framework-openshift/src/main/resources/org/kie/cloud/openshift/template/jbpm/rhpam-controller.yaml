@@ -8,9 +8,9 @@ metadata:
     tags: rhpam,jboss,xpaas
     version: 1.4.0
     openshift.io/display-name: Red Hat Process Automation Manager 7.2 Standalone Controller
-  name: rhpam72-controller
+  name: rhpam${rhba.images.version.prefix}-controller
 labels:
-  template: rhpam72-controller
+  template: rhpam${rhba.images.version.prefix}-controller
   xpaas: 1.4.0
 message: A new Standalone Controller applications have been created in your project. The username/password for accessing Standalone Controller interface is ${KIE_ADMIN_USER}/${KIE_ADMIN_PWD}.
 parameters:
@@ -159,7 +159,7 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: "${IMAGE_STREAM_NAMESPACE}"
-          name: "rhpam72-controller-openshift:${IMAGE_STREAM_TAG}"
+          name: "rhpam${rhba.images.version.prefix}-controller-openshift:${IMAGE_STREAM_TAG}"
     - type: ConfigChange
     replicas: 1
     selector:
@@ -175,7 +175,7 @@ objects:
         terminationGracePeriodSeconds: 60
         containers:
         - name: "${APPLICATION_NAME}-controller"
-          image: rhpam72-controller-openshift
+          image: rhpam${rhba.images.version.prefix}-controller-openshift
           imagePullPolicy: Always
           resources:
             limits:
