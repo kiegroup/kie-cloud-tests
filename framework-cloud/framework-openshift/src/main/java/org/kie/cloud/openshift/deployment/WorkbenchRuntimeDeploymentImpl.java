@@ -24,7 +24,7 @@ import org.kie.cloud.openshift.resource.Project;
 
 public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implements WorkbenchDeployment {
 
-    private Optional<URL> url;
+    private Optional<URL> insecureUrl;
     private Optional<URL> secureUrl;
     private Optional<URI> webSocketUri;
     private String username;
@@ -36,14 +36,21 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
         super(project);
     }
 
-    @Override public Optional<URL> getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(getServiceName());
-        }
-        return url;
+    @Override
+    public URL getUrl() {
+        return getInsecureUrl().orElseGet(() -> getSecureUrl().orElseThrow(() -> new RuntimeException("No controller URL is available.")));
     }
 
-    @Override public Optional<URL> getSecureUrl() {
+    @Override
+    public Optional<URL> getInsecureUrl() {
+        if (insecureUrl == null) {
+            insecureUrl = getHttpRouteUrl(getServiceName());
+        }
+        return insecureUrl;
+    }
+
+    @Override
+    public Optional<URL> getSecureUrl() {
         if (secureUrl == null) {
             secureUrl = getHttpsRouteUrl(getServiceName());
         }
@@ -88,7 +95,7 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
     @Override public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl().orElseGet(getSecureUrl()::get));
+            RouterUtil.waitForRouter(getUrl());
         }
     }
 }

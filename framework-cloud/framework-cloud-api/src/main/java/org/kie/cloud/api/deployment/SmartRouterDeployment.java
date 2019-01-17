@@ -28,5 +28,19 @@ public interface SmartRouterDeployment extends Deployment {
      *
      * @return Smart router URL
      */
-    Optional<URL> getUrl();
+    URL getUrl();
+
+    /**
+     * Get HTTP URL for Smart router service (deployment).
+     *
+     * @return Smart router URL
+     */
+    Optional<URL> getInsecureUrl();
+
+    /**
+     * Get HTTPS URL for Smart router service (deployment).
+     *
+     * @return Smart router URL
+     */
+    Optional<URL> getSecureUrl();
 }

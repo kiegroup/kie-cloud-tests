@@ -108,7 +108,7 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
                 Map<String, String> envVariables = deploymentSettings.getEnvVariables();
                 envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
                 envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
-                envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().get().toString()));
+                envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
                 envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
 
                 ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
