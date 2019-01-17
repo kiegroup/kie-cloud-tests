@@ -22,7 +22,7 @@ import org.kie.cloud.api.deployment.SsoDeployment;
 /**
  * Representation of deployment scenario with Kie server and external database.
  */
-public interface KieServerWithDatabaseScenario extends DeploymentScenario {
+public interface KieServerWithDatabaseScenario extends KieDeploymentScenario {
 
     /**
      * Return Kie Server deployment.

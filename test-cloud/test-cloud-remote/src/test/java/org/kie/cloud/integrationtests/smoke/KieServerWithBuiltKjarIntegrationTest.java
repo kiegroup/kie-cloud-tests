@@ -36,7 +36,7 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
@@ -55,13 +55,13 @@ import org.kie.server.integrationtests.shared.KieServerAssert;
 
 @Category(Smoke.class)
 @RunWith(Parameterized.class)
-public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
+public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public DeploymentScenario kieServerScenario;
+    public KieDeploymentScenario kieServerScenario;
 
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
@@ -108,7 +108,7 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
     }
 
     @Override
-    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected KieDeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return kieServerScenario;
     }
 

@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
@@ -54,13 +54,13 @@ import org.kie.server.controller.client.KieServerControllerClient;
 
 @RunWith(Parameterized.class)
 @Ignore("Currently all templates are using WebSockets, generic scenario builder is not capable of configuring HTTP. Ignoring for now until new generic scenario builder is available.")
-public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
+public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
 
     @Parameterized.Parameter(value = 0)
     public String testScenarioName;
 
     @Parameterized.Parameter(value = 1)
-    public DeploymentScenario deploymentScenario;
+    public KieDeploymentScenario deploymentScenario;
 
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -95,7 +95,7 @@ public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedC
     }
 
     @Override
-    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected KieDeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenario;
     }
 

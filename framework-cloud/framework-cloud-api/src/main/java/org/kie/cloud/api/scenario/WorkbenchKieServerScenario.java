@@ -21,7 +21,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 /**
  * Representation of deployment scenario with Workbench and Kie server.
  */
-public interface WorkbenchKieServerScenario extends DeploymentScenario {
+public interface WorkbenchKieServerScenario extends KieDeploymentScenario {
 
     /**
      * Return Workbench deployment.

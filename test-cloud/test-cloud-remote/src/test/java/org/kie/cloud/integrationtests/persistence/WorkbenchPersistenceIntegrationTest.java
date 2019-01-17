@@ -34,7 +34,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
-import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
@@ -55,13 +55,13 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 @RunWith(Parameterized.class)
 @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed.")
-public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
+public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
 
     @Parameter(value = 0)
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public DeploymentScenario workbenchKieServerScenario;
+    public KieDeploymentScenario workbenchKieServerScenario;
 
     private String repositoryName;
 
@@ -88,7 +88,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
     }
 
     @Override
-    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected KieDeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return workbenchKieServerScenario;
     }
 

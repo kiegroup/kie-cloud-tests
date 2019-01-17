@@ -15,10 +15,12 @@
 
 package org.kie.cloud.api.scenario.builder;
 
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
+
 /**
  * Cloud deployment scenario builder. Create setup for Deployment scenario.
  *
- * @see org.kie.cloud.api.scenario.DeploymentScenario
+ * @see KieDeploymentScenario
  *
  * @param <T> Setup to be built e.g. WorkbenchKieServerDatabaseScenario
  * @see org.kie.cloud.api.scenario.WorkbenchKieServerDatabaseScenario

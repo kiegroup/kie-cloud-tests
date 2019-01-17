@@ -18,6 +18,6 @@ package org.kie.cloud.api.scenario;
 /**
  * Cloud generic deployment scenario representation.
  */
-public interface GenericScenario extends DeploymentScenario {
+public interface GenericScenario extends KieDeploymentScenario {
 
 }
