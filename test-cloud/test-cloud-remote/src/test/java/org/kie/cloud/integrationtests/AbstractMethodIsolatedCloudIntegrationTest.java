@@ -16,7 +16,6 @@
 package org.kie.cloud.integrationtests;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -33,11 +32,7 @@ public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends Deplo
 
     @Before
     public void initializeDeployment() {
-        try {
-            deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
-        } catch (UnsupportedOperationException ex) {
-            Assume.assumeNoException(ex);
-        }
+        deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
         deploymentScenario.setLogFolderName(testName.getMethodName());
 
         ScenarioDeployer.deployScenario(deploymentScenario);

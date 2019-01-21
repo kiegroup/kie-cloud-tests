@@ -138,6 +138,7 @@
         <custom.trusted.secret.name>rhpam-certs</custom.trusted.secret.name>
         <custom.trusted.keystore.alias>jboss</custom.trusted.keystore.alias>
         <custom.trusted.keystore.pwd>test</custom.trusted.keystore.pwd>
+        <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.ApbNotSupported</failsafe.excluded.groups>
       </properties>
       <dependencies>
         <dependency>

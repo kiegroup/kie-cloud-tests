@@ -36,6 +36,7 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
@@ -58,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * Test for Architecture 5 from
  * http://mswiderski.blogspot.cz/2017/08/cloud-runtime-architectures-for-jbpm.html
  */
-@Category(JBPMOnly.class)
+@Category({JBPMOnly.class, ApbNotSupported.class})
 public class EmptyUnmanagedKieServersWithSmartRouterIntegrationTest extends AbstractCloudArchitectureIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(EmptyUnmanagedKieServersWithSmartRouterIntegrationTest.class);
