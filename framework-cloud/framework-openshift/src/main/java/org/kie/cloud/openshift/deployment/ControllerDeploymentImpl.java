@@ -23,7 +23,8 @@ import org.kie.cloud.openshift.resource.Project;
 
 public class ControllerDeploymentImpl extends OpenShiftDeployment implements ControllerDeployment {
 
-    private Optional<URL> url;
+    private Optional<URL> insecureUrl;
+    private Optional<URL> secureUrl;
     private String username;
     private String password;
 
@@ -34,11 +35,24 @@ public class ControllerDeploymentImpl extends OpenShiftDeployment implements Con
     }
 
     @Override
-    public Optional<URL> getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(getServiceName());
+    public URL getUrl() {
+        return getInsecureUrl().orElseGet(() -> getSecureUrl().orElseThrow(() -> new RuntimeException("No controller URL is available.")));
+    }
+
+    @Override
+    public Optional<URL> getInsecureUrl() {
+        if (insecureUrl == null) {
+            insecureUrl = getHttpRouteUrl(getServiceName());
         }
-        return url;
+        return insecureUrl;
+    }
+
+    @Override
+    public Optional<URL> getSecureUrl() {
+        if (secureUrl == null) {
+            secureUrl = getHttpsRouteUrl(getServiceName());
+        }
+        return secureUrl;
     }
 
     @Override
@@ -71,7 +85,7 @@ public class ControllerDeploymentImpl extends OpenShiftDeployment implements Con
     public void waitForScale() {
         super.waitForScale();
         if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl().get());
+            RouterUtil.waitForRouter(getUrl());
         }
     }
 }

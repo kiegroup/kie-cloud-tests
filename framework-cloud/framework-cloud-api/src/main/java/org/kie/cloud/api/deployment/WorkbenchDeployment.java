@@ -27,14 +27,21 @@ public interface WorkbenchDeployment extends Deployment {
     /**
      * Get URL for Kie Workbench service (deployment).
      *
-     * @return Workbench URL
+     * @return Kie Workbench URL
      */
-    Optional<URL> getUrl();
+    URL getUrl();
+
+    /**
+     * Get HTTP URL for Kie Workbench service (deployment).
+     *
+     * @return Kie Workbench URL
+     */
+    Optional<URL> getInsecureUrl();
 
     /**
      * Get HTTPS URL for Kie Workbench service (deployment).
      *
-     * @return Workbench URL
+     * @return Kie Workbench URL
      */
     Optional<URL> getSecureUrl();
 

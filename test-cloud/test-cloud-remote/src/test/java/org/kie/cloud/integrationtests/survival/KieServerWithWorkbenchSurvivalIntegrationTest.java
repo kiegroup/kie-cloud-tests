@@ -19,6 +19,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -181,8 +182,8 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMetho
      * @param e ProcessingException
      */
     private void validateProcessingExceptionCausedBySocketTimeoutException(ProcessingException e) {
-        if (e.getCause() instanceof SocketTimeoutException) {
-            logger.debug("ProcessingException caused by SocketTimeoutException, indicates that Kie server is unavailable.");
+        if (e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof SSLHandshakeException) {
+            logger.debug("ProcessingException caused by "+ e.getCause().getClass() +", indicates that Kie server is unavailable.");
         } else {
             throw e;
         }

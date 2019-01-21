@@ -59,7 +59,7 @@ public class SsoDeployer {
         logger.info("Waiting for SSO deployment to become ready.");
         ssoDeployment.waitForScale();
 
-        createRolesAndUsers(ssoDeployment.getUrl().get().toString() + "/auth", SSO_REALM);
+        createRolesAndUsers(ssoDeployment.getUrl().toString() + "/auth", SSO_REALM);
 
         return ssoDeployment;
     }

@@ -17,12 +17,14 @@ package org.kie.cloud.integrationtests.s2i;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,11 +48,15 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.SolverServicesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerS2iOptaplannerIntegrationTest.class);
 
     @Parameter(value = 0)
     public String testScenarioName;
@@ -83,13 +89,17 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+        try {
+            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+            scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("KIE Server HTTPS S2I is skipped.", ex);
+        }
 
-        return Arrays.asList(new Object[][]{
-            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings}
-        });
+        return scenarios;
     }
 
     @Override

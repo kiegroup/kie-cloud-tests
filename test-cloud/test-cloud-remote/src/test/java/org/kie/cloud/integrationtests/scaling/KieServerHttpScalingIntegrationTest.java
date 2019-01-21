@@ -15,9 +15,9 @@
  */
 package org.kie.cloud.integrationtests.scaling;
 
-import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -51,10 +51,14 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.client.KieServerControllerClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 @Ignore("Currently all templates are using WebSockets, generic scenario builder is not capable of configuring HTTP. Ignoring for now until new generic scenario builder is available.")
 public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerHttpScalingIntegrationTest.class);
 
     @Parameterized.Parameter(value = 0)
     public String testScenarioName;
@@ -67,31 +71,39 @@ public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedC
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
+        try {
+            WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .build();
+            scenarios.add(new Object[]{"Workbench + KIE Server", workbenchKieServerScenario});
+         } catch (UnsupportedOperationException ex) {
+            logger.info("Workbench + KIE Server is skipped.", ex);
+        }
 
-        DeploymentSettings controllerSettings = deploymentScenarioFactory.getControllerSettingsBuilder()
+        try {
+            DeploymentSettings controllerSettings = deploymentScenarioFactory.getControllerSettingsBuilder()
                 .withApplicationName("standalone")
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .withKieServerUser(DeploymentConstants.getKieServerUser(), DeploymentConstants.getKieServerPassword())
                 .build();
-        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
+            DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withControllerConnection("standalone-controller")
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .build();
-        GenericScenario controllerAndKieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+            GenericScenario controllerAndKieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
                 .withKieServer(kieServerSettings)
                 .withController(controllerSettings)
                 .build();
+            scenarios.add(new Object[] { "Controller + KIE Server", controllerAndKieServerScenario });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("Controller + KIE Server is skipped.", ex);
+        }
 
-        return Arrays.asList(new Object[][]{
-            {"Workbench + KIE Server", workbenchKieServerScenario},
-            {"Controller + KIE Server", controllerAndKieServerScenario}
-        });
+        return scenarios;
     }
 
     @Override

@@ -15,18 +15,16 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
-import cz.xtf.openshift.OpenShiftBinaryClient;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
@@ -48,6 +46,8 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.xtf.openshift.OpenShiftBinaryClient;
+
 @RunWith(Parameterized.class)
 public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
 
@@ -67,19 +67,28 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+        try {
+            WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                 .withGitHooksDir(GIT_HOOKS_REMOTE_DIR)
                 .build();
+            scenarios.add(new Object[] { "Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("Workbench + KIE Server - Persistent is skipped.", ex);
+        }
 
-        ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
+        try {
+            ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                 .withGitHooksDir(GIT_HOOKS_REMOTE_DIR)
                 .build();
+            scenarios.add(new Object[]{"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario});
+        } catch (UnsupportedOperationException ex) {
+            logger.info("Clustered Workbench + KIE Server + Database - Persistent scenario is skipped.", ex);
+        }
 
-        return Arrays.asList(new Object[][]{
-            {"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario},
-            {"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario},});
+        return scenarios;
     }
 
     @Override

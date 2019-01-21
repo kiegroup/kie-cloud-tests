@@ -19,6 +19,8 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -57,6 +59,10 @@ public class RouterUtil {
                 }
 
                 Thread.sleep(ROUTER_WAIT_ITERATION_TIME);
+            } catch (SSLHandshakeException e) {
+                logger.warn("SSLHandshakeException: " + e.getMessage());
+                logger.info("Try to execute request again.");
+                continue;
             } catch (Exception e) {
                 logger.error("Error waiting for router", e);
                 throw new RuntimeException("Error waiting for router", e);

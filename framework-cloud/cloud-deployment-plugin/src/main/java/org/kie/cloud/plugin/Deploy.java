@@ -84,9 +84,9 @@ public class Deploy extends AbstractMojo {
             throw new RuntimeException("Error loading build properties", e);
         }
 
-        buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_IP, workbenchDeployment.getUrl().get().getHost());
-        buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_PORT, String.valueOf(extractPort(workbenchDeployment.getUrl().get())));
-        buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_CONTEXT_ROOT, extractContextRoot(workbenchDeployment.getUrl().get()));
+        buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_IP, workbenchDeployment.getUrl().getHost());
+        buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_PORT, String.valueOf(extractPort(workbenchDeployment.getUrl())));
+        buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_CONTEXT_ROOT, extractContextRoot(workbenchDeployment.getUrl()));
         buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_USERNAME, workbenchDeployment.getUsername());
         buildProperties.setProperty(BUILD_PROPERTIES_WORKBENCH_PASSWORD, workbenchDeployment.getPassword());
 

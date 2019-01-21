@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -100,34 +101,43 @@ public class ProjectImpl implements Project {
         }
     }
 
+    static Semaphore semaphore = new Semaphore(1);
+
     @Override
     public synchronized void processApbRun(String image, Map<String, String> extraVars) {
         String podName = "apb-pod-" + UUID.randomUUID().toString().substring(0, 4);
 
-        OpenShiftBinaryClient oc = OpenShiftBinaryClient.getInstance();
-        oc.project(projectName);
-        if(util.getServiceAccount("apb") == null) {
-            oc.executeCommand("Creating serviceaccount failed.", "create", "serviceaccount", "apb");
-            oc.executeCommand("Role binding failed.", "create", "rolebinding", "apb", "--clusterrole=admin", "--serviceaccount=" + projectName + ":apb");
+        try {
+            semaphore.acquire();
+            OpenShiftBinaryClient oc = OpenShiftBinaryClient.getInstance();
+            oc.project(projectName);
+            if(util.getServiceAccount("apb") == null) {
+                oc.executeCommand("Creating serviceaccount failed.", "create", "serviceaccount", "apb");
+                oc.executeCommand("Role binding failed.", "create", "rolebinding", "apb", "--clusterrole=admin", "--serviceaccount=" + projectName + ":apb");
+            }
+
+            List<String> args = new ArrayList<>();
+            args.add("run");
+            args.add(podName);
+            // args.add("--namespace=" + projectName);
+            args.add("--env=POD_NAME=" + podName);
+            args.add("--env=POD_NAMESPACE=" + projectName);
+            args.add("--image=" + image);
+            args.add("--restart=Never");
+            args.add("--attach=true");
+            args.add("--serviceaccount=apb");
+            args.add("--");
+            args.add("provision");
+            args.add("--extra-vars");
+            args.add(formatExtraVars(extraVars));
+
+            logger.info("Executing command: oc " + getApbCommand(args));
+            oc.executeCommand("APB failed.", args.toArray(new String[args.size()]));
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Failed acquire from java.util.concurrent.Semaphore", e);
+        } finally {
+            semaphore.release();
         }
-
-        List<String> args = new ArrayList<>();
-        args.add("run");
-        args.add(podName);
-        // args.add("--namespace=" + projectName);
-        args.add("--env=POD_NAME=" + podName);
-        args.add("--env=POD_NAMESPACE=" + projectName);
-        args.add("--image=" + image);
-        args.add("--restart=Never");
-        args.add("--attach=true");
-        args.add("--serviceaccount=apb");
-        args.add("--");
-        args.add("provision");
-        args.add("--extra-vars");
-        args.add(formatExtraVars(extraVars));
-
-        logger.info("Executing command: oc " + getApbCommand(args));
-        oc.executeCommand("APB failed.", args.toArray(new String[args.size()]));
     }
 
     private String getApbCommand(List<String> args) {

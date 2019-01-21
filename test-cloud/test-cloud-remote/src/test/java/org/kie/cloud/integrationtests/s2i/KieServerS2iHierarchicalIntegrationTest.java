@@ -15,7 +15,9 @@
  */
 package org.kie.cloud.integrationtests.s2i;
 
-import java.util.Arrays;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,7 +39,6 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.Constants;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
@@ -46,11 +47,13 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerS2iHierarchicalIntegrationTest.class);
 
     @Parameter(value = 0)
     public String testScenarioName;
@@ -60,13 +63,17 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+        try {
+            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+            scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("KIE Server HTTPS S2I is skipped.", ex);
+        }
 
-        return Arrays.asList(new Object[][]{
-            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings}
-        });
+        return scenarios;
     }
 
     protected KieServicesClient kieServicesClient;
@@ -87,11 +94,11 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = getGitProvider().createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
+                .withSourceLocation(getGitProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
                 .build();
 
         return deploymentScenarioFactory.getGenericScenarioBuilder()
@@ -108,7 +115,7 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
 
     @After
     public void deleteRepo() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+        getGitProvider().deleteGitRepository(repositoryName);
     }
 
     @Test
