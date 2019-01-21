@@ -18,7 +18,6 @@ package org.kie.cloud.integrationtests.s2i;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -45,6 +45,7 @@ import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
@@ -52,9 +53,14 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.KieServerReflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
+@Category(ApbNotSupported.class) // Because DroolsServerFilterClasses not supported yet
 public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerS2iDroolsIntegrationTest.class);
 
     @Parameter(value = 0)
     public String testScenarioName;
@@ -64,13 +70,17 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+        try {
+            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+            scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("KIE Server HTTPS S2I is skipped.", ex);
+        }
 
-        return Arrays.asList(new Object[][]{
-            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings}
-        });
+        return scenarios;
     }
 
     private KieServicesClient kieServicesClient;

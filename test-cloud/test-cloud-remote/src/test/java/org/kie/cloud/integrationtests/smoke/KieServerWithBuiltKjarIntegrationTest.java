@@ -17,7 +17,6 @@ package org.kie.cloud.integrationtests.smoke;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,6 +51,8 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Category(Smoke.class)
 @RunWith(Parameterized.class)
@@ -62,6 +63,8 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
 
     @Parameter(value = 1)
     public DeploymentScenario kieServerScenario;
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerWithBuiltKjarIntegrationTest.class);
 
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
@@ -80,31 +83,43 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
+        try {
+            KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .build();
+            scenarios.add(new Object[] { "KIE Server + MySQL", kieServerMySqlScenario });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("KIE Server + MySQL is skipped.", ex);
+        }
 
-        KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
+        try {
+            KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .build();
+            scenarios.add(new Object[] { "KIE Server + PostgreSQL", kieServerPostgreSqlScenario });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("KIE Server + PostgreSQL is skipped.", ex);
+        }
 
-        DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
+        try {
+            DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                 .build();
-        GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
+            GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
                 .withKieServer(kieServerSettings)
                 .build();
+            scenarios.add(new Object[] { "KIE Server", kieServerScenario });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("KIE Server is skipped.", ex);
+        }
 
-        return Arrays.asList(new Object[][]{
-            {"KIE Server", kieServerScenario},
-            {"KIE Server + MySQL", kieServerMySqlScenario},
-            {"KIE Server + PostgreSQL", kieServerPostgreSqlScenario},
-        });
+        return scenarios;
     }
 
     @Override

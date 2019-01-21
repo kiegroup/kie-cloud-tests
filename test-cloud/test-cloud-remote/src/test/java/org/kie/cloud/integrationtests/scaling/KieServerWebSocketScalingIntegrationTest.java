@@ -100,7 +100,7 @@ public class KieServerWebSocketScalingIntegrationTest {
 
             DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
                     .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                    .withControllerConnection(Protocol.ws.name(), workbenchDeployment.getWebSocketUri().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().getPort()))
+                    .withControllerConnection(Protocol.ws.name(), workbenchDeployment.getWebSocketUri().get().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().get().getPort()))
                     .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                     .withKieServerSyncDeploy(true)
                     .build();
@@ -112,6 +112,9 @@ public class KieServerWebSocketScalingIntegrationTest {
             kieServerDeployment = kieServerScenario.getKieServerDeployments().get(0);
         } catch (MissingResourceException e) {
             logger.warn("Skipping test because of missing resource.", e);
+            Assume.assumeNoException(e);
+        } catch (UnsupportedOperationException e) {
+            logger.warn("Skipping test", e);
             Assume.assumeNoException(e);
         }
 

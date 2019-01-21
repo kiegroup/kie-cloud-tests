@@ -16,6 +16,7 @@
 package org.kie.cloud.integrationtests.smoke;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -37,9 +38,13 @@ public class KieServerWithMySqlScenarioIntegrationTest extends AbstractCloudInte
 
     @BeforeClass
     public static void initializeDeployment() {
+        try{
         deploymentScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                                                       .build();
+        } catch (UnsupportedOperationException ex) {
+            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+        }
         deploymentScenario.setLogFolderName(KieServerWithMySqlScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }

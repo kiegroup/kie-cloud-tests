@@ -20,6 +20,8 @@
     <openshift.master.url/> <!-- Needs to be defined for proper test run on OpenShift. -->
     <openshift.username>user</openshift.username>
     <openshift.password>redhat</openshift.password>
+    <openshift.admin.username>admin</openshift.admin.username>
+    <openshift.admin.password>admin</openshift.admin.password>
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
 
@@ -74,6 +76,15 @@
 
     <!-- Location for custom Kie application templates. Can be used to point tests to the location containing templates to be used for tests. -->
     <kie.app.template.url/>
+
+    <!-- Custom trusted secret -->
+    <custom.trusted.app.secret/>
+    <custom.trusted.secret.name/>
+    <custom.trusted.keystore.alias/>
+    <custom.trusted.keystore.pwd/>
+
+    <!-- APB -->
+    <apb.image.stream.name/>
   </properties>
 
   <modules>
@@ -115,6 +126,8 @@
               <openshift.master.url>${openshift.master.url}</openshift.master.url>
               <openshift.username>${openshift.username}</openshift.username>
               <openshift.password>${openshift.password}</openshift.password>
+              <openshift.admin.username>${openshift.admin.username}</openshift.admin.username>
+              <openshift.admin.password>${openshift.admin.password}</openshift.admin.password>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <template.project>${template.project}</template.project>
               <db.hostname>${db.hostname}</db.hostname>
@@ -157,6 +170,11 @@
               <sso.service.username>${sso.service.username}</sso.service.username>
               <sso.service.password>${sso.service.password}</sso.service.password>
               <ldap.url>${ldap.url}</ldap.url>
+              <custom.trusted.app.secret>${custom.trusted.app.secret}</custom.trusted.app.secret>
+              <custom.trusted.secret.name>${custom.trusted.secret.name}</custom.trusted.secret.name>
+              <custom.trusted.keystore.alias>${custom.trusted.keystore.alias}</custom.trusted.keystore.alias>
+              <custom.trusted.keystore.pwd>${custom.trusted.keystore.pwd}</custom.trusted.keystore.pwd>
+              <apb.image.stream.name>${apb.image.stream.name}</apb.image.stream.name>
             </systemProperties>
           </configuration>
         </plugin>

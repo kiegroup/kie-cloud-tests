@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 JBoss by Red Hat.
+ * Copyright 2019 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.api.deployment;
+package org.kie.cloud.integrationtests.category;
 
-import java.net.URL;
-
-/**
- * Docker deployment representation in cloud.
- */
-public interface DockerDeployment extends Deployment {
-
-    /**
-     * Get URL for Docker service (deployment).
-     *
-     * @return Docker URL
-     */
-    URL getUrl();
-}
+public interface ApbNotSupported {}

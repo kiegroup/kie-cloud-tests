@@ -29,13 +29,15 @@ import javax.net.ssl.HttpsURLConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import cz.xtf.http.HttpClient;
-import cz.xtf.tuple.Tuple.Pair;
+
 import org.apache.http.entity.ContentType;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cz.xtf.http.HttpClient;
+import cz.xtf.tuple.Tuple.Pair;
 
 public class HttpsWorkbenchTestProvider {
 
@@ -50,7 +52,7 @@ public class HttpsWorkbenchTestProvider {
     private static final String WORKBENCH_CONTROLLER_MANAGEMENT_REST_REQUEST_URL = "rest/controller/management/servers";
 
     public static void testLoginScreen(WorkbenchDeployment workbenchDeployment, boolean ssoScenario) {
-        final URL url = workbenchDeployment.getSecureUrl();
+        final URL url = workbenchDeployment.getSecureUrl().get();
         logger.debug("Test login screen on url {}", url.toString());
 
         try {
@@ -124,11 +126,11 @@ public class HttpsWorkbenchTestProvider {
     }
 
     private static String serverTemplateRequestUrl(WorkbenchDeployment workbenchDeployment, String serverTemplateId) {
-        return workbenchDeployment.getSecureUrl() + "/" + WORKBENCH_CONTROLLER_MANAGEMENT_REST_REQUEST_URL + "/" + serverTemplateId;
+        return workbenchDeployment.getSecureUrl().get() + "/" + WORKBENCH_CONTROLLER_MANAGEMENT_REST_REQUEST_URL + "/" + serverTemplateId;
     }
 
     private static String listServerTemplatesRequestUrl(WorkbenchDeployment workbenchDeployment) {
-        return workbenchDeployment.getSecureUrl() + "/" + WORKBENCH_CONTROLLER_MANAGEMENT_REST_REQUEST_URL;
+        return workbenchDeployment.getSecureUrl().get() + "/" + WORKBENCH_CONTROLLER_MANAGEMENT_REST_REQUEST_URL;
     }
 
     private static String createServerTemplateJson(String serverTemplateId, String serverTemplateName) {

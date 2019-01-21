@@ -1,9 +1,8 @@
 /*
- * Copyright 2017 JBoss by Red Hat.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -12,17 +11,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+
 package org.kie.cloud.integrationtests.s2i;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -31,7 +34,9 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
@@ -50,9 +55,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+@Ignore //TODO: finish scenario
+public class KieServerS2iWithExternalDatabaseIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerS2iJbpmIntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(KieServerS2iWithExternalDatabaseIntegrationTest.class);
 
     @Parameter(value = 0)
     public String testScenarioName;
@@ -67,9 +73,11 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
 
         try {
             KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+            //TODO: add external DB configuration -- do not merge
             scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
         } catch (UnsupportedOperationException ex) {
             logger.info("KIE Server HTTPS S2I is skipped.", ex);
+            Assume.assumeNoException(ex);
         }
 
         return scenarios;
@@ -86,6 +94,8 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
 
     private String repositoryName;
 
+    private static KieServerWithExternalDatabaseScenario deploymentScenario;
+
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
@@ -100,7 +110,6 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
                 .build();
     }
 
-    @Before
     public void setUp() {
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
@@ -112,6 +121,15 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
         gitProvider.deleteGitRepository(repositoryName);
     }
 
+    @Before
+    @Override
+    public void initializeDeployment() {
+        assumeTrue(isExternalDatabaseAllocated());
+        super.initializeDeployment();
+        setUp();
+    }
+
+    //TODO: only for APB?
     @Test
     @Category(JBPMOnly.class)
     public void testContainerAfterExecServerS2IStart() {
@@ -141,4 +159,11 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
         assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
     }
 
+    private static boolean isExternalDatabaseAllocated() {
+        if (DeploymentConstants.getDatabaseDriver().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

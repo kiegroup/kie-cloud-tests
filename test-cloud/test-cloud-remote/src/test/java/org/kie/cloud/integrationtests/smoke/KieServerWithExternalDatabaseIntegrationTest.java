@@ -15,6 +15,9 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,8 +34,6 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
-import static org.junit.Assume.assumeTrue;
-
 @Category(Smoke.class)
 public class KieServerWithExternalDatabaseIntegrationTest extends AbstractCloudIntegrationTest {
 
@@ -41,9 +42,14 @@ public class KieServerWithExternalDatabaseIntegrationTest extends AbstractCloudI
     @BeforeClass
     public static void initializeDeployment() {
         assumeTrue(isExternalDatabaseAllocated());
-        deploymentScenario = deploymentScenarioFactory.getKieServerWithExternalDatabaseScenarioBuilder()
-                                                      .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                                                      .build();
+        try {
+            deploymentScenario = deploymentScenarioFactory.getKieServerWithExternalDatabaseScenarioBuilder()
+                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
+                            MavenConstants.getMavenRepoPassword())
+                    .build();
+        } catch (UnsupportedOperationException ex) {
+            assumeFalse(ex.getMessage().startsWith("Not supported"));
+        }
         deploymentScenario.setLogFolderName(KieServerWithExternalDatabaseIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }

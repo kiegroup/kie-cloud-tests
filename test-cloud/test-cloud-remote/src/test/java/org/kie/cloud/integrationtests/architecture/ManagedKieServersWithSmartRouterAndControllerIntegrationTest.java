@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -42,6 +43,7 @@ import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
@@ -58,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * http://mswiderski.blogspot.cz/2017/08/cloud-runtime-architectures-for-jbpm.html
  */
 @RunWith(Parameterized.class)
+@Category(ApbNotSupported.class)
 public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extends AbstractCloudArchitectureIntegrationTest {
 
     @Parameter(value = 0)
