@@ -28,6 +28,8 @@ public class ApbImageGetter {
 
     static {
         OpenShiftConfig openShiftConfig = new OpenShiftConfigBuilder()
+                .withMasterUrl(OpenShiftConstants.getOpenShiftUrl())
+                .withTrustCerts(true)
                 .withDisableApiGroupCheck(true)
                 .withUsername(OpenShiftConstants.getOpenShiftAdminUserName())
                 .withPassword(OpenShiftConstants.getOpenShiftAdminPassword())
