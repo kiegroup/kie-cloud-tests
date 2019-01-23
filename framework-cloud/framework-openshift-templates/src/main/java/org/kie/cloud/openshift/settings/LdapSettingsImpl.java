@@ -18,11 +18,15 @@ package org.kie.cloud.openshift.settings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.kie.cloud.openshift.settings.AbstractLdapSettings;
+
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 
 
 public class LdapSettingsImpl extends AbstractLdapSettings {
+
+    public LdapSettingsImpl() {
+        super();
+    }
 
     @Override
     public Map<String, String> getEnvVariables() {
@@ -47,7 +51,7 @@ public class LdapSettingsImpl extends AbstractLdapSettings {
         envVariables.put(OpenShiftTemplateConstants.AUTH_LDAP_DEFAULT_ROLE, getLdapDefaultRole());
         envVariables.put(OpenShiftTemplateConstants.AUTH_LDAP_ROLE_NAME_ATTRIBUTE_ID, getLdapRoleNameAttributeId());
         envVariables.put(OpenShiftTemplateConstants.AUTH_LDAP_PARSE_ROLE_NAME_FROM_DN, getLdapParseRoleNameFromDn());
-        envVariables.put(OpenShiftTemplateConstants.AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN, getLdapRoleAttributeId());
+        envVariables.put(OpenShiftTemplateConstants.AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN, getLdapRoleAttributeIsDn());
         envVariables.put(OpenShiftTemplateConstants.AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK, getLdapReferralUserAttributeIdToCheck());
 
         return envVariables.entrySet()

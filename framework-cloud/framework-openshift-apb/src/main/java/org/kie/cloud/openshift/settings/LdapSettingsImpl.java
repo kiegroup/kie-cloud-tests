@@ -24,6 +24,10 @@ import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 
 public class LdapSettingsImpl extends AbstractLdapSettings {
 
+    public LdapSettingsImpl() {
+        super();
+    }
+
     @Override
     public Map<String, String> getEnvVariables() {
         Map<String, String> envVariables = new HashMap<>();
@@ -47,7 +51,7 @@ public class LdapSettingsImpl extends AbstractLdapSettings {
         envVariables.put(OpenShiftApbConstants.AUTH_LDAP_DEFAULT_ROLE, getLdapDefaultRole());
         envVariables.put(OpenShiftApbConstants.AUTH_LDAP_ROLE_NAME_ATTRIBUTE_ID, getLdapRoleNameAttributeId());
         envVariables.put(OpenShiftApbConstants.AUTH_LDAP_PARSE_ROLE_NAME_FROM_DN, getLdapParseRoleNameFromDn());
-        envVariables.put(OpenShiftApbConstants.AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN, getLdapRoleAttributeId());
+        envVariables.put(OpenShiftApbConstants.AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN, getLdapRoleAttributeIsDn());
         envVariables.put(OpenShiftApbConstants.AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK, getLdapReferralUserAttributeIdToCheck());
 
         return envVariables.entrySet()
