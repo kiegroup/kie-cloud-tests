@@ -56,11 +56,23 @@ public class ProcessExecutor implements AutoCloseable {
      * @return Temp file containing process output.
      */
     public File executeProcessCommandToTempFile(String command) {
+        StringBuffer sb = new StringBuffer();
+        Consumer<String> outputConsumer = s -> sb.append(s).append("\n");
+
+        boolean processedSuccessfully = executeProcessCommand(command, outputConsumer);
+
+        if (!processedSuccessfully) {
+            throw new RuntimeException("Error while processing command \"" + command + "\". Process output:\n" + sb.toString());
+        }
+
+        return saveStringToTempFile(sb.toString());
+    }
+
+    private File saveStringToTempFile(String fileContent) {
         try {
             File tempFile = File.createTempFile("openshift", ".yaml");
             try (PrintWriter out = new PrintWriter(tempFile)) {
-                Consumer<String> outputConsumer = s -> out.println(s);
-                executeProcessCommand(command, outputConsumer);
+                out.print(fileContent);
             }
             return tempFile;
         } catch (IOException e) {
@@ -68,15 +80,23 @@ public class ProcessExecutor implements AutoCloseable {
         }
     }
 
-    private void executeProcessCommand(String command, Consumer<String> outputConsumer) {
+    /**
+     * Execute command and wait until command is finished.
+     *
+     * @param command Command to be executed.
+     * @param outputConsumer Consumer processing the process output.
+     * @return True if process terminated normally, false in case of error during processing.
+     */
+    private boolean executeProcessCommand(String command, Consumer<String> outputConsumer) {
         try {
             Process process = Runtime.getRuntime().exec(command);
             Future<?> osFuture = executorService.submit(new ProcessOutputReader(process.getInputStream(), outputConsumer));
             Future<?> esFuture = executorService.submit(new ProcessOutputReader(process.getErrorStream(), outputConsumer));
 
-            process.waitFor();
+            int exitValue = process.waitFor();
             osFuture.get();
             esFuture.get();
+            return exitValue == 0;
         } catch (IOException | InterruptedException | ExecutionException e) {
             throw new RuntimeException("Error executing command " + command, e);
         }
