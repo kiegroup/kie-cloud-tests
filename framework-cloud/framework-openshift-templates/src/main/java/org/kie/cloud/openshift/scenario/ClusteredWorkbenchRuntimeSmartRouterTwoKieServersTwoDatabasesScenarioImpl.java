@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.scenario;
 
@@ -63,7 +63,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
         this.envVariables = envVariables;
-        this.deploySso=deploySso;
+        this.deploySso = deploySso;
     }
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(Map<String, String> envVariables) {
@@ -102,10 +102,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         smartRouterDeployment.scale(1);
 
         kieServerOneDeployment = createKieServerDeployment(project, "1");
-        kieServerOneDeployment.scale(1);
-
         kieServerTwoDeployment = createKieServerDeployment(project, "2");
-        kieServerTwoDeployment.scale(1);
 
         databaseOneDeployment = createDatabaseDeployment(project, "1");
         databaseTwoDeployment = createDatabaseDeployment(project, "2");
@@ -119,6 +116,9 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         // TODO: Workaround for KIECLOUD-48, respin Kie server when database is ready
         kieServerOneDeployment.deleteInstances(kieServerOneDeployment.getInstances());
         kieServerTwoDeployment.deleteInstances(kieServerTwoDeployment.getInstances());
+        // Scale after recreating instances to prevent race condition
+        kieServerOneDeployment.scale(1);
+        kieServerTwoDeployment.scale(1);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchRuntimeDeployment.waitForScale();
@@ -228,5 +228,5 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 }
