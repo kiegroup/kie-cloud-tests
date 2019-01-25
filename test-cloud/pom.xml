@@ -194,6 +194,22 @@
       </build>
     </profile>
     <profile>
+      <!-- Run baseline tests to check basic functionality. Smoke tests are also included. -->
+      <id>baseline</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <groups>org.kie.cloud.integrationtests.category.Smoke,org.kie.cloud.integrationtests.category.Baseline</groups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>custom-parameters</id>
       <activation>
         <property>
