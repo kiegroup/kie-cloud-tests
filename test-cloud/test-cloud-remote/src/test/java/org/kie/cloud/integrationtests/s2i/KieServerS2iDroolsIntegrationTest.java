@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -45,6 +46,7 @@ import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
@@ -54,6 +56,7 @@ import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 
 @RunWith(Parameterized.class)
+@Category(Baseline.class)
 public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     @Parameter(value = 0)
