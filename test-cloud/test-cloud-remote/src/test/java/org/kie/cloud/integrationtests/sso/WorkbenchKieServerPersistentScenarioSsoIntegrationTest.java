@@ -27,17 +27,19 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
+import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
+import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
+@Category(Baseline.class)
 public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static WorkbenchKieServerScenario deploymentScenario;

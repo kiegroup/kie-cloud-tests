@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -34,12 +34,14 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
+@Category(Baseline.class)
 public class LivenessProbeIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {
 
     @Parameter(value = 0)
