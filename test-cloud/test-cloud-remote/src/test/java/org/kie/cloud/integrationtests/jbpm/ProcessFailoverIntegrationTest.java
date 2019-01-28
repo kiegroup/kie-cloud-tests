@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -45,6 +43,8 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Category(JBPMOnly.class)
 public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
@@ -68,9 +68,9 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
 
     @Before
     public void setUp() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = getGitProvider().createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(getGitProvider().getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
         kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
 
@@ -81,7 +81,7 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
 
     @After
     public void tearDown() {
-        gitProvider.deleteGitRepository(repositoryName);
+        getGitProvider().deleteGitRepository(repositoryName);
     }
 
     @Test

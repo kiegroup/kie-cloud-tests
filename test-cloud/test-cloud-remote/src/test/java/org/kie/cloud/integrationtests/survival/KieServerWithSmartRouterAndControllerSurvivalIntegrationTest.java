@@ -130,9 +130,9 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @Before
     public void setUp() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = getGitProvider().createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(getGitProvider().getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(controllerDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment());
@@ -145,7 +145,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @After
     public void tearDown() {
-        gitProvider.deleteGitRepository(repositoryName);
+        getGitProvider().deleteGitRepository(repositoryName);
     }
 
     @Test

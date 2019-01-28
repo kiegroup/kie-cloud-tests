@@ -100,11 +100,11 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = getGitProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                .withSourceLocation(getGitProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
                 .withDroolsServerFilterClasses(false)
                 .build();
 
@@ -129,7 +129,7 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
 
     @After
     public void deleteRepo() {
-        gitProvider.deleteGitRepository(repositoryName);
+        getGitProvider().deleteGitRepository(repositoryName);
     }
 
     @Test

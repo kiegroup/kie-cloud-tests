@@ -17,8 +17,6 @@ package org.kie.cloud.integrationtests.s2i;
 
 import java.util.Arrays;
 import java.util.Collection;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 
 import org.junit.After;
@@ -46,6 +44,8 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
@@ -80,11 +80,11 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = getGitProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                .withSourceLocation(getGitProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
                 .build();
 
         return deploymentScenarioFactory.getGenericScenarioBuilder()
@@ -101,7 +101,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
 
     @After
     public void deleteRepo() {
-        gitProvider.deleteGitRepository(repositoryName);
+        getGitProvider().deleteGitRepository(repositoryName);
     }
 
     @Test

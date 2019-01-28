@@ -114,7 +114,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
         }
 
         if (repositoryName != null) {
-            gitProvider.deleteGitRepository(repositoryName);
+            getGitProvider().deleteGitRepository(repositoryName);
             repositoryName = null;
         }
     }
@@ -146,9 +146,9 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
 
     @Test
     public void testKieServerReadinessProbe() {
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        String repositoryName = getGitProvider().createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(getGitProvider().getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());

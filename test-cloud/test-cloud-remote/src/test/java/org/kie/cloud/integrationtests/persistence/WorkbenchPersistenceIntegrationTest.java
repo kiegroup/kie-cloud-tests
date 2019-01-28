@@ -14,8 +14,6 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -52,6 +50,8 @@ import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed.")
@@ -103,16 +103,16 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
     @After
     public void tearDown() {
         if (repositoryName != null) {
-            gitProvider.deleteGitRepository(repositoryName);
+            getGitProvider().deleteGitRepository(repositoryName);
             repositoryName = null;
         }
     }
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = getGitProvider().createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(getGitProvider().getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         String kieServerLocation = serverInfo.getLocation();

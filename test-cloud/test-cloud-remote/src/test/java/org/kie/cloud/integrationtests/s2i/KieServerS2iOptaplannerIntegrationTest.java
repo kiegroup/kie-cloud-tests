@@ -93,11 +93,11 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = getGitProvider().createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                .withSourceLocation(getGitProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
                 .build();
 
         return deploymentScenarioFactory.getGenericScenarioBuilder()
@@ -123,7 +123,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
 
     @After
     public void deleteRepo() {
-        gitProvider.deleteGitRepository(repositoryName);
+        getGitProvider().deleteGitRepository(repositoryName);
     }
 
     @Test
