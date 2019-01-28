@@ -41,6 +41,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.util.Constants;
+import org.kie.cloud.provider.git.Git;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
@@ -116,7 +117,7 @@ public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extend
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = getGitProvider().createGitRepositoryWithPrefix("architectureRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("architectureRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         controller = deploymentScenarioFactory.getWorkbenchSettingsBuilder()
                 .withApplicationName(CONTROLLER_NAME)
@@ -150,7 +151,7 @@ public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extend
                 .withSmartRouterConnection(RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME, PORT)
                 .withControllerConnection(RANDOM_URL_PREFIX + CONTROLLER_HOSTNAME, PORT)
                 .withContainerDeployment(containerDeploymnet)
-                .withSourceLocation(getGitProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
                 .build();
     }
 
@@ -183,7 +184,7 @@ public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extend
 
     @After
     public void deleteRepo() {
-        getGitProvider().deleteGitRepository(repositoryName);
+        Git.getProvider().deleteGitRepository(repositoryName);
     }
 
     @Test
