@@ -35,7 +35,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;

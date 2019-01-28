@@ -20,13 +20,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
-import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.integrationtests.util.ScenarioDeployer;
+import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
 @Category(Smoke.class)

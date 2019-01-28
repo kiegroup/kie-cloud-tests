@@ -36,7 +36,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;

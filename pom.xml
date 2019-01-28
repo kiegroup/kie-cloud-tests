@@ -135,6 +135,11 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
+        <groupId>org.kie.cloud</groupId>
+        <artifactId>test-cloud-common</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-integ-tests-common</artifactId>
         <version>${version.org.kie}</version>

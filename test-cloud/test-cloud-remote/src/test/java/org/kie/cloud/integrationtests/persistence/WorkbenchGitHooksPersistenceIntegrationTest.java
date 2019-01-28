@@ -43,7 +43,7 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentS
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

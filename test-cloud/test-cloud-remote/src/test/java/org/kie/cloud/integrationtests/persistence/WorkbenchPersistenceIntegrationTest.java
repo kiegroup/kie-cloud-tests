@@ -37,7 +37,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResourceList;

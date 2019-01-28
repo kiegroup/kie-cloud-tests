@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests;
+package org.kie.cloud.tests.common;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +21,6 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.DeploymentScenario;
-import org.kie.cloud.integrationtests.util.ScenarioDeployer;
 
 public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends DeploymentScenario> extends AbstractCloudIntegrationTest {
 
@@ -32,7 +31,7 @@ public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends Deplo
 
     @Before
     public void initializeDeployment() {
-        deploymentScenario = createDeploymentScenario(deploymentScenarioFactory);
+        deploymentScenario = createDeploymentScenario(AbstractCloudIntegrationTest.deploymentScenarioFactory);
         deploymentScenario.setLogFolderName(testName.getMethodName());
 
         ScenarioDeployer.deployScenario(deploymentScenario);

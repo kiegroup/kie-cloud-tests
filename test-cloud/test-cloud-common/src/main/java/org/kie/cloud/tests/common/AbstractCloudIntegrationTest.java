@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests;
+package org.kie.cloud.tests.common;
 
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
