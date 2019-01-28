@@ -24,7 +24,7 @@
 
   <properties>
     <rhba.images.version.prefix>72</rhba.images.version.prefix>
-    <rhba.images.branch>master</rhba.images.branch>
+    <rhba.images.branch>7.2.x</rhba.images.branch>
 
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
@@ -215,6 +215,21 @@
         <groupId>org.jboss</groupId>
         <artifactId>jboss-dmr</artifactId>
         <version>${version.org.jboss.jboss-dmr}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.optaweb.employeerostering</groupId>
+        <artifactId>employee-rostering-shared</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.optaweb.employeerostering</groupId>
+        <artifactId>employee-rostering-restclient</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.optaplanner</groupId>
+        <artifactId>optaplanner-persistence-jackson</artifactId>
+        <version>${version.org.kie}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

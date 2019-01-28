@@ -19,6 +19,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
@@ -34,6 +35,7 @@ import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.EmployeeRosteringScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithMySqlScenarioBuilderImpl;
@@ -150,6 +152,11 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
     @Override
     public LdapSettingsBuilder getLdapSettingsBuilder() {
         return new LdapSettingsBuilderImpl();
+    }
+
+    @Override
+    public EmployeeRosteringScenarioBuilder getEmployeeRosteringScenarioBuilder() {
+        return new EmployeeRosteringScenarioBuilderImpl();
     }
 
     @Override

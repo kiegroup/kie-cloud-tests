@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.constants;
 
+// TODO: these constants should be rather put into classes responsible for respective components
 public class OpenShiftTemplateConstants {
 
     // Used as a generic password for all passwords in the template (Workbench user, Kie server user, Controller user, Workbench maven user)
