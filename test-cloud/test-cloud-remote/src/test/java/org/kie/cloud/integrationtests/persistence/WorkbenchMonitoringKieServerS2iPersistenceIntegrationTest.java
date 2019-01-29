@@ -46,7 +46,7 @@ import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-@Ignore
+@Ignore //TODO
 public class WorkbenchMonitoringKieServerS2iPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     protected KieServicesClient kieServicesClient;
