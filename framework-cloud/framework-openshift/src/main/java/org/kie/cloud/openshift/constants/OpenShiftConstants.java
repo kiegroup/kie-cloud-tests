@@ -138,6 +138,7 @@ public class OpenShiftConstants implements Constants {
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
 
     public static final String APB_IMAGE_STREAM_NAME = "apb.image.stream.name";
+    public static final String APB_IAMGE_STREAM_TAG = "apb.image.stream.tag";
 
     public static final String KIE_IMAGE_TAG_AMQ = "kie.image.tag.amq";
     public static final String KIE_IMAGE_TAG_CONSOLE = "kie.image.tag.console";
@@ -206,6 +207,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getApbImageStreamName() {
         return System.getProperty(APB_IMAGE_STREAM_NAME);
+    }
+
+    public static String getApbImageStreamTag() {
+        return System.getProperty(APB_IAMGE_STREAM_TAG);
     }
 
     public static String getLdapUrl() {
