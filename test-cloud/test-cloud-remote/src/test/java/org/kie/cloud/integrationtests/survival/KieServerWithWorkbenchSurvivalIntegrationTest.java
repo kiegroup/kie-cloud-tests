@@ -52,13 +52,9 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-<<<<<<< HEAD
-@Category({JBPMOnly.class, Baseline.class})
-=======
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category(JBPMOnly.class)
->>>>>>> Avoid GitProvider leaking to every test
+@Category({JBPMOnly.class, Baseline.class})
 public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
     private KieServerControllerClient kieServerControllerClient;
