@@ -51,13 +51,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb implements Workbench
         extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
         extraVars.put(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchMavenUser());
         extraVars.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchMavenPassword());
-
-        /*
-        Add extra var to enable HTTP routes for custom apb image
-
-        TODO: can't be configured workbench maven user
-        
-        */
     }
 
     @Override
