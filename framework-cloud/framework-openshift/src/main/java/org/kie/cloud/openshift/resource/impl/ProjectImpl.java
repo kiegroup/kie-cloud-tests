@@ -28,6 +28,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.ProcessExecutor;
@@ -132,13 +133,25 @@ public class ProjectImpl implements Project {
             args.add(formatExtraVars(extraVars));
 
             logger.info("Executing command: oc " + getApbCommand(args));
-            oc.executeCommand("APB failed.", args.toArray(new String[args.size()]));
+            oc.executeCommandAndConsumeOutput("APB failed.", istream -> {
+                logger.info(podName);
+                File outputDirectory = new File(System.getProperty(APB_BUILDS_LOGS_OUTPUT_DIRECTORY, DEFAULT_APB_BUILDS_LOG_OUTPUT_DIRECTORY));
+                if (!outputDirectory.isDirectory()) {
+                    outputDirectory.mkdir();
+                }
+                File logFile = new File(outputDirectory, projectName + "." + podName + LOG_SUFFIX);
+                FileUtils.copyInputStreamToFile(istream, logFile);
+            } ,args.toArray(new String[args.size()]));
         } catch (InterruptedException e) {
             throw new RuntimeException("Failed acquire from java.util.concurrent.Semaphore", e);
         } finally {
             semaphore.release();
         }
     }
+
+    private static final String APB_BUILDS_LOGS_OUTPUT_DIRECTORY = "apb.build.logs";
+    private static final String DEFAULT_APB_BUILDS_LOG_OUTPUT_DIRECTORY = "apbBuilds";
+    private static final String LOG_SUFFIX = ".log";
 
     private String getApbCommand(List<String> args) {
         return args.stream().collect(Collectors.joining(" "));

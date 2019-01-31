@@ -24,6 +24,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBu
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.ProjectApbSpecificPropertyNames;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerPersistentScenarioApb;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb implements Workbench
     public WorkbenchKieServerPersistentScenarioBuilderApb() {
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.AUTHORING);
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_DB_TYPE, ApbConstants.DbType.MYSQL);
-        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, "1.0");
+        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, OpenShiftConstants.getApbImageStreamTag());
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_VOLUME_SIZE, "1Gi");
 
         extraVars.put(OpenShiftApbConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
@@ -50,13 +51,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb implements Workbench
         extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
         extraVars.put(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchMavenUser());
         extraVars.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchMavenPassword());
-
-        /*
-        Add extra var to enable HTTP routes for custom apb image
-
-        TODO: can't be configured workbench maven user
-        
-        */
     }
 
     @Override

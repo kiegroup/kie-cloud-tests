@@ -69,6 +69,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         super.deploy();
 
         if (deploySso) {
+            logger.warn("SSO is configured for this testscenario. Kie Server SSO client can be set only for one Kie Server. For more deploymets it mus be configured manually.");
             ssoDeployment = SsoDeployer.deploy(project);
 
             extraVars.put(OpenShiftApbConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));

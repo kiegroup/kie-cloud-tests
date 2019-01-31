@@ -38,6 +38,8 @@ import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
+import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.Kjar;
@@ -88,7 +90,10 @@ public class KieServerWebSocketScalingIntegrationTest {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            DeploymentSettings workbenchMonitoringSettings = deploymentScenarioFactory.getWorkbenchMonitoringSettingsBuilder()
+            WorkbenchMonitoringSettingsBuilder workbenchMonitoringSettingsBuilder = deploymentScenarioFactory.getWorkbenchMonitoringSettingsBuilder();
+            KieServerSettingsBuilder kieServerMysqlSettingsBuilder = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder();
+
+            DeploymentSettings workbenchMonitoringSettings = workbenchMonitoringSettingsBuilder
                     .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                     .build();
             workbenchMonitoringScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
@@ -98,7 +103,7 @@ public class KieServerWebSocketScalingIntegrationTest {
             workbenchMonitoringScenario.deploy();
             workbenchDeployment = workbenchMonitoringScenario.getWorkbenchDeployments().get(0);
 
-            DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
+            DeploymentSettings kieServerSettings = kieServerMysqlSettingsBuilder
                     .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                     .withControllerConnection(Protocol.ws.name(), workbenchDeployment.getWebSocketUri().get().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().get().getPort()))
                     .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())

@@ -23,6 +23,7 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.settings.DeploymentSettingsApb;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 
@@ -36,7 +37,7 @@ public class WorkbenchMonitoringSettingsBuilderApb implements WorkbenchMonitorin
 
         // Required values to create persitence values.
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.IMMUTABLE_MON);
-        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, "1.0");
+        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, OpenShiftConstants.getApbImageStreamTag());
         extraVars.put(OpenShiftApbConstants.SMARTROUTER_VOLUME_SIZE, "64Mi");
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_VOLUME_SIZE, "64Mi");
         extraVars.put(OpenShiftApbConstants.APB_BUSINESSCENTRAL_REPLICAS, "1");
