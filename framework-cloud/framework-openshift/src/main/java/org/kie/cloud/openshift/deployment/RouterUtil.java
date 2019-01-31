@@ -60,8 +60,14 @@ public class RouterUtil {
 
                 Thread.sleep(ROUTER_WAIT_ITERATION_TIME);
             } catch (SSLHandshakeException e) {
-                logger.warn("SSLHandshakeException: " + e.getMessage());
-                logger.info("Try to execute request again.");
+                logger.debug("SSLHandshakeException: " + e.getMessage());
+                logger.debug("Wait for a while and try to execute request again.");
+                try {
+                    Thread.sleep(Duration.ofSeconds(1).toMillis());
+                } catch (InterruptedException e1) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted while waiting for server template creation.", e1);
+                }
                 continue;
             } catch (Exception e) {
                 logger.error("Error waiting for router", e);

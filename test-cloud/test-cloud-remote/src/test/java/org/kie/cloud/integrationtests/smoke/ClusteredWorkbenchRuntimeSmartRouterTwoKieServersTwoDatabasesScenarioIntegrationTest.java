@@ -17,11 +17,11 @@ package org.kie.cloud.integrationtests.smoke;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
-import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.AbstractCloudIntegrationTest;
+import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
@@ -30,8 +30,9 @@ import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.SmartRouterTestProvider;
-import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.ScenarioDeployer;
 
 @Category(Smoke.class)
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioIntegrationTest extends AbstractCloudIntegrationTest {
@@ -86,9 +87,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Test
-    @Ignore
+    @Category(ApbNotSupported.class) //failing because of RHPAM-1561
     public void testSmartRouter() {
-        //TODO failing because of RHPAM-1561
         SmartRouterTestProvider.testRouterLoadBalancing(deploymentScenario.getWorkbenchRuntimeDeployment(),
                 deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment(),
                 deploymentScenario.getKieServerTwoDeployment());

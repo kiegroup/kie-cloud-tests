@@ -85,6 +85,7 @@
 
     <!-- APB -->
     <apb.image.stream.name/>
+    <apb.image.stream.tag/> <!-- Tag version of the ImageStream to use. -->
   </properties>
 
   <modules>
@@ -177,6 +178,7 @@
               <custom.trusted.keystore.alias>${custom.trusted.keystore.alias}</custom.trusted.keystore.alias>
               <custom.trusted.keystore.pwd>${custom.trusted.keystore.pwd}</custom.trusted.keystore.pwd>
               <apb.image.stream.name>${apb.image.stream.name}</apb.image.stream.name>
+              <apb.image.stream.tag>${apb.image.stream.tag}</apb.image.stream.tag>
             </systemProperties>
           </configuration>
         </plugin>
