@@ -16,14 +16,15 @@
 
 package org.kie.cloud.openshift.constants.images.imagestream;
 
-import io.fabric8.openshift.api.model.ImageStream;
-import io.fabric8.openshift.api.model.ImageStreamBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.Image;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.ProjectProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.fabric8.openshift.api.model.ImageStream;
+import io.fabric8.openshift.api.model.ImageStreamBuilder;
 
 /**
  * Creates image streams from file or generates them based on system properties.
@@ -59,6 +60,8 @@ public class ImageStreamProvider {
         if (projectProfile == ProjectProfile.DROOLS) {
             createImageStreamForImage(project, Image.WORKBENCH);
             createImageStreamForImage(project, Image.KIE_SERVER);
+            createImageStreamForImage(project, Image.CONTROLLER);
+            createImageStreamForImage(project, Image.WORKBENCH_INDEXING);
         } else if (projectProfile == ProjectProfile.JBPM) {
             createImageStreamForImage(project, Image.AMQ);
             createImageStreamForImage(project, Image.CONSOLE);
