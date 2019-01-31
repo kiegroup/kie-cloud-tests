@@ -61,32 +61,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.optaweb.employeerostering</groupId>
-      <artifactId>employee-rostering-shared</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.optaweb.employeerostering</groupId>
-      <artifactId>employee-rostering-restclient</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.optaplanner</groupId>
-      <artifactId>optaplanner-persistence-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
