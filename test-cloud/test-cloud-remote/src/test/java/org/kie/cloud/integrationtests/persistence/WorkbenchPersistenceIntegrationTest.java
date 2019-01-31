@@ -42,6 +42,7 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
+import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -116,16 +117,16 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
     @After
     public void tearDown() {
         if (repositoryName != null) {
-            getGitProvider().deleteGitRepository(repositoryName);
+            Git.getProvider().deleteGitRepository(repositoryName);
             repositoryName = null;
         }
     }
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        repositoryName = getGitProvider().createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(getGitProvider().getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         String kieServerLocation = serverInfo.getLocation();

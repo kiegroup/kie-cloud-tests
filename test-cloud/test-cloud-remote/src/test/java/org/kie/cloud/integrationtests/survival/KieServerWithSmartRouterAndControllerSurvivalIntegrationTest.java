@@ -43,6 +43,7 @@ import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.constants.MavenConstants;
+import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -131,9 +132,9 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @Before
     public void setUp() {
-        repositoryName = getGitProvider().createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(getGitProvider().getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(controllerDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment());
@@ -146,7 +147,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @After
     public void tearDown() {
-        getGitProvider().deleteGitRepository(repositoryName);
+        Git.getProvider().deleteGitRepository(repositoryName);
     }
 
     @Test

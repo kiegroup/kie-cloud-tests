@@ -31,8 +31,8 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
+import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 
 @RunWith(Parameterized.class)
 public class WorkbenchMonitoringScenarioIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
