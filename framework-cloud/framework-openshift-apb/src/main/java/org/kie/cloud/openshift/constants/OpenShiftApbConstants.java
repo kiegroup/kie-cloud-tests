@@ -59,7 +59,7 @@ public class OpenShiftApbConstants {
     public static final String BUSINESS_CENTRAL_MAVEN_SERVICE = "";
 
     // ImageStreams
-    public static final String IMAGE_STREAM_NAMESPACE = "image_stream_namespace"; // Need to hard replace this value
+    public static final String IMAGE_STREAM_NAMESPACE = "image_stream_namespace";
     public static final String APB_IMAGE_STREAM_TAG = "apb_image_stream_tag";
 
     public static final String DEFAULT_PASSWORD = "";
