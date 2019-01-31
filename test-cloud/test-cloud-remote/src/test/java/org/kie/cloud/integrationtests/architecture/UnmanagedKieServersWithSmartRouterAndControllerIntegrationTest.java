@@ -23,8 +23,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -43,6 +41,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.util.Constants;
+import org.kie.cloud.provider.git.Git;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
@@ -52,6 +51,8 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test for Architecture 1 from
@@ -103,7 +104,7 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix("architectureRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("architectureRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         controller = deploymentScenarioFactory.getWorkbenchSettingsBuilder()
                 .withApplicationName(CONTROLLER_NAME)
@@ -136,7 +137,7 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
                 .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
                 .withSmartRouterConnection(RANDOM_URL_PREFIX + SMART_ROUTER_HOSTNAME, PORT)
                 .withContainerDeployment(containerDeploymnet)
-                .withSourceLocation(gitProvider.getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
                 .build();
     }
 
@@ -157,7 +158,7 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
 
     @After
     public void deleteRepo() {
-        gitProvider.deleteGitRepository(repositoryName);
+        Git.getProvider().deleteGitRepository(repositoryName);
     }
 
     @Test

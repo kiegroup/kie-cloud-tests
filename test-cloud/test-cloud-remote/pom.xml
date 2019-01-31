@@ -28,13 +28,17 @@
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
+      <artifactId>test-cloud-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-common</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-git</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
@@ -45,8 +49,6 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
-
-
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
@@ -58,6 +60,7 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -105,62 +108,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>openshift</id>
-      <properties>
-        <skipTests>false</skipTests>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift-templates</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>openshift-operator</id>
-      <properties>
-        <skipTests>false</skipTests>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift-operator</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>parallel</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <parallel>suitesAndClasses</parallel>
-                <threadCountClasses>3</threadCountClasses>
-                <threadCountSuites>2</threadCountSuites>
-                <perCoreThreadCount>false</perCoreThreadCount>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
 </project>

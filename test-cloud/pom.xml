@@ -77,7 +77,9 @@
   </properties>
 
   <modules>
+    <module>test-cloud-common</module>
     <module>test-cloud-remote</module>
+    <module>test-cloud-optaweb</module>
   </modules>
 
   <build>
@@ -226,6 +228,61 @@
                 <files>
                   <file>${custom.parameters.file}</file>
                 </files>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>openshift</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.kie.cloud</groupId>
+          <artifactId>framework-openshift</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.cloud</groupId>
+          <artifactId>framework-openshift-templates</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>openshift-operator</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.kie.cloud</groupId>
+          <artifactId>framework-openshift</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie.cloud</groupId>
+          <artifactId>framework-openshift-operator</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>parallel</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <parallel>suitesAndClasses</parallel>
+                <threadCountClasses>3</threadCountClasses>
+                <threadCountSuites>2</threadCountSuites>
+                <perCoreThreadCount>false</perCoreThreadCount>
               </configuration>
             </plugin>
           </plugins>

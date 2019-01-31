@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.After;
 import org.junit.Before;
@@ -36,13 +34,14 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
-import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.constants.MavenConstants;
+import org.kie.cloud.provider.git.Git;
+import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -57,6 +56,8 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Category(JBPMOnly.class)
 public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
@@ -130,9 +131,9 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @Before
     public void setUp() {
-        repositoryName = gitProvider.createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
-        WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(controllerDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment());
@@ -145,7 +146,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @After
     public void tearDown() {
-        gitProvider.deleteGitRepository(repositoryName);
+        Git.getProvider().deleteGitRepository(repositoryName);
     }
 
     @Test

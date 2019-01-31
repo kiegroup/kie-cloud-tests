@@ -24,7 +24,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 /**
  * Representation of deployment scenario with clustered Workbench Runtime, Smart router, two Kie servers and two databases.
  */
-public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario extends DeploymentScenario {
+public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario extends KieDeploymentScenario {
 
     /**
      * Return Workbench deployment.

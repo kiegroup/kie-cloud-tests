@@ -13,12 +13,10 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests;
+package org.kie.cloud.tests.common;
 
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderService;
 
 public abstract class AbstractCloudIntegrationTest {
 
@@ -54,6 +52,4 @@ public abstract class AbstractCloudIntegrationTest {
     protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
     protected static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-
-    protected static final GitProvider gitProvider = new GitProviderService().createGitProvider();
 }

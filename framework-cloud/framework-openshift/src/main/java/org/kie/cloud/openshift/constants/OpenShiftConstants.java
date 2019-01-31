@@ -129,6 +129,11 @@ public class OpenShiftConstants implements Constants {
 
     public static final String KIE_APP_TEMPLATE_PROD_IMMUTABLE_MONITOR = "kie.app.template.prod.immutable.monitor";
 
+    /**
+     * A key pointing to a URL to OpenShift template for optaweb-employee-rostering app.
+     */
+    public static final String OPTAWEB_EMPLOYEE_ROSTERING_TEMPLATE = "kie.app.template.optaweb.employee-rostering";
+
     public static final String SSO_APP_TEMPLATE ="sso.app.template";
     public static final String SSO_APP_SECRETS = "sso.app.secrets";
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";

@@ -18,6 +18,7 @@ package org.kie.cloud.api;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
@@ -54,6 +55,7 @@ public interface DeploymentScenarioBuilderFactory {
     SmartRouterSettingsBuilder getSmartRouterSettingsBuilder();
 
     LdapSettingsBuilder getLdapSettingsBuilder();
+    EmployeeRosteringScenarioBuilder getEmployeeRosteringScenarioBuilder();
 
     void deleteNamespace(String namespace);
 }

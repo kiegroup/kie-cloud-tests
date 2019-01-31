@@ -23,7 +23,7 @@ import cz.xtf.openshift.OpenShiftUtil;
 import io.fabric8.kubernetes.api.model.Service;
 
 public class ServiceUtil {
-
+    //TODO: regex patterns should be rather moved into the Deployment? classes responsible for individual applications
     private static final Pattern CONTROLLER_REGEXP = Pattern.compile("(?!secure-).*-controller");
     private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhpamcentr|-rhdmcentr)");
     private static final Pattern WORKBENCH_MONITORING_REGEXP = Pattern.compile("(?!secure-).*-rhpamcentrmon");
@@ -60,7 +60,7 @@ public class ServiceUtil {
         return getServiceName(util, DOCKER_REGEXP);
     }
 
-    private static String getServiceName(OpenShiftUtil util, Pattern regexp) {
+    public static String getServiceName(OpenShiftUtil util, Pattern regexp) {
         // Try to find service name from all available services
         List<Service> services = util.getServices();
         for (Service service : services) {

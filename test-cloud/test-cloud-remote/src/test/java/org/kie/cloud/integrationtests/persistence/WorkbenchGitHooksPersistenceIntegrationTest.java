@@ -40,16 +40,16 @@ import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
-import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.integrationtests.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<DeploymentScenario> {
+public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchGitHooksPersistenceIntegrationTest.class);
 
@@ -57,7 +57,7 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
     public String testScenarioName;
 
     @Parameterized.Parameter(value = 1)
-    public DeploymentScenario workbenchKieServerScenario;
+    public KieDeploymentScenario workbenchKieServerScenario;
 
     private WorkbenchClient workbenchClient;
 
@@ -83,7 +83,7 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
     }
 
     @Override
-    protected DeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected KieDeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return workbenchKieServerScenario;
     }
 
