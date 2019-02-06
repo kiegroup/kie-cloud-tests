@@ -38,7 +38,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     private boolean deploySSO = false;
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderApb() {
-        // Required values to create persitence values.
+        // Required values to create persistence values.
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.MANAGED);
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_DB_TYPE, ApbConstants.DbType.MYSQL);
         extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG,OpenShiftConstants.getApbImageStreamTag());
