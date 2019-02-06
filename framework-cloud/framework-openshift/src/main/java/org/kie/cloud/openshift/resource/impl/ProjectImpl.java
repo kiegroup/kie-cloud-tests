@@ -143,7 +143,8 @@ public class ProjectImpl implements Project {
                 FileUtils.copyInputStreamToFile(istream, logFile);
             } ,args.toArray(new String[args.size()]));
         } catch (InterruptedException e) {
-            throw new RuntimeException("Failed acquire from java.util.concurrent.Semaphore", e);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while waiting for scenario to be initialized.", e);
         } finally {
             semaphore.release();
         }

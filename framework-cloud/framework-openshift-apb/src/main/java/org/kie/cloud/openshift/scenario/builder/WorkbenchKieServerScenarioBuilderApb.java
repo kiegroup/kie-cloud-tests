@@ -50,7 +50,6 @@ public class WorkbenchKieServerScenarioBuilderApb implements WorkbenchKieServerS
         extraVars.put(OpenShiftApbConstants.MAVEN_REPO_USER, repoUserName);
         extraVars.put(OpenShiftApbConstants.MAVEN_REPO_PWD, repoPassword);
         return this;
-        //throw new UnsupportedOperationException("Not supported for APB.");
     }
 
     @Override

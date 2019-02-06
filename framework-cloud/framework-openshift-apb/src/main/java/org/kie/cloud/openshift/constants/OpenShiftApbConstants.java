@@ -17,7 +17,7 @@ package org.kie.cloud.openshift.constants;
 
 public class OpenShiftApbConstants {
 
-    //extra-vars for APB image
+    // extra-vars for APB image
     public static final String APB_PLAN_ID = "_apb_plan_id";
     public static final String APB_KIESERVER_DB_TYPE = "apb_kieserver_db_type";
 
@@ -43,8 +43,6 @@ public class OpenShiftApbConstants {
     public static final String BUSINESS_CENTRAL_SSO_SECRET = "apb_sso_businesscentral_client_secret";
     public static final String KIE_SERVER_SSO_CLIENT = "apb_kieserver_sso_client";
     public static final String KIE_SERVER_SSO_SECRET = "apb_kieserver_sso_client_secret";
-    //public static final String SSO_CLIENT = "apb_sso_client";
-    //public static final String SSO_CLIENT_SECRET = "apb_sso_client_secret";
     public static final String SSO_USER = "apb_sso_user";
     public static final String SSO_PWD = "apb_sso_pwd";
     public static final String SSO_DISABLE_SSL_CERT_VALIDATION = "apb_sso_disable_ssl_cert_validation";
@@ -76,9 +74,6 @@ public class OpenShiftApbConstants {
     public static final String APB_BUSINESSCENTRAL_REPLICAS = "apb_businesscentral_replicas";
 
     // Generic Keystore parameters
-    //public static final String APB_SECRET_NAME = "apb_secret_name";
-    //public static final String APB_KEYSTORE_ALIAS = "apb_keystore_alias";
-    //public static final String APB_KEYSTORE_PWD = "apb_keystore_pwd";
     public static final String BUSINESSCENTRAL_SECRET_NAME = "apb_businesscentral_secret_name";
     public static final String BUSINESSCENTRAL_KEYSTORE_ALIAS = "apb_businesscentral_keystore_alias";
     public static final String BUSINESSCENTRAL_KEYSTORE_PWD = "apb_businesscentral_keystore_pwd";

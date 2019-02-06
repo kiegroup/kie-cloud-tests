@@ -93,10 +93,6 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario 
             extraVars.put(OpenShiftApbConstants.KIE_SERVER_IMAGE_STREAM_NAME, kieServerCustomImageStreamName);
         });
 
-        //logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl().toString());
-        //extraVars.put(OpenShiftApbConstants.IMAGE_STREAM_NAMESPACE, project.getName());
-        //project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl(), extraVars);
-
         logger.info("Creating trusted secret");
         deployCustomTrustedSecret();
 
