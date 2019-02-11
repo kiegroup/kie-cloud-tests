@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import cz.xtf.sso.api.SsoApi;
-import cz.xtf.sso.api.SsoApiFactory;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -30,6 +28,9 @@ import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cz.xtf.sso.api.SsoApi;
+import cz.xtf.sso.api.SsoApiFactory;
 
 public class SsoDeployer {
 

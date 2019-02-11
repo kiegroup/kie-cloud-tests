@@ -16,6 +16,7 @@
 package org.kie.cloud.api.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Smart router deployment representation in cloud.
@@ -28,4 +29,18 @@ public interface SmartRouterDeployment extends Deployment {
      * @return Smart router URL
      */
     URL getUrl();
+
+    /**
+     * Get HTTP URL for Smart router service (deployment).
+     *
+     * @return Smart router URL
+     */
+    Optional<URL> getInsecureUrl();
+
+    /**
+     * Get HTTPS URL for Smart router service (deployment).
+     *
+     * @return Smart router URL
+     */
+    Optional<URL> getSecureUrl();
 }

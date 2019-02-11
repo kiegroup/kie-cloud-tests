@@ -15,7 +15,9 @@
  */
 package org.kie.cloud.integrationtests.s2i;
 
-import java.util.Arrays;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,11 +47,13 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerS2iJbpmIntegrationTest.class);
 
     @Parameter(value = 0)
     public String testScenarioName;
@@ -59,13 +63,17 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
+        List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
-        KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+        try {
+            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+            scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("KIE Server HTTPS S2I is skipped.", ex);
+        }
 
-        return Arrays.asList(new Object[][]{
-            {"KIE Server HTTPS S2I", kieServerHttpsS2ISettings}
-        });
+        return scenarios;
     }
 
     protected KieServicesClient kieServicesClient;

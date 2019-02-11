@@ -17,6 +17,7 @@ package org.kie.cloud.api.deployment;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Kie Workbench deplyoment representation in cloud.
@@ -26,23 +27,30 @@ public interface WorkbenchDeployment extends Deployment {
     /**
      * Get URL for Kie Workbench service (deployment).
      *
-     * @return Workbench URL
+     * @return Kie Workbench URL
      */
     URL getUrl();
 
     /**
+     * Get HTTP URL for Kie Workbench service (deployment).
+     *
+     * @return Kie Workbench URL
+     */
+    Optional<URL> getInsecureUrl();
+
+    /**
      * Get HTTPS URL for Kie Workbench service (deployment).
      *
-     * @return Workbench URL
+     * @return Kie Workbench URL
      */
-    URL getSecureUrl();
+    Optional<URL> getSecureUrl();
 
     /**
      * Get WebSocket URI for Kie Workbench service (deployment).
      *
      * @return Workbench URI
      */
-    URI getWebSocketUri();
+    Optional<URI> getWebSocketUri();
 
     /**
      * Get Kie Workbench user name. Workbench username is set by env. variable

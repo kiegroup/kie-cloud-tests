@@ -23,19 +23,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.FileUtils;
+import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.util.ProcessExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.xtf.openshift.OpenShiftBinaryClient;
 import cz.xtf.openshift.OpenShiftUtil;
 import cz.xtf.openshift.builder.ImageStreamBuilder;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.openshift.api.model.ImageStream;
-import org.kie.cloud.openshift.OpenShiftController;
-import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.util.ProcessExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProjectImpl implements Project {
 
@@ -96,6 +100,69 @@ public class ProjectImpl implements Project {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while waiting for scenario to be initialized.", e);
         }
+    }
+
+    static Semaphore semaphore = new Semaphore(1);
+
+    @Override
+    public synchronized void processApbRun(String image, Map<String, String> extraVars) {
+        String podName = "apb-pod-" + UUID.randomUUID().toString().substring(0, 4);
+
+        try {
+            semaphore.acquire();
+            OpenShiftBinaryClient oc = OpenShiftBinaryClient.getInstance();
+            oc.project(projectName);
+            if(util.getServiceAccount("apb") == null) {
+                oc.executeCommand("Creating serviceaccount failed.", "create", "serviceaccount", "apb");
+                oc.executeCommand("Role binding failed.", "create", "rolebinding", "apb", "--clusterrole=admin", "--serviceaccount=" + projectName + ":apb");
+            }
+
+            List<String> args = new ArrayList<>();
+            args.add("run");
+            args.add(podName);
+            // args.add("--namespace=" + projectName);
+            args.add("--env=POD_NAME=" + podName);
+            args.add("--env=POD_NAMESPACE=" + projectName);
+            args.add("--image=" + image);
+            args.add("--restart=Never");
+            args.add("--attach=true");
+            args.add("--serviceaccount=apb");
+            args.add("--");
+            args.add("provision");
+            args.add("--extra-vars");
+            args.add(formatExtraVars(extraVars));
+
+            logger.info("Executing command: oc " + getApbCommand(args));
+            oc.executeCommandAndConsumeOutput("APB failed.", istream -> {
+                logger.info(podName);
+                File outputDirectory = new File(System.getProperty(APB_BUILDS_LOGS_OUTPUT_DIRECTORY, DEFAULT_APB_BUILDS_LOG_OUTPUT_DIRECTORY));
+                if (!outputDirectory.isDirectory()) {
+                    outputDirectory.mkdir();
+                }
+                File logFile = new File(outputDirectory, projectName + "." + podName + LOG_SUFFIX);
+                FileUtils.copyInputStreamToFile(istream, logFile);
+            } ,args.toArray(new String[args.size()]));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while waiting for scenario to be initialized.", e);
+        } finally {
+            semaphore.release();
+        }
+    }
+
+    private static final String APB_BUILDS_LOGS_OUTPUT_DIRECTORY = "apb.build.logs";
+    private static final String DEFAULT_APB_BUILDS_LOG_OUTPUT_DIRECTORY = "apbBuilds";
+    private static final String LOG_SUFFIX = ".log";
+
+    private String getApbCommand(List<String> args) {
+        return args.stream().collect(Collectors.joining(" "));
+    }
+
+    private String formatExtraVars(Map<String, String> extraVars) {
+        return extraVars.entrySet()
+                        .stream()
+                        .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
+                        .collect(Collectors.joining(", ", "{", "}"));
     }
 
     @Override

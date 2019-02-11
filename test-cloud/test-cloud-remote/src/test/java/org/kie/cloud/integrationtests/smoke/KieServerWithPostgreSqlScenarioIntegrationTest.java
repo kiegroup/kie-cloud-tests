@@ -16,6 +16,7 @@
 package org.kie.cloud.integrationtests.smoke;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -37,11 +38,15 @@ public class KieServerWithPostgreSqlScenarioIntegrationTest extends AbstractClou
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
+        try {
+            deploymentScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                                                       .build();
-        deploymentScenario.setLogFolderName(KieServerWithPostgreSqlScenarioIntegrationTest.class.getSimpleName());
-        ScenarioDeployer.deployScenario(deploymentScenario);
+            deploymentScenario.setLogFolderName(KieServerWithPostgreSqlScenarioIntegrationTest.class.getSimpleName());
+            ScenarioDeployer.deployScenario(deploymentScenario);
+        } catch(UnsupportedOperationException ex) {
+            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+        }
     }
 
     @AfterClass

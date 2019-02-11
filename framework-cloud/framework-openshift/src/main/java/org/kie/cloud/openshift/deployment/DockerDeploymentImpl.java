@@ -40,7 +40,7 @@ public class DockerDeploymentImpl extends OpenShiftDeployment implements DockerD
     @Override
     public URL getUrl() {
         if (url == null) {
-            url = getHttpRouteUrl(getServiceName());
+            url = getHttpRouteUrl(getServiceName()).orElseThrow(() -> new RuntimeException("No Docker URL is available."));
         }
         return url;
     }

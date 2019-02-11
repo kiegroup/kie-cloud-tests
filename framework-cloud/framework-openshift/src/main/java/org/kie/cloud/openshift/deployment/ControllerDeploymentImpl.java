@@ -16,12 +16,15 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import org.kie.cloud.openshift.resource.Project;
+import java.util.Optional;
+
 import org.kie.cloud.api.deployment.ControllerDeployment;
+import org.kie.cloud.openshift.resource.Project;
 
 public class ControllerDeploymentImpl extends OpenShiftDeployment implements ControllerDeployment {
 
-    private URL url;
+    private Optional<URL> insecureUrl;
+    private Optional<URL> secureUrl;
     private String username;
     private String password;
 
@@ -33,10 +36,23 @@ public class ControllerDeploymentImpl extends OpenShiftDeployment implements Con
 
     @Override
     public URL getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(getServiceName());
+        return getInsecureUrl().orElseGet(() -> getSecureUrl().orElseThrow(() -> new RuntimeException("No controller URL is available.")));
+    }
+
+    @Override
+    public Optional<URL> getInsecureUrl() {
+        if (insecureUrl == null) {
+            insecureUrl = getHttpRouteUrl(getServiceName());
         }
-        return url;
+        return insecureUrl;
+    }
+
+    @Override
+    public Optional<URL> getSecureUrl() {
+        if (secureUrl == null) {
+            secureUrl = getHttpsRouteUrl(getServiceName());
+        }
+        return secureUrl;
     }
 
     @Override

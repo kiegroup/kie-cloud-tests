@@ -9,6 +9,7 @@ import org.kie.cloud.openshift.resource.Project;
 public class EmployeeRosteringDeploymentImpl extends OpenShiftDeployment implements EmployeeRosteringDeployment {
 
     private static final Pattern PATTERN = Pattern.compile(".*-optaweb-employee-rostering");
+    private URL url;
 
     public EmployeeRosteringDeploymentImpl(final Project project) {
         super(project);
@@ -16,7 +17,10 @@ public class EmployeeRosteringDeploymentImpl extends OpenShiftDeployment impleme
 
     @Override
     public URL getUrl() {
-        return getHttpRouteUrl(getServiceName());
+        if (url == null) {
+            url = getHttpRouteUrl(getServiceName()).orElseThrow(() -> new RuntimeException("No Docker URL is available."));
+        }
+        return url;
     }
 
     @Override

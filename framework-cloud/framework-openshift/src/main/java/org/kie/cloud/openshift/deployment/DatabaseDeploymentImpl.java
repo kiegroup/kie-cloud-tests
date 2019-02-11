@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.openshift.resource.Project;
@@ -25,7 +26,7 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     private String username;
     private String password;
     private String databaseName;
-    private URL url;
+    private Optional<URL> url;
     private String serviceName;
     private String serviceSuffix = "";
 
@@ -46,11 +47,11 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     }
 
     public void setUrl(URL url) {
-        this.url = url;
+        this.url = Optional.of(url);
     }
 
     @Override
-    public URL getUrl() {
+    public Optional<URL> getUrl() {
         return url;
     }
 

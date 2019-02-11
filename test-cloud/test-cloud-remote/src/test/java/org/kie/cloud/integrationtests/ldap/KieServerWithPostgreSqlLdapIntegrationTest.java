@@ -16,6 +16,7 @@
 package org.kie.cloud.integrationtests.ldap;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -50,11 +51,15 @@ public class KieServerWithPostgreSqlLdapIntegrationTest extends AbstractCloudInt
                 .withLdapRoleFilter(LdapSettingsConstants.ROLE_FILTER)
                 .withLdapRoleRecursion(LdapSettingsConstants.ROLE_RECURSION)
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
+        try {
+            deploymentScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
+                    .withLdapSettings(ldapSettings).withExternalMavenRepo(MavenConstants.getMavenRepoUrl(),
+                            MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .build();
+        } catch (UnsupportedOperationException ex) {
+            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+        }
 
-        deploymentScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
-                .withLdapSettings(ldapSettings).withExternalMavenRepo(MavenConstants.getMavenRepoUrl(),
-                        MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
         deploymentScenario.setLogFolderName(KieServerWithPostgreSqlLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }

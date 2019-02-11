@@ -19,11 +19,13 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -181,9 +183,17 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMetho
      * @param e ProcessingException
      */
     private void validateProcessingExceptionCausedBySocketTimeoutException(ProcessingException e) {
-        if (e.getCause() instanceof SocketTimeoutException) {
-            logger.debug("ProcessingException caused by SocketTimeoutException, indicates that Kie server is unavailable.");
-        } else {
+        if (e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof SSLHandshakeException) {
+            logger.debug("ProcessingException caused by "+ e.getCause().getClass() +", indicates that Kie server is unavailable.");
+        } else if (e.getCause() instanceof ConnectTimeoutException) {
+            Throwable parentE = e.getCause();
+            if (parentE.getCause() instanceof SocketTimeoutException) {
+                logger.debug("ProcessingException caused by "+ parentE.getClass() +" and this was caused by "+ parentE.getCause().getClass()+", indicates that Kie server is unavailable.");
+            } else {
+                throw e;
+            }
+        }
+        else {
             throw e;
         }
     }

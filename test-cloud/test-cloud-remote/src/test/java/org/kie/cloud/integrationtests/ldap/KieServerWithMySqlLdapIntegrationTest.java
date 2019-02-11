@@ -16,6 +16,7 @@
 package org.kie.cloud.integrationtests.ldap;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -50,11 +51,14 @@ public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrat
                 .withLdapRoleFilter(LdapSettingsConstants.ROLE_FILTER)
                 .withLdapRoleRecursion(LdapSettingsConstants.ROLE_RECURSION)
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
-
-        deploymentScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
-                .withLdapSettings(ldapSettings).withExternalMavenRepo(MavenConstants.getMavenRepoUrl(),
-                        MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
+        try {
+            deploymentScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
+                    .withLdapSettings(ldapSettings).withExternalMavenRepo(MavenConstants.getMavenRepoUrl(),
+                            MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .build();
+        } catch (UnsupportedOperationException ex) {
+            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+        }
         deploymentScenario.setLogFolderName(KieServerWithMySqlLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }

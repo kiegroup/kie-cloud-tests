@@ -60,8 +60,28 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>openshift</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+    <profile>
+      <id>openshift-operator</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+    <profile>
+      <id>openshift-apb</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+  </profiles>
 
   <build>
     <testResources>
@@ -96,6 +116,7 @@
             <systemProperties>
               <kjars.build.settings.xml>${kjars.build.settings.xml}</kjars.build.settings.xml>
               <instance.logs>${project.build.directory}/instances</instance.logs>
+              <apb.build.logs>${project.build.directory}/apbBuilds</apb.build.logs>
             </systemProperties>
           </configuration>
         </plugin>
@@ -105,6 +126,10 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>keytool-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

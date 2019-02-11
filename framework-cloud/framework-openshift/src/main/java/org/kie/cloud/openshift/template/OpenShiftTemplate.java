@@ -44,7 +44,8 @@ public enum OpenShiftTemplate {
     // Special template containing secret file.
     SECRET(OpenShiftConstants.KIE_APP_SECRET),
     SSO_SECRET(OpenShiftConstants.SSO_APP_SECRETS),
-    OPTAWEB_EMPLOYEE_ROSTERING(OpenShiftConstants.OPTAWEB_EMPLOYEE_ROSTERING_TEMPLATE);
+    OPTAWEB_EMPLOYEE_ROSTERING(OpenShiftConstants.OPTAWEB_EMPLOYEE_ROSTERING_TEMPLATE),
+    CUSTOM_TRUSTED_SECRET(OpenShiftConstants.CUSTOM_TRUSTED_APP_SECRET);
 
     private static final Properties templateProperties = OpenShiftTemplatePropertiesLoader.getProperties();
 

@@ -16,13 +16,16 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import org.kie.cloud.openshift.resource.Project;
+import java.util.Optional;
+
 import org.kie.cloud.api.deployment.SsoDeployment;
+import org.kie.cloud.openshift.resource.Project;
 
 public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeployment {
 
     private String serviceName;
-    private URL url;
+    private Optional<URL> insecureUrl;
+    private Optional<URL> secureUrl;
     private String username;
     private String password;
 
@@ -40,10 +43,23 @@ public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeploym
 
     @Override
     public URL getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(serviceName);
+        return getInsecureUrl().orElseGet(() -> getSecureUrl().orElseThrow(() -> new RuntimeException("No SSO URL is available.")));
+    }
+
+    @Override
+    public Optional<URL> getInsecureUrl() {
+        if (insecureUrl == null) {
+            insecureUrl = getHttpRouteUrl(getServiceName());
         }
-        return url;
+        return insecureUrl;
+    }
+
+    @Override
+    public Optional<URL> getSecureUrl() {
+        if (secureUrl == null) {
+            secureUrl = getHttpsRouteUrl(getServiceName());
+        }
+        return secureUrl;
     }
 
     @Override

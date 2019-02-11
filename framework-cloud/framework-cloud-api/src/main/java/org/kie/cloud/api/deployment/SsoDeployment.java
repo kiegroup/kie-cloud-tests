@@ -16,6 +16,7 @@
 package org.kie.cloud.api.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * SSO deplyoment representation in cloud.
@@ -28,6 +29,20 @@ public interface SsoDeployment extends Deployment {
      * @return SSO URL
      */
     URL getUrl();
+
+    /**
+     * Get HTTP URL for SSO service (deployment).
+     *
+     * @return SSO URL
+     */
+    Optional<URL> getInsecureUrl();
+
+    /**
+     * Get HTTPS URL for SSO service (deployment).
+     *
+     * @return SSO URL
+     */
+    Optional<URL> getSecureUrl();
 
     /**
      * Get SSO user name.

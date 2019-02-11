@@ -16,13 +16,15 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.openshift.resource.Project;
 
 public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements SmartRouterDeployment {
 
-    private URL url;
+    private Optional<URL> insecureUrl;
+    private Optional<URL> secureUrl;
 
     private String serviceName;
 
@@ -30,15 +32,32 @@ public class SmartRouterDeploymentImpl extends OpenShiftDeployment implements Sm
         super(project);
     }
 
-    @Override public URL getUrl() {
-        if (url == null) {
-            url = getHttpRouteUrl(serviceName);
+    @Override
+    public URL getUrl() {
+        return getInsecureUrl().orElseGet(() -> getSecureUrl().orElseThrow(() -> new RuntimeException("No Smart router URL is available.")));
+    }
+
+    @Override
+    public Optional<URL> getInsecureUrl() {
+        if (insecureUrl == null) {
+            insecureUrl = getHttpRouteUrl(getServiceName());
         }
-        return url;
+        return insecureUrl;
+    }
+
+    @Override
+    public Optional<URL> getSecureUrl() {
+        if (secureUrl == null) {
+            secureUrl = getHttpsRouteUrl(getServiceName());
+        }
+        return secureUrl;
     }
 
     @Override
     public String getServiceName() {
+        if(serviceName == null) {
+            serviceName = ServiceUtil.getSmartRouterServiceName(getOpenShiftUtil());
+        }
         return serviceName;
     }
 
