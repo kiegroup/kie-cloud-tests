@@ -30,7 +30,7 @@ public enum Image {
     CONTROLLER(OpenShiftConstants.KIE_IMAGE_TAG_CONTROLLER),
     KIE_SERVER(OpenShiftConstants.KIE_IMAGE_TAG_KIE_SERVER),
     MYSQL(OpenShiftConstants.KIE_IMAGE_TAG_MYSQL, "registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7", "mysql", "5.7"),
-    POSTGRESQL(OpenShiftConstants.KIE_IMAGE_TAG_POSTGRESQL, "registry.access.redhat.com/rhscl/postgresql-96-rhel7", "postgresql", "9.6"),
+    POSTGRESQL(OpenShiftConstants.KIE_IMAGE_TAG_POSTGRESQL, "registry.access.redhat.com/rhscl/postgresql-10-rhel7", "postgresql", "10"),
     SMARTROUTER(OpenShiftConstants.KIE_IMAGE_TAG_SMARTROUTER),
     WORKBENCH(OpenShiftConstants.KIE_IMAGE_TAG_WORKBENCH),
     WORKBENCH_INDEXING(OpenShiftConstants.KIE_IMAGE_TAG_WORKBENCH_INDEXING);

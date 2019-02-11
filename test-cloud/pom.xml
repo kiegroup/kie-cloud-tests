@@ -77,6 +77,7 @@
     <!-- Location for custom Kie application templates. Can be used to point tests to the location containing templates to be used for tests. -->
     <kie.app.template.url/>
 
+
     <!-- Custom trusted secret -->
     <custom.trusted.app.secret/>
     <custom.trusted.secret.name/>
@@ -87,6 +88,17 @@
     <!-- APB -->
     <apb.image.stream.name/>
     <apb.image.stream.tag/> <!-- Tag version of the ImageStream to use. -->
+
+    <!-- Image tag properties for Image Stream Provider -->
+    <kie.image.tag.amq/>
+    <kie.image.tag.console/>
+    <kie.image.tag.controller/>
+    <kie.image.tag.kieserver/>
+    <kie.image.tag.mysql/>
+    <kie.image.tag.postgresql/>
+    <kie.image.tag.smartrouter/>
+    <kie.image.tag.workbench/>
+    <kie.image.tag.workbench.indexing/>
   </properties>
 
   <modules>
@@ -180,6 +192,15 @@
               <custom.trusted.keystore.pwd>${custom.trusted.keystore.pwd}</custom.trusted.keystore.pwd>
               <apb.image.stream.name>${apb.image.stream.name}</apb.image.stream.name>
               <apb.image.stream.tag>${apb.image.stream.tag}</apb.image.stream.tag>
+              <kie.image.tag.amq>${kie.image.tag.amq}</kie.image.tag.amq>
+              <kie.image.tag.console>${kie.image.tag.console}</kie.image.tag.console>
+              <kie.image.tag.controller>${kie.image.tag.controller}</kie.image.tag.controller>
+              <kie.image.tag.kieserver>${kie.image.tag.kieserver}</kie.image.tag.kieserver>
+              <kie.image.tag.mysql>${kie.image.tag.mysql}</kie.image.tag.mysql>
+              <kie.image.tag.postgresql>${kie.image.tag.postgresql}</kie.image.tag.postgresql>
+              <kie.image.tag.smartrouter>${kie.image.tag.smartrouter}</kie.image.tag.smartrouter>
+              <kie.image.tag.workbench>${kie.image.tag.workbench}</kie.image.tag.workbench>
+              <kie.image.tag.workbench.indexing>${kie.image.tag.workbench.indexing}</kie.image.tag.workbench.indexing>
             </systemProperties>
           </configuration>
         </plugin>

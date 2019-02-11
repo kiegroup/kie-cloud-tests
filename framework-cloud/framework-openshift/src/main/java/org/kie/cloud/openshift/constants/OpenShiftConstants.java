@@ -148,7 +148,7 @@ public class OpenShiftConstants implements Constants {
     public static final String KIE_IMAGE_TAG_AMQ = "kie.image.tag.amq";
     public static final String KIE_IMAGE_TAG_CONSOLE = "kie.image.tag.console";
     public static final String KIE_IMAGE_TAG_CONTROLLER = "kie.image.tag.controller";
-    public static final String KIE_IMAGE_TAG_KIE_SERVER = "kie.image.tag.kie-server";
+    public static final String KIE_IMAGE_TAG_KIE_SERVER = "kie.image.tag.kieserver";
     public static final String KIE_IMAGE_TAG_MYSQL = "kie.image.tag.mysql";
     public static final String KIE_IMAGE_TAG_POSTGRESQL = "kie.image.tag.postgresql";
     public static final String KIE_IMAGE_TAG_SMARTROUTER = "kie.image.tag.smartrouter";
