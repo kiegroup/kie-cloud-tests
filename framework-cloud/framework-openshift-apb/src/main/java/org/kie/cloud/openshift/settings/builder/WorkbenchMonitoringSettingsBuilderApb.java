@@ -37,7 +37,7 @@ public class WorkbenchMonitoringSettingsBuilderApb implements WorkbenchMonitorin
 
         // Required values to create persitence values.
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.IMMUTABLE_MON);
-        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, OpenShiftConstants.getApbImageStreamTag());
+        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, OpenShiftConstants.getApbKieImageStreamTag());
         extraVars.put(OpenShiftApbConstants.SMARTROUTER_VOLUME_SIZE, "64Mi");
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_VOLUME_SIZE, "64Mi");
         extraVars.put(OpenShiftApbConstants.APB_BUSINESSCENTRAL_REPLICAS, "1");
