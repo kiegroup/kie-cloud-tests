@@ -46,6 +46,16 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-common</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-router-proxy</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
