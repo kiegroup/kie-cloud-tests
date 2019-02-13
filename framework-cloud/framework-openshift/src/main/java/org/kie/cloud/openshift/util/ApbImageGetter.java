@@ -39,16 +39,24 @@ public class ApbImageGetter {
 
     /**
      * OpenShift APB image stream name is set by property "apb.image.stream.name".
+     * We can set docker image tag by the property "apb.image.docker.repo.tag". If
+     * docker image tag is not set, then is used by default image with latest tag.
      * Returns docker image name of apb image in namespace "openshift".
      * 
      * @return Name of docker image in OpenShift registry.
      */
     public static String fromImageStream() {
-        return openShiftClient.imageStreams()
-                .inNamespace("openshift")
-                .withName(OpenShiftConstants.getApbImageStreamName())
-                .get()
-                .getStatus()
-                .getDockerImageRepository();
+        String dockerImage = openShiftClient.imageStreams()
+                                .inNamespace("openshift")
+                                .withName(OpenShiftConstants.getApbImageStreamName())
+                                .get()
+                                .getStatus()
+                                .getDockerImageRepository();
+        String tag = OpenShiftConstants.getApbImageDockerRepoTag();
+        if (tag != null && !tag.isEmpty()) {
+            return dockerImage + ":" + tag;
+        } else {
+            return dockerImage;
+        }
     }
 }
