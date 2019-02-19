@@ -142,6 +142,9 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
                 DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
+        extraVars.put(OpenShiftApbConstants.SMARTROUTER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
+        extraVars.put(OpenShiftApbConstants.SMARTROUTER_KEYSTORE_ALIAS, DeploymentConstants.getCustomTrustedKeystoreAlias());
+        extraVars.put(OpenShiftApbConstants.SMARTROUTER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
     }
 
     @Override
