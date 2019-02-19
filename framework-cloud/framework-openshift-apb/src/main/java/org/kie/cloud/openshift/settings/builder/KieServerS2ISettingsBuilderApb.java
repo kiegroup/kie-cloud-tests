@@ -47,6 +47,9 @@ public class KieServerS2ISettingsBuilderApb implements KieServerS2ISettingsBuild
         extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS, DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
+        extraVars.put(OpenShiftApbConstants.SMARTROUTER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
+        extraVars.put(OpenShiftApbConstants.SMARTROUTER_KEYSTORE_ALIAS, DeploymentConstants.getCustomTrustedKeystoreAlias());
+        extraVars.put(OpenShiftApbConstants.SMARTROUTER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
         //apb_kieserver_image_stream_name -- can be also required, has default value (now rhpam72-kieserver-openshift)
 
         // Users
