@@ -80,6 +80,9 @@ public class OpenShiftApbConstants {
     public static final String KIESERVER_SECRET_NAME = "apb_kieserver_secret_name";
     public static final String KIESERVER_KEYSTORE_ALIAS = "apb_kieserver_keystore_alias";
     public static final String KIESERVER_KEYSTORE_PWD = "apb_kieserver_keystore_pwd";
+    public static final String SMARTROUTER_SECRET_NAME = "apb_smartrouter_secret_name";
+    public static final String SMARTROUTER_KEYSTORE_ALIAS = "apb_smartrouter_keystore_alias";
+    public static final String SMARTROUTER_KEYSTORE_PWD = "apb_smartrouter_keystore_pwd";
 
     // Artifact source (S2I)
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "apb_kieserver_container_deployment";
