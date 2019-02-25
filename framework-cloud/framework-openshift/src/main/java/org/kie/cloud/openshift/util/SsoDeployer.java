@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.openshift.util;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +31,11 @@ import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.openshift.OpenShiftUtils;
 import cz.xtf.sso.api.SsoApi;
 import cz.xtf.sso.api.SsoApiFactory;
+import io.fabric8.kubernetes.api.model.KubernetesList;
 
 public class SsoDeployer {
 
@@ -41,10 +46,10 @@ public class SsoDeployer {
     public static SsoDeployment deploy(Project project) {
         SsoDeployment ssoDeployment = createSsoDeployment(project);
 
+        logger.info("Creating SSO image streams in namespece \"openshift\" from " + OpenShiftConstants.getSsoImageStreams());
+        imageStreamDeploy(project);
         logger.info("Creating SSO secrets from " + OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toString());
         project.createResources(OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toExternalForm());
-        logger.info("Creating SSO image streams from " + OpenShiftConstants.getSsoImageStreams());
-        project.createResources(OpenShiftConstants.getSsoImageStreams());
 
         logger.info("Processing template and createing resources from " + OpenShiftTemplate.SSO.getTemplateUrl().toString());
         Map<String, String> ssoEnvVariables = new HashMap<>();
@@ -53,7 +58,6 @@ public class SsoDeployer {
         ssoEnvVariables.put(SsoTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
         ssoEnvVariables.put(SsoTemplateConstants.SSO_SERVICE_USERNAME, DeploymentConstants.getSsoServiceUser());
         ssoEnvVariables.put(SsoTemplateConstants.SSO_SERVICE_PASSWORD, DeploymentConstants.getSsoServicePassword());
-        ssoEnvVariables.put(SsoTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SSO.getTemplateUrl(), ssoEnvVariables);
 
         logger.info("Waiting for SSO deployment to become ready.");
@@ -62,6 +66,19 @@ public class SsoDeployer {
         createRolesAndUsers(ssoDeployment.getUrl().toString() + "/auth", SSO_REALM);
 
         return ssoDeployment;
+    }
+
+    private static void imageStreamDeploy(Project project) {
+        try {
+            OpenShiftUtil openShiftUtil = OpenShiftUtils.admin(project.getName());
+            KubernetesList resourceList = openShiftUtil.client().lists().inNamespace("openshift").load(new URL(OpenShiftConstants.getSsoImageStreams())).get();
+            resourceList.getItems().forEach(item -> {
+                openShiftUtil.client().imageStreams().inNamespace("openshift").withName(item.getMetadata().getName()).delete();
+            });
+            openShiftUtil.client().lists().inNamespace("openshift").create(resourceList);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed resource URL", e);
+        }
     }
 
     private static SsoDeployment createSsoDeployment(Project project) {
