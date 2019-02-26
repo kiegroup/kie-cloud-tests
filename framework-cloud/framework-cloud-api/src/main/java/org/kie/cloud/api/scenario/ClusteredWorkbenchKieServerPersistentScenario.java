@@ -22,7 +22,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 /**
  * Representation of deployment scenario with clustered Workbench and Kie server.
  */
-public interface ClusteredWorkbenchKieServerPersistentScenario extends KieDeploymentScenario {
+public interface ClusteredWorkbenchKieServerPersistentScenario extends KieDeploymentScenario<ClusteredWorkbenchKieServerPersistentScenario> {
 
     /**
      * Return Workbench deployment.

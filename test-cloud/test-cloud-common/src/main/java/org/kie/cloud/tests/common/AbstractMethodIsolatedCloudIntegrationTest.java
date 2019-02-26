@@ -22,7 +22,7 @@ import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 
-public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends DeploymentScenario> extends AbstractCloudIntegrationTest {
+public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends DeploymentScenario<?>> extends AbstractCloudIntegrationTest {
 
     protected T deploymentScenario;
 

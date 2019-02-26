@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 import cz.xtf.openshift.OpenShiftBinaryClient;
 
 @RunWith(Parameterized.class)
-public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
+public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchGitHooksPersistenceIntegrationTest.class);
 
@@ -57,7 +57,7 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
     public String testScenarioName;
 
     @Parameterized.Parameter(value = 1)
-    public KieDeploymentScenario workbenchKieServerScenario;
+    public KieDeploymentScenario<?> workbenchKieServerScenario;
 
     private WorkbenchClient workbenchClient;
 
@@ -92,7 +92,7 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
     }
 
     @Override
-    protected KieDeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected KieDeploymentScenario<?> createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return workbenchKieServerScenario;
     }
 

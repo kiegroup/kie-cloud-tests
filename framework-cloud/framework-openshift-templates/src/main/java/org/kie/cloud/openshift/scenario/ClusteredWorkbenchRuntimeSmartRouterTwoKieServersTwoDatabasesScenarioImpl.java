@@ -45,7 +45,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl extends OpenShiftScenario implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario {
+public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl extends KieCommonScenario<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario {
 
     private WorkbenchDeployment workbenchRuntimeDeployment;
     private SmartRouterDeployment smartRouterDeployment;
@@ -55,14 +55,13 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     private DatabaseDeploymentImpl databaseTwoDeployment;
     private SsoDeployment ssoDeployment;
 
-    private Map<String, String> envVariables;
     private boolean deploySso;
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     private static final Logger logger = LoggerFactory.getLogger(ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl.class);
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
-        this.envVariables = envVariables;
+        super(envVariables);
         this.deploySso=deploySso;
     }
 
@@ -71,9 +70,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployKieDeployments() {
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 

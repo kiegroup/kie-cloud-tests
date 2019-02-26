@@ -38,7 +38,7 @@ import org.kie.cloud.openshift.operator.resources.OpenShiftResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario implements WorkbenchKieServerScenario {
+public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<WorkbenchKieServerScenario> implements WorkbenchKieServerScenario {
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
@@ -46,9 +46,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario im
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployCustomResource() {
         // deploy application
         logger.info("Creating application from " + OpenShiftResource.WORKBENCH_KIE_SERVER.getResourceUrl().toString());
         OpenShiftBinaryClient.getInstance().executeCommand("Deployment failed.", "create", "-f", OpenShiftResource.WORKBENCH_KIE_SERVER.getResourceUrl().toString());

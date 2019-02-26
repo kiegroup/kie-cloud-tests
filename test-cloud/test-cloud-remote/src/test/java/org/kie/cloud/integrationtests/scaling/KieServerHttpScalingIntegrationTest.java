@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 @Ignore("Currently all templates are using WebSockets, generic scenario builder is not capable of configuring HTTP. Ignoring for now until new generic scenario builder is available.")
-public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
+public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerHttpScalingIntegrationTest.class);
 
@@ -64,7 +64,7 @@ public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedC
     public String testScenarioName;
 
     @Parameterized.Parameter(value = 1)
-    public KieDeploymentScenario deploymentScenario;
+    public KieDeploymentScenario<?> deploymentScenario;
 
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -107,7 +107,7 @@ public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedC
     }
 
     @Override
-    protected KieDeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected KieDeploymentScenario<?> createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenario;
     }
 

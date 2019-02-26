@@ -44,7 +44,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericScenarioImpl extends OpenShiftScenario implements GenericScenario {
+public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> implements GenericScenario {
 
     private List<WorkbenchDeployment> workbenchDeployments;
     private List<KieServerDeployment> kieServerDeployments;
@@ -93,9 +93,7 @@ public class GenericScenarioImpl extends OpenShiftScenario implements GenericSce
     }
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployKieDeployments() {
         workbenchDeployments.clear();
         controllerDeployments.clear();
         kieServerDeployments.clear();

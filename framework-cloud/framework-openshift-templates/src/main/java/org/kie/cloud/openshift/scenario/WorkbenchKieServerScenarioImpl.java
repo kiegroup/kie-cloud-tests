@@ -37,23 +37,19 @@ import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchKieServerScenarioImpl extends OpenShiftScenario implements WorkbenchKieServerScenario {
+public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchKieServerScenario> implements WorkbenchKieServerScenario {
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
 
-    private Map<String, String> envVariables;
-
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
     public WorkbenchKieServerScenarioImpl(Map<String, String> envVariables) {
-        this.envVariables = envVariables;
+        super(envVariables);
     }
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployKieDeployments() {
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER.getTemplateUrl(), envVariables);

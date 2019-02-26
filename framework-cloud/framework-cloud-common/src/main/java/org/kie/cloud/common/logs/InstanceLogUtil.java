@@ -51,7 +51,7 @@ public class InstanceLogUtil {
         }
     }
 
-    public static void writeDeploymentLogs(DeploymentScenario deploymentScenario) {
+    public static void writeDeploymentLogs(DeploymentScenario<?> deploymentScenario) {
         for(Deployment deployment : deploymentScenario.getDeployments()) {
             if (deployment != null) {
                 List<Instance> instances = deployment.getInstances();

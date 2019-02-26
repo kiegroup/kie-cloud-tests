@@ -19,7 +19,7 @@ import java.util.List;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 
-public interface DeploymentScenario {
+public interface DeploymentScenario<T extends DeploymentScenario<T>> {
     /**
      * Return deployment scenario namespace.
      *
@@ -61,4 +61,11 @@ public interface DeploymentScenario {
      * @return All available deployments.
      */
     List<Deployment> getDeployments();
+
+    /**
+     * Add listener for this deployment scenario. It will listen to various lifecycle events.
+     *
+     * @param deploymentScenarioListener Deployment scenario listener.
+     */
+    void addDeploymentScenarioListener(DeploymentScenarioListener<T> deploymentScenarioListener);
 }

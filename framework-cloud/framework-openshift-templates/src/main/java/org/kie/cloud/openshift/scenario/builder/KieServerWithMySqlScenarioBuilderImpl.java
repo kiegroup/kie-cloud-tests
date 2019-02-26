@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.LdapSettings;
@@ -26,7 +27,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.scenario.KieServerWithMySqlScenarioImpl;
 
-public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatabaseScenarioBuilder {
+public class KieServerWithMySqlScenarioBuilderImpl extends KieScenarioBuilderImpl<KieServerWithDatabaseScenarioBuilder, KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
     private boolean deploySso = false;
@@ -40,7 +41,7 @@ public class KieServerWithMySqlScenarioBuilderImpl implements KieServerWithDatab
     }
 
     @Override
-    public KieServerWithDatabaseScenario build() {
+    protected DeploymentScenario<KieServerWithDatabaseScenario> getDeploymentScenarioInstance() {
         return new KieServerWithMySqlScenarioImpl(envVariables, deploySso);
     }
 
