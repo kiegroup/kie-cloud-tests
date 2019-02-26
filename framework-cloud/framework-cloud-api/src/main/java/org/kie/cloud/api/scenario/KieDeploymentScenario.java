@@ -25,7 +25,7 @@ import org.kie.cloud.api.deployment.ControllerDeployment;
 /**
  * Cloud deployment scenario representation.
  */
-public interface KieDeploymentScenario extends DeploymentScenario {
+public interface KieDeploymentScenario<T extends DeploymentScenario<T>> extends DeploymentScenario<T> {
 
     /**
      * Return List of all Workbench deployments. If there aren't any deployment,

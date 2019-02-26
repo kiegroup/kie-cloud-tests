@@ -42,21 +42,20 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftScenario implements ClusteredWorkbenchKieServerDatabasePersistentScenario {
+public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends KieCommonScenario<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements ClusteredWorkbenchKieServerDatabasePersistentScenario {
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
     private SsoDeployment ssoDeployment;
 
-    private Map<String, String> envVariables;
     private boolean deploySso;
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
-        this.envVariables = envVariables;
+        super(envVariables);
         this.deploySso = deploySso;
     }
 
@@ -79,9 +78,8 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
         return databaseDeployment;
     }
 
-    @Override public void deploy() {
-        super.deploy();
-
+    @Override
+    protected void deployKieDeployments() {
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 

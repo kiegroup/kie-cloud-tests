@@ -18,7 +18,7 @@ package org.kie.cloud.api.scenario.builder;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.settings.LdapSettings;
 
-public interface KieServerWithDatabaseScenarioBuilder extends DeploymentScenarioBuilder<KieServerWithDatabaseScenario> {
+public interface KieServerWithDatabaseScenarioBuilder extends KieDeploymentScenarioBuilder<KieServerWithDatabaseScenarioBuilder, KieServerWithDatabaseScenario> {
 
     /**
      * Return setup builder with additional configuration of external maven repo.

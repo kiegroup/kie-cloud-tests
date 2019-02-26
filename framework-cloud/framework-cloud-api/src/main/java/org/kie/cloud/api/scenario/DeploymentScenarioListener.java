@@ -1,9 +1,8 @@
 /*
- * Copyright 2017 JBoss by Red Hat.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,9 +14,12 @@
  */
 package org.kie.cloud.api.scenario;
 
-/**
- * Cloud generic deployment scenario representation.
- */
-public interface GenericScenario extends KieDeploymentScenario<GenericScenario> {
+public interface DeploymentScenarioListener<T extends DeploymentScenario<T>> {
 
+    /**
+     * Invoked before the deployment scenario is installed. 
+     *
+     * @param deploymentScenario Deployment scenario which is going to be deployed.
+     */
+    default void beforeDeploymentStarted(T deploymentScenario) {};
 }

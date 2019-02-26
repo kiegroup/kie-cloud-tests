@@ -30,6 +30,7 @@ import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
@@ -40,7 +41,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario implements WorkbenchKieServerPersistentScenario {
+public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<WorkbenchKieServerScenario> implements WorkbenchKieServerPersistentScenario {
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
@@ -57,9 +58,7 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario i
     }
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployKieDeployments() {
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 

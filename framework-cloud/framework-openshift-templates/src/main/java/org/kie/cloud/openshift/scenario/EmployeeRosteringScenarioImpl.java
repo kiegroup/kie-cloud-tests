@@ -30,7 +30,7 @@ import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EmployeeRosteringScenarioImpl extends OpenShiftScenario implements EmployeeRosteringScenario {
+public class EmployeeRosteringScenarioImpl extends OpenShiftScenario<EmployeeRosteringScenario> implements EmployeeRosteringScenario {
 
     private static final String OPTAWEB_HTTPS_SECRET = "OPTAWEB_HTTPS_SECRET";
 
@@ -39,9 +39,7 @@ public class EmployeeRosteringScenarioImpl extends OpenShiftScenario implements 
     private EmployeeRosteringDeployment employeeRosteringDeployment;
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployKieDeployments() {
         this.employeeRosteringDeployment = new EmployeeRosteringDeploymentImpl(project);
 
         Map<String, String> env = new HashMap<>();

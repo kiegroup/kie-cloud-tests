@@ -53,25 +53,23 @@ import org.slf4j.LoggerFactory;
 import cz.xtf.openshift.OpenShiftBinaryClient;
 import cz.xtf.wait.SimpleWaiter;
 
-public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftScenario implements KieServerWithExternalDatabaseScenario {
+public class KieServerWithExternalDatabaseScenarioImpl extends KieCommonScenario<KieServerWithExternalDatabaseScenario> implements KieServerWithExternalDatabaseScenario {
 
     private KieServerDeploymentImpl kieServerDeployment;
     private DockerDeployment dockerDeployment;
-    private Map<String, String> envVariables;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
     public KieServerWithExternalDatabaseScenarioImpl(Map<String, String> envVariables) {
-        this.envVariables = envVariables;
+        super(envVariables);
     }
 
     @Override public KieServerDeployment getKieServerDeployment() {
         return kieServerDeployment;
     }
 
-    @Override public void deploy() {
-        super.deploy();
-
+    @Override
+    protected void deployKieDeployments() {
         ExternalDatabase externalDatabase = TemplateExternalDatabaseProvider.getExternalDatabase();
         envVariables.putAll(externalDatabase.getExternalDatabaseEnvironmentVariables());
 

@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed.")
-public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario> {
+public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchPersistenceIntegrationTest.class);
 
@@ -67,7 +67,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public KieDeploymentScenario workbenchKieServerScenario;
+    public KieDeploymentScenario<?> workbenchKieServerScenario;
 
     private String repositoryName;
 
@@ -102,7 +102,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
     }
 
     @Override
-    protected KieDeploymentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected KieDeploymentScenario<?> createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return workbenchKieServerScenario;
     }
 

@@ -39,7 +39,7 @@ import org.kie.cloud.openshift.util.ApbImageGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchKieServerScenarioApb extends OpenShiftScenario implements WorkbenchKieServerScenario {
+public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKieServerScenario> implements WorkbenchKieServerScenario {
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
@@ -53,9 +53,7 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario implements 
     }
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployKieDeployments() {
         logger.info("Creating trusted secret");
         deployCustomTrustedSecret();
 

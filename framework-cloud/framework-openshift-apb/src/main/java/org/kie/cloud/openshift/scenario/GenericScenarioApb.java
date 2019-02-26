@@ -40,7 +40,7 @@ import org.kie.cloud.openshift.util.ApbImageGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericScenarioApb extends OpenShiftScenario implements GenericScenario {
+public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> implements GenericScenario {
 
     private List<WorkbenchDeployment> workbenchDeployments;
     private List<KieServerDeployment> kieServerDeployments;
@@ -94,9 +94,7 @@ public class GenericScenarioApb extends OpenShiftScenario implements GenericScen
     }
 
     @Override
-    public void deploy() {
-        super.deploy();
-
+    protected void deployKieDeployments() {
         logger.info("Deploy custom trusted certifcate.");
         project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(), Collections.emptyMap());
         // extra vars for custom secret are set in settings builder

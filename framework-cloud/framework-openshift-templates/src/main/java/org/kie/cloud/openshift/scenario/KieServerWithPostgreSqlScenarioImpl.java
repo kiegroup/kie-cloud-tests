@@ -39,24 +39,19 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerWithPostgreSqlScenarioImpl extends OpenShiftScenario implements KieServerWithDatabaseScenario {
+public class KieServerWithPostgreSqlScenarioImpl extends KieCommonScenario<KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenario {
 
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
     private SsoDeployment ssoDeployment;
 
-    private Map<String, String> envVariables;
     private boolean deploySso;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
     public KieServerWithPostgreSqlScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
-        this.envVariables = envVariables;
+        super(envVariables);
         this.deploySso = deploySso;
-    }
-
-    public KieServerWithPostgreSqlScenarioImpl(Map<String, String> envVariables) {
-        this(envVariables, false);
     }
 
     @Override public KieServerDeployment getKieServerDeployment() {
@@ -68,9 +63,8 @@ public class KieServerWithPostgreSqlScenarioImpl extends OpenShiftScenario imple
         return databaseDeployment;
     }
 
-    @Override public void deploy() {
-        super.deploy();
-
+    @Override
+    protected void deployKieDeployments() {
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 
