@@ -102,13 +102,23 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         smartRouterDeployment.scale(1);
 
         kieServerOneDeployment = createKieServerDeployment(project, "1");
-        kieServerOneDeployment.scale(1);
-
         kieServerTwoDeployment = createKieServerDeployment(project, "2");
-        kieServerTwoDeployment.scale(1);
 
         databaseOneDeployment = createDatabaseDeployment(project, "1");
         databaseTwoDeployment = createDatabaseDeployment(project, "2");
+
+        logger.info("Waiting for Database one deployment to become ready.");
+        databaseOneDeployment.waitForScale();
+
+        logger.info("Waiting for Database two deployment to become ready.");
+        databaseTwoDeployment.waitForScale();
+
+        // TODO: Workaround for KIECLOUD-48, respin Kie server when database is ready
+        kieServerOneDeployment.deleteInstances(kieServerOneDeployment.getInstances());
+        kieServerTwoDeployment.deleteInstances(kieServerTwoDeployment.getInstances());
+        // Scale after recreating instances to prevent race condition
+        kieServerOneDeployment.scale(1);
+        kieServerTwoDeployment.scale(1);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchRuntimeDeployment.waitForScale();
@@ -121,12 +131,6 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
         logger.info("Waiting for Kie server two deployment to become ready.");
         kieServerTwoDeployment.waitForScale();
-
-        logger.info("Waiting for Database one deployment to become ready.");
-        databaseOneDeployment.waitForScale();
-
-        logger.info("Waiting for Database two deployment to become ready.");
-        databaseTwoDeployment.waitForScale();
 
         logger.info("Waiting for Kie servers and Smart router to register itself to the Workbench.");
         KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment, 3);
