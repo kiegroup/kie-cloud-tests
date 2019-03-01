@@ -25,7 +25,7 @@ public class LdapSettingsConstants {
     public static final Long SEARCH_TIME_LIMIT = 10000L;
     public static final String ROLE_ATTRIBUTE_ID = "cn";
     public static final String ROLES_CTX_DN = "ou=roles,dc=example,dc=com";
-    public static final String ROLE_FILTER = "(memberOf={1})";
+    public static final String ROLE_FILTER = "(member={1})";
     public static final Long ROLE_RECURSION = 1L;
     public static final String DEFAULT_ROLE = "guest";
 }
