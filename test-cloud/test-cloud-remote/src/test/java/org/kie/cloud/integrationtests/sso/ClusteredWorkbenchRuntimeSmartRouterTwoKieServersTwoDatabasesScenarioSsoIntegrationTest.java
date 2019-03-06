@@ -73,21 +73,21 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Test
     public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerOneDeployment());
-        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerTwoDeployment());
+        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerOneDeployment());
+        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerOneDeployment());
-        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerTwoDeployment());
+        ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerOneDeployment());
+        ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test
     public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerOneDeployment());
-        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerTwoDeployment());
+        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerOneDeployment());
+        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test

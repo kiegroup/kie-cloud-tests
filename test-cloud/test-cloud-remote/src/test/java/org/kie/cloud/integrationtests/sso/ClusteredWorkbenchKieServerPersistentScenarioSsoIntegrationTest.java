@@ -71,7 +71,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testProcesses(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
@@ -83,12 +83,12 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
 
     @Test
     public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment());
+        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment());
+        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
