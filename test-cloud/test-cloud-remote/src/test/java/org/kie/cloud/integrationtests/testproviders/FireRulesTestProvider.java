@@ -59,15 +59,16 @@ public class FireRulesTestProvider {
         MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
     }
 
-    public static void testFireRules(KieServerDeployment kieServerDeployment) {
+    public static void testDeployFromKieServerAndFireRules(KieServerDeployment kieServerDeployment) {
         String containerId = "testFireRules";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.HELLO_RULES_SNAPSHOT.getGroupId(), Kjar.HELLO_RULES_SNAPSHOT.getName(), Kjar.HELLO_RULES_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
+        kieServerDeployment.waitForScale();
 
         try {
-            fireRules(kieServerDeployment, containerId);
+            testFireRules(kieServerDeployment, containerId);
         } finally {
             kieServerClient.disposeContainer(containerId);
         }
@@ -89,14 +90,14 @@ public class FireRulesTestProvider {
 
             KieServerClientProvider.waitForContainerStart(kieServerDeployment, containerId);
 
-            fireRules(kieServerDeployment, containerId);
+            testFireRules(kieServerDeployment, containerId);
         } finally {
             gitProvider.deleteGitRepository(repositoryName);
             kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
         }
     }
 
-    private static void fireRules(KieServerDeployment kieServerDeployment, String containerId) {
+    public static void testFireRules(KieServerDeployment kieServerDeployment, String containerId) {
         RuleServicesClient ruleClient = KieServerClientProvider.getRuleClient(kieServerDeployment);
 
         List<Command<?>> commands = new ArrayList<>();
