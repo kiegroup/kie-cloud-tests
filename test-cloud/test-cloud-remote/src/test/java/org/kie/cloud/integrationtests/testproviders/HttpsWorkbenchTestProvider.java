@@ -79,8 +79,8 @@ public class HttpsWorkbenchTestProvider {
     }
 
     public static void testControllerOperations(WorkbenchDeployment workbenchDeployment, boolean ssoScenario) {
-        String serverId = "KieServerId";
-        String serverName = "KieServerName";
+        String serverId = "kie-server-id";
+        String serverName = "kie-server-name";
         try {
             try {
                 // Create server template using REST API
