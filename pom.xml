@@ -24,7 +24,7 @@
 
   <properties>
     <rhba.images.version.prefix>73</rhba.images.version.prefix>
-    <rhba.images.branch>master</rhba.images.branch>
+    <rhba.images.branch>7.3.x</rhba.images.branch>
 
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
