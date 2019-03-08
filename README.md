@@ -141,3 +141,4 @@ mvn clean install -Popenshift -Ddefault.domain.suffix=.<openshift-ip>.nip.io
 Stop MiniShift: `minishift stop`
 
 Delete Minishift VM: `minishift delete`
+ 
