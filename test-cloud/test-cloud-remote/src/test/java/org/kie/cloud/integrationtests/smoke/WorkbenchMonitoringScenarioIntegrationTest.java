@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -31,10 +32,12 @@ import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 
 @RunWith(Parameterized.class)
+@Category(JBPMOnly.class)
 public class WorkbenchMonitoringScenarioIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     @Parameter(value = 0)
