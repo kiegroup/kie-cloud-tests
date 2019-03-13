@@ -63,10 +63,7 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl ext
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_CONSOLE_CLUSTERED_KIE_SERVER_DATABASE.getTemplateUrl(), envVariables);
 
         workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
-        workbenchRuntimeDeployment.scale(1);
-
         kieServerDeployment = createKieServerDeployment(project, "1");
-
         databaseDeployment = createDatabaseDeployment(project, "1");
 
         logger.info("Waiting for Database deployment to become ready.");
@@ -74,7 +71,6 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl ext
 
         // TODO: Workaround for KIECLOUD-48, respin Kie server when database is ready
         kieServerDeployment.deleteInstances(kieServerDeployment.getInstances());
-        kieServerDeployment.scale(1);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchRuntimeDeployment.waitForScale();
