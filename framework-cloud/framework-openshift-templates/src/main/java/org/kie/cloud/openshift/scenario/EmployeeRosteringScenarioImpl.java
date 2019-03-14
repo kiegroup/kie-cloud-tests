@@ -46,6 +46,7 @@ public class EmployeeRosteringScenarioImpl extends OpenShiftScenario implements 
 
         Map<String, String> env = new HashMap<>();
         env.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
+        env.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, project.getName());
         env.put(OPTAWEB_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
 
         project.processTemplateAndCreateResources(OpenShiftTemplate.OPTAWEB_EMPLOYEE_ROSTERING.getTemplateUrl(), env);
