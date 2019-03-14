@@ -59,8 +59,8 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl ext
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_CONSOLE_CLUSTERED_KIE_SERVER_DATABASE.getTemplateUrl(), envVariables);
 
         workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
-        kieServerDeployment = createKieServerDeployment(project, "1");
-        databaseDeployment = createDatabaseDeployment(project, "1");
+        kieServerDeployment = createKieServerDeployment(project);
+        databaseDeployment = createDatabaseDeployment(project);
 
         logger.info("Waiting for Database deployment to become ready.");
         databaseDeployment.waitForScale();
@@ -108,18 +108,16 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl ext
         return workbenchRuntimeDeployment;
     }
 
-    private KieServerDeploymentImpl createKieServerDeployment(Project project, String kieServerSuffix) {
+    private KieServerDeploymentImpl createKieServerDeployment(Project project) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
-        kieServerDeployment.setServiceSuffix("-" + kieServerSuffix);
 
         return kieServerDeployment;
     }
 
-    private DatabaseDeploymentImpl createDatabaseDeployment(Project project, String databaseSuffix) {
+    private DatabaseDeploymentImpl createDatabaseDeployment(Project project) {
         DatabaseDeploymentImpl databaseDeployment = new DatabaseDeploymentImpl(project);
-        databaseDeployment.setServiceSuffix("-" + databaseSuffix);
         return databaseDeployment;
     }
 
