@@ -39,6 +39,9 @@ public class KieServerPostgreSqlSettingsBuilderImpl implements KieServerSettings
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
         envVariables.put(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchMavenUser());
         envVariables.put(propertyNames.workbenchMavenPassword(), DeploymentConstants.getWorkbenchMavenPassword());
+
+        // TODO: Workaround until Maven repo with released artifacts is implemented
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_MODE, "DEVELOPMENT");
     }
 
     @Override
