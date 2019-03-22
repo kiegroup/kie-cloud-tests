@@ -30,7 +30,9 @@ public enum OpenShiftResource {
     CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT),
     // Configuration resources.
     CRD(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_CRD),
-    RBAC(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_RBAC),
+    SERVICE_ACCOUNT(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_SERVICE_ACCOUNT),
+    ROLE(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_ROLE),
+    ROLE_BINDING(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_ROLE_BINDING),
     OPERATOR(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_OPERATOR);
 
     private static final Properties resourceProperties = OpenShiftResourcePropertiesLoader.getProperties();

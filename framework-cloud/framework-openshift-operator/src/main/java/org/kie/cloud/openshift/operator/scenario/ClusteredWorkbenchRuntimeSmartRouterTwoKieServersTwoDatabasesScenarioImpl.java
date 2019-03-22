@@ -46,10 +46,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private WorkbenchDeployment workbenchRuntimeDeployment;
     private SmartRouterDeployment smartRouterDeployment;
-    private KieServerDeploymentImpl kieServerOneDeployment;
-    private KieServerDeploymentImpl kieServerTwoDeployment;
-    private DatabaseDeploymentImpl databaseOneDeployment;
-    private DatabaseDeploymentImpl databaseTwoDeployment;
+    private KieServerDeploymentImpl kieServerDeployment;
+    private DatabaseDeploymentImpl databaseDeployment;
 
     private static final Logger logger = LoggerFactory.getLogger(ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl.class);
 
@@ -59,28 +57,20 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logger.info("Creating application from " + OpenShiftResource.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getResourceUrl().toString());
         OpenShiftBinaryClient.getInstance().executeCommand("Deployment failed.", "create", "-f", OpenShiftResource.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getResourceUrl().toString());
 
-        // Wait until deployment is created
-        // Temporary, replace by something better.
+        workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
+        smartRouterDeployment = createSmartRouterDeployment(project);
+        kieServerDeployment = createKieServerDeployment(project);
+        databaseDeployment = createDatabaseDeployment(project);
+
+        logger.info("Waiting until all services are created.");
         try {
-            new SimpleWaiter(() -> project.getOpenShiftUtil().getServices().size() == 9).timeout(TimeUnit.MINUTES, 1).execute();
+            new SimpleWaiter(() -> workbenchRuntimeDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
+            new SimpleWaiter(() -> smartRouterDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
+            new SimpleWaiter(() -> kieServerDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
+            new SimpleWaiter(() -> databaseDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
         } catch (TimeoutException e) {
             throw new RuntimeException("Timeout while deploying application.", e);
         }
-
-        workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
-        workbenchRuntimeDeployment.scale(1);
-
-        smartRouterDeployment = createSmartRouterDeployment(project);
-        smartRouterDeployment.scale(1);
-
-        kieServerOneDeployment = createKieServerDeployment(project, "0");
-        kieServerOneDeployment.scale(1);
-
-        kieServerTwoDeployment = createKieServerDeployment(project, "1");
-        kieServerTwoDeployment.scale(1);
-
-        databaseOneDeployment = createDatabaseDeployment(project, "0");
-        databaseTwoDeployment = createDatabaseDeployment(project, "1");
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchRuntimeDeployment.waitForScale();
@@ -88,20 +78,14 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logger.info("Waiting for Smart router deployment to become ready.");
         smartRouterDeployment.waitForScale();
 
-        logger.info("Waiting for Kie server one deployment to become ready.");
-        kieServerOneDeployment.waitForScale();
+        logger.info("Waiting for Kie server deployment to become ready.");
+        kieServerDeployment.waitForScale();
 
-        logger.info("Waiting for Kie server two deployment to become ready.");
-        kieServerTwoDeployment.waitForScale();
-
-        logger.info("Waiting for Database one deployment to become ready.");
-        databaseOneDeployment.waitForScale();
-
-        logger.info("Waiting for Database two deployment to become ready.");
-        databaseTwoDeployment.waitForScale();
+        logger.info("Waiting for Database deployment to become ready.");
+        databaseDeployment.waitForScale();
 
         logger.info("Waiting for Kie servers and Smart router to register itself to the Workbench.");
-        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment, 3);
+        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment, 2);
 
         logNodeNameOfAllInstances();
     }
@@ -118,22 +102,24 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public KieServerDeployment getKieServerOneDeployment() {
-        return kieServerOneDeployment;
+        return kieServerDeployment;
     }
 
     @Override
     public KieServerDeployment getKieServerTwoDeployment() {
-        return kieServerTwoDeployment;
+        logger.warn("Second dpeloyment is not yet supported for now, returning first deployment.");
+        return kieServerDeployment;
     }
 
     @Override
     public DatabaseDeployment getDatabaseOneDeployment() {
-        return databaseOneDeployment;
+        return databaseDeployment;
     }
 
     @Override
     public DatabaseDeployment getDatabaseTwoDeployment() {
-        return databaseTwoDeployment;
+        logger.warn("Second dpeloyment is not yet supported for now, returning first deployment.");
+        return databaseDeployment;
     }
 
     @Override
@@ -143,7 +129,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerDeployment, databaseDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
@@ -164,19 +150,17 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         return smartRouterDeployment;
     }
 
-    private KieServerDeploymentImpl createKieServerDeployment(Project project, String kieServerSuffix) {
+    private KieServerDeploymentImpl createKieServerDeployment(Project project) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
         // Usernames/passwords currently hardcoded
         kieServerDeployment.setUsername("adminUser");
         kieServerDeployment.setPassword("RedHat");
-        kieServerDeployment.setServiceSuffix("-" + kieServerSuffix);
 
         return kieServerDeployment;
     }
 
-    private DatabaseDeploymentImpl createDatabaseDeployment(Project project, String databaseSuffix) {
+    private DatabaseDeploymentImpl createDatabaseDeployment(Project project) {
         DatabaseDeploymentImpl databaseDeployment = new DatabaseDeploymentImpl(project);
-        databaseDeployment.setServiceSuffix("-" + databaseSuffix);
         return databaseDeployment;
     }
 
@@ -187,7 +171,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public List<KieServerDeployment> getKieServerDeployments() {
-        return Arrays.asList(kieServerOneDeployment, kieServerTwoDeployment);
+        return Arrays.asList(kieServerDeployment);
     }
 
     @Override
