@@ -46,6 +46,9 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
         ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
         envVariables.put(propertyNames.workbenchHttpsSecret(), OpenShiftConstants.getKieApplicationSecretName());
+
+        // TODO: Workaround until Maven repo with released artifacts is implemented
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_MODE, "DEVELOPMENT");
     }
 
     @Override
