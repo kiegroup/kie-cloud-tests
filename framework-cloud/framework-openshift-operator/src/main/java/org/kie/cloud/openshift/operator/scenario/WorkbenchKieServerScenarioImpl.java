@@ -53,14 +53,6 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario im
         logger.info("Creating application from " + OpenShiftResource.WORKBENCH_KIE_SERVER.getResourceUrl().toString());
         OpenShiftBinaryClient.getInstance().executeCommand("Deployment failed.", "create", "-f", OpenShiftResource.WORKBENCH_KIE_SERVER.getResourceUrl().toString());
 
-        // Wait until deployment is created
-        // Temporary, replace by something better.
-        try {
-            new SimpleWaiter(() -> project.getOpenShiftUtil().getServices().size() == 2).timeout(TimeUnit.MINUTES, 1).execute();
-        } catch (TimeoutException e) {
-            throw new RuntimeException("Timeout while deploying application.", e);
-        }
-
         // Usernames/passwords currently hardcoded
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername("adminUser");
@@ -69,7 +61,14 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario im
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername("executionUser");
         kieServerDeployment.setPassword("RedHat");
-        kieServerDeployment.setServiceSuffix("-0");
+
+        logger.info("Waiting until all services are created.");
+        try {
+            new SimpleWaiter(() -> workbenchDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
+            new SimpleWaiter(() -> kieServerDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
+        } catch (TimeoutException e) {
+            throw new RuntimeException("Timeout while deploying application.", e);
+        }
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
