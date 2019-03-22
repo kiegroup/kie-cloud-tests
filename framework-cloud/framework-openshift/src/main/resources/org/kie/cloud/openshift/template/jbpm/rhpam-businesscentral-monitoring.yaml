@@ -69,6 +69,12 @@ parameters:
   name: BUSINESS_CENTRAL_HOSTNAME_HTTP
   value: ''
   required: false
+- displayName: Business Central Custom https Route Hostname
+  description: 'Custom hostname for https service route.  Leave blank for default
+    hostname, e.g.: secure-<application-name>-rhpamcentrmon-<project>.<default-domain-suffix>'
+  name: BUSINESS_CENTRAL_HOSTNAME_HTTPS
+  value: ''
+  required: false
 - displayName: ImageStream Namespace
   description: Namespace in which the ImageStreams for Red Hat Middleware images are
     installed. These ImageStreams are normally installed in the openshift namespace.
@@ -87,6 +93,26 @@ parameters:
   name: BUSINESS_CENTRAL_MEMORY_LIMIT
   value: 2Gi
   required: false
+- displayName: Business Central Server Keystore Secret Name
+  description: The name of the secret containing the keystore file
+  name: BUSINESS_CENTRAL_HTTPS_SECRET
+  example: businesscentral-app-secret
+  required: true
+- displayName: Business Central Server Keystore Filename
+  description: The name of the keystore file within the secret
+  name: BUSINESS_CENTRAL_HTTPS_KEYSTORE
+  value: keystore.jks
+  required: false
+- displayName: Business Central Server Certificate Name
+  description: The name associated with the server certificate
+  name: BUSINESS_CENTRAL_HTTPS_NAME
+  value: jboss
+  required: false
+- displayName: Business Central Server Keystore Password
+  description: The password for the keystore and certificate
+  name: BUSINESS_CENTRAL_HTTPS_PASSWORD
+  value: mykeystorepass
+  required: false
 objects:
 - kind: ServiceAccount
   apiVersion: v1
@@ -98,8 +124,12 @@ objects:
   apiVersion: v1
   spec:
     ports:
-    - port: 8080
+    - name: http
+      port: 8080
       targetPort: 8080
+    - name: https
+      port: 8443
+      targetPort: 8443
     selector:
       deploymentConfig: "${APPLICATION_NAME}-rhpamcentrmon"
   metadata:
@@ -121,6 +151,25 @@ objects:
     host: "${BUSINESS_CENTRAL_HOSTNAME_HTTP}"
     to:
       name: "${APPLICATION_NAME}-rhpamcentrmon"
+- kind: Route
+  apiVersion: v1
+  id: "${APPLICATION_NAME}-rhpamcentrmon-https"
+  metadata:
+    name: "secure-${APPLICATION_NAME}-rhpamcentrmon"
+    labels:
+      application: "${APPLICATION_NAME}"
+      service: "${APPLICATION_NAME}-rhpamcentrmon"
+    annotations:
+      description: Route for Business Central Monitoring's https service.
+      haproxy.router.openshift.io/timeout: 60s
+  spec:
+    host: "${BUSINESS_CENTRAL_HOSTNAME_HTTPS}"
+    to:
+      name: "${APPLICATION_NAME}-rhpamcentrmon"
+    port:
+      targetPort: https
+    tls:
+      termination: passthrough
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
@@ -160,6 +209,10 @@ objects:
           resources:
             limits:
               memory: "${BUSINESS_CENTRAL_MEMORY_LIMIT}"
+          volumeMounts:
+          - name: businesscentral-keystore-volume
+            mountPath: "/etc/businesscentral-secret-volume"
+            readOnly: true
           livenessProbe:
             exec:
               command:
@@ -178,6 +231,9 @@ objects:
             protocol: TCP
           - name: http
             containerPort: 8080
+            protocol: TCP
+          - name: https
+            containerPort: 8443
             protocol: TCP
           env:
           - name: KIE_ADMIN_PWD
@@ -200,3 +256,15 @@ objects:
             value: probe.eap.jolokia.EapProbe
           - name: PROBE_DISABLE_BOOT_ERRORS_CHECK
             value: 'true'
+          - name: HTTPS_KEYSTORE_DIR
+            value: "/etc/businesscentral-secret-volume"
+          - name: HTTPS_KEYSTORE
+            value: "${BUSINESS_CENTRAL_HTTPS_KEYSTORE}"
+          - name: HTTPS_NAME
+            value: "${BUSINESS_CENTRAL_HTTPS_NAME}"
+          - name: HTTPS_PASSWORD
+            value: "${BUSINESS_CENTRAL_HTTPS_PASSWORD}"
+        volumes:
+        - name: businesscentral-keystore-volume
+          secret:
+            secretName: "${BUSINESS_CENTRAL_HTTPS_SECRET}"
