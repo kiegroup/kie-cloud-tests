@@ -18,6 +18,7 @@ package org.kie.cloud.integrationtests.smoke;
 import java.time.Duration;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -53,9 +54,13 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
 
     @BeforeClass
     public static void initializeDeployment() {
-        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder()
+        try {
+            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder()
                                                       .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                                                       .build();
+        } catch (UnsupportedOperationException ex) {
+            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+        }
         deploymentScenario.setLogFolderName(ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
 
