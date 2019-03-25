@@ -29,6 +29,7 @@ public class OpenShiftConstants implements Constants {
     public static final String OPENSHIFT_PASSWORD = "openshift.password";
     public static final String OPENSHIFT_ADMIN_USER = "openshift.admin.username";
     public static final String OPENSHIFT_ADMIN_PASSWORD = "openshift.admin.password";
+    public static final String OPENSHIFT_VERSION = "openshift.version";
 
     /**
      * Project name prefix - to simplify identification of projects created in OpenShift.
@@ -196,6 +197,10 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(OPENSHIFT_ADMIN_PASSWORD);
     }
 
+    public static String getOpenShiftVersion() {
+        return System.getProperty(OPENSHIFT_VERSION);
+    }
+
     public static Optional<String> getNamespacePrefix() {
         return Optional.ofNullable(System.getProperty(NAMESPACE_PREFIX));
     }
@@ -265,5 +270,6 @@ public class OpenShiftConstants implements Constants {
         System.setProperty("xtf.config.master.password", getOpenShiftPassword());
         System.setProperty("xtf.config.master.admin.username", getOpenShiftAdminUserName() != null ? getOpenShiftAdminUserName() : getOpenShiftUserName());
         System.setProperty("xtf.config.master.admin.password", getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
+        System.setProperty("xtf.config.openshift.version", getOpenShiftVersion());
     }
 }
