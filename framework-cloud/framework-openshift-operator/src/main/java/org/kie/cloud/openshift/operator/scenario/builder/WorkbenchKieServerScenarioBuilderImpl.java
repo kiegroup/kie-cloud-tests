@@ -16,29 +16,56 @@
 package org.kie.cloud.openshift.operator.scenario.builder;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.openshift.constants.ImageEnvVariables;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
+import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.components.Console;
+import org.kie.cloud.openshift.operator.model.components.Env;
+import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerScenarioImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServerScenarioBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
+    private KieApp kieApp = new KieApp();
 
     public WorkbenchKieServerScenarioBuilderImpl() {
+        List<Env> authenticationEnvVars = new ArrayList<>();
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()));
+
+        kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
+        kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.TRIAL);
+
+        Server server = new Server();
+        server.addEnvs(authenticationEnvVars);
+        kieApp.getSpec().getObjects().addServer(server);
+
+        Console console = new Console();
+        console.addEnvs(authenticationEnvVars);
+        kieApp.getSpec().getObjects().setConsole(console);
     }
 
     @Override
     public WorkbenchKieServerScenario build() {
-        return new WorkbenchKieServerScenarioImpl();
+        return new WorkbenchKieServerScenarioImpl(kieApp);
     }
 
     @Override
     public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        logger.error("Method 'withExternalMavenRepo' is currently not implemented, returning builder without changes.");
-        // TODO: currently skipped to make tests running somehow, needs to be implemented
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_URL, repoUrl));
+            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_USERNAME, repoUserName));
+            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_PASSWORD, repoPassword));
+        }
         return this;
     }
 
