@@ -81,4 +81,8 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
         }
         return serviceName;
     }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 }
