@@ -146,7 +146,7 @@ public class EmptyManagedKieServersWithSmartRouterAndControllerIntegrationTest e
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(EmptyManagedKieServersWithSmartRouterAndControllerIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before

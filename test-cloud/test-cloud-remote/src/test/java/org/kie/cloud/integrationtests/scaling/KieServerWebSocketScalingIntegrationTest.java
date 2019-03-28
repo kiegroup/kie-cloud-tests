@@ -84,7 +84,7 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(KieServerWebSocketScalingIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before

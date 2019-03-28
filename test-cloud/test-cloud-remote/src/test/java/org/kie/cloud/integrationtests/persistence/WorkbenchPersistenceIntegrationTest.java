@@ -124,7 +124,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), WorkbenchPersistenceIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
 

@@ -66,7 +66,7 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEPLOYED_KJAR.getName()).getFile());
+        MavenDeployer.buildAndDeployMavenProject(TimerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEPLOYED_KJAR.getName()).getFile());
     }
 
     @Before

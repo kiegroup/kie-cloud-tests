@@ -49,8 +49,8 @@ public class SmartRouterTestProvider {
     private static final String LOG_MESSAGE = "Log process was started";
 
     static {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(SmartRouterTestProvider.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(SmartRouterTestProvider.class.getResource("/kjars-sources/definition-project-101-snapshot").getFile());
     }
 
     public static void testRouterLoadBalancing(WorkbenchDeployment workbenchDeployment, SmartRouterDeployment smartRouterDeployment,

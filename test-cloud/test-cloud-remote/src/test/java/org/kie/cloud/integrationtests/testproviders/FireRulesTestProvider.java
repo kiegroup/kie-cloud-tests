@@ -56,7 +56,7 @@ public class FireRulesTestProvider {
     private static KieCommands commandsFactory = KieServices.Factory.get().getCommands();
 
     static {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(FireRulesTestProvider.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
     }
 
     public static void testDeployFromKieServerAndFireRules(KieServerDeployment kieServerDeployment) {
@@ -82,7 +82,7 @@ public class FireRulesTestProvider {
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), ClassLoader.class.getResource("/kjars-sources/hello-rules").getFile());
+        String repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), FireRulesTestProvider.class.getResource("/kjars-sources/hello-rules").getFile());
         try {
             WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, Kjar.HELLO_RULES.getName());
 

@@ -39,7 +39,7 @@ public class ProcessTestProvider {
     private static final int TASKS_PAGE_SIZE = 10000;
 
     static {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(ProcessTestProvider.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     public static void testDeployFromKieServerAndExecuteProcesses(KieServerDeployment kieServerDeployment) {

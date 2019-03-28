@@ -132,7 +132,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
     @Before
     public void setUp() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
 
