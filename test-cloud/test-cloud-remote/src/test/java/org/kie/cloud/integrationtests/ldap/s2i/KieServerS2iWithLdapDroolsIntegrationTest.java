@@ -112,7 +112,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository",
-                                                                         ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+                                                                         KieServerS2iWithLdapDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         LdapSettings ldapSettings = deploymentScenarioFactory.getLdapSettingsBuilder()
                 .withLdapBindDn(LdapSettingsConstants.BIND_DN)
@@ -139,7 +139,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndInstallMavenProject(
-                ClassLoader.class.getResource("/kjars-sources/stateless-session").getFile());
+                KieServerS2iWithLdapDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile());
     }
 
     @Before

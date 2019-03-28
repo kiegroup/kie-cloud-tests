@@ -56,7 +56,7 @@ public class HttpsKieServerTestProvider {
     private static final String KIE_CONTAINERS_REQUEST_URL = KIE_SERVER_INFO_REST_REQUEST_URL + "/containers";
 
     static {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(HttpsKieServerTestProvider.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
     }
 
     public static void testKieServerInfo(KieServerDeployment kieServerDeployment, boolean ssoScenario) {

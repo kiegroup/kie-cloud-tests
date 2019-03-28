@@ -115,7 +115,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", KieServerS2iWithSsoDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
@@ -133,7 +133,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndInstallMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session").getFile());
+        MavenDeployer.buildAndInstallMavenProject(KieServerS2iWithSsoDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile());
     }
 
     @Before

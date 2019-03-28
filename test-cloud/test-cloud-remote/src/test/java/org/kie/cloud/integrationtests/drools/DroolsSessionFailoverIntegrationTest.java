@@ -81,7 +81,7 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractMethodIsolated
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rule-project").getFile());
+        MavenDeployer.buildAndDeployMavenProject(DroolsSessionFailoverIntegrationTest.class.getResource("/kjars-sources/rule-project").getFile());
     }
 
     @Before
