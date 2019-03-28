@@ -130,7 +130,7 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
 
     @BeforeClass
     public static void deployMavenProject() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(KieServerWithBuiltKjarIntegrationTest.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
     }
 
     @Before

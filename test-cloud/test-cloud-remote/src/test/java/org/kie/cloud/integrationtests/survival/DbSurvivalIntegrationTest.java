@@ -97,7 +97,7 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
 
     @BeforeClass
     public static void deployMavenProject() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(DbSurvivalIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before

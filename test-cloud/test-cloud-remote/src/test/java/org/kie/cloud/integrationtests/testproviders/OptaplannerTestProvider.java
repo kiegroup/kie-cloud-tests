@@ -50,7 +50,7 @@ public class OptaplannerTestProvider {
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
 
     static {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(OptaplannerTestProvider.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
     }
 
     public static void testDeployFromKieServerAndExecuteSolver(KieServerDeployment kieServerDeployment) {
