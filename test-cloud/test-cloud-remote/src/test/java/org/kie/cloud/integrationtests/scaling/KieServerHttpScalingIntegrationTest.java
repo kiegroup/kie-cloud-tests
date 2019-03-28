@@ -113,7 +113,7 @@ public class KieServerHttpScalingIntegrationTest extends AbstractMethodIsolatedC
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(KieServerHttpScalingIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before

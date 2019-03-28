@@ -69,7 +69,7 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
 
     @Before
     public void setUp() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ProcessFailoverIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
 
         WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
 

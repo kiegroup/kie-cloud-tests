@@ -67,7 +67,7 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+        MavenDeployer.buildAndDeployMavenProject(KieServerWithSmartRouterHttpScalingIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before

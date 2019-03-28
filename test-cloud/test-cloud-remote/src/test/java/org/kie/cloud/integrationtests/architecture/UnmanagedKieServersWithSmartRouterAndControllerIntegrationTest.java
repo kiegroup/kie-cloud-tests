@@ -109,7 +109,7 @@ public class UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest exte
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("architectureRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("architectureRepository", UnmanagedKieServersWithSmartRouterAndControllerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         controller = deploymentScenarioFactory.getWorkbenchSettingsBuilder()
                 .withApplicationName(CONTROLLER_NAME)

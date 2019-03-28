@@ -95,7 +95,7 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, KieServerS2iHierarchicalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)

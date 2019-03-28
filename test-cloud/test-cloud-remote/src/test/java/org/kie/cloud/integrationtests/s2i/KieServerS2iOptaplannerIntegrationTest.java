@@ -104,7 +104,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
 
     @Override
     protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", KieServerS2iOptaplannerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
         DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
@@ -119,7 +119,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndInstallMavenProject(
-                ClassLoader.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
+                KieServerS2iOptaplannerIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
     }
 
     @Before
