@@ -23,47 +23,51 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import cz.xtf.openshift.OpenShiftBinaryClient;
 import cz.xtf.wait.SimpleWaiter;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
-import org.kie.cloud.openshift.operator.resources.OpenShiftResource;
+import org.kie.cloud.openshift.operator.model.KieApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<WorkbenchKieServerScenario> implements WorkbenchKieServerScenario {
+
+    private KieApp kieApp;
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
+    public WorkbenchKieServerScenarioImpl(KieApp kieApp) {
+        this.kieApp = kieApp;
+    }
+
     @Override
     protected void deployCustomResource() {
         // deploy application
-        logger.info("Creating application from " + OpenShiftResource.WORKBENCH_KIE_SERVER.getResourceUrl().toString());
-        OpenShiftBinaryClient.getInstance().executeCommand("Deployment failed.", "create", "-f", OpenShiftResource.WORKBENCH_KIE_SERVER.getResourceUrl().toString());
+        getKieAppClient().create(kieApp);
 
-        // Usernames/passwords currently hardcoded
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
-        workbenchDeployment.setUsername("adminUser");
-        workbenchDeployment.setPassword("RedHat");
+        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername("executionUser");
-        kieServerDeployment.setPassword("RedHat");
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         logger.info("Waiting until all services are created.");
         try {
-            new SimpleWaiter(() -> workbenchDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
-            new SimpleWaiter(() -> kieServerDeployment.isReady()).timeout(TimeUnit.MINUTES, 1).execute();
+            new SimpleWaiter(() -> workbenchDeployment.isReady()).reason("Waiting for Workbench service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
+            new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
         } catch (TimeoutException e) {
             throw new RuntimeException("Timeout while deploying application.", e);
         }

@@ -16,16 +16,28 @@
 package org.kie.cloud.openshift.operator.scenario;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import cz.xtf.openshift.OpenShiftBinaryClient;
 import cz.xtf.openshift.OpenShiftUtils;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import org.kie.cloud.api.scenario.DeploymentScenario;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.KieAppDoneable;
+import org.kie.cloud.openshift.operator.model.KieAppList;
+import org.kie.cloud.openshift.operator.model.components.Console;
+import org.kie.cloud.openshift.operator.model.components.Env;
+import org.kie.cloud.openshift.operator.model.components.Server;
+import org.kie.cloud.openshift.operator.model.components.SmartRouter;
 import org.kie.cloud.openshift.operator.resources.OpenShiftResource;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.OpenShiftScenario;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +49,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     @Override
     protected void deployKieDeployments() {
         deployOperator();
+        deployCustomTrustedSecret();
         deployCustomResource();
     }
 
@@ -97,4 +110,34 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     }
 
     protected abstract void deployCustomResource();
+
+    private void deployCustomTrustedSecret() {
+        project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(), Collections.emptyMap());
+    }
+
+    protected void registerCustomTrustedSecret(Console console) {
+        console.addEnv(new Env("HTTPS_NAME", DeploymentConstants.getCustomTrustedKeystoreAlias()));
+        console.addEnv(new Env("HTTPS_PASSWORD", DeploymentConstants.getCustomTrustedKeystorePwd()));
+        console.setKeystoreSecret(DeploymentConstants.getCustomTrustedSecretName());
+    }
+
+    protected void registerCustomTrustedSecret(SmartRouter smartRouter) {
+        smartRouter.addEnv(new Env("KIE_SERVER_ROUTER_TLS_KEYSTORE_KEYALIAS", DeploymentConstants.getCustomTrustedKeystoreAlias()));
+        smartRouter.addEnv(new Env("KIE_SERVER_ROUTER_TLS_KEYSTORE_PASSWORD", DeploymentConstants.getCustomTrustedKeystorePwd()));
+        smartRouter.setKeystoreSecret(DeploymentConstants.getCustomTrustedSecretName());
+    }
+
+    protected void registerCustomTrustedSecret(Server server) {
+        server.addEnv(new Env("HTTPS_NAME", DeploymentConstants.getCustomTrustedKeystoreAlias()));
+        server.addEnv(new Env("HTTPS_PASSWORD", DeploymentConstants.getCustomTrustedKeystorePwd()));
+        server.setKeystoreSecret(DeploymentConstants.getCustomTrustedSecretName());
+    }
+
+    /**
+     * @return OpenShift client which is aware of KieApp custom resource.
+     */
+    protected NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> getKieAppClient() {
+        CustomResourceDefinition customResourceDefinition = OpenShiftUtils.admin().client().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
+        return OpenShiftUtils.admin().client().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
+    }
 }
