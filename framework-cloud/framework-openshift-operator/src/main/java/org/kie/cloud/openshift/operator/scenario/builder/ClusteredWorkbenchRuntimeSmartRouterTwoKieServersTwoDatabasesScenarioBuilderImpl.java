@@ -26,6 +26,7 @@ import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
+import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
@@ -36,6 +37,7 @@ import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchRuntimeSmartR
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
@@ -81,12 +83,16 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withSmartRouterId(String smartRouterId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getSmartRouter().addEnv(new Env(ImageEnvVariables.KIE_SERVER_ROUTER_ID, smartRouterId));
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(ImageEnvVariables.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, Long.toString(timerServiceDataStoreRefreshInterval.toMillis())));
+        }
+        return this;
     }
 
     @Override
@@ -96,37 +102,50 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.KIE_MAVEN_USER, user));
+        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.KIE_MAVEN_PWD, password));
+
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(propertyNames.workbenchMavenUserName(), user));
+            server.addEnv(new Env(propertyNames.workbenchMavenPassword(), password));
+        }
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer1Hostname(String hostname) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getServers()[0].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer2Hostname(String hostname) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getServers()[1].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer1Hostname(String hostname) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getServers()[0].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String hostname) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getServers()[1].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String hostname) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+        return this;
     }
 
     @Override
