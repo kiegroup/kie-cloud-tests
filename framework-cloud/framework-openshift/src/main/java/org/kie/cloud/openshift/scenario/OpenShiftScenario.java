@@ -95,14 +95,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         try {
             InstanceLogUtil.writeDeploymentLogs(this);
 
-            // Split scale to 0 to speed up tests
-            for (Deployment deployment : getDeployments()) {
-                deployment.scale(0);
-            }
-            for (Deployment deployment : getDeployments()) {
-                deployment.waitForScale();
-            }
-
             project.delete();
             project.close();
         } catch (Exception e) {
