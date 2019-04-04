@@ -71,7 +71,10 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
 
     @Override
     public WorkbenchKieServerScenarioBuilder withKieServerId(String kieServerId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_ID, kieServerId));
+        }
+        return this;
     }
 
     @Override
