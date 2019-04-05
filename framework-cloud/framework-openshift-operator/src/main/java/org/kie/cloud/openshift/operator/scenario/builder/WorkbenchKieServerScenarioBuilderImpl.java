@@ -26,6 +26,7 @@ import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
@@ -38,12 +39,15 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     public WorkbenchKieServerScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.TRIAL);
+
+        CommonConfig commonConfig = new CommonConfig();
+        commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
+        commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
+        kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
         server.addEnvs(authenticationEnvVars);

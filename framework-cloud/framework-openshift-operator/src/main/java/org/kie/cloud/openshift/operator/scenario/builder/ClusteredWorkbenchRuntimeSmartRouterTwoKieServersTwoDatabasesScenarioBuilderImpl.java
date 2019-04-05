@@ -28,6 +28,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
@@ -42,12 +43,15 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.PRODUCTION);
+
+        CommonConfig commonConfig = new CommonConfig();
+        commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
+        commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
+        kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
         server.addEnvs(authenticationEnvVars);
@@ -102,12 +106,11 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password) {
+        kieApp.getSpec().getCommonConfig().setMavenPassword(password);
         kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.KIE_MAVEN_USER, user));
-        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.KIE_MAVEN_PWD, password));
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             server.addEnv(new Env(propertyNames.workbenchMavenUserName(), user));
-            server.addEnv(new Env(propertyNames.workbenchMavenPassword(), password));
         }
         return this;
     }
