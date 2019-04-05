@@ -23,7 +23,61 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CommonConfig {
 
+    private String adminPassword;
+    private String dbPassword;
+    private String amqPassword;
+    private String amqClusterPassword;
+    private String controllerPassword;
+    private String serverPassword;
     private String mavenPassword;
+
+    public String getAdminPassword() {
+        return adminPassword;
+    }
+
+    public void setAdminPassword(String adminPassword) {
+        this.adminPassword = adminPassword;
+    }
+
+    public String getAmqClusterPassword() {
+        return amqClusterPassword;
+    }
+
+    public void setAmqClusterPassword(String amqClusterPassword) {
+        this.amqClusterPassword = amqClusterPassword;
+    }
+
+    public String getAmqPassword() {
+        return amqPassword;
+    }
+
+    public void setAmqPassword(String amqPassword) {
+        this.amqPassword = amqPassword;
+    }
+
+    public String getControllerPassword() {
+        return controllerPassword;
+    }
+
+    public void setControllerPassword(String controllerPassword) {
+        this.controllerPassword = controllerPassword;
+    }
+
+    public String getDbPassword() {
+        return dbPassword;
+    }
+
+    public void setDbPassword(String dbPassword) {
+        this.dbPassword = dbPassword;
+    }
+
+    public String getServerPassword() {
+        return serverPassword;
+    }
+
+    public void setServerPassword(String serverPassword) {
+        this.serverPassword = serverPassword;
+    }
 
     public String getMavenPassword() {
         return mavenPassword;
