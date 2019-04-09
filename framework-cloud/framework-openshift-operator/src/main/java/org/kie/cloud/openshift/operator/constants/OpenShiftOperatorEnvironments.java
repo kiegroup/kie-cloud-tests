@@ -21,6 +21,8 @@ public class OpenShiftOperatorEnvironments {
 
     public static final String TRIAL = getEnvironmentPrefix() + "trial";
     public static final String PRODUCTION = getEnvironmentPrefix() + "production";
+    public static final String AUTHORING = getEnvironmentPrefix() + "authoring";
+    public static final String AUTHORING_HA = getEnvironmentPrefix() + "authoring-ha";
 
     private static String getEnvironmentPrefix() {
         ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
@@ -33,5 +35,4 @@ public class OpenShiftOperatorEnvironments {
                 throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
         }
     }
-
 }
