@@ -42,4 +42,6 @@ public class ImageEnvVariables {
     public static final String RHDMCENTR_MAVEN_REPO_PASSWORD = "RHDMCENTR_MAVEN_REPO_PASSWORD";
     public static final String RHPAMCENTR_MAVEN_REPO_USERNAME = "RHPAMCENTR_MAVEN_REPO_USERNAME";
     public static final String RHPAMCENTR_MAVEN_REPO_PASSWORD = "RHPAMCENTR_MAVEN_REPO_PASSWORD";
+
+    public static final String GIT_HOOKS_DIR = "GIT_HOOKS_DIR";
 }
