@@ -34,6 +34,7 @@ import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SmartRouter;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl;
+import org.kie.cloud.openshift.template.ProjectProfile;
 
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
 
@@ -41,6 +42,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl() {
+        isScenarioAllowed();
+
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
@@ -154,5 +157,17 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    private static void isScenarioAllowed() {
+        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
+        switch (projectProfile) {
+            case JBPM:
+                return;
+            case DROOLS:
+                throw new UnsupportedOperationException("Not supported");
+            default:
+                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
+        }
     }
 }

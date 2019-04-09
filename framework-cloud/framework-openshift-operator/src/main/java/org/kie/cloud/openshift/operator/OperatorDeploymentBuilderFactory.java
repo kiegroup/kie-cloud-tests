@@ -34,7 +34,10 @@ import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
+import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
+import org.kie.cloud.openshift.operator.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 
 public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
@@ -56,7 +59,7 @@ public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuild
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder getWorkbenchKieServerPersistentScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new WorkbenchKieServerPersistentScenarioBuilderImpl();
     }
 
     @Override
@@ -66,87 +69,87 @@ public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuild
 
     @Override
     public ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder getClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public KieServerWithDatabaseScenarioBuilder getKieServerWithMySqlScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public KieServerWithDatabaseScenarioBuilder getKieServerWithPostgreSqlScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl();
     }
 
     @Override
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder getClusteredWorkbenchKieServerPersistentScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl();
     }
 
     @Override
     public GenericScenarioBuilder getGenericScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public KieServerSettingsBuilder getKieServerSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public KieServerSettingsBuilder getKieServerMySqlSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public KieServerSettingsBuilder getKieServerPostgreSqlSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public ControllerSettingsBuilder getControllerSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public WorkbenchSettingsBuilder getWorkbenchSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public WorkbenchMonitoringSettingsBuilder getWorkbenchMonitoringSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public SmartRouterSettingsBuilder getSmartRouterSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public LdapSettingsBuilder getLdapSettingsBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public EmployeeRosteringScenarioBuilder getEmployeeRosteringScenarioBuilder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

@@ -32,7 +32,7 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 
-@Category(Smoke.class)
+@Category({Smoke.class, JBPMOnly.class})
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
