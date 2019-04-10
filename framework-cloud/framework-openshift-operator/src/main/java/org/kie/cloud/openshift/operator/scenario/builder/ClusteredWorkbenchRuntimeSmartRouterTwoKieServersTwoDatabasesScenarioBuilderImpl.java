@@ -33,6 +33,7 @@ import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SmartRouter;
+import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl;
 import org.kie.cloud.openshift.template.ProjectProfile;
 
@@ -40,6 +41,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private KieApp kieApp = new KieApp();
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
+    private boolean deploySSO = false;
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl() {
         isScenarioAllowed();
@@ -47,6 +49,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.PRODUCTION);
@@ -54,6 +57,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         CommonConfig commonConfig = new CommonConfig();
         commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
         commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
+        commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
@@ -75,7 +79,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario build() {
-        return new ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(kieApp);
+        return new ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(kieApp, deploySSO);
     }
 
     @Override
@@ -104,7 +108,20 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySso() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        deploySSO = true;
+        SsoClient ssoClient = new SsoClient();
+        ssoClient.setName("workbench-client");
+        ssoClient.setSecret("workbench-secret");
+        kieApp.getSpec().getObjects().getConsole().setSsoClient(ssoClient);
+
+        Server[] servers = kieApp.getSpec().getObjects().getServers();
+        for (int i=0; i<servers.length; i++) {
+            ssoClient = new SsoClient();
+            ssoClient.setName("kie-server-" + i + "-client");
+            ssoClient.setSecret("kie-server-" + i + "-secret");
+            servers[i].setSsoClient(ssoClient);
+        }
+        return this;
     }
 
     @Override

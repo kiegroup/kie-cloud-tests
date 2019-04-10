@@ -31,6 +31,7 @@ public class Server {
     private String keystoreSecret;
     private Integer deployments;
     private Integer replicas;
+    private SsoClient ssoClient;
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -70,5 +71,13 @@ public class Server {
 
     public void setReplicas(Integer replicas) {
         this.replicas = replicas;
+    }
+
+    public SsoClient getSsoClient() {
+        return ssoClient;
+    }
+
+    public void setSsoClient(SsoClient ssoClient) {
+        this.ssoClient = ssoClient;
     }
 }
