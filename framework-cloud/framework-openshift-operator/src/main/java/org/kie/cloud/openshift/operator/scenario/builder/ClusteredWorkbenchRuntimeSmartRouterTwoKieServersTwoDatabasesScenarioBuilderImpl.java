@@ -28,13 +28,16 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
+import org.kie.cloud.openshift.operator.model.components.Ldap;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SmartRouter;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl;
+import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
 import org.kie.cloud.openshift.template.ProjectProfile;
 
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
@@ -173,7 +176,11 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
+        Auth auth = new Auth();
+        auth.setLdap(ldap);
+        kieApp.getSpec().setAuth(auth);
+        return this;
     }
 
     private static void isScenarioAllowed() {
