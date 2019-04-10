@@ -16,17 +16,21 @@
 package org.kie.cloud.openshift.operator.scenario;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
 import cz.xtf.openshift.OpenShiftBinaryClient;
 import cz.xtf.openshift.OpenShiftUtils;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.openshift.client.NamespacedOpenShiftClient;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.KieAppDoneable;
 import org.kie.cloud.openshift.operator.model.KieAppList;
@@ -103,8 +107,11 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void createOperatorInProject(Project project) {
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
-        OpenShiftBinaryClient.getInstance().project(project.getName());
-        OpenShiftBinaryClient.getInstance().executeCommand("operator failed.", "create", "-f", OpenShiftResource.OPERATOR.getResourceUrl().toString());
+        NamespacedOpenShiftClient client = OpenShiftUtils.admin().client().inNamespace(project.getName());
+        Deployment deployment = client.apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
+        deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(OpenShiftOperatorConstants.getKieOperatorImageTag());
+        client.apps().deployments().create(deployment);
+
         // wait until operator is ready
         project.getOpenShiftUtil().waiters().areExactlyNPodsRunning(1, "name", "kie-cloud-operator");
     }
