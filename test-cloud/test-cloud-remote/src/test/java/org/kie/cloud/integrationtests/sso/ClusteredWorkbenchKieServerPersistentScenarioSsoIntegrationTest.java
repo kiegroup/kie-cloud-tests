@@ -47,17 +47,24 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
 
     @BeforeClass
     public static void initializeDeployment() {
-        try {
-        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                .deploySso()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                .build();
-        } catch (UnsupportedOperationException ex) {
-            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+        if (deploymentScenarioFactory.getCloudAPIImplementationName().equals("openshift-operator")) {
+            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
+                    .deploySso()
+                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .build();
+        } else {
+            try {
+            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
+                    .deploySso()
+                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                    .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                    .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                    .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                    .build();
+            } catch (UnsupportedOperationException ex) {
+                Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+            }
         }
         deploymentScenario.setLogFolderName(ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);

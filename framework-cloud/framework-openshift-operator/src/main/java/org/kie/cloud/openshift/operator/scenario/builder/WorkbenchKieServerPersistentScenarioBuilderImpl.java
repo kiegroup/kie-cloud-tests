@@ -31,17 +31,22 @@ import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
+import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerPersistentScenarioImpl;
 
 public class WorkbenchKieServerPersistentScenarioBuilderImpl implements WorkbenchKieServerPersistentScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
+    private boolean deploySSO = false;
 
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_MAVEN_USER, DeploymentConstants.getWorkbenchUser()));
+        authenticationEnvVars.add(new Env(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchUser()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING);
@@ -49,6 +54,8 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         CommonConfig commonConfig = new CommonConfig();
         commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
         commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
+        commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());
+        commonConfig.setMavenPassword(DeploymentConstants.getWorkbenchPassword());
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
@@ -62,7 +69,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
 
     @Override
     public WorkbenchKieServerPersistentScenario build() {
-        return new WorkbenchKieServerPersistentScenarioImpl(kieApp);
+        return new WorkbenchKieServerPersistentScenarioImpl(kieApp, deploySSO);
     }
 
     @Override
@@ -77,7 +84,20 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder deploySso() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        deploySSO = true;
+        SsoClient ssoClient = new SsoClient();
+        ssoClient.setName("workbench-client");
+        ssoClient.setSecret("workbench-secret");
+        kieApp.getSpec().getObjects().getConsole().setSsoClient(ssoClient);
+
+        Server[] servers = kieApp.getSpec().getObjects().getServers();
+        for (int i=0; i<servers.length; i++) {
+            ssoClient = new SsoClient();
+            ssoClient.setName("kie-server-" + i + "-client");
+            ssoClient.setSecret("kie-server-" + i + "-secret");
+            servers[i].setSsoClient(ssoClient);
+        }
+        return this;
     }
 
     @Override

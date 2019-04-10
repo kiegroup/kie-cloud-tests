@@ -18,45 +18,45 @@ package org.kie.cloud.openshift.operator.model.components;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * KieApp specification.
+ * SSO configuration.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Spec {
+public class Sso {
 
-    private String environment;
-    private CommonConfig commonConfig;
-    private Objects objects = new Objects();
-    private Auth auth;
+    private String url;
+    private String realm;
+    private String adminUser;
+    private String adminPassword;
 
-    public CommonConfig getCommonConfig() {
-        return commonConfig;
+    public String getAdminPassword() {
+        return adminPassword;
     }
 
-    public void setCommonConfig(CommonConfig commonConfig) {
-        this.commonConfig = commonConfig;
+    public void setAdminPassword(String adminPassword) {
+        this.adminPassword = adminPassword;
     }
 
-    public String getEnvironment() {
-        return environment;
+    public String getAdminUser() {
+        return adminUser;
     }
 
-    public void setEnvironment(String environment) {
-        this.environment = environment;
+    public void setAdminUser(String adminUser) {
+        this.adminUser = adminUser;
     }
 
-    public Objects getObjects() {
-        return objects;
+    public String getRealm() {
+        return realm;
     }
 
-    public void setObjects(Objects objects) {
-        this.objects = objects;
+    public void setRealm(String realm) {
+        this.realm = realm;
     }
 
-    public Auth getAuth() {
-        return auth;
+    public String getUrl() {
+        return url;
     }
 
-    public void setAuth(Auth auth) {
-        this.auth = auth;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
