@@ -54,6 +54,19 @@ public class OpenShiftOperatorConstants implements Constants {
      */
     public static final String KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT = "kie.app.operator.deployments.clustered-workbench-monitoring.smartrouter.two-kieservers.two-databases";
 
+    /**
+     * Image tag for Kie Operator.
+     */
+    public static final String KIE_OPERATOR_IMAGE_TAG = "kie.operator.image.tag";
+
+    public static String getKieOperatorImageTag() {
+        String kieOperatorImageTag = System.getProperty(KIE_OPERATOR_IMAGE_TAG);
+        if (kieOperatorImageTag == null || kieOperatorImageTag.isEmpty()) {
+            throw new RuntimeException("System property " + KIE_OPERATOR_IMAGE_TAG + " has to be defined so specific Kie Operator version is deployed.");
+        }
+        return kieOperatorImageTag;
+    }
+
     @Override
     public void initConfigProperties() {
         // nothing to init here
