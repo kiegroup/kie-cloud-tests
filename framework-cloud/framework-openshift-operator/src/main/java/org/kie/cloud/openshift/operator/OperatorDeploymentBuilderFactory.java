@@ -39,6 +39,7 @@ import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchKieSe
 import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
+import org.kie.cloud.openshift.operator.settings.builder.LdapSettingsOperatorBuilder;
 
 public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
 
@@ -144,7 +145,7 @@ public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuild
 
     @Override
     public LdapSettingsBuilder getLdapSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new LdapSettingsOperatorBuilder();
     }
 
     @Override
