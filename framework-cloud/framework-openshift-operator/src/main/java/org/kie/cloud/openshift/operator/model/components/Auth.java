@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Auth {
 
     private Sso sso;
+    private Ldap ldap;
 
     public Sso getSso() {
         return sso;
@@ -32,4 +33,13 @@ public class Auth {
     public void setSso(Sso sso) {
         this.sso = sso;
     }
+
+    public Ldap getLdap() {
+        return ldap;
+    }
+
+    public void setLdap(Ldap ldap) {
+        this.ldap = ldap;
+    }
+
 }
