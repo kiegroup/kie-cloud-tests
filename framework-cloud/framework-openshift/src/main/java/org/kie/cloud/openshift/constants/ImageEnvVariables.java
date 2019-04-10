@@ -23,6 +23,8 @@ public class ImageEnvVariables {
     public static final String KIE_ADMIN_PWD = "KIE_ADMIN_PWD";
     public static final String KIE_MAVEN_USER = "KIE_MAVEN_USER";
     public static final String KIE_MAVEN_PWD = "KIE_MAVEN_PWD";
+    public static final String KIE_SERVER_CONTROLLER_USER = "KIE_SERVER_CONTROLLER_USER";
+    public static final String MAVEN_REPO_USERNAME = "MAVEN_REPO_USERNAME";
 
     public static final String KIE_SERVER_ID = "KIE_SERVER_ID";
     public static final String KIE_SERVER_MODE = "KIE_SERVER_MODE";

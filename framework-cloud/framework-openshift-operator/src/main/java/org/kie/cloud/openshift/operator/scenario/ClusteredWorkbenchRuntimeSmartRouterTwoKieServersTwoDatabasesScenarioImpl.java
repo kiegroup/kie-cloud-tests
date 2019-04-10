@@ -39,8 +39,11 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
+import org.kie.cloud.openshift.operator.model.components.Sso;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,16 +57,33 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     private KieServerDeploymentImpl kieServerTwoDeployment;
     private DatabaseDeploymentImpl databaseOneDeployment;
     private DatabaseDeploymentImpl databaseTwoDeployment;
+    private SsoDeployment ssoDeployment;
+    private boolean deploySso;
 
     private static final Logger logger = LoggerFactory.getLogger(ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl.class);
 
-    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(KieApp kieApp) {
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioImpl(KieApp kieApp, boolean deploySso) {
         this.kieApp = kieApp;
+        this.deploySso = deploySso;
     }
 
     @Override
     public void deploy() {
         super.deploy();
+
+        if (deploySso) {
+            ssoDeployment = SsoDeployer.deploy(project);
+
+            Sso sso = new Sso();
+            sso.setAdminUser(DeploymentConstants.getSsoServiceUser());
+            sso.setAdminPassword(DeploymentConstants.getSsoServicePassword());
+            sso.setUrl(SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
+            sso.setRealm(DeploymentConstants.getSsoRealm());
+
+            Auth auth = new Auth();
+            auth.setSso(sso);
+            kieApp.getSpec().setAuth(auth);
+        }
 
         registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());
         registerCustomTrustedSecret(kieApp.getSpec().getObjects().getSmartRouter());
@@ -149,12 +169,12 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public SsoDeployment getSsoDeployment() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return ssoDeployment;
 	}
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }

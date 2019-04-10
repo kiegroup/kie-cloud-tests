@@ -35,7 +35,10 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
+import org.kie.cloud.openshift.operator.model.components.Sso;
+import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +48,14 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
+    private SsoDeployment ssoDeployment;
+    private boolean deploySso;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public ClusteredWorkbenchKieServerPersistentScenarioImpl(KieApp kieApp) {
+    public ClusteredWorkbenchKieServerPersistentScenarioImpl(KieApp kieApp, boolean deploySso) {
         this.kieApp = kieApp;
+        this.deploySso = deploySso;
     }
 
     @Override
@@ -64,6 +70,20 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     @Override public void deploy() {
         super.deploy();
+
+        if (deploySso) {
+            ssoDeployment = SsoDeployer.deploy(project);
+
+            Sso sso = new Sso();
+            sso.setAdminUser(DeploymentConstants.getSsoServiceUser());
+            sso.setAdminPassword(DeploymentConstants.getSsoServicePassword());
+            sso.setUrl(SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
+            sso.setRealm(DeploymentConstants.getSsoRealm());
+
+            Auth auth = new Auth();
+            auth.setSso(sso);
+            kieApp.getSpec().setAuth(auth);
+        }
 
         registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
@@ -99,7 +119,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     }
 
     @Override public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
@@ -126,6 +146,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     @Override
     public SsoDeployment getSsoDeployment() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return ssoDeployment;
     }
 }
