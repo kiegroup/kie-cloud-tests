@@ -18,45 +18,45 @@ package org.kie.cloud.openshift.operator.model.components;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * KieApp specification.
+ * SSO client configuration.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Spec {
+public class SsoClient {
 
-    private String environment;
-    private CommonConfig commonConfig;
-    private Objects objects = new Objects();
-    private Auth auth;
+    private String name;
+    private String secret;
+    private String hostnameHTTP;
+    private String hostnameHTTPS;
 
-    public CommonConfig getCommonConfig() {
-        return commonConfig;
+    public String getHostnameHTTP() {
+        return hostnameHTTP;
     }
 
-    public void setCommonConfig(CommonConfig commonConfig) {
-        this.commonConfig = commonConfig;
+    public void setHostnameHTTP(String hostnameHTTP) {
+        this.hostnameHTTP = hostnameHTTP;
     }
 
-    public String getEnvironment() {
-        return environment;
+    public String getHostnameHTTPS() {
+        return hostnameHTTPS;
     }
 
-    public void setEnvironment(String environment) {
-        this.environment = environment;
+    public void setHostnameHTTPS(String hostnameHTTPS) {
+        this.hostnameHTTPS = hostnameHTTPS;
     }
 
-    public Objects getObjects() {
-        return objects;
+    public String getName() {
+        return name;
     }
 
-    public void setObjects(Objects objects) {
-        this.objects = objects;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Auth getAuth() {
-        return auth;
+    public String getSecret() {
+        return secret;
     }
 
-    public void setAuth(Auth auth) {
-        this.auth = auth;
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 }
