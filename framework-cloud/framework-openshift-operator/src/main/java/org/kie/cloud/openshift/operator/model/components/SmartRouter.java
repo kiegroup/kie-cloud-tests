@@ -27,9 +27,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SmartRouter {
 
+    private Integer replicas;
     private List<Env> env = new ArrayList<>();
     private String keystoreSecret;
     private Resources resources;
+
+    public Integer getReplicas() {
+        return replicas;
+    }
+
+    public void setReplicas(Integer replicas) {
+        this.replicas = replicas;
+    }
 
     public void addEnv(Env env) {
         this.env.add(env);
