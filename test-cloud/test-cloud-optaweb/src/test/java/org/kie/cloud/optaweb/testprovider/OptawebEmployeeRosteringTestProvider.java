@@ -28,6 +28,8 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.kie.cloud.optaweb.rest.OptaWebObjectMapperResolver;
 import org.optaweb.employeerostering.restclient.ServiceClientFactory;
+import org.optaweb.employeerostering.shared.contract.Contract;
+import org.optaweb.employeerostering.shared.contract.ContractRestService;
 import org.optaweb.employeerostering.shared.employee.Employee;
 import org.optaweb.employeerostering.shared.employee.EmployeeAvailabilityState;
 import org.optaweb.employeerostering.shared.employee.EmployeeRestService;
@@ -61,6 +63,7 @@ public class OptawebEmployeeRosteringTestProvider {
     private SpotRestService spotRestService;
     private ShiftRestService shiftRestService;
     private RosterRestService rosterRestService;
+    private ContractRestService contractRestService;
 
     public OptawebEmployeeRosteringTestProvider(URL baseUrl) {
         LOGGER.info("Connecting to " + baseUrl.toExternalForm());
@@ -74,6 +77,7 @@ public class OptawebEmployeeRosteringTestProvider {
         spotRestService = serviceClientFactory.createSpotRestServiceClient();
         shiftRestService = serviceClientFactory.createShiftRestServiceClient();
         rosterRestService = serviceClientFactory.createRosterRestServiceClient();
+        contractRestService = serviceClientFactory.createContractRestServiceClient();
     }
 
     public void fromSkillToRoster() {
@@ -85,8 +89,10 @@ public class OptawebEmployeeRosteringTestProvider {
         Spot neurology = newSpot("Neurology", ambulatoryCare);
         Spot emergency = newSpot("Emergency", criticalCare);
 
-        Employee francis = newEmployee("Francis Fitzgerald Groovy", ambulatoryCare, criticalCare);
-        Employee ivy = newEmployee("Ivy Green", ambulatoryCare);
+        Contract fullTime = createContract("Full time");
+
+        Employee francis = newEmployee("Francis Fitzgerald Groovy", fullTime, ambulatoryCare, criticalCare);
+        Employee ivy = newEmployee("Ivy Green", fullTime, ambulatoryCare);
 
         employeeUnavailability(francis, ROSTER_START_DAY, 8, 16);
 
@@ -137,6 +143,12 @@ public class OptawebEmployeeRosteringTestProvider {
         }
     }
 
+    private Contract createContract(String name) {
+        Contract contract = new Contract(tenantId, name);
+        Contract out = contractRestService.addContract(tenantId, contract);
+        return out;
+    }
+
     private Skill newSkill(String skillName) {
         return skillRestService.addSkill(tenantId, new Skill(tenantId, skillName));
     }
@@ -145,9 +157,8 @@ public class OptawebEmployeeRosteringTestProvider {
         return spotRestService.addSpot(tenantId, new Spot(tenantId, spotName, newSkillSet(requiredSkills)));
     }
 
-    private Employee newEmployee(String name, Skill... skills) {
-        Employee employee = new Employee(tenantId, name);
-        employee.setSkillProficiencySet(newSkillSet(skills));
+    private Employee newEmployee(String name, Contract contract, Skill... skills) {
+        Employee employee = new Employee(tenantId, name, contract, newSkillSet(skills));
         return employeeRestService.addEmployee(tenantId, employee);
     }
 
