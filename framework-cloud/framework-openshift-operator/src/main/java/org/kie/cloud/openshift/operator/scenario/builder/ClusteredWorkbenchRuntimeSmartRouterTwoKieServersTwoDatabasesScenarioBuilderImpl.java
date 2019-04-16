@@ -64,10 +64,20 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
+        server.setName(OpenShiftConstants.getKieApplicationName() + "-kieserver");
         server.addEnvs(authenticationEnvVars);
         // TODO: Workaround until Maven repo with released artifacts is implemented
         server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_MODE, "DEVELOPMENT"));
-        server.setDeployments(2);
+        server.setDeployments(1);
+        server.setReplicas(1);
+        kieApp.getSpec().getObjects().addServer(server);
+
+        server = new Server();
+        server.setName(OpenShiftConstants.getKieApplicationName() + "-kieserver-2");
+        server.addEnvs(authenticationEnvVars);
+        // TODO: Workaround until Maven repo with released artifacts is implemented
+        server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_MODE, "DEVELOPMENT"));
+        server.setDeployments(1);
         server.setReplicas(1);
         kieApp.getSpec().getObjects().addServer(server);
 

@@ -34,6 +34,8 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
+import org.kie.cloud.openshift.operator.deployment.WorkbenchOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,11 +58,11 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
         // deploy application
         getKieAppClient().create(kieApp);
 
-        workbenchDeployment = new WorkbenchDeploymentImpl(project);
+        workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
-        kieServerDeployment = new KieServerDeploymentImpl(project);
+        kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
