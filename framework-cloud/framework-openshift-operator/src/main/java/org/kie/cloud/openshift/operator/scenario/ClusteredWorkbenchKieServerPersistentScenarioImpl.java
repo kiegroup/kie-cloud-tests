@@ -34,6 +34,8 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
+import org.kie.cloud.openshift.operator.deployment.WorkbenchOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
@@ -93,11 +95,11 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
         // deploy application
         getKieAppClient().create(kieApp);
 
-        workbenchDeployment = new WorkbenchDeploymentImpl(project);
+        workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
-        kieServerDeployment = new KieServerDeploymentImpl(project);
+        kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
