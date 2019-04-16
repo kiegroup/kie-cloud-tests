@@ -38,6 +38,9 @@ import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
+import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
+import org.kie.cloud.openshift.operator.deployment.SmartRouterOperatorDeployment;
+import org.kie.cloud.openshift.operator.deployment.WorkbenchRuntimeOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
@@ -180,26 +183,26 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
-        WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl(project);
+        WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeOperatorDeployment(project, getKieAppClient());
         workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
         return workbenchRuntimeDeployment;
     }
 
     private SmartRouterDeployment createSmartRouterDeployment(Project project) {
-        SmartRouterDeploymentImpl smartRouterDeployment = new SmartRouterDeploymentImpl(project);
+        SmartRouterDeploymentImpl smartRouterDeployment = new SmartRouterOperatorDeployment(project, getKieAppClient());
         return smartRouterDeployment;
     }
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project) {
-        KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
+        KieServerDeploymentImpl kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         return kieServerDeployment;
     }
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project, String serviceSuffix) {
-        KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
+        KieServerDeploymentImpl kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setServiceSuffix(serviceSuffix);
