@@ -31,6 +31,7 @@ public class Console {
     private String keystoreSecret;
     private Integer replicas;
     private SsoClient ssoClient;
+    private Resources resources;
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -70,5 +71,13 @@ public class Console {
 
     public void setSsoClient(SsoClient ssoClient) {
         this.ssoClient = ssoClient;
+    }
+
+    public Resources getResources() {
+        return resources;
+    }
+
+    public void setResources(Resources resources) {
+        this.resources = resources;
     }
 }

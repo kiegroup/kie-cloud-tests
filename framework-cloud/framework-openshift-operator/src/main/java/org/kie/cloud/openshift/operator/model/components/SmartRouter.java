@@ -29,6 +29,7 @@ public class SmartRouter {
 
     private List<Env> env = new ArrayList<>();
     private String keystoreSecret;
+    private Resources resources;
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -52,5 +53,13 @@ public class SmartRouter {
 
     public void setKeystoreSecret(String keystoreSecret) {
         this.keystoreSecret = keystoreSecret;
+    }
+
+    public Resources getResources() {
+        return resources;
+    }
+
+    public void setResources(Resources resources) {
+        this.resources = resources;
     }
 }
