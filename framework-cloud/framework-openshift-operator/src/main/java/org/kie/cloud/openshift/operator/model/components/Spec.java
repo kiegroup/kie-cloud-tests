@@ -27,6 +27,7 @@ public class Spec {
     private CommonConfig commonConfig;
     private Objects objects = new Objects();
     private Auth auth;
+    private ImageRegistry imageRegistry;
 
     public CommonConfig getCommonConfig() {
         return commonConfig;
@@ -58,5 +59,13 @@ public class Spec {
 
     public void setAuth(Auth auth) {
         this.auth = auth;
+    }
+
+    public ImageRegistry getImageRegistry() {
+        return imageRegistry;
+    }
+
+    public void setImageRegistry(ImageRegistry imageRegistry) {
+        this.imageRegistry = imageRegistry;
     }
 }
