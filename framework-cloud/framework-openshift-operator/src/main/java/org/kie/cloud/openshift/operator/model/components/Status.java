@@ -13,37 +13,41 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.openshift.operator.model;
+package org.kie.cloud.openshift.operator.model.components;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.fabric8.kubernetes.client.CustomResource;
-import org.kie.cloud.openshift.operator.model.components.Spec;
-import org.kie.cloud.openshift.operator.model.components.Status;
 
 /**
- * Custom resource representation used by Fabric8 OpenShift client.
+ * Custom resource status. 
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class KieApp extends CustomResource {
+public class Status {
 
-    private static final long serialVersionUID = -7608178420952152353L;
+    private Conditions[] conditions;
+    private String consoleHost;
+    private String[] deployments;
 
-    private Spec spec = new Spec();
-    private Status status;
-
-    public Spec getSpec() {
-        return spec;
+    public Conditions[] getConditions() {
+        return conditions;
     }
 
-    public void setSpec(Spec spec) {
-        this.spec = spec;
+    public void setConditions(Conditions[] conditions) {
+        this.conditions = conditions;
     }
 
-    public Status getStatus() {
-        return status;
+    public String getConsoleHost() {
+        return consoleHost;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setConsoleHost(String consoleHost) {
+        this.consoleHost = consoleHost;
+    }
+
+    public String[] getDeployments() {
+        return deployments;
+    }
+
+    public void setDeployments(String[] deployments) {
+        this.deployments = deployments;
     }
 }
