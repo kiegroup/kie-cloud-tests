@@ -27,11 +27,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Server {
 
+    private String name;
     private List<Env> env = new ArrayList<>();
     private String keystoreSecret;
     private Integer deployments;
     private Integer replicas;
     private SsoClient ssoClient;
+    private Resources resources;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -79,5 +89,13 @@ public class Server {
 
     public void setSsoClient(SsoClient ssoClient) {
         this.ssoClient = ssoClient;
+    }
+
+    public Resources getResources() {
+        return resources;
+    }
+
+    public void setResources(Resources resources) {
+        this.resources = resources;
     }
 }
