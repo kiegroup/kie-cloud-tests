@@ -42,6 +42,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.provider.git.Git;
 import org.kie.server.api.model.instance.TaskSummary;
@@ -61,7 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * http://mswiderski.blogspot.cz/2017/08/cloud-runtime-architectures-for-jbpm.html
  */
 @RunWith(Parameterized.class)
-@Category(ApbNotSupported.class)
+@Category({ApbNotSupported.class, OperatorNotSupported.class})
 public class ManagedKieServersWithSmartRouterAndControllerIntegrationTest extends AbstractCloudArchitectureIntegrationTest {
 
     @Parameter(value = 0)

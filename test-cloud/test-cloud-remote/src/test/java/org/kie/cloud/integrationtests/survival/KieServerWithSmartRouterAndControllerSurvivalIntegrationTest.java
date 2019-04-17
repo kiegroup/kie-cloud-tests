@@ -39,6 +39,7 @@ import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.Kjar;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.integrationtests.util.SmartRouterUtils;
 import org.kie.cloud.integrationtests.util.WorkbenchUtils;
@@ -60,7 +61,7 @@ import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Category({JBPMOnly.class, ApbNotSupported.class})
+@Category({JBPMOnly.class, ApbNotSupported.class, OperatorNotSupported.class})
 public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class);
