@@ -33,11 +33,12 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 
 @RunWith(Parameterized.class)
-@Category(JBPMOnly.class)
+@Category({JBPMOnly.class, OperatorNotSupported.class})
 public class WorkbenchMonitoringScenarioIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
 
     @Parameter(value = 0)
