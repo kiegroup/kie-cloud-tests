@@ -151,6 +151,8 @@ objects:
     host: "${BUSINESS_CENTRAL_HOSTNAME_HTTP}"
     to:
       name: "${APPLICATION_NAME}-rhpamcentrmon"
+    port:
+      targetPort: http
 - kind: Route
   apiVersion: v1
   id: "${APPLICATION_NAME}-rhpamcentrmon-https"
