@@ -18,36 +18,27 @@ package org.kie.cloud.openshift.operator.model.components;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Custom resource status. 
+ * KieApp deployments with status.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Status {
+public class Deployments {
 
-    private Conditions[] conditions;
-    private String consoleHost;
-    private Deployments deployments;
+    private String[] ready;
+    private String[] starting;
 
-    public Conditions[] getConditions() {
-        return conditions;
+    public String[] getReady() {
+        return ready;
     }
 
-    public void setConditions(Conditions[] conditions) {
-        this.conditions = conditions;
+    public void setReady(String[] ready) {
+        this.ready = ready;
     }
 
-    public String getConsoleHost() {
-        return consoleHost;
+    public String[] getStarting() {
+        return starting;
     }
 
-    public void setConsoleHost(String consoleHost) {
-        this.consoleHost = consoleHost;
-    }
-
-    public Deployments getDeployments() {
-        return deployments;
-    }
-
-    public void setDeployments(Deployments deployments) {
-        this.deployments = deployments;
+    public void setStarting(String[] starting) {
+        this.starting = starting;
     }
 }
