@@ -51,13 +51,13 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.PRODUCTION);
 
         CommonConfig commonConfig = new CommonConfig();
+        commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());
         commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
         commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
         commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());

@@ -45,7 +45,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl implements
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_MAVEN_USER, DeploymentConstants.getWorkbenchUser()));
         authenticationEnvVars.add(new Env(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchUser()));
@@ -54,6 +53,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl implements
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING_HA);
 
         CommonConfig commonConfig = new CommonConfig();
+        commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());
         commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
         commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
         commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());

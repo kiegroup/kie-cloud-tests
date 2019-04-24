@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CommonConfig {
 
+    private String adminUser;
     private String adminPassword;
     private String amqClusterPassword;
     private String amqPassword;
@@ -34,6 +35,10 @@ public class CommonConfig {
     private String mavenPassword;
     private String serverPassword;
     private String version;
+
+    public String getAdminUser() {
+        return adminUser;
+    }
 
     public String getAdminPassword() {
         return adminPassword;
@@ -77,6 +82,10 @@ public class CommonConfig {
 
     public String getVersion() {
         return version;
+    }
+
+    public void setAdminUser(String adminUser) {
+        this.adminUser = adminUser;
     }
 
     public void setAdminPassword(String adminPassword) {
