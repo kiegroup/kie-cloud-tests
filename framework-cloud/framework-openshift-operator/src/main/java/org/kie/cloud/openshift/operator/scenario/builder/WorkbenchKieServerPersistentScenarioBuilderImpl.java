@@ -46,7 +46,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_MAVEN_USER, DeploymentConstants.getWorkbenchUser()));
         authenticationEnvVars.add(new Env(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchUser()));
@@ -55,6 +54,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING);
 
         CommonConfig commonConfig = new CommonConfig();
+        commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());
         commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
         commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
         commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());
