@@ -87,6 +87,20 @@
     <dependency>
       <groupId>cz.xtf</groupId>
       <artifactId>utilities</artifactId>
+      <exclusions>
+          <exclusion>
+            <groupId>org.pacesys</groupId>
+            <artifactId>openstack4j-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson2-provider</artifactId>
+          </exclusion>
+        </exclusions>
     </dependency>
   </dependencies>
 
