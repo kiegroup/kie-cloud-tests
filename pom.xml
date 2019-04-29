@@ -23,7 +23,7 @@
   </modules>
 
   <properties>
-    <rhba.images.version.prefix>73</rhba.images.version.prefix>
+    <rhba.images.version.prefix>74</rhba.images.version.prefix>
     <rhba.images.branch>master</rhba.images.branch>
     <rhba.operator.branch>master</rhba.operator.branch>
 
@@ -196,6 +196,22 @@
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>cz.xtf</groupId>
+        <artifactId>core</artifactId>
+        <version>${version.cz.xtf}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>cz.xtf</groupId>
+        <artifactId>builder</artifactId>
+         <version>${version.cz.xtf}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.shared</groupId>

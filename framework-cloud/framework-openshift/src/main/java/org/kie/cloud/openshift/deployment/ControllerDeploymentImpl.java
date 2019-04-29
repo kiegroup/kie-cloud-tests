@@ -76,7 +76,7 @@ public class ControllerDeploymentImpl extends OpenShiftDeployment implements Con
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getControllerServiceName(getOpenShiftUtil());
+            serviceName = ServiceUtil.getControllerServiceName(getOpenShift());
         }
         return serviceName;
     }

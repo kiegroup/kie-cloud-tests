@@ -52,7 +52,7 @@ public class SmartRouterOperatorDeployment extends SmartRouterDeploymentImpl {
         Integer replicas = kieApp.getSpec().getObjects().getSmartRouter().getReplicas();
         if (replicas == null) {
             // If replicas are not set in custom resource then get them from deployment config.
-            replicas = getOpenShiftUtil().getDeploymentConfig(getServiceName()).getSpec().getReplicas();
+            replicas = getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas();
         }
 
         waitUntilAllPodsAreReadyAndRunning(replicas);

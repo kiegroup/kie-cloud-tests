@@ -22,7 +22,6 @@ import java.util.Map;
 import org.kie.cloud.api.constants.ConfigurationInitializer;
 import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProviderFactory;
-import org.kie.cloud.git.gitlab.GitLabGitProviderFactory;
 import org.kie.cloud.git.gogs.GogsGitProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +38,6 @@ public class GitProviderService {
         GitProviderFactory factory;
 
         factory = new GitHubGitProviderFactory();
-        providerFactories.put(factory.providerType(), factory);
-
-        factory = new GitLabGitProviderFactory();
         providerFactories.put(factory.providerType(), factory);
 
         factory = new GogsGitProviderFactory();

@@ -86,7 +86,7 @@
     </dependency>
     <dependency>
       <groupId>cz.xtf</groupId>
-      <artifactId>utilities</artifactId>
+      <artifactId>core</artifactId>
       <exclusions>
           <exclusion>
             <groupId>org.pacesys</groupId>

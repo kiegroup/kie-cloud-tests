@@ -102,6 +102,6 @@ public class ImageStreamProvider {
                                                               .endTag()
                                                           .endSpec()
                                                           .build();
-        project.getOpenShiftUtil().createImageStream(imageStream);
+        project.getOpenShift().createImageStream(imageStream);
     }
 }

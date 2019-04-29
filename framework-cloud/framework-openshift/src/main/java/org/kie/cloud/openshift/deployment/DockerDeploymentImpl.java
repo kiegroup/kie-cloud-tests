@@ -32,7 +32,7 @@ public class DockerDeploymentImpl extends OpenShiftDeployment implements DockerD
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getDockerServiceName(getOpenShiftUtil());
+            serviceName = ServiceUtil.getDockerServiceName(getOpenShift());
         }
         return serviceName;
     }

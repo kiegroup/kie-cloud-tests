@@ -83,7 +83,7 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getWorkbenchServiceName(getOpenShiftUtil());
+            serviceName = ServiceUtil.getWorkbenchServiceName(getOpenShift());
         }
         return serviceName;
     }

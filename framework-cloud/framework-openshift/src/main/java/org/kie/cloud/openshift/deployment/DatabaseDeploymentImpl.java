@@ -77,7 +77,7 @@ public class DatabaseDeploymentImpl extends OpenShiftDeployment implements Datab
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getDatabaseServiceName(getOpenShiftUtil(), serviceSuffix);
+            serviceName = ServiceUtil.getDatabaseServiceName(getOpenShift(), serviceSuffix);
         }
         return serviceName;
     }

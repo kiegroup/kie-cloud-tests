@@ -23,9 +23,18 @@
       <artifactId>framework-cloud-common</artifactId>
     </dependency>
 
+    <!-- Required because of SsoDeployer. When SsoDeployer will get refactored then this dependency should be deleted and XTF version raised. -->
     <dependency>
       <groupId>cz.xtf</groupId>
       <artifactId>utilities</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cz.xtf</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cz.xtf</groupId>
+      <artifactId>builder</artifactId>
     </dependency>
 
     <dependency>

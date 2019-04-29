@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
@@ -50,9 +49,10 @@ import org.kie.cloud.openshift.util.OpenShiftTemplateProcessor;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import cz.xtf.openshift.OpenShiftBinaryClient;
-import cz.xtf.wait.SimpleWaiter;
+import cz.xtf.core.openshift.OpenShiftBinary;
+import cz.xtf.core.openshift.OpenShifts;
+import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.WaiterException;
 
 public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<KieServerWithExternalDatabaseScenario> implements KieServerWithExternalDatabaseScenario {
 
@@ -182,17 +182,17 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
         String jdbcSourceImage = project.getName() + "/" + externalDriver.getImageName() + ":" + externalDriver.getImageVersion();
         String targetKieServerImageStream = kieServerCustomImageStreamName + ":" + kieServerImageStreamTag;
 
-        OpenShiftBinaryClient.getInstance().project(project.getName());
-        OpenShiftBinaryClient.getInstance().executeCommand("Custom Kie server image build failed.", "new-build", "--name", buildName, "--image-stream=" + originalKieServerImageStream, "--source-image=" + jdbcSourceImage, "--source-image-path=" + externalDriver.getSourceImagePath(), "--to=" + targetKieServerImageStream, "-e", "CUSTOM_INSTALL_DIRECTORIES=" + externalDriver.getCustomInstallDirectories());
+        OpenShiftBinary masterBinary = OpenShifts.masterBinary(project.getName());
+        masterBinary.execute("new-build", "--name", buildName, "--image-stream=" + originalKieServerImageStream, "--source-image=" + jdbcSourceImage, "--source-image-path=" + externalDriver.getSourceImagePath(), "--to=" + targetKieServerImageStream, "-e", "CUSTOM_INSTALL_DIRECTORIES=" + externalDriver.getCustomInstallDirectories());
 
         waitUntilBuildCompletes(buildName);
     }
 
     private void waitUntilBuildCompletes(String buildName) {
         try {
-            new SimpleWaiter(() -> project.getOpenShiftUtil().getLatestBuild(buildName) != null).timeout(TimeUnit.MINUTES, 1).execute();
-            project.getOpenShiftUtil().waiters().hasBuildCompleted(project.getOpenShiftUtil().getLatestBuild(buildName).getMetadata().getName()).execute();
-        } catch (TimeoutException e) {
+            new SimpleWaiter(() -> project.getOpenShift().getLatestBuild(buildName) != null).timeout(TimeUnit.MINUTES, 1).waitFor();
+            project.getOpenShift().waiters().hasBuildCompleted(project.getOpenShift().getLatestBuild(buildName).getMetadata().getName()).waitFor();
+        } catch (WaiterException e) {
             throw new RuntimeException("Error while waiting for the custom Kie server build to finish.", e);
         }
     }

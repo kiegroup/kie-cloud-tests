@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.core.openshift.OpenShift;
 import io.fabric8.kubernetes.api.model.Service;
 
 public class ServiceUtil {
@@ -33,41 +33,41 @@ public class ServiceUtil {
     private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
 
-    public static String getControllerServiceName(OpenShiftUtil util) {
-        return getServiceName(util, CONTROLLER_REGEXP);
+    public static String getControllerServiceName(OpenShift openShift) {
+        return getServiceName(openShift, CONTROLLER_REGEXP);
     }
 
-    public static String getSsoServiceName(OpenShiftUtil util) {
-        return getServiceName(util, SSO_REGEXP);
+    public static String getSsoServiceName(OpenShift openShift) {
+        return getServiceName(openShift, SSO_REGEXP);
     }
 
-    public static String getWorkbenchServiceName(OpenShiftUtil util) {
-        return getServiceName(util, WORKBENCH_REGEXP);
+    public static String getWorkbenchServiceName(OpenShift openShift) {
+        return getServiceName(openShift, WORKBENCH_REGEXP);
     }
 
-    public static String getWorkbenchMonitoringServiceName(OpenShiftUtil util) {
-        return getServiceName(util, WORKBENCH_MONITORING_REGEXP);
+    public static String getWorkbenchMonitoringServiceName(OpenShift openShift) {
+        return getServiceName(openShift, WORKBENCH_MONITORING_REGEXP);
     }
 
-    public static String getKieServerServiceName(OpenShiftUtil util, String suffix) {
-        return getServiceName(util, Pattern.compile(KIE_SERVER_REGEXP.pattern() + suffix));
+    public static String getKieServerServiceName(OpenShift openShift, String suffix) {
+        return getServiceName(openShift, Pattern.compile(KIE_SERVER_REGEXP.pattern() + suffix));
     }
 
-    public static String getSmartRouterServiceName(OpenShiftUtil util) {
-        return getServiceName(util, SMART_ROUTER_REGEXP);
+    public static String getSmartRouterServiceName(OpenShift openShift) {
+        return getServiceName(openShift, SMART_ROUTER_REGEXP);
     }
 
-    public static String getDatabaseServiceName(OpenShiftUtil util, String suffix) {
-        return getServiceName(util, Pattern.compile(DATABASE_REGEXP.pattern() + suffix));
+    public static String getDatabaseServiceName(OpenShift openShift, String suffix) {
+        return getServiceName(openShift, Pattern.compile(DATABASE_REGEXP.pattern() + suffix));
     }
 
-    public static String getDockerServiceName(OpenShiftUtil util) {
-        return getServiceName(util, DOCKER_REGEXP);
+    public static String getDockerServiceName(OpenShift openShift) {
+        return getServiceName(openShift, DOCKER_REGEXP);
     }
 
-    public static String getServiceName(OpenShiftUtil util, Pattern regexp) {
+    public static String getServiceName(OpenShift openShift, Pattern regexp) {
         // Try to find service name from all available services
-        List<Service> services = util.getServices();
+        List<Service> services = openShift.getServices();
         for (Service service : services) {
             if (regexp.matcher(service.getMetadata().getName()).matches()) {
                 return service.getMetadata().getName();

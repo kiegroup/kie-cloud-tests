@@ -39,8 +39,7 @@ import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.core.openshift.OpenShift;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.Route;
@@ -49,20 +48,20 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftDeployment.class);
 
-    private OpenShiftUtil util;
+    private OpenShift openShift;
     private Project project;
 
     public OpenShiftDeployment(Project project) {
         this.project = project;
-        this.util = project.getOpenShiftUtil();
+        this.openShift = project.getOpenShift();
     }
 
-    public OpenShiftUtil getOpenShiftUtil() {
-        return util;
+    public OpenShift getOpenShift() {
+        return openShift;
     }
 
-    public void setOpenShiftUtil(OpenShiftUtil util) {
-        this.util = util;
+    public void setOpenShift(OpenShift openShift) {
+        this.openShift = openShift;
     }
 
     @Override
@@ -78,8 +77,8 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void deleteInstances(List<Instance> instances) {
         for (Instance instance : instances) {
-            Pod pod = util.getPod(instance.getName());
-            util.deletePod(pod);
+            Pod pod = openShift.getPod(instance.getName());
+            openShift.deletePod(pod);
         }
     }
 
@@ -87,13 +86,13 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void scale(int instances) {
-        util.client().deploymentConfigs().inNamespace(getNamespace()).withName(getServiceName()).scale(instances, true);
+        openShift.deploymentConfigs().inNamespace(getNamespace()).withName(getServiceName()).scale(instances, true);
     }
 
     @Override
     public boolean isReady() {
         try {
-            Service service = util.getService(getServiceName());
+            Service service = openShift.getService(getServiceName());
             return service != null;
         } catch (Exception e) {
             return false;
@@ -106,7 +105,7 @@ public abstract class OpenShiftDeployment implements Deployment {
             // Deployment config has a same name as its service.
             String deploymentConfigName = getServiceName();
 
-            List<Instance> instances = util.getPods().stream()
+            List<Instance> instances = openShift.getPods().stream()
                     .filter(pod -> {
                         String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
                         return deploymentConfigName.equals(podsDeploymentConfigName);
@@ -122,21 +121,23 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void waitForScale() {
-        int expectedPods = util.getDeploymentConfig(getServiceName()).getSpec().getReplicas().intValue();
+        int expectedPods = openShift.getDeploymentConfig(getServiceName()).getSpec().getReplicas().intValue();
         waitUntilAllPodsAreReadyAndRunning(expectedPods);
     }
 
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {
         try {
-            util.waiters()
+            openShift.waiters()
                     .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                    .assertEventually("Pods for service " + getServiceName() + " are not ready.");
+                    .reason("Waiting for pods of service " + getServiceName() + " to become ready.")
+                    .waitFor();
 
-            util.waiters()
+            openShift.waiters()
                     .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                    .assertEventually("Pods for service " + getServiceName() + " are not runnning.");
+                    .reason("Waiting for pods of service " + getServiceName() + " to become runnning.")
+                    .waitFor();
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
         }
@@ -146,8 +147,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     public void setRouterTimeout(Duration timeoutValue) {
         // Route has a same name as its service.
         String routeName = getServiceName();
-        util.client()
-            .routes()
+        openShift.routes()
             .withName(routeName)
             .edit()
             .editMetadata()
@@ -160,8 +160,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     public void resetRouterTimeout() {
         // Route has a same name as its service.
         String routeName = getServiceName();
-        util.client()
-            .routes()
+        openShift.routes()
             .withName(routeName)
             .edit()
             .editMetadata()
@@ -173,7 +172,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     private Instance createInstance(Pod pod) {
         String instanceName = pod.getMetadata().getName();
 
-        return new OpenShiftInstance(util, getNamespace(), instanceName);
+        return new OpenShiftInstance(openShift, getNamespace(), instanceName);
     }
 
     protected Optional<URL> getHttpRouteUrl(String serviceName) {
@@ -208,7 +207,7 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     private Optional<URI> getRouteUri(Protocol protocol, String serviceName) {
         URI uri;
-        Service service = util.getService(serviceName);
+        Service service = openShift.getService(serviceName);
         Predicate<Route> httpsPredicate = n -> n.getSpec().getTls() != null;
         Predicate<Route> httpPredicate = n -> n.getSpec().getTls() == null;
 
@@ -218,7 +217,7 @@ public abstract class OpenShiftDeployment implements Deployment {
             String defaultRoutingSubdomain = DeploymentConstants.getDefaultDomainSuffix();
             routeHost = getServiceName() + "-" + getNamespace() + defaultRoutingSubdomain;
         } else {
-            List<Route> routes = util.getRoutes();
+            List<Route> routes = openShift.getRoutes();
             Optional<Route> route = routes.stream()
                                           .filter(protocol == Protocol.https ? httpsPredicate : httpPredicate)
                                           .filter(n -> n.getSpec().getTo().getName().equals(serviceName))

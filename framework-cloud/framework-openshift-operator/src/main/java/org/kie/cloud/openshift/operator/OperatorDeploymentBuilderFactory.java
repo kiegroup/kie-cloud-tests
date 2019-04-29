@@ -14,7 +14,7 @@
  */
 package org.kie.cloud.openshift.operator;
 
-import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.core.openshift.OpenShift;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
@@ -155,8 +155,8 @@ public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuild
 
     @Override
     public void deleteNamespace(String namespace) {
-        try (OpenShiftUtil util = OpenShiftController.getOpenShiftUtil(namespace)) {
-            util.deleteProject();
+        try (OpenShift openShift = OpenShiftController.getOpenShift(namespace)) {
+            openShift.deleteProject();
         }
     }
 }

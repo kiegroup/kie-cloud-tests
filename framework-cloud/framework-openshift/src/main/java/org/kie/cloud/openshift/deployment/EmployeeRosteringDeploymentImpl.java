@@ -25,6 +25,6 @@ public class EmployeeRosteringDeploymentImpl extends OpenShiftDeployment impleme
 
     @Override
     public String getServiceName() {
-        return ServiceUtil.getServiceName(getOpenShiftUtil(), PATTERN);
+        return ServiceUtil.getServiceName(getOpenShift(), PATTERN);
     }
 }

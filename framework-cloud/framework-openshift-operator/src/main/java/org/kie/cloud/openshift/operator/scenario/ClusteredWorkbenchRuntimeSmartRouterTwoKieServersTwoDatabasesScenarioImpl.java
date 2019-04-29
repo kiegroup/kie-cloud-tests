@@ -20,9 +20,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import cz.xtf.wait.SimpleWaiter;
+import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.WaiterException;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
@@ -105,13 +105,13 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
         logger.info("Waiting until all services are created.");
         try {
-            new SimpleWaiter(() -> workbenchRuntimeDeployment.isReady()).reason("Waiting for Workbench runtime service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
-            new SimpleWaiter(() -> smartRouterDeployment.isReady()).reason("Waiting for Smart router service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
-            new SimpleWaiter(() -> kieServerOneDeployment.isReady()).reason("Waiting for Kie server one service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
-            new SimpleWaiter(() -> kieServerTwoDeployment.isReady()).reason("Waiting for Kie server two service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
-            new SimpleWaiter(() -> databaseOneDeployment.isReady()).reason("Waiting for Database one service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
-            new SimpleWaiter(() -> databaseTwoDeployment.isReady()).reason("Waiting for Database two service to be created.").timeout(TimeUnit.MINUTES, 1).execute();
-        } catch (TimeoutException e) {
+            new SimpleWaiter(() -> workbenchRuntimeDeployment.isReady()).reason("Waiting for Workbench runtime service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            new SimpleWaiter(() -> smartRouterDeployment.isReady()).reason("Waiting for Smart router service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            new SimpleWaiter(() -> kieServerOneDeployment.isReady()).reason("Waiting for Kie server one service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            new SimpleWaiter(() -> kieServerTwoDeployment.isReady()).reason("Waiting for Kie server two service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            new SimpleWaiter(() -> databaseOneDeployment.isReady()).reason("Waiting for Database one service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            new SimpleWaiter(() -> databaseTwoDeployment.isReady()).reason("Waiting for Database two service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+        } catch (WaiterException e) {
             throw new RuntimeException("Timeout while deploying application.", e);
         }
 

@@ -36,7 +36,7 @@ public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeploym
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getSsoServiceName(getOpenShiftUtil());
+            serviceName = ServiceUtil.getSsoServiceName(getOpenShift());
         }
         return serviceName;
     }
