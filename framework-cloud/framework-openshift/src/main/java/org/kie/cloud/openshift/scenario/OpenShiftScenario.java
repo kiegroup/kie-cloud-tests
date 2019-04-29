@@ -105,7 +105,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     protected void logNodeNameOfAllInstances() {
         for (Deployment deployment : getDeployments()) {
             deployment.getInstances().forEach(instance -> {
-                Pod pod = project.getOpenShiftUtil().getPod(instance.getName());
+                Pod pod = project.getOpenShift().getPod(instance.getName());
                 String podName = pod.getMetadata().getName();
                 String instanceNodeName = pod.getSpec().getNodeName();
                 logger.info("Node name of the {}: {} ", podName, instanceNodeName);

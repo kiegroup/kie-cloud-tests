@@ -41,8 +41,7 @@ import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilde
 import org.kie.cloud.openshift.settings.builder.KieServerS2ISettingsBuilderApb;
 import org.kie.cloud.openshift.settings.builder.LdapSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderApb;
-
-import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.core.openshift.OpenShift;
 
 public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
 
@@ -148,8 +147,8 @@ public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFac
 
     @Override
     public void deleteNamespace(String namespace) {
-        try (OpenShiftUtil util = OpenShiftController.getOpenShiftUtil(namespace)) {
-            util.deleteProject();
+        try (OpenShift openShift = OpenShiftController.getOpenShift(namespace)) {
+            openShift.deleteProject();
         }
     }
 

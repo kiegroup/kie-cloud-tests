@@ -17,7 +17,8 @@ package org.kie.cloud.openshift.util;
 
 import java.io.IOException;
 
-import cz.xtf.openshift.OpenShiftBinaryClient;
+import cz.xtf.core.openshift.OpenShiftBinary;
+import cz.xtf.core.openshift.OpenShifts;
 import org.kie.cloud.api.deployment.DockerDeployment;
 import org.kie.cloud.openshift.deployment.DockerDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
@@ -44,14 +45,10 @@ public class DockerRegistryDeployer {
     private static void deployDockerRegistry(Project project) {
         logger.info("Creating internal Docker registry.");
 
-        try {
-            OpenShiftBinaryClient.getInstance().loginDefault();
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error while logging into OpenShift using XTF.", e);
-        }
-
-        OpenShiftBinaryClient.getInstance().project(project.getName());
-        OpenShiftBinaryClient.getInstance().executeCommand("Registry creation failed.", "new-app", "registry:2", "-l", "deploymentConfig=registry");
-        OpenShiftBinaryClient.getInstance().executeCommand("Registry exposing failed.", "expose", "service", "registry");
+        // Login is part of binary retrieval
+        OpenShiftBinary masterBinary = OpenShifts.masterBinary();
+        masterBinary.project(project.getName());
+        masterBinary.execute("new-app", "registry:2", "-l", "deploymentConfig=registry");
+        masterBinary.execute("expose", "service", "registry");
     }
 }

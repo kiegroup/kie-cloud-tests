@@ -29,7 +29,7 @@
 
     <dependency>
       <groupId>cz.xtf</groupId>
-      <artifactId>utilities</artifactId>
+      <artifactId>core</artifactId>
     </dependency>
 
     <dependency>

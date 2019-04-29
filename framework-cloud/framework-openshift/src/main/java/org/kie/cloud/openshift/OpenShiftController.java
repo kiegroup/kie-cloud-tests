@@ -19,12 +19,12 @@ import org.kie.cloud.api.constants.ConfigurationInitializer;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 
-import cz.xtf.TestConfiguration;
-import cz.xtf.openshift.OpenShiftUtil;
-import cz.xtf.openshift.OpenShiftUtils;
+import cz.xtf.core.config.OpenShiftConfig;
+import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.openshift.OpenShifts;
 
 /**
- * Utility class for access to OpenShiftUtil. It provides basic OpenShift client initialization and basic project handling.
+ * Utility class for access to OpenShift. It provides basic OpenShift client initialization and basic project handling.
  */
 public class OpenShiftController {
 
@@ -33,18 +33,18 @@ public class OpenShiftController {
     }
 
     /**
-     * @return OpenShiftUtil with default namespace configured.
+     * @return OpenShift with default namespace configured.
      */
-    public static OpenShiftUtil getOpenShiftUtil() {
-        return getOpenShiftUtil(TestConfiguration.masterNamespace());
+    public static OpenShift getOpenShift() {
+        return getOpenShift(OpenShiftConfig.namespace());
     }
 
     /**
-     * @param projectName Namespace to be set to OpenShiftUtil.
-     * @return OpenShiftUtil with project namespace configured.
+     * @param projectName Namespace to be set to OpenShift.
+     * @return OpenShift with project namespace configured.
      */
-    public static OpenShiftUtil getOpenShiftUtil(String projectName) {
-        return OpenShiftUtils.master(projectName);
+    public static OpenShift getOpenShift(String projectName) {
+        return OpenShifts.master(projectName);
     }
 
     /**
@@ -52,8 +52,8 @@ public class OpenShiftController {
      * @return Project object representing created project.
      */
     public static Project createProject(String projectName) {
-        try (OpenShiftUtil util = getOpenShiftUtil()) {
-            util.createProjectRequest(projectName);
+        try (OpenShift openShift = getOpenShift()) {
+            openShift.createProjectRequest(projectName);
 
             return new ProjectImpl(projectName);
         }
@@ -63,8 +63,8 @@ public class OpenShiftController {
      * @param projectName Project name.
      */
     public static void deleteProject(String projectName) {
-        try (OpenShiftUtil util = getOpenShiftUtil()) {
-            util.deleteProject(projectName);
+        try (OpenShift openShift = getOpenShift()) {
+            openShift.deleteProject(projectName);
         }
     }
 }

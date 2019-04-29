@@ -24,10 +24,6 @@ public class GitConstants implements Constants {
 
     public static final String GIT_PROVIDER = "git.provider";
 
-    public static final String GITLAB_URL = "gitlab.url";
-    public static final String GITLAB_USER = "gitlab.username";
-    public static final String GITLAB_PASSWORD = "gitlab.password";
-
     public static final String GITHUB_USER = "github.username";
     public static final String GITHUB_PASSWORD = "github.password";
 
@@ -39,18 +35,6 @@ public class GitConstants implements Constants {
 
     public static String getGitProvider() {
         return System.getProperty(GIT_PROVIDER);
-    }
-
-    public static String getGitLabUrl() {
-        return System.getProperty(GITLAB_URL);
-    }
-
-    public static String getGitLabUser() {
-        return System.getProperty(GITLAB_USER);
-    }
-
-    public static String getGitLabPassword() {
-        return System.getProperty(GITLAB_PASSWORD);
     }
 
     public static String getGitHubUser() {

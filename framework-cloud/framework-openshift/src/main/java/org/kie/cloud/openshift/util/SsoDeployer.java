@@ -30,9 +30,8 @@ import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import cz.xtf.openshift.OpenShiftUtil;
-import cz.xtf.openshift.OpenShiftUtils;
+import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.openshift.OpenShifts;
 import cz.xtf.sso.api.SsoApi;
 import cz.xtf.sso.api.SsoApiFactory;
 import io.fabric8.kubernetes.api.model.KubernetesList;
@@ -70,12 +69,12 @@ public class SsoDeployer {
 
     private static void imageStreamDeploy(Project project) {
         try {
-            OpenShiftUtil openShiftUtil = OpenShiftUtils.admin(project.getName());
-            KubernetesList resourceList = openShiftUtil.client().lists().inNamespace("openshift").load(new URL(OpenShiftConstants.getSsoImageStreams())).get();
+            OpenShift openShift = OpenShifts.admin(project.getName());
+            KubernetesList resourceList = openShift.lists().inNamespace("openshift").load(new URL(OpenShiftConstants.getSsoImageStreams())).get();
             resourceList.getItems().forEach(item -> {
-                openShiftUtil.client().imageStreams().inNamespace("openshift").withName(item.getMetadata().getName()).delete();
+                openShift.imageStreams().inNamespace("openshift").withName(item.getMetadata().getName()).delete();
             });
-            openShiftUtil.client().lists().inNamespace("openshift").create(resourceList);
+            openShift.lists().inNamespace("openshift").create(resourceList);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed resource URL", e);
         }

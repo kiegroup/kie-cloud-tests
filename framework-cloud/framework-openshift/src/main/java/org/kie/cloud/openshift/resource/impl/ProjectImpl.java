@@ -28,16 +28,15 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import cz.xtf.openshift.OpenShiftBinaryClient;
-import cz.xtf.openshift.OpenShiftUtil;
-import cz.xtf.openshift.builder.ImageStreamBuilder;
+import cz.xtf.builder.builders.ImageStreamBuilder;
+import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.openshift.OpenShiftBinary;
+import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.openshift.api.model.ImageStream;
 
@@ -46,11 +45,11 @@ public class ProjectImpl implements Project {
     private static final Logger logger = LoggerFactory.getLogger(ProjectImpl.class);
 
     private String projectName;
-    private OpenShiftUtil util;
+    private OpenShift openShift;
 
     public ProjectImpl(String projectName) {
         this.projectName = projectName;
-        this.util = OpenShiftController.getOpenShiftUtil(projectName);
+        this.openShift = OpenShiftController.getOpenShift(projectName);
     }
 
     @Override
@@ -58,23 +57,24 @@ public class ProjectImpl implements Project {
         return projectName;
     }
 
-    public OpenShiftUtil getOpenShiftUtil() {
-        return util;
+    public OpenShift getOpenShift() {
+        return openShift;
     }
 
     @Override
     public void delete() {
-        util.deleteProject();
+        openShift.deleteProject();
     }
 
     @Override
     public void processTemplateAndCreateResources(URL templateUrl, Map<String, String> envVariables) {
         boolean templateIsFile = templateUrl.getProtocol().equals("file");
-        OpenShiftBinaryClient instance = getOpenShiftBinaryClient();
+
+        // Used to log into OpenShift
+        getOpenShiftBinary(getName());
 
         List<String> commandParameters = new ArrayList<>();
-        commandParameters.add(instance.getOcBinaryPath().toString());
-        commandParameters.add("--config=" + instance.getOcConfigPath().toString());
+        commandParameters.add(getOpenShiftBinaryPath());
         commandParameters.add("process");
         commandParameters.add("-f");
         commandParameters.add(templateIsFile ? templateUrl.getPath() : templateUrl.toExternalForm());
@@ -90,7 +90,7 @@ public class ProjectImpl implements Project {
 
         try (ProcessExecutor executor = new ProcessExecutor()) {
             File processedTemplate = executor.executeProcessCommandToTempFile(completeProcessingCommand);
-            executor.executeProcessCommand(instance.getOcBinaryPath().toString() + " --config=" + instance.getOcConfigPath().toString() + " create -n " + getName() + " -f " + processedTemplate.getAbsolutePath());
+            executor.executeProcessCommand(getOpenShiftBinaryPath() + " create -n " + getName() + " -f " + processedTemplate.getAbsolutePath());
         }
         // TODO: Temporary workaround to wait until scenario is completely initialized as there is a delay between finishing template creation command
         // and actual creation of resources on OpenShift. This should be removed when deployments won't be scaled in the beginning and will contain availability check.
@@ -110,11 +110,10 @@ public class ProjectImpl implements Project {
 
         try {
             semaphore.acquire();
-            OpenShiftBinaryClient oc = OpenShiftBinaryClient.getInstance();
-            oc.project(projectName);
-            if(util.getServiceAccount("apb") == null) {
-                oc.executeCommand("Creating serviceaccount failed.", "create", "serviceaccount", "apb");
-                oc.executeCommand("Role binding failed.", "create", "rolebinding", "apb", "--clusterrole=admin", "--serviceaccount=" + projectName + ":apb");
+            OpenShiftBinary oc = getOpenShiftBinary(projectName);
+            if(openShift.getServiceAccount("apb") == null) {
+                oc.execute("create", "serviceaccount", "apb");
+                oc.execute("create", "rolebinding", "apb", "--clusterrole=admin", "--serviceaccount=" + projectName + ":apb");
             }
 
             List<String> args = new ArrayList<>();
@@ -133,15 +132,7 @@ public class ProjectImpl implements Project {
             args.add(formatExtraVars(extraVars));
 
             logger.info("Executing command: oc " + getApbCommand(args));
-            oc.executeCommandAndConsumeOutput("APB failed.", istream -> {
-                logger.info(podName);
-                File outputDirectory = new File(System.getProperty(APB_BUILDS_LOGS_OUTPUT_DIRECTORY, DEFAULT_APB_BUILDS_LOG_OUTPUT_DIRECTORY));
-                if (!outputDirectory.isDirectory()) {
-                    outputDirectory.mkdir();
-                }
-                File logFile = new File(outputDirectory, projectName + "." + podName + LOG_SUFFIX);
-                FileUtils.copyInputStreamToFile(istream, logFile);
-            } ,args.toArray(new String[args.size()]));
+            oc.execute(args.toArray(new String[0]));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while waiting for scenario to be initialized.", e);
@@ -149,10 +140,6 @@ public class ProjectImpl implements Project {
             semaphore.release();
         }
     }
-
-    private static final String APB_BUILDS_LOGS_OUTPUT_DIRECTORY = "apb.build.logs";
-    private static final String DEFAULT_APB_BUILDS_LOG_OUTPUT_DIRECTORY = "apbBuilds";
-    private static final String LOG_SUFFIX = ".log";
 
     private String getApbCommand(List<String> args) {
         return args.stream().collect(Collectors.joining(" "));
@@ -168,8 +155,8 @@ public class ProjectImpl implements Project {
     @Override
     public void createResources(String resourceUrl) {
         try {
-            KubernetesList resourceList = util.client().lists().inNamespace(projectName).load(new URL(resourceUrl)).get();
-            util.client().lists().inNamespace(projectName).create(resourceList);
+            KubernetesList resourceList = openShift.lists().inNamespace(projectName).load(new URL(resourceUrl)).get();
+            openShift.lists().inNamespace(projectName).create(resourceList);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed resource URL", e);
         }
@@ -177,25 +164,29 @@ public class ProjectImpl implements Project {
 
     @Override
     public void createResources(InputStream inputStream) {
-        KubernetesList resourceList = util.client().lists().inNamespace(projectName).load(inputStream).get();
-        util.client().lists().inNamespace(projectName).create(resourceList);
+        KubernetesList resourceList = openShift.lists().inNamespace(projectName).load(inputStream).get();
+        openShift.lists().inNamespace(projectName).create(resourceList);
     }
 
     @Override
     public void createImageStream(String imageStreamName, String imageTag) {
         ImageStream driverImageStream = new ImageStreamBuilder(imageStreamName).fromExternalImage(imageTag).build();
-        util.createImageStream(driverImageStream);
+        openShift.createImageStream(driverImageStream);
     }
 
     public void close() {
         try {
-            util.close();
+            openShift.close();
         } catch (Exception e) {
             logger.warn("Exception while closing OpenShift client.", e);
         }
     }
 
-    private static synchronized OpenShiftBinaryClient getOpenShiftBinaryClient() {
-        return OpenShiftBinaryClient.getInstance();
+    private static synchronized OpenShiftBinary getOpenShiftBinary(String namespace) {
+        return OpenShifts.masterBinary(namespace);
+    }
+
+    private static synchronized String getOpenShiftBinaryPath() {
+        return OpenShifts.getBinaryPath();
     }
 }

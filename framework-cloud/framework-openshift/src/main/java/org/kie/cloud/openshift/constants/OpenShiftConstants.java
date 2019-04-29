@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
+import cz.xtf.core.config.OpenShiftConfig;
 import org.kie.cloud.api.constants.Constants;
 
 public class OpenShiftConstants implements Constants {
@@ -265,11 +266,12 @@ public class OpenShiftConstants implements Constants {
     @Override
     public void initConfigProperties() {
         // init XTF configuration for OpenShift
-        System.setProperty("xtf.config.master.url", getOpenShiftUrl());
-        System.setProperty("xtf.config.master.username", getOpenShiftUserName());
-        System.setProperty("xtf.config.master.password", getOpenShiftPassword());
-        System.setProperty("xtf.config.master.admin.username", getOpenShiftAdminUserName() != null ? getOpenShiftAdminUserName() : getOpenShiftUserName());
-        System.setProperty("xtf.config.master.admin.password", getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
-        System.setProperty("xtf.config.openshift.version", getOpenShiftVersion());
+        System.setProperty(OpenShiftConfig.OPENSHIFT_URL, getOpenShiftUrl());
+        System.setProperty(OpenShiftConfig.OPENSHIFT_MASTER_USERNAME, getOpenShiftUserName());
+        System.setProperty(OpenShiftConfig.OPENSHIFT_MASTER_PASSWORD, getOpenShiftPassword());
+        System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_USERNAME, getOpenShiftAdminUserName() != null ? getOpenShiftAdminUserName() : getOpenShiftUserName());
+        System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_PASSWORD, getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
+        System.setProperty(OpenShiftConfig.OPENSHIFT_VERSION, getOpenShiftVersion());
+        System.setProperty(OpenShiftConfig.OPENSHIFT_NAMESPACE, "openshift");
     }
 }

@@ -79,7 +79,7 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
     @Override
     public String getServiceName() {
         if (serviceName == null) {
-            serviceName = ServiceUtil.getKieServerServiceName(getOpenShiftUtil(), serviceSuffix);
+            serviceName = ServiceUtil.getKieServerServiceName(getOpenShift(), serviceSuffix);
         }
         return serviceName;
     }

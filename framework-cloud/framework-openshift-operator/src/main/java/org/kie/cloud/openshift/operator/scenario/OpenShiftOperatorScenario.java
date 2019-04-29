@@ -15,20 +15,18 @@
 
 package org.kie.cloud.openshift.operator.scenario;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import cz.xtf.openshift.OpenShiftBinaryClient;
-import cz.xtf.openshift.OpenShiftUtils;
+import cz.xtf.core.openshift.OpenShiftBinary;
+import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import org.kie.cloud.api.scenario.DeploymentScenario;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.openshift.client.NamespacedOpenShiftClient;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.model.KieApp;
@@ -58,62 +56,55 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     }
 
     private void deployOperator() {
-        try {
-            // Operations need to be done as an administrator
-            OpenShiftBinaryClient.getInstance().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(), OpenShiftConstants.getOpenShiftAdminPassword(), null);
+        // Operations need to be done as an administrator
+        OpenShiftBinary masterBinary = OpenShifts.masterBinary();
+        masterBinary.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(), OpenShiftConstants.getOpenShiftAdminPassword());
 
-            createCustomResourceDefinitionsInOpenShift();
-            createServiceAccountInProject(project);
-            createRoleInProject(project);
-            createRoleBindingsInProject(project);
-            createOperatorInProject(project);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while initializing Operator.", e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted while initializing Operator.", e);
-        }
+        createCustomResourceDefinitionsInOpenShift();
+        createServiceAccountInProject(masterBinary, project);
+        createRoleInProject(masterBinary, project);
+        createRoleBindingsInProject(masterBinary, project);
+        createOperatorInProject(project);
     }
 
     private void createCustomResourceDefinitionsInOpenShift() {
-        List<CustomResourceDefinition> customResourceDefinitions = OpenShiftUtils.admin().client().customResourceDefinitions().list().getItems();
+        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.admin().customResourceDefinitions().list().getItems();
         boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
         if(!operatorCrdExists) {
             logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
-            OpenShiftBinaryClient instance = OpenShiftBinaryClient.getInstance();
             try (ProcessExecutor executor = new ProcessExecutor()) {
-                executor.executeProcessCommand(instance.getOcBinaryPath().toString() + " --config=" + instance.getOcConfigPath().toString() + " create -n " + getNamespace() + " -f " + OpenShiftResource.CRD.getResourceUrl().toString());
+                executor.executeProcessCommand(OpenShifts.getBinaryPath() + " create -n " + getNamespace() + " -f " + OpenShiftResource.CRD.getResourceUrl().toString());
             }
         }
     }
 
-    private void createServiceAccountInProject(Project project) {
+    private void createServiceAccountInProject(OpenShiftBinary masterBinary, Project project) {
         logger.info("Creating service account in project '" + project.getName() + "' from " + OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
-        OpenShiftBinaryClient.getInstance().project(project.getName());
-        OpenShiftBinaryClient.getInstance().executeCommand("Service account creation failed.", "create", "-f", OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
+        masterBinary.project(project.getName());
+        masterBinary.execute("create", "-f", OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
     }
 
-    private void createRoleInProject(Project project) {
+    private void createRoleInProject(OpenShiftBinary masterBinary, Project project) {
         logger.info("Creating role in project '" + project.getName() + "' from " + OpenShiftResource.ROLE.getResourceUrl().toString());
-        OpenShiftBinaryClient.getInstance().project(project.getName());
-        OpenShiftBinaryClient.getInstance().executeCommand("Role creation failed.", "create", "-f", OpenShiftResource.ROLE.getResourceUrl().toString());
+        masterBinary.project(project.getName());
+        masterBinary.execute("create", "-f", OpenShiftResource.ROLE.getResourceUrl().toString());
     }
 
-    private void createRoleBindingsInProject(Project project) {
+    private void createRoleBindingsInProject(OpenShiftBinary masterBinary, Project project) {
         logger.info("Creating role bindings in project '" + project.getName() + "' from " + OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
-        OpenShiftBinaryClient.getInstance().project(project.getName());
-        OpenShiftBinaryClient.getInstance().executeCommand("Role binding failed.", "create", "-f", OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
+        masterBinary.project(project.getName());
+        masterBinary.execute("create", "-f", OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
     }
 
     private void createOperatorInProject(Project project) {
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
-        NamespacedOpenShiftClient client = OpenShiftUtils.admin().client().inNamespace(project.getName());
+        NamespacedOpenShiftClient client = OpenShifts.admin(project.getName());
         Deployment deployment = client.apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
         deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(OpenShiftOperatorConstants.getKieOperatorImageTag());
         client.apps().deployments().create(deployment);
 
         // wait until operator is ready
-        project.getOpenShiftUtil().waiters().areExactlyNPodsRunning(1, "name", "kie-cloud-operator");
+        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "kie-cloud-operator");
     }
 
     protected abstract void deployCustomResource();
@@ -144,7 +135,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
      * @return OpenShift client which is aware of KieApp custom resource.
      */
     protected NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> getKieAppClient() {
-        CustomResourceDefinition customResourceDefinition = OpenShiftUtils.admin().client().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
-        return OpenShiftUtils.admin().client().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
+        CustomResourceDefinition customResourceDefinition = OpenShifts.admin().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
+        return OpenShifts.admin().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
     }
 }

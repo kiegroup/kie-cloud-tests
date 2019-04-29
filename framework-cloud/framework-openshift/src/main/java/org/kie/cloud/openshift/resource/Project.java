@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
-import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.core.openshift.OpenShift;
 
 /**
  * Project representation.
@@ -39,7 +39,7 @@ public interface Project extends AutoCloseable {
     /**
      * @return OpenShift client.
      */
-    public OpenShiftUtil getOpenShiftUtil();
+    public OpenShift getOpenShift();
 
     /**
      * Process template and create all resources defined there.
