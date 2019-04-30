@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import cz.xtf.openshift.OpenShiftBinaryClient;
+import cz.xtf.core.openshift.OpenShiftBinary;
+import cz.xtf.core.openshift.OpenShifts;
 import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
 import org.junit.Before;
@@ -168,8 +169,7 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
     }
 
     private void rsync(final String podName, final Path localDir, final String remoteDir, boolean toPod) {
-        OpenShiftBinaryClient oc = OpenShiftBinaryClient.getInstance();
-        oc.project(deploymentScenario.getNamespace());
+        OpenShiftBinary oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
 
         List<String> args = new ArrayList<>();
         args.add("rsync");
@@ -178,7 +178,7 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
                 .getAbsoluteFile().getPath() + "/");
         args.add(toPod ? (podName + ":" + remoteDir + "/") : localDir.toFile()
                 .getAbsoluteFile().getPath() + "/");
-        oc.executeCommand("rsync has failed", args.toArray(new String[args.size()]));
+        oc.execute(args.toArray(new String[args.size()]));
     }
 
 }

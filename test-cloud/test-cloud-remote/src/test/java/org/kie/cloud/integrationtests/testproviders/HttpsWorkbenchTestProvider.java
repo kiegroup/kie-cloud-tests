@@ -29,15 +29,13 @@ import javax.net.ssl.HttpsURLConnection;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
+import cz.xtf.client.Http;
+import cz.xtf.client.HttpResponseParser;
 import org.apache.http.entity.ContentType;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import cz.xtf.http.HttpClient;
-import cz.xtf.tuple.Tuple.Pair;
 
 public class HttpsWorkbenchTestProvider {
 
@@ -61,15 +59,15 @@ public class HttpsWorkbenchTestProvider {
                 String urlString = urlParts[0] + ":" + urlParts[1];
 
                 logger.debug("Test login screen on url {}", urlString);
-                Pair<String, Integer> responseAndCode = HttpClient.get(urlString).responseAndCode();
-                assertThat(responseAndCode.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
-                assertThat(responseAndCode.getFirst()).contains(DeploymentConstants.getSsoRealm());
+                HttpResponseParser responseAndCode = Http.get(urlString).trustAll().execute();
+                assertThat(responseAndCode.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                assertThat(responseAndCode.response()).contains(DeploymentConstants.getSsoRealm());
 
             } else {
                 logger.debug("Test login screen on url {}", url.toString());
-                Pair<String, Integer> responseAndCode = HttpClient.get(url.toString()).responseAndCode();
-                assertThat(responseAndCode.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
-                assertThat(responseAndCode.getFirst()).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
+                HttpResponseParser responseAndCode = Http.get(url.toString()).trustAll().execute();
+                assertThat(responseAndCode.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                assertThat(responseAndCode.response()).contains(WORKBENCH_LOGIN_SCREEN_TEXT);
             }
 
         } catch (IOException e) {
@@ -84,28 +82,31 @@ public class HttpsWorkbenchTestProvider {
         try {
             try {
                 // Create server template using REST API
-                Pair<String, Integer> responseCreateServerTemplate = HttpClient.put(serverTemplateRequestUrl(workbenchDeployment, serverId))
+                HttpResponseParser responseCreateServerTemplate = Http.put(serverTemplateRequestUrl(workbenchDeployment, serverId))
                         .basicAuth(workbenchDeployment.getUsername(), workbenchDeployment.getPassword())
-                        .addHeader("Content-Type", "application/json")
+                        .header("Content-Type", "application/json")
                         .data(createServerTemplateJson(serverId, serverName), ContentType.APPLICATION_JSON)
                         .preemptiveAuth()
-                        .responseAndCode();
-                assertThat(responseCreateServerTemplate.getSecond()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
+                        .trustAll()
+                        .execute();
+                assertThat(responseCreateServerTemplate.code()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
 
                 // Check that server template exists
-                Pair<String, Integer> responseCheckServerTemplate = HttpClient.get(listServerTemplatesRequestUrl(workbenchDeployment))
+                HttpResponseParser responseCheckServerTemplate = Http.get(listServerTemplatesRequestUrl(workbenchDeployment))
                         .basicAuth(workbenchDeployment.getUsername(), workbenchDeployment.getPassword())
-                        .addHeader("Accept", "application/json")
+                        .header("Accept", "application/json")
                         .preemptiveAuth()
-                        .responseAndCode();
-                assertThat(responseCheckServerTemplate.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
-                verifyServerTemplateExists(serverId, responseCheckServerTemplate.getFirst());
+                        .trustAll()
+                        .execute();
+                assertThat(responseCheckServerTemplate.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
+                verifyServerTemplateExists(serverId, responseCheckServerTemplate.response());
             } finally {
                 // Delete server template
-                HttpClient.delete(serverTemplateRequestUrl(workbenchDeployment, serverId))
+                Http.delete(serverTemplateRequestUrl(workbenchDeployment, serverId))
                         .basicAuth(workbenchDeployment.getUsername(), workbenchDeployment.getPassword())
                         .preemptiveAuth()
-                        .code();
+                        .trustAll()
+                        .execute();
             }
         } catch (IOException e) {
             logger.error("Unable to connect to workbench REST API", e);

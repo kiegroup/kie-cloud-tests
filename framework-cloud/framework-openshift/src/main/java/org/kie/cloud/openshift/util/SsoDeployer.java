@@ -28,12 +28,12 @@ import org.kie.cloud.openshift.constants.SsoTemplateConstants;
 import org.kie.cloud.openshift.deployment.SsoDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.sso.SsoApi;
+import org.kie.cloud.openshift.util.sso.SsoApiFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShifts;
-import cz.xtf.sso.api.SsoApi;
-import cz.xtf.sso.api.SsoApiFactory;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 
 public class SsoDeployer {

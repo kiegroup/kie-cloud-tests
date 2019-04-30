@@ -65,6 +65,12 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- XTF dependencies -->
+    <dependency>
+      <groupId>cz.xtf</groupId>
+      <artifactId>http-client</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>

@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import cz.xtf.client.Http;
+import cz.xtf.client.HttpResponseParser;
 import org.apache.http.entity.ContentType;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -43,8 +45,6 @@ import org.kie.server.api.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.xtf.http.HttpClient;
-import cz.xtf.tuple.Tuple.Pair;
 
 public class HttpsKieServerTestProvider {
 
@@ -61,17 +61,18 @@ public class HttpsKieServerTestProvider {
 
     public static void testKieServerInfo(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
-            Pair<String, Integer> responseAndCode;
+            HttpResponseParser responseAndCode;
             String url = serverInforRequestUrl(kieServerDeployment, ssoScenario);
 
             logger.debug("Test Kie Server info on url {}", url);
-            responseAndCode = HttpClient.get(url)
+            responseAndCode = Http.get(url)
                     .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
                     .preemptiveAuth()
-                    .responseAndCode();
+                    .trustAll()
+                    .execute();
 
-            assertThat(responseAndCode.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
-            ServiceResponse<KieServerInfo> kieServerInfoServiceResponse = marshaller.unmarshall(responseAndCode.getFirst(), ServiceResponse.class);
+            assertThat(responseAndCode.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
+            ServiceResponse<KieServerInfo> kieServerInfoServiceResponse = marshaller.unmarshall(responseAndCode.response(), ServiceResponse.class);
             KieServerInfo kieServerInfo = kieServerInfoServiceResponse.getResult();
             Assertions.assertThat(kieServerInfo.getCapabilities()).contains(KieServerConstants.CAPABILITY_BRM);
         } catch (Exception e) {
@@ -86,38 +87,41 @@ public class HttpsKieServerTestProvider {
             String urlPut = containerRequestUrl(kieServerDeployment, containerId, ssoScenario);
 
             logger.debug("Test get Kie Server containers on url {}", urlPut);
-            Pair<String, Integer> responseAndCodePut = HttpClient.put(urlPut)
+            HttpResponseParser responseAndCodePut = Http.put(urlPut)
                     .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
-                    .addHeader("Content-Type", "application/xml")
+                    .header("Content-Type", "application/xml")
                     .data(createContainerRequestContent(Kjar.HELLO_RULES_SNAPSHOT), ContentType.TEXT_XML)
                     .preemptiveAuth()
-                    .responseAndCode();
+                    .trustAll()
+                    .execute();
 
-            assertThat(responseAndCodePut.getSecond()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
-            assertThat(responseAndCodePut.getFirst()).contains("Container " + containerId + " successfully created");
+            assertThat(responseAndCodePut.code()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
+            assertThat(responseAndCodePut.response()).contains("Container " + containerId + " successfully created");
 
             String urlGet = getContainersRequestUrl(kieServerDeployment, ssoScenario);
 
             logger.debug("Test get Kie Server containers on url {}", urlGet);
-            Pair<String, Integer> responseAndCodeGet = HttpClient.get(urlGet)
+            HttpResponseParser responseAndCodeGet = Http.get(urlGet)
                     .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
                     .preemptiveAuth()
-                    .responseAndCode();
+                    .trustAll()
+                    .execute();
 
-            assertThat(responseAndCodeGet.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
-            final List<String> containers = parseListContainersResponse(responseAndCodeGet.getFirst());
+            assertThat(responseAndCodeGet.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
+            final List<String> containers = parseListContainersResponse(responseAndCodeGet.response());
             assertThat(containers).contains(containerId);
 
             String urlDisploseContainer = containerRequestUrl(kieServerDeployment, containerId, ssoScenario);
 
             logger.debug("Test dispose Kie Server containers on url {}", urlDisploseContainer);
-            Pair<String, Integer> responseAndCodeDelete = HttpClient.delete(urlDisploseContainer)
+            HttpResponseParser responseAndCodeDelete = Http.delete(urlDisploseContainer)
                     .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
-                    .addHeader("Content-Type", "application/xml")
+                    .header("Content-Type", "application/xml")
                     .preemptiveAuth()
-                    .responseAndCode();
+                    .trustAll()
+                    .execute();
 
-            assertThat(responseAndCodeDelete.getSecond()).isEqualTo(HttpsURLConnection.HTTP_OK);
+            assertThat(responseAndCodeDelete.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
         } catch (Exception e) {
             logger.error("Unable to connect to KIE server REST API", e);
             throw new RuntimeException("Unable to connect to KIE server REST API", e);

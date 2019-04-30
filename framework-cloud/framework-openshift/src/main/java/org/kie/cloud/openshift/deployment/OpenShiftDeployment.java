@@ -130,13 +130,13 @@ public abstract class OpenShiftDeployment implements Deployment {
             openShift.waiters()
                     .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                    .reason("Waiting for pods of service " + getServiceName() + " to become ready.")
+                    .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become ready.")
                     .waitFor();
 
             openShift.waiters()
                     .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                    .reason("Waiting for pods of service " + getServiceName() + " to become runnning.")
+                    .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become runnning.")
                     .waitFor();
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
