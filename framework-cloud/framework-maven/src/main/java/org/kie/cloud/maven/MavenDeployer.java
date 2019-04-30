@@ -20,10 +20,10 @@ import java.nio.file.Paths;
 
 import org.apache.maven.it.VerificationException;
 import org.kie.cloud.api.constants.ConfigurationInitializer;
+import org.kie.cloud.maven.util.MavenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.xtf.maven.MavenUtil;
 
 public class MavenDeployer {
 

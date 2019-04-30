@@ -188,17 +188,6 @@
       </dependency>
       <dependency>
         <groupId>cz.xtf</groupId>
-        <artifactId>utilities</artifactId>
-        <version>${version.cz.xtf}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>cz.xtf</groupId>
         <artifactId>core</artifactId>
         <version>${version.cz.xtf}</version>
         <exclusions>
@@ -211,6 +200,11 @@
       <dependency>
         <groupId>cz.xtf</groupId>
         <artifactId>builder</artifactId>
+         <version>${version.cz.xtf}</version>
+      </dependency>
+      <dependency>
+        <groupId>cz.xtf</groupId>
+        <artifactId>http-client</artifactId>
          <version>${version.cz.xtf}</version>
       </dependency>
       <dependency>

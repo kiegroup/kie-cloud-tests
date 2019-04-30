@@ -20,11 +20,6 @@
     </dependency>
 
     <!-- XTF dependencies -->
-    <!-- Required because of MavenUtil. Maven build needs to be refactored to not rely on XTF. -->
-    <dependency>
-      <groupId>cz.xtf</groupId>
-      <artifactId>utilities</artifactId>
-    </dependency>
     <dependency>
       <groupId>cz.xtf</groupId>
       <artifactId>core</artifactId>
