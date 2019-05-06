@@ -14,7 +14,7 @@
 
   <name>KIE :: Cloud :: Framework :: Common</name>
   <description>Common tools for Kie integration tests</description>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.kie.cloud</groupId>
@@ -52,6 +52,12 @@
       </exclusions>
     </dependency>
 
+    <!-- Kie server router -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-router-proxy</artifactId>
+    </dependency>
+    
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.integrationtests.util;
+package org.kie.cloud.tests.common.client.util;
 
 public class LdapSettingsConstants {
 

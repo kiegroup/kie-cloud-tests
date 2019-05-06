@@ -13,11 +13,12 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.util;
+package org.kie.cloud.tests.common.client.util;
 
 import java.time.Duration;
 import java.util.function.BooleanSupplier;
 
+import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
