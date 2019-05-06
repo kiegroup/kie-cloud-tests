@@ -17,6 +17,7 @@ package org.kie.cloud.openshift.resource;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 import cz.xtf.core.openshift.OpenShift;
@@ -57,6 +58,30 @@ public interface Project extends AutoCloseable {
     public void processApbRun(String image, Map<String,String> extraVars);
 
     /**
+     * Create resources from YAML file using command line client.
+     * @param yamlUrl Url to yaml file with resources
+     */
+    public void createResourcesFromYaml(String yamlUrl);
+
+    /**
+     * Create resources from YAML files using command line client.
+     * @param yamlUrls Urls to yaml files with resources
+     */
+    public void createResourcesFromYaml(List<String> yamlUrls);
+
+    /**
+     * Create resources from YAML files as admin using command line client.
+     * @param yamlUrl Url to yaml files with resources
+     */
+    public void createResourcesFromYamlAsAdmin(String yamlUrl);
+
+    /**
+     * Create resources from YAML files as admin using command line client.
+     * @param yamlUrls Url to yaml files with resources
+     */
+    public void createResourcesFromYamlAsAdmin(List<String> yamlUrls);
+
+    /**
      * Create all resources defined in resource URL.
      *
      * @param resourceUrl URL of resource list to be created
@@ -77,4 +102,18 @@ public interface Project extends AutoCloseable {
      * @param imageTag Image tag used to resolve image,for example Docker tag.
      */
     public void createImageStream(String imageStreamName, String imageTag);
+
+    /**
+     * Run oc command
+     * @param args Command parameters
+     * @return Output of oc
+     */
+    public String runOcCommand(String... args);
+
+    /**
+     * Run oc command as admin
+     * @param args Command parameters
+     * @return Output of oc
+     */
+    public String runOcCommandAsAdmin(String... args);
 }

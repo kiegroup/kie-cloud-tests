@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
@@ -162,6 +163,48 @@ public class ProjectImpl implements Project {
         }
     }
 
+    public void createResourcesFromYaml(String yamlUrl) {
+        final String output = openShiftBinaryClient().execute("create", "-f", yamlUrl);
+        logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
+    }
+
+    public void createResourcesFromYaml(List<String> yamlUrls) {
+        final OpenShiftBinary oc = openShiftBinaryClient();
+        for (String url : yamlUrls) {
+            final String output = oc.execute("create", "-f", url);
+            logger.info("Yaml resources from file {} were created by oc client. Output = {}", url, output);
+        }
+    }
+
+    public void createResourcesFromYamlAsAdmin(String yamlUrl) {
+        final String output = openShiftBinaryClientAsAdmin().execute("create", "-f", yamlUrl);
+        logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
+    }
+
+    public void createResourcesFromYamlAsAdmin(List<String> yamlUrls) {
+        final OpenShiftBinary oc = openShiftBinaryClientAsAdmin();
+        for (String url : yamlUrls) {
+            final String output = oc.execute("create", "-f", url);
+            logger.info("Yaml resources from file {} were created by oc client. Output = {}", url, output);
+        }
+    }
+
+    private OpenShiftBinary openShiftBinaryClient() {
+        final OpenShiftBinary oc = OpenShifts.masterBinary(this.getName());
+        oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftUserName(),
+                 OpenShiftConstants.getOpenShiftPassword());
+
+        return oc;
+    }
+
+    private OpenShiftBinary openShiftBinaryClientAsAdmin() {
+        final OpenShiftBinary oc = OpenShifts.masterBinary(this.getName());
+        oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
+                 OpenShiftConstants.getOpenShiftAdminPassword());
+
+        return oc;
+    }
+
     @Override
     public void createResources(InputStream inputStream) {
         KubernetesList resourceList = openShift.lists().inNamespace(projectName).load(inputStream).get();
@@ -172,6 +215,20 @@ public class ProjectImpl implements Project {
     public void createImageStream(String imageStreamName, String imageTag) {
         ImageStream driverImageStream = new ImageStreamBuilder(imageStreamName).fromExternalImage(imageTag).build();
         openShift.createImageStream(driverImageStream);
+    }
+
+    @Override
+    public String runOcCommand(String... args) {
+        final String output = openShiftBinaryClient().execute(args);
+
+        return output;
+    }
+
+    @Override
+    public String runOcCommandAsAdmin(String... args) {
+        final String output = openShiftBinaryClientAsAdmin().execute(args);
+
+        return output;
     }
 
     public void close() {
