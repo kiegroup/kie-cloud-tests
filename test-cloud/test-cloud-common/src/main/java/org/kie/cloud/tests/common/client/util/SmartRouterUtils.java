@@ -13,10 +13,11 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.util;
+package org.kie.cloud.tests.common.client.util;
 
 import java.time.Duration;
 
+import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 

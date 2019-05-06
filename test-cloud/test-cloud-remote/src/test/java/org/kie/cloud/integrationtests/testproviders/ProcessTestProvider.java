@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.Kjar;
-import org.kie.cloud.integrationtests.util.Constants;
 import org.kie.cloud.maven.MavenDeployer;
+import org.kie.cloud.tests.common.client.util.Kjar;
+import org.kie.cloud.tests.common.time.Constants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;

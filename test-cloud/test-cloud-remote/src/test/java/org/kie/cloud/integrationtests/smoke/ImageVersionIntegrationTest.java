@@ -30,8 +30,8 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.cloud.integrationtests.category.Smoke;
-import org.kie.cloud.integrationtests.util.TimeUtils;
 import org.kie.server.client.KieServicesClient;
 
 @Category(Smoke.class)
