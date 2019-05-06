@@ -99,6 +99,9 @@
     <kie.image.tag.smartrouter/>
     <kie.image.tag.workbench/>
     <kie.image.tag.workbench.indexing/>
+
+    <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
+    <xtf.openshift.token/>
   </properties>
 
   <modules>
@@ -203,6 +206,7 @@
               <kie.image.tag.workbench>${kie.image.tag.workbench}</kie.image.tag.workbench>
               <kie.image.tag.workbench.indexing>${kie.image.tag.workbench.indexing}</kie.image.tag.workbench.indexing>
               <openshift.version>${openshift.version}</openshift.version>
+              <xtf.openshift.token>${xtf.openshift.token}</xtf.openshift.token>
             </systemProperties>
           </configuration>
         </plugin>
