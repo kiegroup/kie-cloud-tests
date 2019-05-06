@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.util;
+package org.kie.cloud.tests.common.client.util;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -23,7 +23,8 @@ import java.util.Map;
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.tests.common.client.util.Kjar;
+import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.spec.Capability;
