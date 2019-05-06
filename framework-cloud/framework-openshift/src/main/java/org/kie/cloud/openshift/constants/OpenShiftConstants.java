@@ -167,6 +167,11 @@ public class OpenShiftConstants implements Constants {
     public static final String KIE_IMAGE_TAG_WORKBENCH = "kie.image.tag.workbench";
     public static final String KIE_IMAGE_TAG_WORKBENCH_INDEXING = "kie.image.tag.workbench.indexing";
 
+    /* HA CEP properties */
+    public static final String AMQ_STREAMS_ZIP = "amq.streams.zip";
+    public static final String AMQ_STREAMS_DIR = "amqStreamsDirectory";
+    public static final String HA_CEP_RESOURCES_LIST = "ha.cep.resources";
+
     /**
      * File path pointing to folder containing JDBC driver scripts.
      */
@@ -244,6 +249,18 @@ public class OpenShiftConstants implements Constants {
 
     public static String getKieApplicationName() {
         return System.getProperty(KIE_APP_NAME);
+    }
+
+    public static String getAMQStreamsZip() {
+        return System.getProperty(AMQ_STREAMS_ZIP);
+    }
+
+    public static String getAMQStreamsDir() {
+        return System.getProperty(AMQ_STREAMS_DIR);
+    }
+
+    public static String getHaCepResourcesList() {
+        return System.getProperty(HA_CEP_RESOURCES_LIST);
     }
 
     public static File getKieJdbcDriverScriptsFolder() {

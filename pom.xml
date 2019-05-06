@@ -35,6 +35,7 @@
     <version.org.eclipse.mylyn.github>2.1.5</version.org.eclipse.mylyn.github>
     <version.http.core>4.4.9</version.http.core>
     <version.http.client>4.5.5</version.http.client>
+    <version.ant.compress>1.5</version.ant.compress>
     <version.jgit>4.11.0.201803080745-r</version.jgit>
 
     <version.cz.xtf>0.11</version.cz.xtf>
@@ -143,6 +144,11 @@
       </dependency>
       <dependency>
         <groupId>org.kie.cloud</groupId>
+        <artifactId>framework-openshift-strimzi</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.cloud</groupId>
         <artifactId>test-cloud-common</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
@@ -180,6 +186,11 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>fluent-hc</artifactId>
         <version>${version.http.client}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant-compress</artifactId>
+        <version>${version.ant.compress}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.mylyn.github</groupId>
