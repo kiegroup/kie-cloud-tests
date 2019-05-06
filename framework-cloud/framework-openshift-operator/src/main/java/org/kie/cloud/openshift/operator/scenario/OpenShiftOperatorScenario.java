@@ -68,14 +68,15 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     }
 
     private void createCustomResourceDefinitionsInOpenShift() {
-        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.admin().customResourceDefinitions().list().getItems();
-        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
-        if(!operatorCrdExists) {
+        // TODO: Commented out due to UnrecognizedPropertyException, uncomment with raised Fabric8 version to check if it is fixed already.
+//        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
+//        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
+//        if(!operatorCrdExists) {
             logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
             try (ProcessExecutor executor = new ProcessExecutor()) {
                 executor.executeProcessCommand(OpenShifts.getBinaryPath() + " create -n " + getNamespace() + " -f " + OpenShiftResource.CRD.getResourceUrl().toString());
             }
-        }
+//        }
     }
 
     private void createServiceAccountInProject(OpenShiftBinary masterBinary, Project project) {
@@ -98,7 +99,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void createOperatorInProject(Project project) {
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
-        NamespacedOpenShiftClient client = OpenShifts.admin(project.getName());
+        NamespacedOpenShiftClient client = OpenShifts.master(project.getName());
         Deployment deployment = client.apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
         deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(OpenShiftOperatorConstants.getKieOperatorImageTag());
         client.apps().deployments().create(deployment);
@@ -135,7 +136,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
      * @return OpenShift client which is aware of KieApp custom resource.
      */
     protected NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> getKieAppClient() {
-        CustomResourceDefinition customResourceDefinition = OpenShifts.admin().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
-        return OpenShifts.admin().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
+        CustomResourceDefinition customResourceDefinition = OpenShifts.master().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
+        return OpenShifts.master().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
     }
 }
