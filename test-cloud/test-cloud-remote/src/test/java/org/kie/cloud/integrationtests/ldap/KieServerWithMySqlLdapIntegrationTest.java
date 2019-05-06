@@ -28,8 +28,8 @@ import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.integrationtests.util.LdapSettingsConstants;
 import org.kie.cloud.tests.common.ScenarioDeployer;
+import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 import org.kie.cloud.maven.constants.MavenConstants;
 
 public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrationTest {

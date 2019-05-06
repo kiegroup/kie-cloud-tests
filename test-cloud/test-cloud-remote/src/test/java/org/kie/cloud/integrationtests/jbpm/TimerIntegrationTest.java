@@ -32,11 +32,11 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServ
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
-import org.kie.cloud.integrationtests.Kjar;
+import org.kie.cloud.tests.common.client.util.Kjar;
+import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.tests.common.time.Constants;
+import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
-import org.kie.cloud.integrationtests.util.Constants;
-import org.kie.cloud.integrationtests.util.TimeUtils;
-import org.kie.cloud.integrationtests.util.WorkbenchUtils;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerStatus;

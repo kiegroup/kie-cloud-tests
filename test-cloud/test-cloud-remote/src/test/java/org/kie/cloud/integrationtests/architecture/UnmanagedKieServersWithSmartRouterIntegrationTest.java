@@ -44,7 +44,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.integrationtests.util.Constants;
+import org.kie.cloud.tests.common.time.Constants;
 import org.kie.cloud.provider.git.Git;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;

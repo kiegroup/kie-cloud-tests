@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.util;
+package org.kie.cloud.tests.common.time;
 
 public class Constants {
     public class ProcessId {

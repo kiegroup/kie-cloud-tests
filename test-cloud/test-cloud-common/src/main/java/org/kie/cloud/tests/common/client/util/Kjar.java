@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests;
+package org.kie.cloud.tests.common.client.util;
 
 public enum Kjar {
     DEFINITION("org.kie.server.testing", "definition-project", "1.0.0.Final"),
