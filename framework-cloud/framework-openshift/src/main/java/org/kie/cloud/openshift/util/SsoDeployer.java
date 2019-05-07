@@ -36,6 +36,7 @@ import cz.xtf.openshift.OpenShiftUtils;
 import cz.xtf.sso.api.SsoApi;
 import cz.xtf.sso.api.SsoApiFactory;
 import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 
 public class SsoDeployer {
 
@@ -76,6 +77,10 @@ public class SsoDeployer {
                 openShiftUtil.client().imageStreams().inNamespace("openshift").withName(item.getMetadata().getName()).delete();
             });
             openShiftUtil.client().lists().inNamespace("openshift").create(resourceList);
+        } catch (KubernetesClientException e) {
+            if(!e.getMessage().contains("already exists")) {
+                throw new RuntimeException("Kubernetes Client Exception and Image stream not exists", e);
+            }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed resource URL", e);
         }
