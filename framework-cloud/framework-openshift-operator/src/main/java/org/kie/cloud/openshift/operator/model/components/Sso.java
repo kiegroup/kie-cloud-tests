@@ -27,6 +27,7 @@ public class Sso {
     private String realm;
     private String adminUser;
     private String adminPassword;
+    private String principalAttribute;
 
     public String getAdminPassword() {
         return adminPassword;
@@ -58,5 +59,13 @@ public class Sso {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getPrincipalAttribute() {
+        return principalAttribute;
+    }
+
+    public void setPrincipalAttribute(String principalAttribute) {
+        this.principalAttribute = principalAttribute;
     }
 }
