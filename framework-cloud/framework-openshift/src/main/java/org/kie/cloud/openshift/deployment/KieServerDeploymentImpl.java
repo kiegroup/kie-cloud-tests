@@ -16,12 +16,21 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 
+import cz.xtf.core.waiting.SimpleWaiter;
+import io.fabric8.kubernetes.api.model.ConfigMap;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.openshift.resource.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieServerDeployment {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerDeploymentImpl.class);
 
     private Optional<URL> insecureUrl;
     private Optional<URL> secureUrl;
@@ -89,5 +98,60 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         if (getInstances().size() > 0) {
             RouterUtil.waitForRouter(getUrl());
         }
+    }
+
+    @Override
+    public void waitForContainerRespin() {
+        getKieServerConfigMap().ifPresent(config -> {
+            logger.info("Config map found, waiting for rollout.");
+            waitForRolloutTrigger(config);
+            waitForRolloutFinish(config);
+            waitForScale();
+        });
+    }
+
+    /**
+     * Wait until rollout required label disappear from config map.
+     *
+     * @param kieServerDeployment Kie server config map with configuration.
+     */
+    private void waitForRolloutTrigger(ConfigMap kieServerConfigMap) {
+        String rolloutRequiredLabel = "services.server.kie.org/openshift-startup-strategy.rolloutRequired";
+        Map<String, String> kieServerConfigMapLabels = kieServerConfigMap.getMetadata().getLabels();
+
+        if (kieServerConfigMapLabels.containsKey(rolloutRequiredLabel)) {
+            logger.info("Rollout required label found, waiting for rollout trigger.");
+            BooleanSupplier rolloutLabelNotFound = () -> !getKieServerConfigMap().orElseThrow(() -> new RuntimeException("Kie server config map not found."))
+                                                                                 .getMetadata()
+                                                                                 .getLabels()
+                                                                                 .containsKey(rolloutRequiredLabel);
+            new SimpleWaiter(rolloutLabelNotFound).timeout(TimeUnit.MINUTES, 1).waitFor();
+        }
+    }
+
+    /**
+     * Wait until temporary rollout config map disappears, marking that new Kie server pod is starting.
+     *
+     * @param kieServerConfigMap Kie server config map with configuration.
+     */
+    private void waitForRolloutFinish(ConfigMap kieServerConfigMap) {
+        String kieServerIdLabel = "services.server.kie.org/kie-server-id";
+        String kieServerId = kieServerConfigMap.getMetadata().getLabels().get(kieServerIdLabel);
+        String rolloutInProgressConfigMapName = "kieserver-rollout-in-progress-" + kieServerId;
+
+        if (getOpenShift().getConfigMap(rolloutInProgressConfigMapName) != null) {
+            logger.info("Temporary rollout config map found, rollout is in progress.");
+            new SimpleWaiter(() -> getOpenShift().getConfigMap(rolloutInProgressConfigMapName) == null).timeout(TimeUnit.MINUTES, 5).waitFor();
+        }
+    }
+
+    /**
+     * @return Kie server config map if exists.
+     */
+    private Optional<ConfigMap> getKieServerConfigMap() {
+        // Expecting the config map to be owned by deployment config with same name as its service. Needs to be adjusted in case this changes!!!!
+        return getOpenShift().getConfigMaps().stream().filter(cm -> !cm.getMetadata().getOwnerReferences().isEmpty())
+                                                      .filter(cm -> cm.getMetadata().getOwnerReferences().get(0).getName().equals(getServiceName()))
+                                                      .findAny();
     }
 }

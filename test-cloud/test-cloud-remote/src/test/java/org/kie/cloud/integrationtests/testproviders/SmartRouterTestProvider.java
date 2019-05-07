@@ -116,20 +116,23 @@ public class SmartRouterTestProvider {
         KieServicesClient kieServerClientTwo = KieServerClientProvider.getKieServerClient(kieServerDeploymentTwo);
 
         try {
-            deployProject(kieServerClientOne, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
-            deployProject(kieServerClientTwo, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
+            deployProject(kieServerDeploymentOne, kieServerClientOne, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
+            deployProject(kieServerDeploymentTwo, kieServerClientTwo, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
 
             verifyProcessAvailableInContainer(smartRouterClient, containerId, Constants.ProcessId.USERTASK);
 
-            deployProject(kieServerClientOne, containerIdUpdated, containerAlias, Kjar.DEFINITION_101_SNAPSHOT);
+            deployProject(kieServerDeploymentOne, kieServerClientOne, containerIdUpdated, containerAlias, Kjar.DEFINITION_101_SNAPSHOT);
 
             for (int i = 0; i < RETRIES_NUMBER; i++) {
                 verifyProcessAvailableInContainer(smartRouterClient, containerIdUpdated, Constants.ProcessId.UPDATED_USERTASK);
             }
         } finally {
             kieServerClientOne.disposeContainer(containerId);
+            kieServerDeploymentOne.waitForContainerRespin();
             kieServerClientOne.disposeContainer(containerIdUpdated);
+            kieServerDeploymentOne.waitForContainerRespin();
             kieServerClientTwo.disposeContainer(containerId);
+            kieServerDeploymentTwo.waitForContainerRespin();
         }
     }
 
@@ -144,8 +147,8 @@ public class SmartRouterTestProvider {
         KieServicesClient kieServerClientTwo = KieServerClientProvider.getKieServerClient(kieServerDeploymentTwo);
 
         try {
-            deployProject(kieServerClientOne, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
-            deployProject(kieServerClientTwo, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
+            deployProject(kieServerDeploymentOne, kieServerClientOne, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
+            deployProject(kieServerDeploymentTwo, kieServerClientTwo, containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT);
 
             for (int i = 0; i < RETRIES_NUMBER; i++) {
                 verifyProcessAvailableInContainer(smartRouterClient, containerAlias, Constants.ProcessId.LOG);
@@ -158,15 +161,18 @@ public class SmartRouterTestProvider {
         } finally {
             kieServerClientOne.disposeContainer(containerId);
             kieServerClientTwo.disposeContainer(containerId);
+            kieServerDeploymentOne.waitForContainerRespin();
+            kieServerDeploymentTwo.waitForContainerRespin();
         }
     }
 
-    private static void deployProject(KieServicesClient kieServerClient, String containerId, String containerAlias, Kjar project) {
+    private static void deployProject(KieServerDeployment kieServerDeployment, KieServicesClient kieServerClient, String containerId, String containerAlias, Kjar project) {
         KieContainerResource resource = new KieContainerResource(containerId,
                 new ReleaseId(project.getGroupId(), project.getName(), project.getVersion()));
         resource.setContainerAlias(containerAlias);
 
         kieServerClient.createContainer(containerId, resource);
+        kieServerDeployment.waitForContainerRespin();
     }
 
     private static void verifyProcessAvailableInContainer(KieServicesClient kieServerClient, String containerId, String processId) {

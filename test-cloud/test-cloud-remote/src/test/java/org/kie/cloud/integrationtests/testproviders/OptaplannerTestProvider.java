@@ -71,6 +71,7 @@ public class OptaplannerTestProvider {
         } finally {
             kieServerDeployment.resetRouterTimeout();
             kieServerClient.disposeContainer(containerId);
+            kieServerDeployment.waitForContainerRespin();
         }
     }
 

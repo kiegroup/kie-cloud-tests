@@ -59,4 +59,9 @@ public interface KieServerDeployment extends Deployment {
      * @return Kie Server user password
      */
     String getPassword();
+
+    /**
+     * Wait until Kie server pods are restarted. This happens after any change made into Kie server config map when OpenShiftStartupStrategy is used.
+     */
+    void waitForContainerRespin();
 }

@@ -107,6 +107,7 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
 
         kieServicesClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION)));
+        deploymentScenario.getKieServerDeployment().waitForContainerRespin();
     }
 
     @Test
