@@ -47,5 +47,6 @@ public class ProjectBuilderTestProvider {
                 new KieContainerResource(containerId, new ReleaseId(
                         workbenchClient.getSpace(spaceName).getDefaultGroupId(), projectName, projectVersion)));
         KieServerAssert.assertSuccess(createContainer);
+        kieServerDeployment.waitForContainerRespin();
     }
 }

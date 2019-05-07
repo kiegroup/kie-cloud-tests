@@ -58,12 +58,13 @@ public class ProcessTestProvider {
 
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
-        kieServerDeployment.waitForScale();
+        kieServerDeployment.waitForContainerRespin();
 
         try {
             testExecuteProcessWithUserTask(kieServerDeployment, containerId);
         } finally {
             kieServerClient.disposeContainer(containerId);
+            kieServerDeployment.waitForContainerRespin();
         }
     }
 
@@ -92,12 +93,13 @@ public class ProcessTestProvider {
 
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
-        kieServerDeployment.waitForScale();
+        kieServerDeployment.waitForContainerRespin();
 
         try {
             testExecuteProcessWithSignal(kieServerDeployment, containerId);
         } finally {
             kieServerClient.disposeContainer(containerId);
+            kieServerDeployment.waitForContainerRespin();
         }
     }
 

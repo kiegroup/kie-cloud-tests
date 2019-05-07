@@ -65,12 +65,13 @@ public class FireRulesTestProvider {
 
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.HELLO_RULES_SNAPSHOT.getGroupId(), Kjar.HELLO_RULES_SNAPSHOT.getName(), Kjar.HELLO_RULES_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
-        kieServerDeployment.waitForScale();
+        kieServerDeployment.waitForContainerRespin();
 
         try {
             testFireRules(kieServerDeployment, containerId);
         } finally {
             kieServerClient.disposeContainer(containerId);
+            kieServerDeployment.waitForContainerRespin();
         }
     }
 
