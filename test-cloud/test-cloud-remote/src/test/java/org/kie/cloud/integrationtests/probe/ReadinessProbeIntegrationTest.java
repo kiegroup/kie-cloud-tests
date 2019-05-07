@@ -48,6 +48,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
@@ -67,7 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-@Category(Baseline.class)
+@Category({Baseline.class, OperatorNotSupported.class}) // Operator doesn't support scaling Workbench to 0 for this scenario
 public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {
 
     @Parameter(value = 0)
