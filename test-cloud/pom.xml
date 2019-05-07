@@ -99,9 +99,6 @@
     <kie.image.tag.smartrouter/>
     <kie.image.tag.workbench/>
     <kie.image.tag.workbench.indexing/>
-
-    <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
-    <xtf.openshift.token/>
   </properties>
 
   <modules>
@@ -206,7 +203,6 @@
               <kie.image.tag.workbench>${kie.image.tag.workbench}</kie.image.tag.workbench>
               <kie.image.tag.workbench.indexing>${kie.image.tag.workbench.indexing}</kie.image.tag.workbench.indexing>
               <openshift.version>${openshift.version}</openshift.version>
-              <xtf.openshift.token>${xtf.openshift.token}</xtf.openshift.token>
             </systemProperties>
           </configuration>
         </plugin>
@@ -305,6 +301,9 @@
         <custom.trusted.keystore.alias>jboss</custom.trusted.keystore.alias>
         <custom.trusted.keystore.pwd>test</custom.trusted.keystore.pwd>
         <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.OperatorNotSupported</failsafe.excluded.groups>
+
+        <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
+        <xtf.openshift.token/>
       </properties>
       <dependencies>
         <dependency>
@@ -365,6 +364,7 @@
                 <systemProperties>
                   <javax.net.ssl.trustStore>${certificate.dir}/test-keystore</javax.net.ssl.trustStore>
                   <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
+                  <xtf.openshift.token>${xtf.openshift.token}</xtf.openshift.token>
                 </systemProperties>
               </configuration>
             </plugin>
