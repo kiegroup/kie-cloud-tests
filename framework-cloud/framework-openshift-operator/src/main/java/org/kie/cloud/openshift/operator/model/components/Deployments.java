@@ -25,6 +25,7 @@ public class Deployments {
 
     private String[] ready;
     private String[] starting;
+    private String[] stopped;
 
     public String[] getReady() {
         return ready;
@@ -40,5 +41,13 @@ public class Deployments {
 
     public void setStarting(String[] starting) {
         this.starting = starting;
+    }
+
+    public String[] getStopped() {
+        return stopped;
+    }
+
+    public void setStopped(String[] stopped) {
+        this.stopped = stopped;
     }
 }
