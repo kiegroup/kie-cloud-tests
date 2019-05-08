@@ -23,7 +23,6 @@ import java.util.Map;
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;

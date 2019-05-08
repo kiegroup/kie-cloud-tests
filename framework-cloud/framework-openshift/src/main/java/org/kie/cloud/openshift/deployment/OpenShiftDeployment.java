@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -41,8 +42,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.xtf.core.openshift.OpenShift;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.RouteList;
 
 public abstract class OpenShiftDeployment implements Deployment {
 
@@ -145,28 +148,68 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void setRouterTimeout(Duration timeoutValue) {
-        // Route has a same name as its service.
-        String routeName = getServiceName();
-        openShift.routes()
-            .withName(routeName)
-            .edit()
-            .editMetadata()
-            .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds()+"s")
-            .endMetadata()
-            .done();
+        RouteList list = getRoutes();
+        for(Route r : list.getItems()) {
+            openShift
+              .routes()
+              .withName(r.getMetadata().getName())
+              .edit()
+              .editMetadata()
+              .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds()+"s")
+              .endMetadata()
+              .done();
+        }
     }
 
     @Override
     public void resetRouterTimeout() {
-        // Route has a same name as its service.
-        String routeName = getServiceName();
-        openShift.routes()
-            .withName(routeName)
+        RouteList list = getRoutes();
+        for(Route r : list.getItems()) {
+          openShift
+              .routes()
+              .withName(r.getMetadata().getName())
+              .edit()
+              .editMetadata()
+              .removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT)
+              .endMetadata()
+              .done();
+        }
+    }
+    
+    @Override
+    public void setRouterBalance(String balance) {
+        RouteList list = getRoutes();
+        for(Route r : list.getItems()) {
+          openShift
+              .routes()
+              .withName(r.getMetadata().getName())
+              .edit()
+              .editMetadata()
+              .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_BALANCE, balance)
+              .endMetadata()
+              .done();
+        }
+    }
+    
+    @Override
+    public void setResources(Map<String,String> requests, Map<String,String> limits) {
+        openShift
+            .deploymentConfigs()
+            .withName(getServiceName()) // Deployment config has same name as its service.
             .edit()
-            .editMetadata()
-            .removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT)
-            .endMetadata()
-            .done();
+            .editOrNewSpec()
+            .editTemplate()
+            .editOrNewSpec()
+            .editContainer(0)
+            .editResources()
+            .addToRequests(transformMap(requests))
+            .addToLimits(transformMap(limits))  
+            .endResources()
+            .endContainer()
+            .endSpec()
+            .endTemplate()
+            .endSpec()
+            .done();       
     }
 
     private Instance createInstance(Pod pod) {
@@ -203,6 +246,13 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     protected Optional<URI> getWebSocketRouteUri(String serviceName) {
         return getRouteUri(Protocol.ws, serviceName);
+    }
+    
+    protected RouteList getRoutes(){
+        return openShift
+                   .routes()
+                   .withLabel("service", getServiceName())
+                   .list();
     }
 
     private Optional<URI> getRouteUri(Protocol protocol, String serviceName) {
@@ -255,4 +305,13 @@ public abstract class OpenShiftDeployment implements Deployment {
                 throw new IllegalArgumentException("Unrecognized protocol '" + protocol + "'");
         }
     }
+    
+    private Map<String, Quantity> transformMap(Map<String, String> x){
+        return x.entrySet().stream()
+                .collect(Collectors.toMap(
+                                          e -> e.getKey(),
+                                          e -> new Quantity(e.getValue())
+                                      ));
+    }
+    
 }

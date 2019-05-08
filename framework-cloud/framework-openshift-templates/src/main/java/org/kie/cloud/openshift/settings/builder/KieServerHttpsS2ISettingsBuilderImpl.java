@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -161,6 +162,19 @@ public class KieServerHttpsS2ISettingsBuilderImpl implements KieServerS2ISetting
     @Override
     public KieServerS2ISettingsBuilder withKieServerSecret(String secret) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, secret);
+        return this;
+    }
+    
+    @Override
+    public KieServerS2ISettingsBuilder withTimerServiceDataStoreRefreshInterval(
+            Duration timerServiceDataStoreRefreshInterval) {
+        envVariables.put(OpenShiftTemplateConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, Long.toString(timerServiceDataStoreRefreshInterval.toMillis()));
+        return this;
+    }
+    
+    @Override
+    public KieServerS2ISettingsBuilder withKieServerMemoryLimit(String limit) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_MEMORY_LIMIT, limit);
         return this;
     }
 }
