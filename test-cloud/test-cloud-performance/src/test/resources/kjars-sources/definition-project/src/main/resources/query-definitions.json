@@ -1,0 +1,9 @@
+[
+  {
+    "query-name" : "jbpmOldValueVarSearch",
+    "query-source" : "${org.kie.server.persistence.ds}",
+    "query-expression" : "select vil.processInstanceId, vil.processId, vil.id, vil.variableId, vil.value, vil.oldvalue from VariableInstanceLog vil where vil.id in (select MAX(v.id) from VariableInstanceLog v group by v.variableId, v.processInstanceId)",
+    "query-target" : "CUSTOM"
+
+  }
+]
