@@ -35,7 +35,7 @@ public class KieServerUtils {
      * @param kieServerClient Kie server client.
      * @param resource Container resource to be deployed.
      * @param timeout Overall deployment timeout.
-     * @return
+     * @return ServiceResponse of Kie Container
      */
     public static ServiceResponse<KieContainerResource> createContainer(KieServicesClient kieServerClient, KieContainerResource resource, Duration timeout) {
         String containerId = resource.getContainerId();

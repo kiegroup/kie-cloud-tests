@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.api.settings.builder;
 
+import java.time.Duration;
+
 import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.api.settings.DeploymentSettings;
 
@@ -184,4 +186,20 @@ public interface KieServerS2ISettingsBuilder extends SettingsBuilder<DeploymentS
      * @return Builder
      */
     KieServerS2ISettingsBuilder withKieServerSecret(String secret);
+    
+    /**
+     * Return setup builder with specified timer service data store refresh interval.
+     * 
+     * @param timerServiceDataStoreRefreshInterval timer service data store refresh interval.
+     * @return Builder with configured timer service data store refresh interval.
+     */
+    KieServerS2ISettingsBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval);
+
+    /**
+     * Return setup builder with specified memory limit.
+     * 
+     * @param limit memory limit (e.g.: 4Gi, etc).
+     * @return Builder with configured memory limit.
+     */
+    KieServerS2ISettingsBuilder withKieServerMemoryLimit(String limit);
 }

@@ -17,6 +17,7 @@ package org.kie.cloud.api.deployment;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Deployment representation in cloud environment.
@@ -87,4 +88,19 @@ public interface Deployment {
      * This method resets a router timeout for the cloud deployment back to original value.
      */
     void resetRouterTimeout();
+    
+    /**
+     * This method sets a router balance strategy for the cloud deployment.
+     *
+     * @param balance Type of balance (roundrobin, etc.)
+     */
+    void setRouterBalance(String balance);
+
+    /**
+     * This method sets resources quota for the cloud deployment.
+     *
+     * @param requests map with the CPU, memory, ephemeral storage requests
+     * @param requests map with the CPU, memory, ephemeral storage limits
+     */
+    void setResources(Map<String, String> requests, Map<String, String> limits);
 }
