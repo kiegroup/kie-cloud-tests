@@ -40,6 +40,10 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String HAPROXY_ROUTER_TIMEOUT = "haproxy.router.openshift.io/timeout";
     /**
+     * Property name to configure Openshift router balance.
+     */
+    public static final String HAPROXY_ROUTER_BALANCE = "haproxy.router.openshift.io/balance";
+    /**
      * Used Kie application name. Needed for identification of services within the project.
      */
     public static final String KIE_APP_NAME = "kie.app.name";
