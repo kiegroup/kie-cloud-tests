@@ -105,7 +105,9 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         client.apps().deployments().create(deployment);
 
         // wait until operator is ready
-        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "kie-cloud-operator");
+        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "kie-cloud-operator").waitFor();
+        // wait until operator console is ready
+        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "console-cr-form").waitFor();
     }
 
     protected abstract void deployCustomResource();
