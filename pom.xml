@@ -264,6 +264,11 @@
         <artifactId>optaplanner-persistence-jackson</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-client</artifactId>
+        <version>5.11.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

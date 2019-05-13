@@ -52,6 +52,11 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-client</artifactId>
+    </dependency>
+
     <!-- Kie server router -->
     <dependency>
       <groupId>org.kie.server</groupId>

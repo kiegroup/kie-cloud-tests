@@ -15,11 +15,17 @@
  */
 package org.kie.cloud.openshift.scenario;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
+import org.kie.cloud.api.deployment.AmqDeployment;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -32,13 +38,16 @@ import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
+import org.kie.cloud.openshift.deployment.AmqDeploymentImpl;
 import org.kie.cloud.openshift.deployment.ControllerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
+import org.kie.cloud.openshift.deployment.ServiceUtil;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.settings.GenericScenarioSettings;
+import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.template.ProjectProfile;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
@@ -51,6 +60,7 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
     private List<SmartRouterDeployment> smartRouterDeployments;
     private List<ControllerDeployment> controllerDeployments;
     private SsoDeployment ssoDeployment;
+    private AmqDeployment amqDeployment;
 
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
@@ -94,6 +104,10 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
 
     @Override
     protected void deployKieDeployments() {
+        logger.info("Creating AMQ secret");
+        createAmqSecret();
+        logger.info("AMQ secret created");
+
         workbenchDeployments.clear();
         controllerDeployments.clear();
         kieServerDeployments.clear();
@@ -170,8 +184,53 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
             kieServerDeployment.waitForScale();
         }
 
+        // check if there is an AMQ deployment
+        try {
+            logger.info("Searching for AMQ.");
+            ServiceUtil.getAmqJolokiaServiceName(project.getOpenShift());
+            amqDeployment = createAmqDeployment(project);
+            addAmqSecretToAmqServiceAccount();
+            logger.info("AMQ found and deployment created.");
+        } catch (RuntimeException e) {
+            if (!e.getMessage().contains("not found.")) {
+                logger.info("AMQ not found, skipping creating AMQ deployment.", e);
+            } else {
+                logger.error("Runtime exception thrown and AMQ was founded.",e);
+                throw new RuntimeException("Exception catched during creating AMQ deployment.",e);
+            }
+        }
+
         logNodeNameOfAllInstances();
     }
+
+    private void addAmqSecretToAmqServiceAccount() {
+        project.getOpenShift()
+            .serviceAccounts()
+            .inNamespace(getNamespace())
+            .withName("amq-service-account")
+                .edit()
+                    .addNewSecret()
+                        .withName("amq-app-secret")
+                    .endSecret()
+                .done();
+    }
+    private void createAmqSecret() {
+        try {
+            project.getOpenShift().secrets().createOrReplaceWithNew()
+            .withNewMetadata()
+                .withName("amq-app-secret")
+                .withNamespace(getNamespace())
+            .endMetadata()
+            .addToData("broker.ks", 
+                    Base64.encodeBase64String(Files.readAllBytes(Paths.get(DeploymentConstants.getCertificateDir()+"/broker.ks")))) //TODO replace with constants
+            .addToData("broker.ts", 
+                    Base64.encodeBase64String(Files.readAllBytes(Paths.get(DeploymentConstants.getCertificateDir()+"/broker.ts")))) //TODO replace with constants
+            .done();
+        } catch (IOException ex) {
+            throw new RuntimeException("Exception cat during creating AMQ secret." , ex);
+        }
+    }
+
 
     private void deployTemplateWithSettings(Project project, DeploymentSettings deploymentSettings) {
         Map<String, String> envVariables = new HashMap<>(deploymentSettings.getEnvVariables());
@@ -192,6 +251,9 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         deployments.addAll(controllerDeployments);
         if (ssoDeployment != null) {
             deployments.add(ssoDeployment);
+        }
+        if (amqDeployment != null) {
+            deployments.add(amqDeployment);
         }
         return deployments;
     }
@@ -238,6 +300,14 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         controllerDeployment.scale(1);
 
         return controllerDeployment;
+    }
+
+    private AmqDeployment createAmqDeployment(Project project) {
+        AmqDeploymentImpl amqDeployment = new AmqDeploymentImpl(project);
+        amqDeployment.setUsername(DeploymentConstants.getAmqUsername());
+        amqDeployment.setPassword(DeploymentConstants.getAmqPassword());
+
+        return amqDeployment;
     }
 
 }

@@ -168,6 +168,14 @@ public class OpenShiftTemplateConstants {
     public static final String AMQ_IMAGE_STREAM_NAME = "AMQ_IMAGE_STREAM_NAME";
     public static final String AMQ_IMAGE_STREAM_TAG = "AMQ_IMAGE_STREAM_TAG";
 
+    public static final String AMQ_USERNAME = "AMQ_USERNAME";
+    public static final String AMQ_PASSWORD = "AMQ_PASSWORD";
+    public static final String AMQ_SECRET = "AMQ_SECRET";
+    public static final String AMQ_TRUSTSTORE = "AMQ_TRUSTSTORE";
+    public static final String AMQ_TRUSTSTORE_PASSWORD = "AMQ_TRUSTSTORE_PASSWORD";
+    public static final String AMQ_KEYSTORE = "AMQ_KEYSTORE";
+    public static final String AMQ_KEYSTORE_PASSWORD = "AMQ_KEYSTORE_PASSWORD";
+
     // CORS constants
     public static final String KIE_SERVER_ACCESS_CONTROL_ALLOW_ORIGIN = "KIE_SERVER_ACCESS_CONTROL_ALLOW_ORIGIN";
     public static final String KIE_SERVER_ACCESS_CONTROL_ALLOW_METHODS = "KIE_SERVER_ACCESS_CONTROL_ALLOW_METHODS";

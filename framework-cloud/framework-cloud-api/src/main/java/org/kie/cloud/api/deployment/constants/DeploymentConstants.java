@@ -37,6 +37,9 @@ public class DeploymentConstants implements Constants {
     public static final String CONTROLLER_USER = "org.kie.server.controller.user";
     public static final String CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
 
+    public static final String AMQ_USERNAME = "amq.username";
+    public static final String AMQ_PASSWORD = "amq.password";
+
     public static final String DATABASE_HOST = "db.hostname";
     public static final String DATABASE_PORT = "db.port";
     public static final String DATABASE_DRIVER = "db.driver";
@@ -60,6 +63,8 @@ public class DeploymentConstants implements Constants {
     public static final String CUSTOM_TRUSTED_SECRET_NAME = "custom.trusted.secret.name";
     public static final String CUSTOM_TRUSTED_KEYSTORE_ALIAS = "custom.trusted.keystore.alias";
     public static final String CUSTOM_TRUSTED_KEYSTORE_PWD = "custom.trusted.keystore.pwd";
+
+    public static final String CERTIFICATE_DIR = "certificate.dir";
 
     public static String getKieServerUser() {
         return System.getProperty(KIE_SERVER_USER);
@@ -91,6 +96,14 @@ public class DeploymentConstants implements Constants {
 
     public static String getControllerPassword() {
         return System.getProperty(CONTROLLER_PASSWORD);
+    }
+
+    public static String getAmqUsername() {
+        return System.getProperty(AMQ_USERNAME);
+    }
+
+    public static String getAmqPassword() {
+        return System.getProperty(AMQ_PASSWORD);
     }
 
     public static String getDatabaseHost() {
@@ -166,6 +179,10 @@ public class DeploymentConstants implements Constants {
 
     public static String getCustomTrustedKeystorePwd() {
         return System.getProperty(CUSTOM_TRUSTED_KEYSTORE_PWD);
+    }
+
+    public static String getCertificateDir() {
+        return System.getProperty(CERTIFICATE_DIR);
     }
 
     @Override

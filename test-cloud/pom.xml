@@ -68,6 +68,10 @@
 
     <default.domain.suffix/>
 
+    <!-- Amq properties -->
+    <amq.username>yoda</amq.username>
+    <amq.password>usetheforce123@</amq.password>
+
     <!-- This property can be overridden to exclude specific test category according to specific needs. -->
     <failsafe.excluded.groups/>
 
@@ -128,6 +132,112 @@
           </executions>
         </plugin>
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>keytool-maven-plugin</artifactId>
+          <executions>
+<!-- Generate a self-signed certificate for the broker keystore:
+$ keytool -genkey -alias broker -keyalg RSA -keystore broker.ks -->
+            <execution>
+              <id>AMQ-generateCertBroker</id>
+              <goals>
+                <goal>generateKeyPair</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>broker</alias>
+                <keyalg>RSA</keyalg>
+                <keystore>${certificate.dir}/broker.ks</keystore>
+                <dname>CN=*.project.openshiftdomain</dname>
+                <keypass>changeit</keypass>
+                <storepass>changeit</storepass>
+              </configuration>
+            </execution>
+<!-- Export the certificate so that it can be shared with clients:
+$ keytool -export -alias broker -keystore broker.ks -file broker_cert -->
+            <execution>
+              <id>AMQ-exportCertBroker</id>
+              <goals>
+                <goal>exportCertificate</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>broker</alias>
+                <keystore>${certificate.dir}/broker.ks</keystore>
+                <file>${certificate.dir}/broker_cert</file>
+                <storepass>changeit</storepass>
+              </configuration>
+            </execution>
+<!-- Generate a self-signed certificate for the client keystore:
+$ keytool -genkey -alias client -keyalg RSA -keystore client.ks -->
+          <execution>
+              <id>AMQ-generateCertClient</id>
+              <goals>
+                <goal>generateKeyPair</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>client</alias>
+                <keyalg>RSA</keyalg>
+                <keystore>${certificate.dir}/client.ks</keystore>
+                <dname>CN=Unknown</dname>
+                <keypass>changeit</keypass>
+                <storepass>changeit</storepass>
+              </configuration>
+            </execution>
+<!-- Create a client truststore that imports the broker certificate:
+$ keytool -import -alias broker -keystore client.ts -file broker_cert -->
+            <execution>
+              <id>AMQ-createClientTrustore</id>
+              <goals>
+                <goal>importCertificate</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>broker</alias>
+                <keystore>${certificate.dir}/client.ts</keystore>
+                <file>${certificate.dir}/broker_cert</file>
+                <keypass>changeit</keypass>
+                <storepass>changeit</storepass>
+                <trustcacerts>true</trustcacerts>
+                <noprompt>true</noprompt>
+              </configuration>
+            </execution>
+<!-- Export the client’s certificate from the keystore:
+$ keytool -export -alias client -keystore client.ks -file client_cert -->
+            <execution>
+              <id>AMQ-exportCertClient</id>
+              <goals>
+                <goal>exportCertificate</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>client</alias>
+                <keystore>${certificate.dir}/client.ks</keystore>
+                <file>${certificate.dir}/client_cert</file>
+                <storepass>changeit</storepass>
+              </configuration>
+            </execution>
+<!-- Import the client’s exported certificate into a broker SERVER truststore:
+$ keytool -import -alias client -keystore broker.ts -file client_cert -->
+            <execution>
+              <id>AMQ-createBrokerTrustore</id>
+              <goals>
+                <goal>importCertificate</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>client</alias>
+                <keystore>${certificate.dir}/broker.ts</keystore>
+                <file>${certificate.dir}/client_cert</file>
+                <keypass>changeit</keypass>
+                <storepass>changeit</storepass>
+                <trustcacerts>true</trustcacerts>
+                <noprompt>true</noprompt>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
@@ -179,6 +289,8 @@
               <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
+              <amq.username>${amq.username}</amq.username>
+              <amq.password>${amq.password}</amq.password>
               <kie.artifact.version>${kie.artifact.version}</kie.artifact.version>
               <kie.app.template.url>${kie.app.template.url}</kie.app.template.url>
               <sso.image.streams>${sso.image.streams}</sso.image.streams>
@@ -208,6 +320,7 @@
               <kie.image.tag.workbench.indexing>${kie.image.tag.workbench.indexing}</kie.image.tag.workbench.indexing>
               <openshift.version>${openshift.version}</openshift.version>
               <kie.image.registry.custom>${kie.image.registry.custom}</kie.image.registry.custom>
+              <certificate.dir>${certificate.dir}</certificate.dir>
             </systemProperties>
           </configuration>
         </plugin>
@@ -462,8 +575,8 @@
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
                 <parallel>suitesAndClasses</parallel>
-                <threadCountClasses>3</threadCountClasses>
-                <threadCountSuites>2</threadCountSuites>
+                <threadCountClasses>6</threadCountClasses>
+                <threadCountSuites>5</threadCountSuites>
                 <perCoreThreadCount>false</perCoreThreadCount>
               </configuration>
             </plugin>
