@@ -31,6 +31,10 @@
       <groupId>cz.xtf</groupId>
       <artifactId>core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cz.xtf</groupId>
+      <artifactId>http-client</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
