@@ -28,6 +28,7 @@ import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioB
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
+import org.kie.cloud.api.settings.builder.KieServerS2IAmqSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
@@ -50,6 +51,7 @@ import org.kie.cloud.openshift.settings.builder.ControllerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerMySqlSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerPostgreSqlSettingsBuilderImpl;
+import org.kie.cloud.openshift.settings.builder.KieServerS2IAmqSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.LdapSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
@@ -141,6 +143,11 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
     @Override
     public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
         return new KieServerHttpsS2ISettingsBuilderImpl();
+    }
+
+    @Override
+    public KieServerS2IAmqSettingsBuilder getKieServerS2IAmqSettingsBuilder() {
+        return new KieServerS2IAmqSettingsBuilderImpl();
     }
 
     @Override

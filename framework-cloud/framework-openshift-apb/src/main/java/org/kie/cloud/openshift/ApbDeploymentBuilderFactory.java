@@ -28,6 +28,7 @@ import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioB
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
+import org.kie.cloud.api.settings.builder.KieServerS2IAmqSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
@@ -124,6 +125,11 @@ public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFac
     @Override
     public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
         return new KieServerS2ISettingsBuilderApb();
+    }
+
+    @Override
+    public KieServerS2IAmqSettingsBuilder getKieServerS2IAmqSettingsBuilder() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

@@ -87,6 +87,10 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to OpenShift template file containing just Kie server S2I.
      */
     public static final String KIE_APP_TEMPLATE_KIE_SERVER_HTTPS_S2I = "kie.app.template.kie-server-https-s2i";
+    /**
+     * URL pointing to OpenShift template file containing just Kie server S2I with AMQ.
+     */
+    public static final String KIE_APP_TEMPLATE_KIE_SERVER_S2I_AMQ = "kie.app.template.kie-server-s2i-amq";
 
     /**
      * URL pointing to OpenShift template file containing Kie server and PostgreSQL database.
@@ -152,6 +156,8 @@ public class OpenShiftConstants implements Constants {
     public static final String SSO_APP_TEMPLATE ="sso.app.template";
     public static final String SSO_APP_SECRETS = "sso.app.secrets";
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
+
+    public static final String AMQ_IMAGE_STREAMS = "amq.image.streams";
 
     public static final String APB_IMAGE_STREAM_NAME = "apb.image.stream.name";
     public static final String APB_IMAGE_DOCKER_REPO_TAG = "apb.image.docker.repo.tag";
@@ -229,6 +235,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getSsoImageStreams() {
         return System.getProperty(SSO_IMAGE_STREAMS);
+    }
+
+    public static String getAmqImageStreams() {
+        return System.getProperty(AMQ_IMAGE_STREAMS);
     }
 
     public static String getApbImageStreamName() {
