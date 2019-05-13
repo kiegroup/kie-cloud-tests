@@ -33,6 +33,8 @@ public class ServiceUtil {
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
     private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
     private static final Pattern SECURE_SSO_REGEXP = Pattern.compile("secure-sso");
+    private static final Pattern AMQ_JOLOKIA_REGEXP = Pattern.compile("(?!secure-).*amq-jolokia");
+    private static final Pattern AMQ_TCP_REGEXP = Pattern.compile("(?!secure-).*amq-tcp");
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
     private static final Pattern MAVEN_NEXUS_REPOSITORY_REGEXP = Pattern.compile("nexus");
     private static final Pattern PROMETHEUS_REGEXP = Pattern.compile("prometheus-operated");
@@ -47,6 +49,14 @@ public class ServiceUtil {
 
     public static String getSecureSsoServiceName(OpenShift openShift) {
         return getServiceName(openShift, SECURE_SSO_REGEXP);
+    }
+
+    public static String getAmqJolokiaServiceName(OpenShift openShift) {
+        return getServiceName(openShift, AMQ_JOLOKIA_REGEXP);
+    }
+
+    public static String getAmqTcpServiceName(OpenShift openShift) {
+        return getServiceName(openShift, AMQ_TCP_REGEXP);
     }
 
     public static String getWorkbenchServiceName(OpenShift openShift) {

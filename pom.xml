@@ -44,6 +44,7 @@
     <version.org.keycloak>4.8.3.Final</version.org.keycloak>
     <version.org.projectlombok>1.16.10</version.org.projectlombok>
     <version.org.jboss.jboss-dmr>1.5.0.Final</version.org.jboss.jboss-dmr>
+    <version.org.apache.activemq>5.11.0</version.org.apache.activemq>
     <version.org.apache.maven.shared>1.5</version.org.apache.maven.shared>
     <version.org.apache.maven.failsafe>2.21.0</version.org.apache.maven.failsafe>
     <version.org.codehaus.mojo.keytool>1.5</version.org.codehaus.mojo.keytool>
@@ -374,6 +375,11 @@
         <version>${version.com.google.code.gson}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-client</artifactId>
+        <version>${version.org.apache.activemq}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
