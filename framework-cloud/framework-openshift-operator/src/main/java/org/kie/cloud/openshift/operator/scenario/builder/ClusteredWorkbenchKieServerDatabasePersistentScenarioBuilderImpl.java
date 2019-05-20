@@ -24,6 +24,7 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePer
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.operator.model.KieApp;
@@ -31,6 +32,7 @@ import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
+import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Ldap;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
@@ -55,6 +57,13 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING_HA);
+
+        OpenShiftOperatorConstants.getKieImageRegistryCustom().ifPresent(registry -> {
+            ImageRegistry imageRegistry = new ImageRegistry();
+            imageRegistry.setInsecure(true);
+            imageRegistry.setRegistry(registry);
+            kieApp.getSpec().setImageRegistry(imageRegistry);
+        });
 
         CommonConfig commonConfig = new CommonConfig();
         commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());

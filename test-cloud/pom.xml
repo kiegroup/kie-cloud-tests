@@ -99,6 +99,8 @@
     <kie.image.tag.smartrouter/>
     <kie.image.tag.workbench/>
     <kie.image.tag.workbench.indexing/>
+
+    <kie.image.registry.custom/>
   </properties>
 
   <modules>
@@ -203,6 +205,7 @@
               <kie.image.tag.workbench>${kie.image.tag.workbench}</kie.image.tag.workbench>
               <kie.image.tag.workbench.indexing>${kie.image.tag.workbench.indexing}</kie.image.tag.workbench.indexing>
               <openshift.version>${openshift.version}</openshift.version>
+              <kie.image.registry.custom>${kie.image.registry.custom}</kie.image.registry.custom>
             </systemProperties>
           </configuration>
         </plugin>
