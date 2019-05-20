@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.operator.constants;
 
+import java.util.Optional;
+
 import org.kie.cloud.api.constants.Constants;
 
 public class OpenShiftOperatorConstants implements Constants {
@@ -55,9 +57,22 @@ public class OpenShiftOperatorConstants implements Constants {
     public static final String KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT = "kie.app.operator.deployments.clustered-workbench-monitoring.smartrouter.two-kieservers.two-databases";
 
     /**
+     * Custom registry for Kie deployments.
+     */
+    public static final String KIE_IMAGE_REGISTRY_CUSTOM = "kie.image.registry.custom";
+
+    /**
      * Image tag for Kie Operator.
      */
     public static final String KIE_OPERATOR_IMAGE_TAG = "kie.operator.image.tag";
+
+    public static Optional<String> getKieImageRegistryCustom() {
+        String kieOperatorImageTag = System.getProperty(KIE_IMAGE_REGISTRY_CUSTOM);
+        if (kieOperatorImageTag != null && !kieOperatorImageTag.isEmpty()) {
+            return Optional.of(kieOperatorImageTag);
+        }
+        return Optional.empty();
+    }
 
     public static String getKieOperatorImageTag() {
         String kieOperatorImageTag = System.getProperty(KIE_OPERATOR_IMAGE_TAG);

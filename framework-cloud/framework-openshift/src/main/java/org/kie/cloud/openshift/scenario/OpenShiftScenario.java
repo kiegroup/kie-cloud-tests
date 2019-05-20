@@ -38,10 +38,19 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     protected String projectName;
     protected Project project;
     private String logFolderName;
+    private boolean createImageStreams;
 
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
+
+    public OpenShiftScenario() {
+        this(true);
+    }
+
+    public OpenShiftScenario(boolean createImageStreams) {
+        this.createImageStreams = createImageStreams;
+    }
 
     @Override
     public String getNamespace() {
@@ -75,8 +84,10 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
 
-        logger.info("Creating image streams.");
-        ImageStreamProvider.createImageStreamsInProject(project);
+        if (createImageStreams) {
+            logger.info("Creating image streams.");
+            ImageStreamProvider.createImageStreamsInProject(project);
+        }
 
         for (DeploymentScenarioListener<T> deploymentScenarioListener : deploymentScenarioListeners) {
             deploymentScenarioListener.beforeDeploymentStarted((T) this);

@@ -48,6 +48,10 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftOperatorScenario.class);
 
+    public OpenShiftOperatorScenario() {
+        super(false);
+    }
+
     @Override
     protected void deployKieDeployments() {
         deployOperator();
