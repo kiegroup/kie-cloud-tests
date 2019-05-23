@@ -162,7 +162,9 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
             logger.info("scaled to {} pods", SCALE_COUNT);
         } else if (SCALE_COUNT == 1) {
             pods.add(deploymentScenario.getKieServerDeployments().get(0).getInstances().get(0).getName());
-        } else throw new RuntimeException("wrong scale parameter, should be equal or greater than 1");
+        } else {
+            throw new RuntimeException("wrong scale parameter, should be equal or greater than 1");
+        }
         
         
         deploymentScenario.getKieServerDeployments().get(0).setRouterTimeout(Duration.ofMinutes(ROUTER_TIMEOUT));

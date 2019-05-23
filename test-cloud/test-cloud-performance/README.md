@@ -25,8 +25,8 @@ They can be found in the class _KieServerS2iJbpmEJBTimerPerfIntegrationTest_:
 | refreshInterval            | 30             | Seconds for refreshing the EJB timers                         |
 | routerTimeout              | 60             | Minutes for router timeout                                    |
 | routerBalance              | roundrobin     | Strategy for router balancing                                 |
-| requests.cpu               | 1000m          | CPU (in millicores) per requested container                   |
-| requests.memory            | 1Gi            | RAM memory (in bytes) per requested container                 |
+| requests.cpu               | 4000m          | CPU (in millicores) per requested container                   |
+| requests.memory            | 4Gi            | RAM memory (in bytes) per requested container                 |
 | limits.cpu                 | 4000m          | CPU (in millicores) to be limited per container               |
 | limits.memory              | 4Gi            | RAM memory (in bytes) to be limited per container             |
 
