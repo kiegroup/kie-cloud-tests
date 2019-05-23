@@ -18,6 +18,8 @@ package org.kie.cloud.openshift.scenario;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,7 +86,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         File amqStreamsZipFile;
         try {
             amqStreamsZipFile = File.createTempFile("amq-streams", ".zip");
-            Request.Get(OpenShiftConstants.getAMQStreamsZip()).execute().saveContent(amqStreamsZipFile);
+            FileUtils.copyURLToFile(new URL(OpenShiftConstants.getAMQStreamsZip()), amqStreamsZipFile);
         } catch (IOException e) {
             throw new RuntimeException("Unable to download AMQ streams zip", e);
         }
