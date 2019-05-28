@@ -90,11 +90,13 @@ public class FireRulesTestProvider {
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerAlias, Kjar.HELLO_RULES, KieContainerStatus.STARTED);
 
             KieServerClientProvider.waitForContainerStart(kieServerDeployment, containerId);
+            kieServerDeployment.waitForContainerRespin();
 
             testFireRules(kieServerDeployment, containerId);
         } finally {
             gitProvider.deleteGitRepository(repositoryName);
             kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
+            kieServerDeployment.waitForContainerRespin();
         }
     }
 
