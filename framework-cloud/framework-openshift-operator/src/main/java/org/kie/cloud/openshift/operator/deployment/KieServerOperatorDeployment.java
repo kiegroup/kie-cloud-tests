@@ -59,7 +59,7 @@ public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
         }
 
         waitUntilAllPodsAreReadyAndRunning(replicas);
-        if (getInstances().size() > 0) {
+        if (replicas > 0) {
             RouterUtil.waitForRouter(getUrl());
         }
     }
