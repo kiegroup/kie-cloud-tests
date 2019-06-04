@@ -56,7 +56,7 @@ public class WorkbenchRuntimeOperatorDeployment extends WorkbenchRuntimeDeployme
         }
 
         waitUntilAllPodsAreReadyAndRunning(replicas);
-        if (getInstances().size() > 0) {
+        if (replicas > 0) {
             RouterUtil.waitForRouter(getUrl());
         }
     }
