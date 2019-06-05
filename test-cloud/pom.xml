@@ -301,10 +301,10 @@
     <profile>
       <id>openshift-operator</id>
       <properties>
-        <custom.trusted.app.secret>file://${project.build.testOutputDirectory}/secret/rhpam-certs.secret.yaml</custom.trusted.app.secret>
+        <custom.trusted.app.secret>file://${project.build.testOutputDirectory}/secret/rhpam-certs.secret-aws.yaml</custom.trusted.app.secret>
         <custom.trusted.secret.name>rhpam-certs</custom.trusted.secret.name>
-        <custom.trusted.keystore.alias>jboss</custom.trusted.keystore.alias>
-        <custom.trusted.keystore.pwd>test</custom.trusted.keystore.pwd>
+        <custom.trusted.keystore.alias>jbossaws</custom.trusted.keystore.alias>
+        <custom.trusted.keystore.pwd>changeit</custom.trusted.keystore.pwd>
         <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.OperatorNotSupported</failsafe.excluded.groups>
 
         <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
@@ -340,8 +340,8 @@
                     <storepass>changeit</storepass>
                     <keystore>${certificate.dir}/test-keystore</keystore>
                     <keypass>changeit</keypass>
-                    <alias>jboss</alias>
-                    <file>${certificate.dir}/rhpam-test-ca.crt</file>
+                    <alias>jbossaws</alias>
+                    <file>${certificate.dir}/rhpam-test-ca-aws.crt</file>
                     <trustcacerts>true</trustcacerts>
                     <noprompt>true</noprompt>
                   </configuration>
