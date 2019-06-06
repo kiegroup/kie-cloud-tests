@@ -24,6 +24,8 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.LdapSettings;
+import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
@@ -36,12 +38,22 @@ import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
+import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
+import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.controller.client.KieServerControllerClient;
 
 @Category(Baseline.class)
 public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static WorkbenchKieServerScenario deploymentScenario;
+
+    private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
+    private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
+    private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -66,6 +78,22 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         deploymentScenario
                 .setLogFolderName(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Workaround to speed test execution.
+        // Create all containers while Kie servers are turned off to avoid expensive respins.
+        KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
+        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
+
+        deploymentScenario.getKieServerDeployment().scale(0);
+        deploymentScenario.getKieServerDeployment().waitForScale();
+
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
+
+        deploymentScenario.getKieServerDeployment().scale(1);
+        deploymentScenario.getKieServerDeployment().waitForScale();
     }
 
     @AfterClass
@@ -82,7 +110,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
+        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
     }
 
     @Test
@@ -94,12 +122,12 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
 
     @Test
     public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
+        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
+    public void testSolverFromExternalMavenRepo() throws Exception {
+        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
 
     @Test
@@ -112,7 +140,8 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     public void testKieServerHttps() {
         for (KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
             HttpsKieServerTestProvider.testKieServerInfo(kieServerDeployment, false);
-            HttpsKieServerTestProvider.testDeployContainer(kieServerDeployment, false);
+            // Skipped as the check is too time consuming, the HTTPS functionality is verified by testKieServerInfo()
+            // HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
         }
     }
 
