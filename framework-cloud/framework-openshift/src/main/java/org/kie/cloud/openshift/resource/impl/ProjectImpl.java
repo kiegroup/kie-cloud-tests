@@ -16,9 +16,11 @@
 package org.kie.cloud.openshift.resource.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -176,6 +178,17 @@ public class ProjectImpl implements Project {
         }
     }
 
+    public void createResourceFromYamlString(String yamlString) {
+        try {
+            final File tmpYamlFile = File.createTempFile("openshift-resource-",".yaml");
+            Files.write(tmpYamlFile.toPath(), yamlString.getBytes("UTF-8"));
+            final String output = openShiftBinaryClient().execute("create", "-f", tmpYamlFile.getAbsolutePath());
+            logger.info("Yaml resources from string was created by oc client. Output = {}", output);
+        } catch (IOException e) {
+            throw new RuntimeException("Error creating resource from string", e);
+        }
+    }
+
     public void createResourcesFromYamlAsAdmin(String yamlUrl) {
         final String output = openShiftBinaryClientAsAdmin().execute("create", "-f", yamlUrl);
         logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
@@ -186,6 +199,17 @@ public class ProjectImpl implements Project {
         for (String url : yamlUrls) {
             final String output = oc.execute("create", "-f", url);
             logger.info("Yaml resources from file {} were created by oc client. Output = {}", url, output);
+        }
+    }
+
+    public void createResourcesFromYamlStringAsAdmin(String yamlString) {
+        try {
+            final File tmpYamlFile = File.createTempFile("openshift-resource-",".yaml");
+            Files.write(tmpYamlFile.toPath(), yamlString.getBytes("UTF-8"));
+            final String output = openShiftBinaryClientAsAdmin().execute("create", "-f", tmpYamlFile.getAbsolutePath());
+            logger.info("Yaml resources from string was created by oc client. Output = {}", output);
+        } catch (IOException e) {
+            throw new RuntimeException("Error creating resource from string", e);
         }
     }
 
