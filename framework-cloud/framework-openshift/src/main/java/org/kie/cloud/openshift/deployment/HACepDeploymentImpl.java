@@ -16,11 +16,15 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.List;
 
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.HACepDeployment;
+import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
+
+import static java.util.stream.Collectors.toList;
 
 public class HACepDeploymentImpl extends OpenShiftDeployment implements HACepDeployment {
 
@@ -62,6 +66,17 @@ public class HACepDeploymentImpl extends OpenShiftDeployment implements HACepDep
     public URL getUrl() {
         return getHttpRouteUrl(getServiceName())
                 .orElseThrow(() -> new RuntimeException("Can not found route for service: " + getServiceName()));
+    }
+
+    @Override
+    public List<Instance> getInstances() {
+        List<Instance> instances = getOpenShift().getPods().stream()
+                .filter(pod -> pod.getMetadata().getLabels().containsKey(POD_LABEL_KEY))
+                .filter(pod -> pod.getMetadata().getLabels().get(POD_LABEL_KEY).equals(POD_LABEL_VALUE))
+                .map(pod -> new OpenShiftInstance(getOpenShift(), getNamespace(), pod.getMetadata().getName()))
+                .collect(toList());
+
+            return instances;
     }
 
     @Override

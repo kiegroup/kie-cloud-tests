@@ -70,6 +70,12 @@ public interface Project extends AutoCloseable {
     public void createResourcesFromYaml(List<String> yamlUrls);
 
     /**
+     * Create resources from YAML string using command line client.
+     * @param yamlString String with yaml
+     */
+    public void createResourceFromYamlString(String yamlString);
+
+    /**
      * Create resources from YAML files as admin using command line client.
      * @param yamlUrl Url to yaml files with resources
      */
@@ -80,6 +86,12 @@ public interface Project extends AutoCloseable {
      * @param yamlUrls Url to yaml files with resources
      */
     public void createResourcesFromYamlAsAdmin(List<String> yamlUrls);
+
+    /**
+     * Create resources from YAML string as admin using command line client.
+     * @param yamlString String with yaml
+     */
+    public void createResourcesFromYamlStringAsAdmin(String yamlString);
 
     /**
      * Create all resources defined in resource URL.

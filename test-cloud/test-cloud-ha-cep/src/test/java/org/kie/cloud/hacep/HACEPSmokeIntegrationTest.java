@@ -22,7 +22,7 @@ import org.kie.cloud.api.deployment.HACepDeployment;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 
-public class HACEPIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<HACepScenario> {
+public class HACEPSmokeIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<HACepScenario> {
 
     private static final String HEALTH_URL = "/health";
 
@@ -32,7 +32,7 @@ public class HACEPIntegrationTest extends AbstractMethodIsolatedCloudIntegration
     }
 
     @Test
-    public void testSmoke() throws InterruptedException {
+    public void testHACepHealth() throws InterruptedException {
         final String haCEPURL = ((HACepDeployment) deploymentScenario.getDeployments().get(0)).getUrl().toString();
         final int responseCode = Https.getCode(haCEPURL + HEALTH_URL);
         Assertions.assertThat(responseCode).isEqualTo(200);

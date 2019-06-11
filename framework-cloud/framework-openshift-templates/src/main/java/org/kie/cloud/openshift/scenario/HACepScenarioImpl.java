@@ -17,35 +17,40 @@ package org.kie.cloud.openshift.scenario;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.fluent.Request;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.HACepDeployment;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.HACepDeploymentImpl;
-import org.kie.cloud.strimzi.TopicOperator;
+import org.kie.cloud.strimzi.StrimziOperator;
+import org.kie.cloud.strimzi.deployment.KafkaDeployment;
+import org.kie.cloud.strimzi.deployment.StrimziOperatorDeployment;
+import org.kie.cloud.strimzi.deployment.ZookeeperDeployment;
+import org.kie.cloud.strimzi.resources.KafkaCluster;
+import org.kie.cloud.strimzi.resources.KafkaClusterBuilder;
+import org.kie.cloud.strimzi.resources.KafkaTopic;
+import org.kie.cloud.strimzi.resources.KafkaTopicSpec;
+import org.kie.cloud.strimzi.resources.KafkaTopicBuilder;
 
 public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implements HACepScenario {
 
     private static final String AMQ_STREAMS_INSTALL_SUBDIRECTORY = "install/cluster-operator";
     private static final String AMQ_STREAMS_TEMPLATES_SUBDIRECTORY = "examples/templates/cluster-operator";
-    private static final String KAFKA_EPHEMERAL = "examples/kafka/kafka-ephemeral.yaml";
 
+    private static final String KAFKA_CLUSTER_NAME = "my-cluster";
     private static final String MASTER_EVENTS_TOPIC = "control";
     private static final String USER_INPUT_TOPIC = "events";
     private static final String SNAPSHOTS_TOPIC = "snapshot";
 
+    private StrimziOperator strimziOperator;
     private HACepDeployment haCepDeployment;
 
     @Override
@@ -58,13 +63,25 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         final File amqStreamsTemplatesDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_TEMPLATES_SUBDIRECTORY);
 
         project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsTemplatesDirectory));
-        final File kafkaEphemeralFile = new File(amqStreamsDirectory, KAFKA_EPHEMERAL);
-        project.createResourcesFromYamlAsAdmin(kafkaEphemeralFile.getAbsolutePath());
 
-        final TopicOperator topicOperator = new TopicOperator(project, getAMQStreamsDirectory());
-        topicOperator.createTopic(MASTER_EVENTS_TOPIC);
-        topicOperator.createTopic(USER_INPUT_TOPIC);
-        topicOperator.createTopic(SNAPSHOTS_TOPIC);
+        final StrimziOperatorDeployment strimziOperatorDeployment = new StrimziOperatorDeployment(project);
+        strimziOperatorDeployment.waitForScale();
+
+        strimziOperator = new StrimziOperator(project);
+        final KafkaClusterBuilder kafkaClusterBuilder = new KafkaClusterBuilder(KAFKA_CLUSTER_NAME)
+                .addKafkaConfigItem("offsets.topic.replication.factor", "3")
+                .addKafkaConfigItem("transaction.state.log.replication.factor", "3")
+                .addKafkaConfigItem("transaction.state.log.min.isr", "2")
+                .addKafkaConfigItem("log.message.format.version", "2.1")
+                .addKafkaConfigItem("auto.create.topics.enable", "true");
+        final KafkaCluster kafkaCluster = kafkaClusterBuilder.build();
+        strimziOperator.createCluster(kafkaCluster);
+        final ZookeeperDeployment zookeeperDeployment = new ZookeeperDeployment(kafkaCluster.getMetadata().getName(), project);
+        zookeeperDeployment.waitForScale();
+        final KafkaDeployment kafkaDeployment = new KafkaDeployment(kafkaCluster.getMetadata().getName(), project);
+        kafkaDeployment.waitForScale();
+
+        createTopics();
 
         project.runOcCommandAsAdmin("create", "clusterrolebinding", "permissive-binding",
                                                "--clusterrole=cluster-admin", "--group=system:serviceaccounts");
@@ -99,6 +116,36 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         unzip.execute();
 
         return amqStreamsDirectory;
+    }
+
+    private void createTopics() {
+        final KafkaTopic masterEventsTopic = new KafkaTopicBuilder(MASTER_EVENTS_TOPIC, KAFKA_CLUSTER_NAME)
+                .withPartitions(3)
+                .withReplicas(3)
+                .addConfigItem("retention.ms", "7200000")
+                .addConfigItem("segment.bytes", "1073741824")
+                .build();
+        strimziOperator.createTopic(masterEventsTopic);
+
+        final KafkaTopic userInputTopic = new KafkaTopicBuilder(USER_INPUT_TOPIC, KAFKA_CLUSTER_NAME)
+                .withPartitions(3)
+                .withReplicas(3)
+                .addConfigItem("retention.ms", "7200000")
+                .addConfigItem("segment.bytes", "1073741824")
+                .build();
+        strimziOperator.createTopic(userInputTopic);
+
+        final KafkaTopic snapshotsTopic = new KafkaTopicBuilder(SNAPSHOTS_TOPIC, KAFKA_CLUSTER_NAME)
+                .withPartitions(3)
+                .withReplicas(3)
+                .addConfigItem("retention.ms", "7200000")
+                .addConfigItem("segment.bytes", "1073741824")
+                .addConfigItem("cleanup.policy", "compact")
+                .addConfigItem("segment.ms", "100")
+                .addConfigItem("min.cleanable.dirty.ratio", "0.01")
+                .addConfigItem("delete.retention.ms", "100")
+                .build();
+        strimziOperator.createTopic(snapshotsTopic);
     }
 
     private static void filterNamespaceInInstallationFiles(final File amqStreamsInstallDirectory,
