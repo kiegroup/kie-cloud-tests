@@ -37,6 +37,7 @@ import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerScenarioImpl;
 public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServerScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
+    private boolean deployPrometheus = false;
 
     public WorkbenchKieServerScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
@@ -69,7 +70,7 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
 
     @Override
     public WorkbenchKieServerScenario build() {
-        return new WorkbenchKieServerScenarioImpl(kieApp);
+        return new WorkbenchKieServerScenarioImpl(kieApp, deployPrometheus);
     }
 
     @Override
@@ -113,5 +114,14 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     @Override
     public WorkbenchKieServerScenarioBuilder withAccessControlMaxAge(Duration maxAge) {
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withPrometheusMonitoring() {
+        deployPrometheus = true;
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(ImageEnvVariables.PROMETHEUS_SERVER_EXT_DISABLED, "false"));
+        }
+        return this;
     }
 }

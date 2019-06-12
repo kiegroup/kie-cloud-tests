@@ -46,4 +46,6 @@ public class ImageEnvVariables {
     public static final String RHPAMCENTR_MAVEN_REPO_PASSWORD = "RHPAMCENTR_MAVEN_REPO_PASSWORD";
 
     public static final String GIT_HOOKS_DIR = "GIT_HOOKS_DIR";
+
+    public static final String PROMETHEUS_SERVER_EXT_DISABLED = "PROMETHEUS_SERVER_EXT_DISABLED";
 }

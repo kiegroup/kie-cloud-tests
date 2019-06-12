@@ -21,10 +21,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.kie.cloud.api.deployment.ControllerDeployment;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.PrometheusDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -34,6 +37,7 @@ import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.PrometheusDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +45,14 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
+    private boolean deployPrometheus;
+    private PrometheusDeployment prometheusDeployment;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
-    public WorkbenchKieServerScenarioImpl(Map<String, String> envVariables) {
+    public WorkbenchKieServerScenarioImpl(Map<String, String> envVariables, boolean deployPrometheus) {
         super(envVariables);
+        this.deployPrometheus = deployPrometheus;
     }
 
     @Override
@@ -53,6 +60,10 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.WORKBENCH_KIE_SERVER.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER.getTemplateUrl(), envVariables);
+
+        if (deployPrometheus) {
+            prometheusDeployment = PrometheusDeployer.deploy(project);
+        }
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
@@ -117,5 +128,10 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
     @Override
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<PrometheusDeployment> getPrometheusDeployment() {
+        return Optional.ofNullable(prometheusDeployment);
     }
 }

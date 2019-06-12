@@ -144,4 +144,6 @@ public class OpenShiftApbConstants {
     public static final String KIE_SERVER_EXTERNALDB_URL = "apb_kieserver_external_db_url";
 
     public static final String KIE_SERVER_IMAGE_STREAM_NAME = "apb_kieserver_image_stream_name";
+
+    public static final String PROMETHEUS_SERVER_EXT_DISABLED = "apb_kieserver_prometheus_ext_disabled";
 }

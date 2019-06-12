@@ -30,6 +30,7 @@ import org.kie.cloud.openshift.scenario.WorkbenchKieServerScenarioImpl;
 public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServerScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private boolean deployPrometheus = false;
 
     public WorkbenchKieServerScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
@@ -40,7 +41,7 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
 
     @Override
     public WorkbenchKieServerScenario build() {
-        return new WorkbenchKieServerScenarioImpl(envVariables);
+        return new WorkbenchKieServerScenarioImpl(envVariables, deployPrometheus);
     }
 
     @Override
@@ -87,6 +88,13 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     public WorkbenchKieServerScenarioBuilder withAccessControlMaxAge(Duration maxAge) {
         String maxAgeInSeconds = Long.toString(maxAge.getSeconds());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ACCESS_CONTROL_MAX_AGE, maxAgeInSeconds);
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withPrometheusMonitoring() {
+        deployPrometheus = true;
+        envVariables.put(OpenShiftTemplateConstants.PROMETHEUS_SERVER_EXT_DISABLED, "false");
         return this;
     }
 }

@@ -21,10 +21,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.PrometheusDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -36,6 +38,7 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
+import org.kie.cloud.openshift.util.PrometheusDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,13 +46,16 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
+    private boolean deployPrometheus;
+    private PrometheusDeployment prometheusDeployment;
 
     private Map<String, String> extraVars;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioApb.class);
 
-    public WorkbenchKieServerScenarioApb(Map<String, String> extraVars) {
+    public WorkbenchKieServerScenarioApb(Map<String, String> extraVars, boolean deployPrometheus) {
         this.extraVars = extraVars;
+        this.deployPrometheus = deployPrometheus;
     }
 
     @Override
@@ -62,6 +68,10 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
         extraVars.put("namespace", projectName);
         extraVars.put("cluster", "openshift");
         project.processApbRun(ApbImageGetter.fromImageStream(), extraVars);
+
+        if (deployPrometheus) {
+            prometheusDeployment = PrometheusDeployer.deploy(project);
+        }
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(ApbConstants.DefaultUser.KIE_ADMIN);
@@ -143,5 +153,10 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
     @Override
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<PrometheusDeployment> getPrometheusDeployment() {
+        return Optional.ofNullable(prometheusDeployment);
     }
 }

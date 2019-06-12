@@ -32,6 +32,7 @@ public class ServiceUtil {
     private static final Pattern DATABASE_REGEXP = Pattern.compile("(.*-mysql|.*-postgresql)");
     private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
+    private static final Pattern PROMETHEUS_REGEXP = Pattern.compile("prometheus-operated");
 
     public static String getControllerServiceName(OpenShift openShift) {
         return getServiceName(openShift, CONTROLLER_REGEXP);
@@ -63,6 +64,10 @@ public class ServiceUtil {
 
     public static String getDockerServiceName(OpenShift openShift) {
         return getServiceName(openShift, DOCKER_REGEXP);
+    }
+
+    public static String getPrometheusServiceName(OpenShift openShift) {
+        return getServiceName(openShift, PROMETHEUS_REGEXP);
     }
 
     public static String getServiceName(OpenShift openShift, Pattern regexp) {
