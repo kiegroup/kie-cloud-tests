@@ -71,4 +71,9 @@ public interface WorkbenchKieServerScenarioBuilder extends DeploymentScenarioBui
      * @return Builder with Access-Control-Max-Age response header for Kie server.
      */
     WorkbenchKieServerScenarioBuilder withAccessControlMaxAge(Duration maxAge);
+
+    /**
+     * @return Builder with Prometheus monitoring configured monitoring deployed Kie servers.
+     */
+    WorkbenchKieServerScenarioBuilder withPrometheusMonitoring();
 }
