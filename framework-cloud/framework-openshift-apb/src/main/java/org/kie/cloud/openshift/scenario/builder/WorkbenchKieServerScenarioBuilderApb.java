@@ -30,6 +30,7 @@ import org.kie.cloud.openshift.scenario.WorkbenchKieServerScenarioApb;
 public class WorkbenchKieServerScenarioBuilderApb implements WorkbenchKieServerScenarioBuilder {
 
     private final Map<String, String> extraVars = new HashMap<>();
+    private boolean deployPrometheus = false;
 
     public WorkbenchKieServerScenarioBuilderApb() {
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.TRIAL);
@@ -41,7 +42,7 @@ public class WorkbenchKieServerScenarioBuilderApb implements WorkbenchKieServerS
 
     @Override
     public WorkbenchKieServerScenario build() {
-        return new WorkbenchKieServerScenarioApb(extraVars);
+        return new WorkbenchKieServerScenarioApb(extraVars, deployPrometheus);
     }
 
     @Override
@@ -81,4 +82,11 @@ public class WorkbenchKieServerScenarioBuilderApb implements WorkbenchKieServerS
     public WorkbenchKieServerScenarioBuilder withAccessControlMaxAge(Duration maxAge) {
         throw new UnsupportedOperationException("Not supported for APB.");
 	}
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withPrometheusMonitoring() {
+        deployPrometheus = true;
+        extraVars.put(OpenShiftApbConstants.PROMETHEUS_SERVER_EXT_DISABLED, "false");
+        return this;
+    }
 }

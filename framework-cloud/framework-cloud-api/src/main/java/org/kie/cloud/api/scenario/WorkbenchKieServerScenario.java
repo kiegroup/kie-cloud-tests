@@ -15,7 +15,10 @@
 
 package org.kie.cloud.api.scenario;
 
+import java.util.Optional;
+
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.PrometheusDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 /**
@@ -38,4 +41,14 @@ public interface WorkbenchKieServerScenario extends KieDeploymentScenario<Workbe
      * @see KieServerDeployment
      */
     KieServerDeployment getKieServerDeployment();
+
+    /**
+     * Return Prometheus deployment.
+     *
+     * @return PrometheusDeployment
+     * @see PrometheusDeployment
+     */
+    default Optional<PrometheusDeployment> getPrometheusDeployment() {
+        return Optional.empty();
+    };
 }
