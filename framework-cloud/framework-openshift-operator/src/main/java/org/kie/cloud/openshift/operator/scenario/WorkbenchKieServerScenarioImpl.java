@@ -20,14 +20,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.WaiterException;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.PrometheusDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -38,6 +39,7 @@ import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
 import org.kie.cloud.openshift.operator.deployment.WorkbenchOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.util.PrometheusDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,17 +49,24 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
+    private boolean deployPrometheus;
+    private PrometheusDeployment prometheusDeployment;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
-    public WorkbenchKieServerScenarioImpl(KieApp kieApp) {
+    public WorkbenchKieServerScenarioImpl(KieApp kieApp, boolean deployPrometheus) {
         this.kieApp = kieApp;
+        this.deployPrometheus = deployPrometheus;
     }
 
     @Override
     protected void deployCustomResource() {
         // deploy application
         getKieAppClient().create(kieApp);
+
+        if (deployPrometheus) {
+            prometheusDeployment = PrometheusDeployer.deploy(project);
+        }
 
         workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
@@ -130,5 +139,10 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     @Override
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<PrometheusDeployment> getPrometheusDeployment() {
+        return Optional.ofNullable(prometheusDeployment);
     }
 }
