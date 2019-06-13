@@ -38,7 +38,7 @@
     <version.ant.compress>1.5</version.ant.compress>
     <version.jgit>4.11.0.201803080745-r</version.jgit>
 
-    <version.cz.xtf>0.11</version.cz.xtf>
+    <version.cz.xtf>0.12</version.cz.xtf>
     <version.org.keycloak>4.1.0.Final</version.org.keycloak>
     <version.org.projectlombok>1.16.10</version.org.projectlombok>
     <version.org.jboss.jboss-dmr>1.5.0.Final</version.org.jboss.jboss-dmr>
