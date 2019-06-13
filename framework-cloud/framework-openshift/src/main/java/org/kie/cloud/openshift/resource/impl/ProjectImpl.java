@@ -72,7 +72,7 @@ public class ProjectImpl implements Project {
         boolean templateIsFile = templateUrl.getProtocol().equals("file");
 
         // Used to log into OpenShift
-        getOpenShiftBinary(getName());
+        OpenShiftBinary oc = getOpenShiftBinary(getName());
 
         List<String> commandParameters = new ArrayList<>();
         commandParameters.add(getOpenShiftBinaryPath());
@@ -91,7 +91,7 @@ public class ProjectImpl implements Project {
 
         try (ProcessExecutor executor = new ProcessExecutor()) {
             File processedTemplate = executor.executeProcessCommandToTempFile(completeProcessingCommand);
-            executor.executeProcessCommand(getOpenShiftBinaryPath() + " create -n " + getName() + " -f " + processedTemplate.getAbsolutePath());
+            oc.execute("create", "-n", getName(), "-f", processedTemplate.getAbsolutePath());
         }
         // TODO: Temporary workaround to wait until scenario is completely initialized as there is a delay between finishing template creation command
         // and actual creation of resources on OpenShift. This should be removed when deployments won't be scaled in the beginning and will contain availability check.

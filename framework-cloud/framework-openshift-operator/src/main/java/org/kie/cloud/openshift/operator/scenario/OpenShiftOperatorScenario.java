@@ -16,7 +16,6 @@
 package org.kie.cloud.openshift.operator.scenario;
 
 import java.util.Collections;
-import java.util.List;
 
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
@@ -27,7 +26,6 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.openshift.client.NamespacedOpenShiftClient;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.KieAppDoneable;
@@ -40,7 +38,6 @@ import org.kie.cloud.openshift.operator.resources.OpenShiftResource;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.OpenShiftScenario;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
-import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,44 +58,41 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void deployOperator() {
         // Operations need to be done as an administrator
-        OpenShiftBinary masterBinary = OpenShifts.masterBinary();
-        masterBinary.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(), OpenShiftConstants.getOpenShiftAdminPassword());
+        OpenShiftBinary adminBinary = OpenShifts.adminBinary();
 
-        createCustomResourceDefinitionsInOpenShift();
-        createServiceAccountInProject(masterBinary, project);
-        createRoleInProject(masterBinary, project);
-        createRoleBindingsInProject(masterBinary, project);
+        createCustomResourceDefinitionsInOpenShift(adminBinary);
+        createServiceAccountInProject(adminBinary, project);
+        createRoleInProject(adminBinary, project);
+        createRoleBindingsInProject(adminBinary, project);
         createOperatorInProject(project);
     }
 
-    private void createCustomResourceDefinitionsInOpenShift() {
+    private void createCustomResourceDefinitionsInOpenShift(OpenShiftBinary adminBinary) {
         // TODO: Commented out due to UnrecognizedPropertyException, uncomment with raised Fabric8 version to check if it is fixed already.
 //        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
 //        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
 //        if(!operatorCrdExists) {
             logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
-            try (ProcessExecutor executor = new ProcessExecutor()) {
-                executor.executeProcessCommand(OpenShifts.getBinaryPath() + " create -n " + getNamespace() + " -f " + OpenShiftResource.CRD.getResourceUrl().toString());
-            }
+            adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
 //        }
     }
 
-    private void createServiceAccountInProject(OpenShiftBinary masterBinary, Project project) {
+    private void createServiceAccountInProject(OpenShiftBinary adminBinary, Project project) {
         logger.info("Creating service account in project '" + project.getName() + "' from " + OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
-        masterBinary.project(project.getName());
-        masterBinary.execute("create", "-f", OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
+        adminBinary.project(project.getName());
+        adminBinary.execute("create", "-f", OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
     }
 
-    private void createRoleInProject(OpenShiftBinary masterBinary, Project project) {
+    private void createRoleInProject(OpenShiftBinary adminBinary, Project project) {
         logger.info("Creating role in project '" + project.getName() + "' from " + OpenShiftResource.ROLE.getResourceUrl().toString());
-        masterBinary.project(project.getName());
-        masterBinary.execute("create", "-f", OpenShiftResource.ROLE.getResourceUrl().toString());
+        adminBinary.project(project.getName());
+        adminBinary.execute("create", "-f", OpenShiftResource.ROLE.getResourceUrl().toString());
     }
 
-    private void createRoleBindingsInProject(OpenShiftBinary masterBinary, Project project) {
+    private void createRoleBindingsInProject(OpenShiftBinary adminBinary, Project project) {
         logger.info("Creating role bindings in project '" + project.getName() + "' from " + OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
-        masterBinary.project(project.getName());
-        masterBinary.execute("create", "-f", OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
+        adminBinary.project(project.getName());
+        adminBinary.execute("create", "-f", OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
     }
 
     private void createOperatorInProject(Project project) {
