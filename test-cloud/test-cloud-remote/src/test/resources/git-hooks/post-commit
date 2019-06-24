@@ -1,4 +1,4 @@
 #!/bin/sh
 
-echo Congratulations! You\'ve just made a commit! Time for a break. >> /opt/eap/standalone/data/kie/git/hooks/out.txt
-date +%Y-%m-%d\ %H:%M:%S >> /opt/eap/standalone/data/kie/git/hooks/out.txt
+echo Congratulations! You\'ve just made a commit! Time for a break. >> /opt/kie/data/git/hooks/out.txt
+date +%Y-%m-%d\ %H:%M:%S >> /opt/kie/data/git/hooks/out.txt

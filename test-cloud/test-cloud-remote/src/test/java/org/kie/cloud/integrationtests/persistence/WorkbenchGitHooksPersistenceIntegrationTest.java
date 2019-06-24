@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,8 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import cz.xtf.core.openshift.OpenShiftBinary;
-import cz.xtf.core.openshift.OpenShifts;
 import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
 import org.junit.Before;
@@ -48,7 +48,8 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import cz.xtf.core.openshift.OpenShiftBinary;
+import cz.xtf.core.openshift.OpenShifts;
 
 @RunWith(Parameterized.class)
 @Category({OperatorNotSupported.class}) // Operator doesn't support scaling Workbench to 0 for this scenario
@@ -66,7 +67,7 @@ public class WorkbenchGitHooksPersistenceIntegrationTest extends AbstractMethodI
 
     private WorkbenchDeployment workbenchDeployment;
 
-    private static final String GIT_HOOKS_REMOTE_DIR = "/opt/eap/standalone/data/kie/git/hooks";
+    private static final String GIT_HOOKS_REMOTE_DIR = "/opt/kie/data/git/hooks";
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
