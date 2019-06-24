@@ -134,20 +134,15 @@ parameters:
   required: false
 - displayName: KIE Server Custom http Route Hostname
   description: 'Custom hostname for http service route. Leave blank for default hostname,
-    e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
+    e.g.: insecure-<application-name>-kieserver-<project>.<default-domain-suffix>'
   name: KIE_SERVER_HOSTNAME_HTTP
   value: ''
   required: false
 - displayName: KIE Server Custom https Route Hostname
   description: 'Custom hostname for https service route.  Leave blank for default
-    hostname, e.g.: secure-<application-name>-kieserver-<project>.<default-domain-suffix>'
+    hostname, e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
   name: KIE_SERVER_HOSTNAME_HTTPS
   value: ''
-  required: false
-- displayName: Use the secure route name to link application requests to KIE_SERVER_HOSTNAME_HTTPS vs KIE_SERVER_HOSTNAME_HTTP.
-  description: 'If true, will use secure-APPLICATION_NAME-kieserver vs. APPLICATION_NAME-kieserver as the route name.'
-  name: KIE_SERVER_USE_SECURE_ROUTE_NAME
-  value: 'false'
   required: false
 - displayName: KIE Server Keystore Secret Name
   description: The name of the secret containing the keystore file
@@ -330,7 +325,7 @@ parameters:
   name: AMQ_GLOBAL_MAX_SIZE
   example: 10 gb
   required: false
-- description: Name of a secret containing SSL related files
+- description: "Name of a secret containing SSL related files."
   displayName: Secret Name
   name: AMQ_SECRET
   required: false
@@ -364,7 +359,7 @@ parameters:
   description: "AMQ Broker Image"
   name: AMQ_BROKER_IMAGESTREAM_NAME
   required: true
-  value: amq-broker-72-openshift:1.3
+  value: amq-broker-73-openshift:7.3
 ## End of AMQ configuration
 - displayName: RH-SSO URL
   description: RH-SSO URL
@@ -529,7 +524,6 @@ objects:
     name: "${APPLICATION_NAME}-kieserver"
   roleRef:
     name: edit
-# start of AMQ ServiceAccount
 - kind: ServiceAccount
   apiVersion: v1
   metadata:
@@ -547,7 +541,6 @@ objects:
     name: "amq-service-account"
   roleRef:
     name: view
-# end of AMQ ServiceAccount
 - kind: Service
   apiVersion: v1
   spec:
@@ -765,7 +758,7 @@ objects:
   apiVersion: v1
   id: "${APPLICATION_NAME}-kieserver-http"
   metadata:
-    name: "${APPLICATION_NAME}-kieserver"
+    name: "insecure-${APPLICATION_NAME}-kieserver"
     labels:
       application: "${APPLICATION_NAME}"
       service: "${APPLICATION_NAME}-kieserver"
@@ -782,7 +775,7 @@ objects:
   apiVersion: v1
   id: "${APPLICATION_NAME}-kieserver-https"
   metadata:
-    name: "secure-${APPLICATION_NAME}-kieserver"
+    name: "${APPLICATION_NAME}-kieserver"
     labels:
       application: "${APPLICATION_NAME}"
       service: "${APPLICATION_NAME}-kieserver"
@@ -984,8 +977,6 @@ objects:
                 fieldPath: metadata.labels['services.server.kie.org/kie-server-id']
           - name: KIE_SERVER_ROUTE_NAME
             value: "${APPLICATION_NAME}-kieserver"
-          - name: KIE_SERVER_USE_SECURE_ROUTE_NAME
-            value: "${KIE_SERVER_USE_SECURE_ROUTE_NAME}"
           - name: KIE_SERVER_USER
             value: "${KIE_SERVER_USER}"
           - name: KIE_SERVER_PWD
@@ -1249,7 +1240,7 @@ objects:
         from:
           kind: ImageStreamTag
           name: ${AMQ_BROKER_IMAGESTREAM_NAME}
-          namespace: ${IMAGE_STREAM_NAMESPACE}
+          namespace: openshift
       type: ImageChange
     - type: ConfigChange
     replicas: 1
@@ -1266,7 +1257,7 @@ objects:
         terminationGracePeriodSeconds: 60
         containers:
         - name: ${APPLICATION_NAME}-amq
-          image: ${AMQ_BROKER_IMAGESTREAM_NAME}
+          image: registry.redhat.io/amq-broker-7/amq-broker-73-openshift:7.3
           imagePullPolicy: Always
           readinessProbe:
             exec:
@@ -1331,16 +1322,6 @@ objects:
             value: "${AMQ_KEYSTORE}"
           - name: AMQ_KEYSTORE_PASSWORD
             value: "${AMQ_KEYSTORE_PASSWORD}"
-          ##- name: AMQ_GLOBAL_MAX_SIZE
-          ##  value: "${AMQ_GLOBAL_MAX_SIZE}"
-          ##- name: AMQ_REQUIRE_LOGIN
-          ##  value: "${AMQ_REQUIRE_LOGIN}"
-          ##- name: AMQ_EXTRA_ARGS
-          ##  value: "${AMQ_EXTRA_ARGS}"
-          ##- name: AMQ_ANYCAST_PREFIX
-          ##  value: "${AMQ_ANYCAST_PREFIX}"
-          ##- name: AMQ_MULTICAST_PREFIX
-          ##  value: "${AMQ_MULTICAST_PREFIX}"
           volumeMounts:
               - mountPath: /etc/amq-secret-volume
                 name: broker-secret-volume

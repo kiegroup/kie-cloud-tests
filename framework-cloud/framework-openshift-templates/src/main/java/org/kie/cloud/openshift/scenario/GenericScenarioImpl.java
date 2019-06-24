@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +46,8 @@ import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.settings.GenericScenarioSettings;
-import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.util.AmqImageStreamDeployer;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +106,9 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         logger.info("Creating AMQ secret");
         createAmqSecret();
         logger.info("AMQ secret created");
+        logger.info("Creating AMQ image stream");
+        AmqImageStreamDeployer.deploy(project);
+        logger.info("AMQ image stream created");
 
         workbenchDeployments.clear();
         controllerDeployments.clear();

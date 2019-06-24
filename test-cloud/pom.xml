@@ -69,6 +69,7 @@
     <default.domain.suffix/>
 
     <!-- Amq properties -->
+    <amq.image.streams>https://raw.githubusercontent.com/jboss-container-images/jboss-amq-7-broker-openshift-image/amq-broker-73-dev/amq-broker-7-image-streams.yaml</amq.image.streams>
     <amq.username>yoda</amq.username>
     <amq.password>usetheforce123@</amq.password>
 
@@ -289,6 +290,7 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
               <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
               <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
+              <amq.image.streams>${amq.image.streams}</amq.image.streams>
               <amq.username>${amq.username}</amq.username>
               <amq.password>${amq.password}</amq.password>
               <kie.artifact.version>${kie.artifact.version}</kie.artifact.version>

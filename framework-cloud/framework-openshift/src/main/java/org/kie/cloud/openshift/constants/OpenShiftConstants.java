@@ -157,6 +157,8 @@ public class OpenShiftConstants implements Constants {
     public static final String SSO_APP_SECRETS = "sso.app.secrets";
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
 
+    public static final String AMQ_IMAGE_STREAMS = "amq.image.streams";
+
     public static final String APB_IMAGE_STREAM_NAME = "apb.image.stream.name";
     public static final String APB_IMAGE_DOCKER_REPO_TAG = "apb.image.docker.repo.tag";
     public static final String APB_KIE_IAMGE_STREAM_TAG = "apb.kie.image.stream.tag";
@@ -233,6 +235,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getSsoImageStreams() {
         return System.getProperty(SSO_IMAGE_STREAMS);
+    }
+
+    public static String getAmqImageStreams() {
+        return System.getProperty(AMQ_IMAGE_STREAMS);
     }
 
     public static String getApbImageStreamName() {
