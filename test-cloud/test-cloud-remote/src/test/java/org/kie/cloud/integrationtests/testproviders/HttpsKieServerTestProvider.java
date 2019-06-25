@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import cz.xtf.client.Http;
-import cz.xtf.client.HttpResponseParser;
 import org.apache.http.entity.ContentType;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -44,6 +42,9 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cz.xtf.client.Http;
+import cz.xtf.client.HttpResponseParser;
 
 
 public class HttpsKieServerTestProvider {
@@ -98,6 +99,8 @@ public class HttpsKieServerTestProvider {
             assertThat(responseAndCodePut.code()).isEqualTo(HttpsURLConnection.HTTP_CREATED);
             assertThat(responseAndCodePut.response()).contains("Container " + containerId + " successfully created");
 
+            kieServerDeployment.waitForContainerRespin();
+
             String urlGet = getContainersRequestUrl(kieServerDeployment, ssoScenario);
 
             logger.debug("Test get Kie Server containers on url {}", urlGet);
@@ -122,6 +125,8 @@ public class HttpsKieServerTestProvider {
                     .execute();
 
             assertThat(responseAndCodeDelete.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
+
+            kieServerDeployment.waitForContainerRespin();
         } catch (Exception e) {
             logger.error("Unable to connect to KIE server REST API", e);
             throw new RuntimeException("Unable to connect to KIE server REST API", e);
