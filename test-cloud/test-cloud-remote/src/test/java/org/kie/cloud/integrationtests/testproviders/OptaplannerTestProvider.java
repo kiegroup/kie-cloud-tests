@@ -61,6 +61,8 @@ public class OptaplannerTestProvider {
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment, extraClasses(kieContainer));
         KieServerUtils.createContainer(kieServerClient, new KieContainerResource(containerId, CLOUD_BALANCE_RELEASE_ID), Duration.ofMinutes(3));
 
+        kieServerDeployment.waitForContainerRespin();
+
         try {
             testExecuteSolver(kieServerDeployment, containerId);
         } catch (InterruptedException e) {
