@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.sso;
 
-import java.util.UUID;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -24,10 +22,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.integrationtests.category.Baseline;
-import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
@@ -36,20 +32,14 @@ import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
-import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.ScenarioDeployer;
 
 @Category(Baseline.class)
 public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static WorkbenchKieServerScenario deploymentScenario;
-
-    private static final String SECURED_URL_PREFIX = "secured-";
-    private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
-    private static final String BUSINESS_CENTRAL_NAME = "rhpamcentr";
-    private static final String KIE_SERVER_NAME = "kieserver";
-    private static final String BUSINESS_CENTRAL_HOSTNAME = BUSINESS_CENTRAL_NAME + DeploymentConstants.getDefaultDomainSuffix();
-    private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -62,10 +52,6 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
             deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                     .deploySso()
                     .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                    .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                    .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                    .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                    .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                     .build();
         }
         deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
