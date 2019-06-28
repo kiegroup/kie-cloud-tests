@@ -31,4 +31,13 @@ public abstract class AbstractMySqlExternalDatabase implements ExternalDatabase 
         return Optional.empty();
     }
 
+    @Override
+    public String getDriverImageName() {
+        return "jboss-kie-mysql-extension-openshift-image";
+    }
+
+    @Override
+    public String getDriverImageVersion() {
+        return "8.0.12";
+    }
 }
