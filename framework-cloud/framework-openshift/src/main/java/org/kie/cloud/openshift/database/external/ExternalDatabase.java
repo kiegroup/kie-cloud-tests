@@ -39,4 +39,14 @@ public interface ExternalDatabase {
      * @return All environment variables required for connection to this database.
      */
     Map<String, String> getExternalDatabaseEnvironmentVariables();
+
+    /**
+     * @return Image name of driver image.
+     */
+    String getDriverImageName();
+
+    /**
+     * @return Image version of driver image.
+     */
+    String getDriverImageVersion();
 }

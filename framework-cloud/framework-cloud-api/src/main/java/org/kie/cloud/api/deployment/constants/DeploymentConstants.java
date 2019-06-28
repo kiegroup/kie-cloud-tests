@@ -61,6 +61,9 @@ public class DeploymentConstants implements Constants {
     public static final String CUSTOM_TRUSTED_KEYSTORE_ALIAS = "custom.trusted.keystore.alias";
     public static final String CUSTOM_TRUSTED_KEYSTORE_PWD = "custom.trusted.keystore.pwd";
 
+    // URL for external registry containing driver images for external DB tests
+    public static final String EXTERNAL_REGISTRY_URL = "external.registry.url";
+
     public static String getKieServerUser() {
         return System.getProperty(KIE_SERVER_USER);
     }
@@ -166,6 +169,10 @@ public class DeploymentConstants implements Constants {
 
     public static String getCustomTrustedKeystorePwd() {
         return System.getProperty(CUSTOM_TRUSTED_KEYSTORE_PWD);
+    }
+
+    public static String getExternalRegistryUrl() {
+        return System.getProperty(EXTERNAL_REGISTRY_URL);
     }
 
     @Override
