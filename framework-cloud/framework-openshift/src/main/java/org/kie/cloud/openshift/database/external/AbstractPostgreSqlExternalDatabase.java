@@ -31,4 +31,13 @@ public abstract class AbstractPostgreSqlExternalDatabase implements ExternalData
         return Optional.empty();
     }
 
+    @Override
+    public String getDriverImageName() {
+        return "jboss-kie-postgresql-extension-openshift-image";
+    }
+
+    @Override
+    public String getDriverImageVersion() {
+        return "42.2.5";
+    }
 }
