@@ -34,4 +34,15 @@ public abstract class AbstractSybaseExternalDatabase implements ExternalDatabase
         return Optional.of(driver);
     }
 
+    @Override
+    public String getDriverImageName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getDriverImageVersion() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

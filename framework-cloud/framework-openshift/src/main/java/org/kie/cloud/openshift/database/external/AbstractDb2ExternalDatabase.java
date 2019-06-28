@@ -35,4 +35,13 @@ public abstract class AbstractDb2ExternalDatabase implements ExternalDatabase {
         return Optional.of(driver);
     }
 
+    @Override
+    public String getDriverImageName() {
+        return "jboss-kie-db2-extension-openshift-image";
+    }
+
+    @Override
+    public String getDriverImageVersion() {
+        return "11.1.4.4";
+    }
 }

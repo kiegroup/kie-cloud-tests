@@ -34,4 +34,13 @@ public abstract class AbstractMariaDbExternalDatabase implements ExternalDatabas
         return Optional.of(driver);
     }
 
+    @Override
+    public String getDriverImageName() {
+        return "jboss-kie-mariadb-extension-openshift-image";
+    }
+
+    @Override
+    public String getDriverImageVersion() {
+        return "2.4.0";
+    }
 }
