@@ -16,21 +16,6 @@
 
 package org.kie.cloud.openshift.util.sso;
 
-import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.ssl.SSLContexts;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.ProtocolMapperRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
-import org.kie.cloud.openshift.util.sso.entity.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.core.Response;
-
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +26,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.core.Response;
+
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.ssl.SSLContexts;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.kie.cloud.openshift.util.sso.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SsoRestApi implements SsoApi {
     private static final Logger log = LoggerFactory.getLogger(SsoRestApi.class);
@@ -72,7 +76,19 @@ public class SsoRestApi implements SsoApi {
                 log.warn("Failed to create naive sslContext!");
             }
         }
-        this.client = Keycloak.getInstance(authUrl, "master", "admin", "admin", "admin-cli", null, sslContext);
+
+        ResteasyClient client = new ResteasyClientBuilder().sslContext(sslContext)
+                                                           .hostnameVerifier(new NoopHostnameVerifier())
+                                                           .connectionPoolSize(10)
+                                                           .build();
+        this.client = KeycloakBuilder.builder()
+                                     .serverUrl(authUrl)
+                                     .realm("master")
+                                     .username("admin")
+                                     .password("admin")
+                                     .clientId("admin-cli")
+                                     .resteasyClient(client)
+                                     .build();
     }
 
     public <R> R withKeycloakClient(Function<Keycloak, R> f) {
