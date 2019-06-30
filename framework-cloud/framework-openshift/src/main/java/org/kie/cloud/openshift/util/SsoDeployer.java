@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 
 public class SsoDeployer {
 
@@ -42,10 +43,39 @@ public class SsoDeployer {
     private static final String SSO_REALM = DeploymentConstants.getSsoRealm();
     private static final String ADMIN = "admin", KIE_SERVER = "kie-server", REST_ALL = "rest-all";
 
+    /**
+     * Deploy and configure SSO using HTTP route.
+     *
+     * @param project
+     * @return
+     */
     public static SsoDeployment deploy(Project project) {
+        SsoDeployment ssoDeployment = deploySsoTemplate(project);
+
+        createRolesAndUsers(ssoDeployment.getUrl().toString() + "/auth", SSO_REALM);
+
+        return ssoDeployment;
+    }
+
+    /**
+     * Deploy and configure SSO using HTTPS route.
+     *
+     * @param project
+     * @return
+     */
+    public static SsoDeployment deploySecure(Project project) {
+        SsoDeployment ssoDeployment = deploySsoTemplate(project);
+
+        URL ssoSecureUrl = ssoDeployment.getSecureUrl().orElseThrow(() -> new RuntimeException("RH SSO secure URL not found."));
+        createRolesAndUsers(ssoSecureUrl.toString() + "/auth", SSO_REALM);
+
+        return ssoDeployment;
+    }
+
+    private static SsoDeployment deploySsoTemplate(Project project) {
         SsoDeployment ssoDeployment = createSsoDeployment(project);
 
-        logger.info("Creating SSO image streams in namespece \"openshift\" from " + OpenShiftConstants.getSsoImageStreams());
+        logger.info("Creating SSO image streams in namespace \"openshift\" from " + OpenShiftConstants.getSsoImageStreams());
         imageStreamDeploy(project);
         logger.info("Creating SSO secrets from " + OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toString());
         project.createResources(OpenShiftTemplate.SSO_SECRET.getTemplateUrl().toExternalForm());
@@ -57,12 +87,12 @@ public class SsoDeployer {
         ssoEnvVariables.put(SsoTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
         ssoEnvVariables.put(SsoTemplateConstants.SSO_SERVICE_USERNAME, DeploymentConstants.getSsoServiceUser());
         ssoEnvVariables.put(SsoTemplateConstants.SSO_SERVICE_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        ssoEnvVariables.put(SsoTemplateConstants.HTTPS_NAME, "jboss");
+        ssoEnvVariables.put(SsoTemplateConstants.HTTPS_PASSWORD, "mykeystorepass");
         project.processTemplateAndCreateResources(OpenShiftTemplate.SSO.getTemplateUrl(), ssoEnvVariables);
 
         logger.info("Waiting for SSO deployment to become ready.");
         ssoDeployment.waitForScale();
-
-        createRolesAndUsers(ssoDeployment.getUrl().toString() + "/auth", SSO_REALM);
 
         return ssoDeployment;
     }
@@ -77,6 +107,12 @@ public class SsoDeployer {
             openShift.lists().inNamespace("openshift").create(resourceList);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed resource URL", e);
+        } catch (KubernetesClientException e) {
+            if (e.getMessage().contains("AlreadyExists")) {
+                // Image stream was already recreated, ignoring exception.
+            } else {
+                throw new RuntimeException("Error while deploying SSO image stream.", e);
+            }
         }
     }
 
