@@ -24,6 +24,7 @@ import org.kie.cloud.openshift.resource.Project;
 public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeployment {
 
     private String serviceName;
+    private String secureServiceName;
     private Optional<URL> insecureUrl;
     private Optional<URL> secureUrl;
     private String username;
@@ -39,6 +40,13 @@ public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeploym
             serviceName = ServiceUtil.getSsoServiceName(getOpenShift());
         }
         return serviceName;
+    }
+
+    public String getSecureServiceName() {
+        if (secureServiceName == null) {
+            secureServiceName = ServiceUtil.getSecureSsoServiceName(getOpenShift());
+        }
+        return secureServiceName;
     }
 
     @Override
@@ -57,7 +65,7 @@ public class SsoDeploymentImpl extends OpenShiftDeployment implements SsoDeploym
     @Override
     public Optional<URL> getSecureUrl() {
         if (secureUrl == null) {
-            secureUrl = getHttpsRouteUrl(getServiceName());
+            secureUrl = getHttpsRouteUrl(getSecureServiceName());
         }
         return secureUrl;
     }

@@ -28,6 +28,7 @@ public class Sso {
     private String adminUser;
     private String adminPassword;
     private String principalAttribute;
+    private Boolean disableSSLCertValidation;
 
     public String getAdminPassword() {
         return adminPassword;
@@ -67,5 +68,13 @@ public class Sso {
 
     public void setPrincipalAttribute(String principalAttribute) {
         this.principalAttribute = principalAttribute;
+    }
+
+    public Boolean getDisableSSLCertValidation() {
+        return disableSSLCertValidation;
+    }
+
+    public void setDisableSSLCertValidation(Boolean disableSSLCertValidation) {
+        this.disableSSLCertValidation = disableSSLCertValidation;
     }
 }
