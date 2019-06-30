@@ -24,4 +24,7 @@ public class SsoTemplateConstants {
     public static final String SSO_SERVICE_PASSWORD = "SSO_SERVICE_PASSWORD";
 
     public static final String IMAGE_STREAM_NAMESPACE = "IMAGE_STREAM_NAMESPACE";
+
+    public static final String HTTPS_NAME = "HTTPS_NAME";
+    public static final String HTTPS_PASSWORD = "HTTPS_PASSWORD";
 }
