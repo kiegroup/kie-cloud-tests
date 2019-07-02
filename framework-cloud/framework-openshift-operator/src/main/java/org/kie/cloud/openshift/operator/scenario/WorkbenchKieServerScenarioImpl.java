@@ -65,7 +65,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
         getKieAppClient().create(kieApp);
 
         if (deployPrometheus) {
-            prometheusDeployment = PrometheusDeployer.deploy(project);
+            prometheusDeployment = PrometheusDeployer.deployAsOperator(project);
         }
 
         workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
