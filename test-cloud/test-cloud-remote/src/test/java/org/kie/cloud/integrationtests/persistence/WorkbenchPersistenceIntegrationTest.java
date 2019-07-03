@@ -24,7 +24,6 @@ import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -58,7 +57,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-@Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed.")
 public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchPersistenceIntegrationTest.class);
@@ -129,14 +127,13 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        String kieServerLocation = serverInfo.getLocation();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION, KieContainerStatus.STARTED);
 
-        verifyOneServerTemplateWithContainer(kieServerLocation, CONTAINER_ID);
+        verifyOneServerTemplateWithContainer(CONTAINER_ID);
 
         scaleToZeroAndToOne(workbenchDeployment);
 
-        verifyOneServerTemplateWithContainer(kieServerLocation, CONTAINER_ID);
+        verifyOneServerTemplateWithContainer(CONTAINER_ID);
     }
 
     @Test
@@ -164,13 +161,14 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         assertThat(containersResponse.getResult().getContainers().get(0).getContainerId()).isEqualTo(CONTAINER_ID);
     }
 
-    private void verifyOneServerTemplateWithContainer(String kieServerLocation, String containerId) {
+    private void verifyOneServerTemplateWithContainer(String containerId) {
         ServerTemplateList serverTemplates = kieControllerClient.listServerTemplates();
         assertThat(serverTemplates.getServerTemplates()).as("Number of server templates differ.").hasSize(1);
 
         ServerTemplate serverTemplate = serverTemplates.getServerTemplates()[0];
         assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
-        assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
+        // Skip check on URL as the workbench has an internal IP to KIE server and we only have the route here
+        // assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
         assertThat(serverTemplate.getContainersSpec()).hasSize(1);
         assertThat(serverTemplate.getContainersSpec().iterator().next().getId()).isEqualTo(containerId);
     }
