@@ -305,7 +305,7 @@
         <custom.trusted.secret.name>rhpam-certs</custom.trusted.secret.name>
         <custom.trusted.keystore.alias>jbossaws</custom.trusted.keystore.alias>
         <custom.trusted.keystore.pwd>changeit</custom.trusted.keystore.pwd>
-        <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.OperatorNotSupported</failsafe.excluded.groups>
+        <operator.excluded.group>org.kie.cloud.integrationtests.category.OperatorNotSupported</operator.excluded.group>
 
         <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
         <xtf.openshift.token/>
@@ -366,6 +366,7 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
+                <excludedGroups>${operator.excluded.group},${failsafe.excluded.groups}</excludedGroups>
                 <systemProperties>
                   <javax.net.ssl.trustStore>${certificate.dir}/test-keystore</javax.net.ssl.trustStore>
                   <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
