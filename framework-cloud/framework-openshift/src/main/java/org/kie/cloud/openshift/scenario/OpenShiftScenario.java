@@ -19,15 +19,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
-import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
+import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
@@ -39,6 +42,9 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     protected Project project;
     private String logFolderName;
     private boolean createImageStreams;
+
+    private ScheduledFuture<?> instancesLogCollectorFuture;
+    private InstancesLogCollectorRunnable instancesLogCollectorRunnable;
 
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
 
@@ -81,6 +87,11 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         logger.info("Creating project " + projectName);
         project = OpenShiftController.createProject(projectName);
 
+        // Init the log collector
+        instancesLogCollectorRunnable = new InstancesLogCollectorRunnable(project, getLogFolderName());
+        instancesLogCollectorFuture = Executors.newScheduledThreadPool(1)
+                                               .scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, 5, TimeUnit.SECONDS);
+
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
 
@@ -104,7 +115,13 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     @Override
     public void undeploy() {
         try {
-            InstanceLogUtil.writeDeploymentLogs(this);
+            // Release log collectors
+            instancesLogCollectorRunnable.releaseLogs();
+            try {
+                instancesLogCollectorFuture.cancel(true);
+            } catch (Exception e) {
+                logger.error("Error killing log collector thread", e);
+            }
 
             project.delete();
             project.close();

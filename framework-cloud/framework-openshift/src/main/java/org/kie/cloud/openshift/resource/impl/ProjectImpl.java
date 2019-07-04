@@ -28,18 +28,22 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.kie.cloud.openshift.OpenShiftController;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
-import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.util.ProcessExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import cz.xtf.builder.builders.ImageStreamBuilder;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.openshift.api.model.ImageStream;
+import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.openshift.OpenShiftController;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.util.OpenshiftPodUtil;
+import org.kie.cloud.openshift.util.ProcessExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static java.util.stream.Collectors.toList;
 
 public class ProjectImpl implements Project {
 
@@ -83,7 +87,7 @@ public class ProjectImpl implements Project {
         commandParameters.add("--ignore-unknown-parameters=true");
         commandParameters.add("-o");
         commandParameters.add("yaml");
-        for (Entry<String, String> envVariable : envVariables.entrySet() ) {
+        for (Entry<String, String> envVariable : envVariables.entrySet()) {
             commandParameters.add("-p");
             commandParameters.add(envVariable.getKey() + "=" + envVariable.getValue());
         }
@@ -112,7 +116,7 @@ public class ProjectImpl implements Project {
         try {
             semaphore.acquire();
             OpenShiftBinary oc = getOpenShiftBinary(projectName);
-            if(openShift.getServiceAccount("apb") == null) {
+            if (openShift.getServiceAccount("apb") == null) {
                 oc.execute("create", "serviceaccount", "apb");
                 oc.execute("create", "rolebinding", "apb", "--clusterrole=admin", "--serviceaccount=" + projectName + ":apb");
             }
@@ -246,4 +250,14 @@ public class ProjectImpl implements Project {
     private static synchronized String getOpenShiftBinaryPath() {
         return OpenShifts.getBinaryPath();
     }
+
+    @Override
+    public List<Instance> getAllInstances() {
+        return this.openShift.getPods()
+                             .stream()
+                             .filter(pod -> OpenshiftPodUtil.isRunningPod(pod))
+                             .map(pod -> OpenshiftPodUtil.createInstance(openShift, getName(), pod))
+                             .collect(toList());
+    }
+
 }

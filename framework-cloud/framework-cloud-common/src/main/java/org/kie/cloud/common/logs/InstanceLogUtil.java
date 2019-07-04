@@ -16,6 +16,7 @@
 package org.kie.cloud.common.logs;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -33,7 +34,36 @@ public class InstanceLogUtil {
     private static final String DEFAULT_LOG_OUTPUT_DIRECTORY = "instances";
     private static final String LOG_SUFFIX = ".log";
 
+    public static void appendInstanceLogLines(String instanceName, Collection<String> lines, String customLogFolderName) {
+        File logFile = getOutputFile(instanceName, customLogFolderName);
+        try {
+            FileUtils.writeLines(logFile, "UTF-8", lines, true);
+        } catch (Exception e) {
+            logger.error("Error writting instance logs", e);
+        }
+    }
+
     public static void writeInstanceLogs(Instance instance, String customLogFolderName) {
+        File logFile = getOutputFile(instance.getName(), customLogFolderName);
+        try {
+            FileUtils.write(logFile, instance.getLogs(), "UTF-8");
+        } catch (Exception e) {
+            logger.error("Error writting instance logs", e);
+        }
+    }
+
+    public static void writeDeploymentLogs(DeploymentScenario<?> deploymentScenario) {
+        for (Deployment deployment : deploymentScenario.getDeployments()) {
+            if (deployment != null) {
+                List<Instance> instances = deployment.getInstances();
+                for (Instance instance : instances) {
+                    writeInstanceLogs(instance, deploymentScenario.getLogFolderName());
+                }
+            }
+        }
+    }
+
+    private static File getOutputFile(String instanceName, String customLogFolderName) {
         File outputDirectory = new File(System.getProperty(INSTANCES_LOGS_OUTPUT_DIRECTORY, DEFAULT_LOG_OUTPUT_DIRECTORY));
         if (!outputDirectory.isDirectory()) {
             outputDirectory.mkdir();
@@ -43,22 +73,6 @@ public class InstanceLogUtil {
             outputDirectory.mkdir();
         }
 
-        File logFile = new File(outputDirectory, instance.getName() + LOG_SUFFIX);
-        try {
-            FileUtils.write(logFile, instance.getLogs(), "UTF-8");
-        } catch (Exception e) {
-            logger.error("Error writting instance logs", e);
-        }
-    }
-
-    public static void writeDeploymentLogs(DeploymentScenario<?> deploymentScenario) {
-        for(Deployment deployment : deploymentScenario.getDeployments()) {
-            if (deployment != null) {
-                List<Instance> instances = deployment.getInstances();
-                for (Instance instance : instances) {
-                    writeInstanceLogs(instance, deploymentScenario.getLogFolderName());
-                }
-            }
-        }
+        return new File(outputDirectory, instanceName + LOG_SUFFIX);
     }
 }

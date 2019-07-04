@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import cz.xtf.core.openshift.OpenShift;
+import org.kie.cloud.api.deployment.Instance;
 
 /**
  * Project representation.
@@ -55,7 +56,7 @@ public interface Project extends AutoCloseable {
      * @param image APB Image to be provision
      * @param extraVars Map of extra vars to override default values from the APB image
      */
-    public void processApbRun(String image, Map<String,String> extraVars);
+    public void processApbRun(String image, Map<String, String> extraVars);
 
     /**
      * Create resources from YAML file using command line client.
@@ -116,4 +117,12 @@ public interface Project extends AutoCloseable {
      * @return Output of oc
      */
     public String runOcCommandAsAdmin(String... args);
+
+    /**
+     * Return list of all started instances in the project.
+     *
+     * @return List of Instances
+     * @see Instance
+     */
+    List<Instance> getAllInstances();
 }
