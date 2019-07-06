@@ -115,17 +115,18 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     @Override
     public void undeploy() {
         try {
-            // Release log collectors
-            instancesLogCollectorRunnable.releaseLogs();
+            // Release log collectors & flush logs
             try {
-                instancesLogCollectorFuture.cancel(true);
+                instancesLogCollectorFuture.cancel(false);
             } catch (Exception e) {
                 logger.error("Error killing log collector thread", e);
             }
+            instancesLogCollectorRunnable.flushRemainingInstanceLogs();
 
             project.delete();
             project.close();
         } catch (Exception e) {
+            logger.error("Error undeploy", e);
             throw new RuntimeException("Error while undeploying scenario.", e);
         }
     }
