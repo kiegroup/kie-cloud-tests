@@ -55,7 +55,7 @@ public interface Instance {
      *
      * @return True if instance is existing on Openshift.
      */
-    boolean isExisting();
+    boolean exists();
 
     /**
      * Return started time of currently running instance.

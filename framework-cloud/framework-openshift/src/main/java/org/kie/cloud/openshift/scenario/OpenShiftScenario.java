@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
@@ -38,12 +38,14 @@ import org.slf4j.LoggerFactory;
 
 public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> implements DeploymentScenario<T> {
 
+    private static final Integer DEFAULT_SCHEDULED_FIX_RATE_LOG_COLLECTOR_IN_SECONDS = 5;
+
     protected String projectName;
     protected Project project;
     private String logFolderName;
     private boolean createImageStreams;
 
-    private ScheduledFuture<?> instancesLogCollectorFuture;
+    private ScheduledExecutorService logCollectorExecutorService;
     private InstancesLogCollectorRunnable instancesLogCollectorRunnable;
 
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
@@ -89,9 +91,9 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
         // Init the log collector
         logger.info("Launch instances log collector on project {}", projectName);
+        logCollectorExecutorService = Executors.newScheduledThreadPool(1);
         instancesLogCollectorRunnable = new InstancesLogCollectorRunnable(project, getLogFolderName());
-        instancesLogCollectorFuture = Executors.newScheduledThreadPool(1)
-                                               .scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, 5, TimeUnit.SECONDS);
+        logCollectorExecutorService.scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, DEFAULT_SCHEDULED_FIX_RATE_LOG_COLLECTOR_IN_SECONDS, TimeUnit.SECONDS);
 
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
@@ -118,7 +120,8 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         try {
             logger.info("Release log collector(s)");
             try {
-                instancesLogCollectorFuture.cancel(false);
+                logCollectorExecutorService.shutdownNow();
+                logCollectorExecutorService = null;
                 instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors();
             } catch (Exception e) {
                 logger.error("Error killing log collector thread", e);

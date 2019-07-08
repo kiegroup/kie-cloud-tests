@@ -26,7 +26,7 @@ public class OpenshiftInstanceUtil {
     }
 
     /**
-     * Return list of all started instances in the project.
+     * Return list of all scheduled instances in the project.
      *
      * @return List of Instances
      * @see Instance
@@ -34,8 +34,12 @@ public class OpenshiftInstanceUtil {
     public static List<OpenShiftInstance> getAllInstances(OpenShift openshift, String namespace) {
         return openshift.getPods()
                         .stream()
+                        .filter(OpenshiftInstanceUtil::isScheduledPod)
                         .map(pod -> createInstance(openshift, openshift.getNamespace(), pod))
-                        .filter(Instance::isRunning)
                         .collect(toList());
+    }
+
+    private static boolean isScheduledPod(Pod pod) {
+        return !POD_STATUS_PENDING.equals(pod.getStatus().getPhase());
     }
 }

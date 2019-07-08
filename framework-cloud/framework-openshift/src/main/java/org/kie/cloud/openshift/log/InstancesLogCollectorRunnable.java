@@ -2,11 +2,11 @@ package org.kie.cloud.openshift.log;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,8 @@ public class InstancesLogCollectorRunnable implements Runnable {
     private Project project;
     private String logFolderName;
 
-    private Map<OpenShiftInstance, Future<?>> observedInstances = new ConcurrentHashMap<>();
+    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private Set<OpenShiftInstance> observedInstances = Collections.synchronizedSet(new HashSet<>());
 
     public InstancesLogCollectorRunnable(Project project, String logFolderName) {
         super();
@@ -39,7 +40,7 @@ public class InstancesLogCollectorRunnable implements Runnable {
 
     @Override
     public void run() {
-        // Check for new instances and oberve on them
+        // Check for new instances and observe on them
         OpenshiftInstanceUtil.getAllInstances(project.getOpenShift(), project.getName()).stream()
                              // Filter non observed instances
                              .filter(instance -> !isInstanceObserved(instance))
@@ -51,14 +52,16 @@ public class InstancesLogCollectorRunnable implements Runnable {
     }
 
     public void closeAndFlushRemainingInstanceCollectors() {
-        // For all remaining observed instances, stop thread && writeinstancelogs
-        List<OpenShiftInstance> instances = new ArrayList<>(observedInstances.keySet());
-        instances.forEach(this::stopObserveInstanceLogs);
+        // Keep instances list before stopping everything
+        List<OpenShiftInstance> instances = new ArrayList<>(observedInstances);
+        // Stop all observations
+        executorService.shutdownNow();
+        // Flush all remaining instances (which were still observed)
         instances.forEach(this::flushInstanceLogs);
     }
 
     private void observeInstanceLog(OpenShiftInstance instance) {
-        Future<?> future = Executors.newSingleThreadExecutor().submit(() -> {
+        Future<?> future = executorService.submit(() -> {
             instance.observeLogs().buffer(DEFAULT_OBERVABLE_BUFFER_IN_SECONDS, TimeUnit.SECONDS)
                     .subscribe(logLines -> instanceLogLines(instance, logLines), error -> {
                         throw new RuntimeException(error);
@@ -68,31 +71,13 @@ public class InstancesLogCollectorRunnable implements Runnable {
         setInstanceAsObserved(instance, future);
     }
 
-    private void stopObserveInstanceLogs(OpenShiftInstance instance) {
-        Optional<Future<?>> opt = observedInstances.entrySet().stream()
-                                                   .filter(e -> instance.getName().equals(e.getKey().getName()))
-                                                   .findFirst().map(Entry::getValue);
-        if (opt.isPresent()) {
-            Future<?> future = opt.get();
-            // Stop thread
-            try {
-                if (!future.isDone()) {
-                    logger.trace("Kill {}", instance.getName());
-                    future.cancel(true);
-                }
-            } catch (Exception e) {
-                logger.error("Error while stopping observable thread from instance " + instance.getName(), e);
-            }
-        }
-    }
-
     private void instanceLogLines(OpenShiftInstance instance, Collection<String> logLines) {
         InstanceLogUtil.appendInstanceLogLines(instance.getName(), logLines, logFolderName);
     }
 
     private void flushInstanceLogs(Instance instance) {
         logger.trace("Flushing logs from {}", instance.getName());
-        if (instance.isExisting()) {
+        if (instance.exists()) {
             logger.trace("Flush logs from {}", instance.getName());
             InstanceLogUtil.writeInstanceLogs(instance, logFolderName);
         } else {
@@ -101,13 +86,13 @@ public class InstancesLogCollectorRunnable implements Runnable {
     }
 
     private boolean isInstanceObserved(OpenShiftInstance instance) {
-        return this.observedInstances.keySet().stream().map(Instance::getName)
+        return this.observedInstances.stream().map(Instance::getName)
                                      .anyMatch(name -> name.equals(instance.getName()));
     }
 
     private void setInstanceAsObserved(OpenShiftInstance instance, Future<?> future) {
         logger.trace("Observe instance {}", instance.getName());
-        this.observedInstances.put(instance, future);
+        this.observedInstances.add(instance);
     }
 
     private void removeInstanceObserved(OpenShiftInstance instance) {

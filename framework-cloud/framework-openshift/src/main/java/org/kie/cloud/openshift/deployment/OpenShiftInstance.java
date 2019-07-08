@@ -60,11 +60,11 @@ public class OpenShiftInstance implements Instance {
 
     @Override
     public boolean isRunning() {
-        return isExisting() && getContainerRunningState() != null;
+        return exists() && getContainerRunningState() != null;
     }
 
     @Override
-    public boolean isExisting() {
+    public boolean exists() {
         return Objects.nonNull(openshift.getPod(name));
     }
 

@@ -34,15 +34,6 @@ public class InstanceLogUtil {
     private static final String DEFAULT_LOG_OUTPUT_DIRECTORY = "instances";
     private static final String LOG_SUFFIX = ".log";
 
-    public static void appendInstanceLogLines(String instanceName, Collection<String> lines, String customLogFolderName) {
-        File logFile = getOutputFile(instanceName, customLogFolderName);
-        try {
-            FileUtils.writeLines(logFile, "UTF-8", lines, true);
-        } catch (Exception e) {
-            logger.error("Error writting instance logs", e);
-        }
-    }
-
     public static void writeInstanceLogs(Instance instance, String customLogFolderName) {
         File logFile = getOutputFile(instance.getName(), customLogFolderName);
         try {
@@ -63,16 +54,25 @@ public class InstanceLogUtil {
         }
     }
 
+    public static void appendInstanceLogLines(String instanceName, Collection<String> lines, String customLogFolderName) {
+        File logFile = getOutputFile(instanceName, customLogFolderName);
+        try {
+            FileUtils.writeLines(logFile, "UTF-8", lines, true);
+        } catch (Exception e) {
+            logger.error("Error writting instance logs", e);
+        }
+    }
+
     private static File getOutputFile(String instanceName, String customLogFolderName) {
         File outputDirectory = new File(System.getProperty(INSTANCES_LOGS_OUTPUT_DIRECTORY, DEFAULT_LOG_OUTPUT_DIRECTORY));
         if (!outputDirectory.isDirectory()) {
             outputDirectory.mkdir();
         }
-        outputDirectory = new File(outputDirectory, customLogFolderName);
-        if (!outputDirectory.isDirectory()) {
-            outputDirectory.mkdir();
+        File logDirectory = new File(outputDirectory, customLogFolderName);
+        if (!logDirectory.isDirectory()) {
+            logDirectory.mkdir();
         }
 
-        return new File(outputDirectory, instanceName + LOG_SUFFIX);
+        return new File(logDirectory, instanceName + LOG_SUFFIX);
     }
 }

@@ -212,18 +212,18 @@
       <dependency>
         <groupId>cz.xtf</groupId>
         <artifactId>builder</artifactId>
-         <version>${version.cz.xtf}</version>
+        <version>${version.cz.xtf}</version>
       </dependency>
       <dependency>
         <groupId>cz.xtf</groupId>
         <artifactId>http-client</artifactId>
-         <version>${version.cz.xtf}</version>
+        <version>${version.cz.xtf}</version>
       </dependency>
       <dependency>
-		<groupId>io.reactivex</groupId>
-		<artifactId>rxjava</artifactId>
-		<version>${version.rx-java}</version>
-	  </dependency>
+        <groupId>io.reactivex</groupId>
+        <artifactId>rxjava</artifactId>
+        <version>${version.rx-java}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-verifier</artifactId>
