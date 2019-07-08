@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.operator.scenario;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,13 +84,15 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     protected void deployCustomResource() {
 
         if (deploySso) {
-            ssoDeployment = SsoDeployer.deploy(project);
+            ssoDeployment = SsoDeployer.deploySecure(project);
+            URL ssoSecureUrl = ssoDeployment.getSecureUrl().orElseThrow(() -> new RuntimeException("RH SSO secure URL not found."));
 
             Sso sso = new Sso();
             sso.setAdminUser(DeploymentConstants.getSsoServiceUser());
             sso.setAdminPassword(DeploymentConstants.getSsoServicePassword());
-            sso.setUrl(SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
+            sso.setUrl(SsoDeployer.createSsoEnvVariable(ssoSecureUrl.toString()));
             sso.setRealm(DeploymentConstants.getSsoRealm());
+            sso.setDisableSSLCertValidation(true);
 
             Auth auth = new Auth();
             auth.setSso(sso);
