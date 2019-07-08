@@ -15,16 +15,17 @@
  */
 package org.kie.cloud.openshift.deployment;
 
-import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
-
 import java.time.Instant;
+import java.util.Objects;
 
 import cz.xtf.core.openshift.OpenShift;
 import io.fabric8.kubernetes.api.model.ContainerStateRunning;
 import io.fabric8.kubernetes.api.model.Pod;
-
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.Instance;
+import rx.Observable;
+
+import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
 public class OpenShiftInstance implements Instance {
 
@@ -52,13 +53,19 @@ public class OpenShiftInstance implements Instance {
         return name;
     }
 
-    @Override public CommandExecutionResult runCommand(String... command) {
+    @Override
+    public CommandExecutionResult runCommand(String... command) {
         return runCommandImpl(openshift.pods().withName(name), command);
     }
 
     @Override
     public boolean isRunning() {
-        return getContainerRunningState() != null;
+        return isExisting() && getContainerRunningState() != null;
+    }
+
+    @Override
+    public boolean isExisting() {
+        return Objects.nonNull(openshift.getPod(name));
     }
 
     @Override
@@ -80,5 +87,9 @@ public class OpenShiftInstance implements Instance {
     public String getLogs() {
         Pod pod = openshift.getPod(name);
         return openshift.getPodLog(pod);
+    }
+
+    public Observable<String> observeLogs() {
+        return openshift.observePodLog(openshift.getPod(getName()));
     }
 }

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import cz.xtf.core.openshift.OpenShift;
-import org.kie.cloud.api.deployment.Instance;
 
 /**
  * Project representation.
@@ -117,12 +116,4 @@ public interface Project extends AutoCloseable {
      * @return Output of oc
      */
     public String runOcCommandAsAdmin(String... args);
-
-    /**
-     * Return list of all started instances in the project.
-     *
-     * @return List of Instances
-     * @see Instance
-     */
-    List<Instance> getAllInstances();
 }

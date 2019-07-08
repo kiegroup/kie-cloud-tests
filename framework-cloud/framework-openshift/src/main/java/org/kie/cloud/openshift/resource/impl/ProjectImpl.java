@@ -34,16 +34,12 @@ import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.openshift.api.model.ImageStream;
-import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.util.OpenshiftPodUtil;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.stream.Collectors.toList;
 
 public class ProjectImpl implements Project {
 
@@ -249,15 +245,6 @@ public class ProjectImpl implements Project {
 
     private static synchronized String getOpenShiftBinaryPath() {
         return OpenShifts.getBinaryPath();
-    }
-
-    @Override
-    public List<Instance> getAllInstances() {
-        return this.openShift.getPods()
-                             .stream()
-                             .filter(pod -> OpenshiftPodUtil.isRunningPod(pod))
-                             .map(pod -> OpenshiftPodUtil.createInstance(openShift, getName(), pod))
-                             .collect(toList());
     }
 
 }

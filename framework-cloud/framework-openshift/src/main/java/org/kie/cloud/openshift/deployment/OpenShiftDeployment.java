@@ -42,7 +42,7 @@ import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.util.OpenshiftPodUtil;
+import org.kie.cloud.openshift.util.OpenshiftInstanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +114,7 @@ public abstract class OpenShiftDeployment implements Deployment {
                                                     String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
                                                     return deploymentConfigName.equals(podsDeploymentConfigName);
                                                 })
-                                                .map(pod -> OpenshiftPodUtil.createInstance(openShift, getNamespace(), pod))
+                                                .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getNamespace(), pod))
                                                 .collect(toList());
 
             return instances;

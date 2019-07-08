@@ -51,6 +51,13 @@ public interface Instance {
     boolean isRunning();
 
     /**
+     * Return true if instance is existing on Openshift.
+     *
+     * @return True if instance is existing on Openshift.
+     */
+    boolean isExisting();
+
+    /**
      * Return started time of currently running instance.
      *
      * @return Started time.
