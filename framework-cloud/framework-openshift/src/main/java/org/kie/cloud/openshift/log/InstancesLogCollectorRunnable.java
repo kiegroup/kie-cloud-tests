@@ -92,7 +92,6 @@ public class InstancesLogCollectorRunnable implements Runnable {
 
     private void flushInstanceLogs(Instance instance) {
         logger.trace("Flushing logs from {}", instance.getName());
-        // Flush all logs
         if (instance.isExisting()) {
             logger.trace("Flush logs from {}", instance.getName());
             InstanceLogUtil.writeInstanceLogs(instance, logFolderName);
