@@ -50,12 +50,10 @@ public class InstancesLogCollectorRunnable implements Runnable {
         // Calling get pod on a no more existing pod will cause the "obervePodLog" to complete ...
     }
 
-    public void flushRemainingInstanceLogs() {
+    public void closeAndFlushRemainingInstanceCollectors() {
         // For all remaining observed instances, stop thread && writeinstancelogs
         List<OpenShiftInstance> instances = new ArrayList<>(observedInstances.keySet());
-        logger.info("Killing observing threads");
         instances.forEach(this::stopObserveInstanceLogs);
-        logger.info("Got through !!!!!!!!!!! Now flushing logs");
         instances.forEach(this::flushInstanceLogs);
     }
 
@@ -79,7 +77,7 @@ public class InstancesLogCollectorRunnable implements Runnable {
             // Stop thread
             try {
                 if (!future.isDone()) {
-                    logger.info("Kill {}", instance.getName());
+                    logger.trace("Kill {}", instance.getName());
                     future.cancel(true);
                 }
             } catch (Exception e) {
@@ -89,18 +87,17 @@ public class InstancesLogCollectorRunnable implements Runnable {
     }
 
     private void instanceLogLines(OpenShiftInstance instance, Collection<String> logLines) {
-        //		logger.info("Instance {}\n {}", instance.getName(), logLines);
         InstanceLogUtil.appendInstanceLogLines(instance.getName(), logLines, logFolderName);
     }
 
     private void flushInstanceLogs(Instance instance) {
-        logger.info("Flushing logs from {}", instance.getName());
+        logger.trace("Flushing logs from {}", instance.getName());
         // Flush all logs
         if (instance.isExisting()) {
-            logger.info("Flush logs from {}", instance.getName());
+            logger.trace("Flush logs from {}", instance.getName());
             InstanceLogUtil.writeInstanceLogs(instance, logFolderName);
         } else {
-            logger.info("Ignoring instance {} as not running", instance.getName());
+            logger.trace("Ignoring instance {} as not running", instance.getName());
         }
     }
 
@@ -110,12 +107,12 @@ public class InstancesLogCollectorRunnable implements Runnable {
     }
 
     private void setInstanceAsObserved(OpenShiftInstance instance, Future<?> future) {
-        logger.info("Observe instance {}", instance.getName());
+        logger.trace("Observe instance {}", instance.getName());
         this.observedInstances.put(instance, future);
     }
 
     private void removeInstanceObserved(OpenShiftInstance instance) {
-        logger.info("finished observing instance {}", instance.getName());
+        logger.trace("finished observing instance {}", instance.getName());
         this.observedInstances.remove(instance);
     }
 

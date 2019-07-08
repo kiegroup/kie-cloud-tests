@@ -88,6 +88,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         project = OpenShiftController.createProject(projectName);
 
         // Init the log collector
+        logger.info("Launch instances log collector on project {}", projectName);
         instancesLogCollectorRunnable = new InstancesLogCollectorRunnable(project, getLogFolderName());
         instancesLogCollectorFuture = Executors.newScheduledThreadPool(1)
                                                .scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, 5, TimeUnit.SECONDS);
@@ -115,13 +116,13 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     @Override
     public void undeploy() {
         try {
-            // Release log collectors & flush logs
+            logger.info("Release log collector(s)");
             try {
                 instancesLogCollectorFuture.cancel(false);
+                instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors();
             } catch (Exception e) {
                 logger.error("Error killing log collector thread", e);
             }
-            instancesLogCollectorRunnable.flushRemainingInstanceLogs();
 
             project.delete();
             project.close();
