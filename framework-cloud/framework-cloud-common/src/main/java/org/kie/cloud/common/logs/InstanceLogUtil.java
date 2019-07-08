@@ -64,15 +64,8 @@ public class InstanceLogUtil {
     }
 
     private static File getOutputFile(String instanceName, String customLogFolderName) {
-        File outputDirectory = new File(System.getProperty(INSTANCES_LOGS_OUTPUT_DIRECTORY, DEFAULT_LOG_OUTPUT_DIRECTORY));
-        if (!outputDirectory.isDirectory()) {
-            outputDirectory.mkdir();
-        }
-        File logDirectory = new File(outputDirectory, customLogFolderName);
-        if (!logDirectory.isDirectory()) {
-            logDirectory.mkdir();
-        }
-
-        return new File(logDirectory, instanceName + LOG_SUFFIX);
+        File outputDirectory = new File(System.getProperty(INSTANCES_LOGS_OUTPUT_DIRECTORY, DEFAULT_LOG_OUTPUT_DIRECTORY), customLogFolderName);
+        outputDirectory.mkdirs();
+        return new File(outputDirectory, instanceName + LOG_SUFFIX);
     }
 }
