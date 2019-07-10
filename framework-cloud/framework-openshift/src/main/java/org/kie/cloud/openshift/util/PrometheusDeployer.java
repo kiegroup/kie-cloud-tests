@@ -39,11 +39,10 @@ import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.rbac.KubernetesClusterRoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.PrometheusDeployment;
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.PrometheusDeploymentImpl;
-import org.kie.cloud.openshift.deployment.ServiceUtil;
 import org.kie.cloud.openshift.prometheus.servicemonitor.ServiceMonitor;
 import org.kie.cloud.openshift.prometheus.servicemonitor.ServiceMonitorDoneable;
 import org.kie.cloud.openshift.prometheus.servicemonitor.ServiceMonitorList;
@@ -78,7 +77,7 @@ public class PrometheusDeployer {
     private static final String METRIC_SECRET_USERNAME_KEY = "username";
     private static final String METRIC_SECRET_PASSWORD_KEY = "password";
 
-    public static PrometheusDeployment deploy(Project project) {
+    public static PrometheusDeployment deploy(Project project, KieServerDeployment kieServerDeployment) {
         addClusterRoleToAdminUser(project);
 
         createServiceAccount(project, PROMETHEUS_OPERATOR_SERVICE_ACCOUNT);
@@ -94,14 +93,14 @@ public class PrometheusDeployer {
         createPrometheusCustomResource(project, PROMETHEUS_CUSTOM_RESOURCE);
         exposePrometheusRoute(project);
 
-        createMetricsSecret(project);
+        createMetricsSecret(project, kieServerDeployment);
         createServiceMonitorCustomResource(project);
 
         PrometheusDeployment prometheusDeployment = new PrometheusDeploymentImpl(project);
         return prometheusDeployment;
     }
 
-    public static PrometheusDeployment deployAsOperator(Project project) {
+    public static PrometheusDeployment deployAsOperator(Project project, KieServerDeployment kieServerDeployment) {
         OperatorDeployer.deploy(project, "prometheus", "beta");
 
         createServiceAccount(project, PROMETHEUS_SERVICE_ACCOUNT);
@@ -110,7 +109,7 @@ public class PrometheusDeployer {
         createPrometheusCustomResource(project, PROMETHEUS_CUSTOM_RESOURCE);
         exposePrometheusRoute(project);
 
-        createMetricsSecret(project);
+        createMetricsSecret(project, kieServerDeployment);
         createServiceMonitorCustomResource(project);
 
         PrometheusDeployment prometheusDeployment = new PrometheusDeploymentImpl(project);
@@ -187,11 +186,10 @@ public class PrometheusDeployer {
         }
     }
 
-    private static void createMetricsSecret(Project project) {
+    private static void createMetricsSecret(Project project, KieServerDeployment kieServerDeployment) {
         SecretBuilder secretBuilder = new SecretBuilder(METRIC_SECRET_NAME);
-        // Using Workbench credentials as for trial template the password is shared
-        secretBuilder.addRawData(METRIC_SECRET_USERNAME_KEY, DeploymentConstants.getWorkbenchUser());
-        secretBuilder.addRawData(METRIC_SECRET_PASSWORD_KEY, DeploymentConstants.getWorkbenchPassword());
+        secretBuilder.addRawData(METRIC_SECRET_USERNAME_KEY, kieServerDeployment.getUsername());
+        secretBuilder.addRawData(METRIC_SECRET_PASSWORD_KEY, kieServerDeployment.getPassword());
         Secret metricSecret = secretBuilder.build();
         project.getOpenShift().createSecret(metricSecret);
     }
@@ -217,7 +215,17 @@ public class PrometheusDeployer {
         endpoint.setBasicAuth(basicAuth);
 
         Selector selector = new Selector();
-        selector.addMatchLabel("service", ServiceUtil.getKieServerServiceName(project.getOpenShift(), ""));
+
+        String serviceName = project.getOpenShift().getServices().stream()
+                .map(s -> s.getMetadata().getName())
+                .filter(n -> n.contains("kieserver"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Kie Server service was not found"));
+
+        selector.addMatchLabel("service", project.getOpenShift().getService(serviceName)
+                                                                .getMetadata()
+                                                                .getLabels()
+                                                                .get("service"));
 
         Spec spec = new Spec();
         spec.setSelector(selector);
