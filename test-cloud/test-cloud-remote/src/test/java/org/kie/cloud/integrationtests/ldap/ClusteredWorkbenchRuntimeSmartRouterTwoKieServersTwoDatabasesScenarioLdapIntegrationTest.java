@@ -34,6 +34,7 @@ import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 
+@Category(JBPMOnly.class) // Smart router is available just for jBPM
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario deploymentScenario;
