@@ -15,14 +15,12 @@ import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.common.logs.InstanceLogUtil;
 import org.kie.cloud.openshift.deployment.OpenShiftInstance;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.scenario.OpenShiftScenario;
-import org.kie.cloud.openshift.util.OpenshiftInstanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InstancesLogCollectorRunnable implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
+    private static final Logger logger = LoggerFactory.getLogger(InstancesLogCollectorRunnable.class);
 
     private static final Integer DEFAULT_OBERVABLE_BUFFER_IN_SECONDS = 5;
 
@@ -41,37 +39,65 @@ public class InstancesLogCollectorRunnable implements Runnable {
     @Override
     public void run() {
         // Check for new instances and observe on them
-        OpenshiftInstanceUtil.getAllInstances(project.getOpenShift(), project.getName()).stream()
-                             // Filter non observed instances
-                             .filter(instance -> !isInstanceObserved(instance))
-                             // Observe instance logs
-                             .forEach(this::observeInstanceLog);
+        project.getAllInstances()
+               .stream()
+               .filter(instance -> instance instanceof OpenShiftInstance)
+               .map(instance -> (OpenShiftInstance) instance)
+               // Filter non observed instances
+               .filter(instance -> !isInstanceObserved(instance))
+               // Observe instance logs
+               .forEach(this::observeInstanceLog);
 
         // Check if instances are still existing
         // Calling get pod on a no more existing pod will cause the "obervePodLog" to complete ...
     }
 
-    public void closeAndFlushRemainingInstanceCollectors() {
-        // Keep instances list before stopping everything
-        List<OpenShiftInstance> instances = new ArrayList<>(observedInstances);
-        // Stop all observations
-        executorService.shutdownNow();
-        // Flush all remaining instances (which were still observed)
-        instances.forEach(this::flushInstanceLogs);
+    public void closeAndFlushRemainingInstanceCollectors(int waitForCompletionInMs) {
+        // Make a copy before stopping collector threads
+        List<Instance> instances = new ArrayList<>(observedInstances);
+
+        // Stop all collectors
+        executorService.shutdown(); // Disable new tasks from being submitted
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!executorService.awaitTermination(waitForCompletionInMs, TimeUnit.MILLISECONDS)) {
+                logger.warn("Log collector Threadpool cannot stop. Force shutdown ...");
+                executorService.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!executorService.awaitTermination(waitForCompletionInMs, TimeUnit.MILLISECONDS))
+                    logger.error("Log collector Threadpool did not terminate");
+            } else {
+                logger.info("Log collector Threadpool stopped correctly");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            executorService.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+        } finally {
+            // Finally, flush logs to be sure we have the last state of running pods
+            instances.forEach(this::flushInstanceLogs);
+        }
     }
 
     private void observeInstanceLog(OpenShiftInstance instance) {
         Future<?> future = executorService.submit(() -> {
-            instance.observeLogs().buffer(DEFAULT_OBERVABLE_BUFFER_IN_SECONDS, TimeUnit.SECONDS)
-                    .subscribe(logLines -> instanceLogLines(instance, logLines), error -> {
-                        throw new RuntimeException(error);
-                    }, () -> removeInstanceObserved(instance));
-            removeInstanceObserved(instance);
+            try {
+                instance.observeLogs().buffer(DEFAULT_OBERVABLE_BUFFER_IN_SECONDS, TimeUnit.SECONDS)
+                        .subscribe(logLines -> instanceLogLines(instance, logLines), error -> {
+                            throw new RuntimeException(error);
+                        });
+            } catch (Exception e) {
+                logger.error("Problem observing logs for instance " + instance.getName(), e);
+            } finally {
+                removeInstanceObserved(instance);
+            }
         });
         setInstanceAsObserved(instance, future);
     }
 
     private void instanceLogLines(OpenShiftInstance instance, Collection<String> logLines) {
+        logger.trace("Write log lines {}", logLines);
         InstanceLogUtil.appendInstanceLogLines(instance.getName(), logLines, logFolderName);
     }
 

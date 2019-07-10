@@ -122,7 +122,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             try {
                 logCollectorExecutorService.shutdownNow();
                 logCollectorExecutorService = null;
-                instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors();
+                instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors(5000);
             } catch (Exception e) {
                 logger.error("Error killing log collector thread", e);
             }
