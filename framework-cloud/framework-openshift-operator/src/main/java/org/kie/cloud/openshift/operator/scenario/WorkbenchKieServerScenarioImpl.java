@@ -64,10 +64,6 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
         // deploy application
         getKieAppClient().create(kieApp);
 
-        if (deployPrometheus) {
-            prometheusDeployment = PrometheusDeployer.deployAsOperator(project);
-        }
-
         workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
@@ -75,6 +71,10 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
         kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
+
+        if (deployPrometheus) {
+            prometheusDeployment = PrometheusDeployer.deployAsOperator(project, kieServerDeployment);
+        }
 
         logger.info("Waiting until all services are created.");
         try {
