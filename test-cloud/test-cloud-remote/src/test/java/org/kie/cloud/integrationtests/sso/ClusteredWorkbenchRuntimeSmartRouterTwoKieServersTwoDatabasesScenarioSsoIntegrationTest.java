@@ -36,7 +36,7 @@ import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
-@Category(ApbNotSupported.class)
+@Category({ApbNotSupported.class, JBPMOnly.class}) // Smart router is available just for jBPM
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final String SECURED_URL_PREFIX = "secured-";
