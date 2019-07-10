@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.kie.cloud.api.deployment.ControllerDeployment;
-
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.PrometheusDeployment;
@@ -61,10 +60,6 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER.getTemplateUrl(), envVariables);
 
-        if (deployPrometheus) {
-            prometheusDeployment = PrometheusDeployer.deploy(project);
-        }
-
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(envVariables.get(OpenShiftTemplateConstants.DEFAULT_PASSWORD));
@@ -72,6 +67,10 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(envVariables.get(OpenShiftTemplateConstants.DEFAULT_PASSWORD));
+
+        if (deployPrometheus) {
+            prometheusDeployment = PrometheusDeployer.deploy(project, kieServerDeployment);
+        }
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();

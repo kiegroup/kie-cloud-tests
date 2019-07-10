@@ -69,10 +69,6 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
         extraVars.put("cluster", "openshift");
         project.processApbRun(ApbImageGetter.fromImageStream(), extraVars);
 
-        if (deployPrometheus) {
-            prometheusDeployment = PrometheusDeployer.deploy(project);
-        }
-
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(ApbConstants.DefaultUser.KIE_ADMIN);
         workbenchDeployment.setPassword(ApbConstants.DefaultUser.PASSWORD);
@@ -81,6 +77,10 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
         kieServerDeployment.setServiceSuffix("-0");
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(ApbConstants.DefaultUser.PASSWORD);
+
+        if (deployPrometheus) {
+            prometheusDeployment = PrometheusDeployer.deploy(project, kieServerDeployment);
+        }
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
