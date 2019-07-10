@@ -48,10 +48,14 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
     @BeforeClass
     public static void initializeDeployment() {
         if (deploymentScenarioFactory.getCloudAPIImplementationName().equals("openshift-operator")) {
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                    .deploySso()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                    .build();
+            try {
+                deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
+                        .deploySso()
+                        .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                        .build();
+            } catch (UnsupportedOperationException ex) {
+                Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
+            }
         } else {
             try {
             deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()

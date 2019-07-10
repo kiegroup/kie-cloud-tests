@@ -37,6 +37,7 @@ import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.cloud.tests.common.time.Constants;
 import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerStatus;
@@ -47,7 +48,7 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-@Category(ApbNotSupported.class) // Because TimerServiceDataStoreRefreshInterval is not supported yet
+@Category({ApbNotSupported.class, JBPMOnly.class}) // Because TimerServiceDataStoreRefreshInterval is not supported yet
 public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final Kjar DEPLOYED_KJAR = Kjar.TIMER;
