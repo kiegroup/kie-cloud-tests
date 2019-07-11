@@ -15,11 +15,12 @@
 
 package org.kie.cloud.openshift.database.external;
 
-import java.util.Optional;
-
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
+import org.kie.cloud.openshift.database.driver.MySqlExternalDriver;
 
 public abstract class AbstractMySqlExternalDatabase implements ExternalDatabase {
+
+    private ExternalDriver driver = new MySqlExternalDriver();
 
     @Override
     public String getDriverName() {
@@ -27,17 +28,7 @@ public abstract class AbstractMySqlExternalDatabase implements ExternalDatabase 
     }
 
     @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.empty();
-    }
-
-    @Override
-    public String getDriverImageName() {
-        return "jboss-kie-mysql-extension-openshift-image";
-    }
-
-    @Override
-    public String getDriverImageVersion() {
-        return "8.0.12";
+    public ExternalDriver getExternalDriver() {
+        return driver;
     }
 }

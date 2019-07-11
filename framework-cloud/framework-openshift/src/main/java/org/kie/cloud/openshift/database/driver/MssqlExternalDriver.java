@@ -18,32 +18,17 @@ package org.kie.cloud.openshift.database.driver;
 public class MssqlExternalDriver extends AbstractExternalDriver {
 
     @Override
+    public String getName() {
+        return "mssql";
+    }
+
+    @Override
     public String getImageName() {
-        return "mssql-driver-image";
+        return "jboss-kie-mssql-extension-openshift-image";
     }
 
     @Override
     public String getImageVersion() {
-        return "2016";
-    }
-
-    @Override
-    public String getDockerFileRelativePath() {
-        return "mssql-driver-image";
-    }
-
-    @Override
-    public String getCustomInstallDirectories() {
-        return "mssql-driver/extensions";
-    }
-
-    @Override
-    public String getSourceImagePath() {
-        return "/extensions:mssql-driver/";
-    }
-
-    @Override
-    protected String getDriverBinaryFileLocationInArtifactRepo() {
-        return "com/microsoft/sqlserver/sqljdbc4/4.0/sqljdbc4-4.0.jar";
+        return "7.2.2.jre11";
     }
 }

@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.database.external;
 
-import java.util.Optional;
-
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
 import org.kie.cloud.openshift.database.driver.MariaDbExternalDriver;
 
@@ -30,17 +28,7 @@ public abstract class AbstractMariaDbExternalDatabase implements ExternalDatabas
     }
 
     @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
-
-    @Override
-    public String getDriverImageName() {
-        return "jboss-kie-mariadb-extension-openshift-image";
-    }
-
-    @Override
-    public String getDriverImageVersion() {
-        return "2.4.0";
+    public ExternalDriver getExternalDriver() {
+        return driver;
     }
 }

@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.database.external;
 
-import java.util.Optional;
-
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
 import org.kie.cloud.openshift.database.driver.MssqlExternalDriver;
 
@@ -30,17 +28,7 @@ public abstract class AbstractMssqlExternalDatabase implements ExternalDatabase 
     }
 
     @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
-
-    @Override
-    public String getDriverImageName() {
-        return "jboss-kie-mssql-extension-openshift-image";
-    }
-
-    @Override
-    public String getDriverImageVersion() {
-        return "7.0.0.jre8";
+    public ExternalDriver getExternalDriver() {
+        return driver;
     }
 }
