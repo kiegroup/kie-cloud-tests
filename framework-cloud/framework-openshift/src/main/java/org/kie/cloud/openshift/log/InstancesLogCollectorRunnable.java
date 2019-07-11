@@ -47,9 +47,6 @@ public class InstancesLogCollectorRunnable implements Runnable {
                .filter(instance -> !isInstanceObserved(instance))
                // Observe instance logs
                .forEach(this::observeInstanceLog);
-
-        // Check if instances are still existing
-        // Calling get pod on a no more existing pod will cause the "obervePodLog" to complete ...
     }
 
     public void closeAndFlushRemainingInstanceCollectors(int waitForCompletionInMs) {
@@ -67,7 +64,7 @@ public class InstancesLogCollectorRunnable implements Runnable {
                 if (!executorService.awaitTermination(waitForCompletionInMs, TimeUnit.MILLISECONDS))
                     logger.error("Log collector Threadpool did not terminate");
             } else {
-                logger.info("Log collector Threadpool stopped correctly");
+                logger.debug("Log collector Threadpool stopped correctly");
             }
         } catch (InterruptedException ie) {
             // (Re-)Cancel if current thread also interrupted
@@ -112,8 +109,10 @@ public class InstancesLogCollectorRunnable implements Runnable {
     }
 
     private boolean isInstanceObserved(OpenShiftInstance instance) {
-        return this.observedInstances.stream().map(Instance::getName)
-                                     .anyMatch(name -> name.equals(instance.getName()));
+        synchronized (observedInstances) {
+            return this.observedInstances.stream().map(Instance::getName)
+                                         .anyMatch(name -> name.equals(instance.getName()));
+        }
     }
 
     private void setInstanceAsObserved(OpenShiftInstance instance, Future<?> future) {

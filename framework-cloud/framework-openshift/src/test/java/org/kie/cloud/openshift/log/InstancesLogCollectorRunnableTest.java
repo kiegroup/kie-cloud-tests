@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -31,7 +32,6 @@ public class InstancesLogCollectorRunnableTest {
     private static final String LOG_OUTPUT_DIRECTORY = "instances";
     private static final String LOG_SUFFIX = ".log";
 
-    private static final Integer WAIT_BEFORE_MSG_IN_MS = 2000;
     private static final Integer DEFAULT_WAIT_FOR_COMPLETION_IN_MS = 5000;
 
     @Mock
@@ -50,7 +50,7 @@ public class InstancesLogCollectorRunnableTest {
 
     @Test
     public void oneInstanceRunning() {
-        setInstanceMocks("BONJOUR");
+        setObserveLogCallable(setInstanceMocks("BONJOUR"), null);
         ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
@@ -69,7 +69,7 @@ public class InstancesLogCollectorRunnableTest {
 
     @Test
     public void oneInstanceRunningRunnableExecutedTwice() {
-        setInstanceMocks("BONJOUR");
+        setObserveLogCallable(setInstanceMocks("BONJOUR"), null);
         ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
@@ -88,7 +88,9 @@ public class InstancesLogCollectorRunnableTest {
 
     @Test
     public void manyInstancesRunning() {
-        setInstanceMocks("BONJOUR", "HELLO", "BUON GIORNO", "HALLO", "DOBRY DEN");
+        List<OpenShiftInstance> instances = setInstanceMocks("BONJOUR", "HELLO", "BUON GIORNO", "HALLO", "DOBRY DEN");
+        setObserveLogCallable(instances, 1000); // Add small tempo to be sure the check after on the number of threads/observed instances is correct 
+
         ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
@@ -110,7 +112,7 @@ public class InstancesLogCollectorRunnableTest {
 
     @Test
     public void killBeforeFinished() {
-        setInstanceMocks("BONJOUR");
+        setObserveLogCallable(setInstanceMocks("BONJOUR"), 2000);
         ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
@@ -144,14 +146,20 @@ public class InstancesLogCollectorRunnableTest {
     private OpenShiftInstance createInstanceMock(String message) {
         OpenShiftInstance instanceMock = Mockito.mock(OpenShiftInstance.class);
         Mockito.when(instanceMock.getName()).thenReturn(message);
+        return instanceMock;
+    }
 
-        Mockito.when(instanceMock.observeLogs()).then((invocation) -> {
-            return Observable.fromCallable(() -> {
-                Thread.sleep(WAIT_BEFORE_MSG_IN_MS);
-                return message;
+    private void setObserveLogCallable(List<OpenShiftInstance> instances, Integer waitForMessage) {
+        instances.forEach(instance -> {
+            Mockito.when(instance.observeLogs()).then((invocation) -> {
+                return Observable.fromCallable(() -> {
+                    if (Objects.nonNull(waitForMessage)) {
+                        Thread.sleep(waitForMessage);
+                    }
+                    return instance.getName();
+                });
             });
         });
-        return instanceMock;
     }
 
     private ExecutorService retrieveExecutorService() {
