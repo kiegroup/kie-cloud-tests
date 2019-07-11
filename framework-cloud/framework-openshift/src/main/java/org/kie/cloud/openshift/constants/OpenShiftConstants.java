@@ -264,8 +264,14 @@ public class OpenShiftConstants implements Constants {
     }
 
     public static File getKieJdbcDriverScriptsFolder() {
-        String kieJdbcDriverScriptsFolder = System.getProperty(KIE_JDBC_DRIVER_SCRIPTS);
-        return new File(kieJdbcDriverScriptsFolder);
+        String kieJdbcDriverScriptsFolderPath = System.getProperty(KIE_JDBC_DRIVER_SCRIPTS);
+        File kieJdbcDriverScriptsFolder = new File(kieJdbcDriverScriptsFolderPath);
+
+        if (!kieJdbcDriverScriptsFolder.exists()) {
+            throw new RuntimeException("JDBC driver script folder " + kieJdbcDriverScriptsFolder.getAbsolutePath() + " doesn't exist.");
+        }
+
+        return kieJdbcDriverScriptsFolder;
     }
 
     public static URL getKieJdbcDriverBinaryUrl() {

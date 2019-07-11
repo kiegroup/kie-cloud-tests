@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,20 @@
 
 package org.kie.cloud.openshift.database.driver;
 
-public class MariaDbExternalDriver extends AbstractExternalDriver {
+public class PostgreSqlExternalDriver extends AbstractExternalDriver {
 
     @Override
     public String getName() {
-        return "mariadb";
+        return "postgresql";
     }
 
     @Override
     public String getImageName() {
-        return "jboss-kie-mariadb-extension-openshift-image";
+        return "jboss-kie-postgresql-extension-openshift-image";
     }
 
     @Override
     public String getImageVersion() {
-        return "2.4.0";
+        return "42.2.5";
     }
 }

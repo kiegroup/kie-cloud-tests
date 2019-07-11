@@ -18,32 +18,17 @@ package org.kie.cloud.openshift.database.driver;
 public class Db2ExternalDriver extends AbstractExternalDriver {
 
     @Override
+    public String getName() {
+        return "db2";
+    }
+
+    @Override
     public String getImageName() {
-        return "db2-driver-image";
+        return "jboss-kie-db2-extension-openshift-image";
     }
 
     @Override
     public String getImageVersion() {
-        return "10.5";
-    }
-
-    @Override
-    public String getDockerFileRelativePath() {
-        return "db2-driver-image";
-    }
-
-    @Override
-    public String getCustomInstallDirectories() {
-        return "db2-driver/extensions";
-    }
-
-    @Override
-    public String getSourceImagePath() {
-        return "/extensions:db2-driver/";
-    }
-
-    @Override
-    protected String getDriverBinaryFileLocationInArtifactRepo() {
-        return "com/ibm/db2/jcc/db2jcc4/10.5/db2jcc4-10.5.jar";
+        return "11.1.4.4";
     }
 }

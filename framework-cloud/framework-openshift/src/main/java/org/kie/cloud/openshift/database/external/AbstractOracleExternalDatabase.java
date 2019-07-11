@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.database.external;
 
-import java.util.Optional;
-
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
 import org.kie.cloud.openshift.database.driver.OracleExternalDriver;
 
@@ -30,19 +28,7 @@ public abstract class AbstractOracleExternalDatabase implements ExternalDatabase
     }
 
     @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
-
-    @Override
-    public String getDriverImageName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getDriverImageVersion() {
-        // TODO Auto-generated method stub
-        return null;
+    public ExternalDriver getExternalDriver() {
+        return driver;
     }
 }
