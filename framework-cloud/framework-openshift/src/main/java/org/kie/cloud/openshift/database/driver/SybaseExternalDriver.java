@@ -18,6 +18,11 @@ package org.kie.cloud.openshift.database.driver;
 public class SybaseExternalDriver extends AbstractExternalDriver {
 
     @Override
+    public String getName() {
+        return "sybase";
+    }
+
+    @Override
     public String getImageName() {
         return "sybase-driver-image";
     }
@@ -25,25 +30,5 @@ public class SybaseExternalDriver extends AbstractExternalDriver {
     @Override
     public String getImageVersion() {
         return "16.0";
-    }
-
-    @Override
-    public String getDockerFileRelativePath() {
-        return "sybase-driver-image";
-    }
-
-    @Override
-    public String getCustomInstallDirectories() {
-        return "sybase-driver/extensions";
-    }
-
-    @Override
-    public String getSourceImagePath() {
-        return "/extensions:sybase-driver/";
-    }
-
-    @Override
-    protected String getDriverBinaryFileLocationInArtifactRepo() {
-        return "com/sysbase/jconn4/16.0_PL05/jconn4-16.0_PL05.jar";
     }
 }

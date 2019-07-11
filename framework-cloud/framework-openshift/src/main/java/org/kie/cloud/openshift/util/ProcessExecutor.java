@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,8 +46,18 @@ public class ProcessExecutor implements AutoCloseable {
      * @param command Command to be executed.
      */
     public void executeProcessCommand(String command) {
+        executeProcessCommand(command, null);
+    }
+
+    /**
+     * Execute command and wait until command is finished. Output and error streams are redirected to the logger.
+     *
+     * @param command Command to be executed.
+     * @param directory Directory where the command should be executed.
+     */
+    public void executeProcessCommand(String command, Path directory) {
         Consumer<String> outputConsumer = s -> logger.info(s);
-        executeProcessCommand(command, outputConsumer);
+        executeProcessCommand(command, outputConsumer, directory);
     }
 
     /**
@@ -59,7 +70,7 @@ public class ProcessExecutor implements AutoCloseable {
         StringBuffer sb = new StringBuffer();
         Consumer<String> outputConsumer = s -> sb.append(s).append("\n");
 
-        boolean processedSuccessfully = executeProcessCommand(command, outputConsumer);
+        boolean processedSuccessfully = executeProcessCommand(command, outputConsumer, null);
 
         if (!processedSuccessfully) {
             throw new RuntimeException("Error while processing command \"" + command + "\". Process output:\n" + sb.toString());
@@ -85,11 +96,17 @@ public class ProcessExecutor implements AutoCloseable {
      *
      * @param command Command to be executed.
      * @param outputConsumer Consumer processing the process output.
+     * @param directory Directory where the command should be executed.
      * @return True if process terminated normally, false in case of error during processing.
      */
-    private boolean executeProcessCommand(String command, Consumer<String> outputConsumer) {
+    private boolean executeProcessCommand(String command, Consumer<String> outputConsumer, Path directory) {
         try {
-            Process process = Runtime.getRuntime().exec(command);
+            ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
+            if (directory != null) {
+                processBuilder = processBuilder.directory(directory.toFile());
+            }
+            Process process = processBuilder.start();
+
             Future<?> osFuture = executorService.submit(new ProcessOutputReader(process.getInputStream(), outputConsumer));
             Future<?> esFuture = executorService.submit(new ProcessOutputReader(process.getErrorStream(), outputConsumer));
 

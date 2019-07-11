@@ -24,6 +24,11 @@ import java.net.URL;
 public interface ExternalDriver {
 
     /**
+     * @return Name of the driver. Used by Cekit to identify image to be built.
+     */
+    String getName();
+
+    /**
      * @return Name of the driver image.
      */
     String getImageName();
@@ -34,35 +39,19 @@ public interface ExternalDriver {
     String getImageVersion();
 
     /**
-     * @return Driver Docker file path relative to base script folder.
+     * @param dockerUrl URL to Docker registry.
+     * @return Docker tag where the driver image is built using Cekit.
      */
-    String getDockerFileRelativePath();
-
-    /**
-     * @return Install directories for OpenShift build producing Kie server with custom driver.
-     */
-    String getCustomInstallDirectories();
-
-    /**
-     * @return Specify the file or directory to copy from the source image and its destination in the build directory. Format: [source]:[destination-dir].
-     */
-    String getSourceImagePath();
+    String getSourceDockerTag();
 
     /**
      * @param dockerUrl URL to Docker registry.
-     * @return Docker tag.
+     * @return Docker tag where the driver image should be pushed to.
      */
-    String getDockerTag(URL dockerUrl);
+    String getTargetDockerTag(URL dockerUrl);
 
     /**
-     * @param kieJdbcDriverScriptsFolder Folder containing all driver scripts.
-     * @param dockerUrl URL to Docker registry.
-     * @return Docker command to build driver image.
+     * @return Cekit command to build driver image.
      */
-    String getDockerImageBuildCommand(File kieJdbcDriverScriptsFolder, URL dockerUrl);
-
-    /**
-     * @return Location where driver binary file should be downloaded to.
-     */
-    File getDriverBinaryFileLocation();
+    String getCekitImageBuildCommand();
 }

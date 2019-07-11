@@ -18,6 +18,11 @@ package org.kie.cloud.openshift.database.driver;
 public class OracleExternalDriver extends AbstractExternalDriver {
 
     @Override
+    public String getName() {
+        return "oracle";
+    }
+
+    @Override
     public String getImageName() {
         return "oracle-driver-image";
     }
@@ -25,25 +30,5 @@ public class OracleExternalDriver extends AbstractExternalDriver {
     @Override
     public String getImageVersion() {
         return "12c";
-    }
-
-    @Override
-    public String getDockerFileRelativePath() {
-        return "oracle-driver-image";
-    }
-
-    @Override
-    public String getCustomInstallDirectories() {
-        return "oracle-driver/extensions";
-    }
-
-    @Override
-    public String getSourceImagePath() {
-        return "/extensions:oracle-driver/";
-    }
-
-    @Override
-    protected String getDriverBinaryFileLocationInArtifactRepo() {
-        return "com/oracle/ojdbc7/12.1.0.1/ojdbc7-12.1.0.1.jar";
     }
 }
