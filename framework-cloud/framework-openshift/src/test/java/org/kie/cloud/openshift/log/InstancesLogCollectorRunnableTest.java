@@ -2,7 +2,6 @@ package org.kie.cloud.openshift.log;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +21,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import rx.Observable;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InstancesLogCollectorRunnableTest {
@@ -52,15 +51,17 @@ public class InstancesLogCollectorRunnableTest {
     @Test
     public void oneInstanceRunning() {
         setInstanceMocks("BONJOUR");
-        ExecutorService executorService = retrieveExecutorServiceField();
+        ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
 
         assertEquals(1, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances("BONJOUR");
 
         cut.closeAndFlushRemainingInstanceCollectors(DEFAULT_WAIT_FOR_COMPLETION_IN_MS);
 
         assertEquals(0, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances();
 
         checkLog("BONJOUR", true);
 
@@ -69,16 +70,18 @@ public class InstancesLogCollectorRunnableTest {
     @Test
     public void oneInstanceRunningRunnableExecutedTwice() {
         setInstanceMocks("BONJOUR");
-        ExecutorService executorService = retrieveExecutorServiceField();
+        ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
         cut.run();
 
         assertEquals(1, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances("BONJOUR");
 
         cut.closeAndFlushRemainingInstanceCollectors(DEFAULT_WAIT_FOR_COMPLETION_IN_MS);
 
         assertEquals(0, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances();
 
         checkLog("BONJOUR", true);
     }
@@ -86,15 +89,17 @@ public class InstancesLogCollectorRunnableTest {
     @Test
     public void manyInstancesRunning() {
         setInstanceMocks("BONJOUR", "HELLO", "BUON GIORNO", "HALLO", "DOBRY DEN");
-        ExecutorService executorService = retrieveExecutorServiceField();
+        ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
 
         assertEquals(5, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances("BONJOUR", "HELLO", "BUON GIORNO", "HALLO", "DOBRY DEN");
 
         cut.closeAndFlushRemainingInstanceCollectors(DEFAULT_WAIT_FOR_COMPLETION_IN_MS);
 
         assertEquals(0, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances();
 
         checkLog("BONJOUR", true);
         checkLog("HELLO", true);
@@ -106,16 +111,18 @@ public class InstancesLogCollectorRunnableTest {
     @Test
     public void killBeforeFinished() {
         setInstanceMocks("BONJOUR");
-        ExecutorService executorService = retrieveExecutorServiceField();
+        ExecutorService executorService = retrieveExecutorService();
 
         cut.run();
 
         assertEquals(1, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances("BONJOUR");
 
         // Here we wait less than the time for the message to be delivered
         cut.closeAndFlushRemainingInstanceCollectors(1000);
 
         assertEquals(0, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances();
 
         checkLog("BONJOUR", false);
     }
@@ -147,17 +154,15 @@ public class InstancesLogCollectorRunnableTest {
         return instanceMock;
     }
 
-    private ExecutorService retrieveExecutorServiceField() {
-        ExecutorService executor;
-        try {
-            Field field = cut.getClass().getDeclaredField("executorService");
-            field.setAccessible(true);
-            executor = (ExecutorService) field.get(cut);
-            return executor;
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-            assertFalse("Unable to retrieve Executor Service", true);
-            return null;
-        }
+    private ExecutorService retrieveExecutorService() {
+        return cut.executorService;
+    }
+
+    private void checkObservedInstances(String... instanceNames) {
+        assertEquals(instanceNames.length, cut.observedInstances.size());
+        Arrays.asList(instanceNames).forEach(instanceName -> {
+            assertTrue("Instance with name " + instanceName + " is not observed...", cut.observedInstances.stream().map(Instance::getName).anyMatch(instanceName::equals));
+        });
     }
 
     private void checkLog(String message, boolean exist) {

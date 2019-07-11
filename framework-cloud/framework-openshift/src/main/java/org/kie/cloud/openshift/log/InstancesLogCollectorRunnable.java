@@ -27,8 +27,8 @@ public class InstancesLogCollectorRunnable implements Runnable {
     private Project project;
     private String logFolderName;
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
-    private Set<OpenShiftInstance> observedInstances = Collections.synchronizedSet(new HashSet<>());
+    protected ExecutorService executorService = Executors.newCachedThreadPool();
+    protected Set<OpenShiftInstance> observedInstances = Collections.synchronizedSet(new HashSet<>());
 
     public InstancesLogCollectorRunnable(Project project, String logFolderName) {
         super();
