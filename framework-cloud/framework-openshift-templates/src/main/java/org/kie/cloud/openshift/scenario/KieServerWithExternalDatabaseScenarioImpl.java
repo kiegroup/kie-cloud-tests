@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.scenario;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,11 +30,15 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.database.driver.ExternalDriver;
 import org.kie.cloud.openshift.database.external.ExternalDatabase;
 import org.kie.cloud.openshift.database.external.TemplateExternalDatabaseProvider;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.DockerRegistryDeployer;
+import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,10 +62,14 @@ public class KieServerWithExternalDatabaseScenarioImpl extends KieCommonScenario
         ExternalDatabase externalDatabase = TemplateExternalDatabaseProvider.getExternalDatabase();
         envVariables.putAll(externalDatabase.getExternalDatabaseEnvironmentVariables());
 
+        dockerDeployment = DockerRegistryDeployer.deploy(project);
+
         // Create image stream from external image with driver and reference it for template
-        String kieServerCustomImageStreamName = "kieserver-openshift-with-custom-driver";
-        project.createImageStream(kieServerCustomImageStreamName, DeploymentConstants.getExternalRegistryUrl() + "/" + externalDatabase.getDriverImageName() + ":" + externalDatabase.getDriverImageVersion());
-        envVariables.put(OpenShiftTemplateConstants.EXTENSIONS_IMAGE, kieServerCustomImageStreamName + ":" + externalDatabase.getDriverImageVersion());
+        installDriverImageToRegistry(dockerDeployment, externalDatabase.getExternalDriver());
+        createDriverImageStreams(dockerDeployment, externalDatabase.getExternalDriver());
+
+        String extensionImage = externalDatabase.getExternalDriver().getImageName() + ":" + externalDatabase.getExternalDriver().getImageVersion();
+        envVariables.put(OpenShiftTemplateConstants.EXTENSIONS_IMAGE, extensionImage);
         envVariables.put(OpenShiftTemplateConstants.EXTENSIONS_IMAGE_NAMESPACE, project.getName());
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.KIE_SERVER_DATABASE_EXTERNAL.getTemplateUrl().toString());
@@ -101,5 +110,28 @@ public class KieServerWithExternalDatabaseScenarioImpl extends KieCommonScenario
     @Override
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
+    }
+
+    private void installDriverImageToRegistry(DockerDeployment dockerDeployment, ExternalDriver externalDriver) {
+        File kieJdbcDriverScriptsFolder = OpenShiftConstants.getKieJdbcDriverScriptsFolder();
+        String buildCommand = externalDriver.getCekitImageBuildCommand();
+        String sourceDockerTag = externalDriver.getSourceDockerTag();
+        String targetDockerTag = externalDriver.getTargetDockerTag(dockerDeployment.getUrl());
+
+        try (ProcessExecutor processExecutor = new ProcessExecutor()) {
+            logger.info("Building JDBC driver image.");
+            processExecutor.executeProcessCommand(buildCommand, kieJdbcDriverScriptsFolder.toPath());
+
+            logger.info("Pushing JDBC driver image to Docker registry.");
+            processExecutor.executeProcessCommand("docker tag " + sourceDockerTag + " " + targetDockerTag);
+            processExecutor.executeProcessCommand("docker push " + targetDockerTag);
+        }
+    }
+
+    private void createDriverImageStreams(DockerDeployment dockerDeployment, ExternalDriver externalDriver) {
+        String imageStreamName = externalDriver.getImageName();
+        String dockerTag = externalDriver.getTargetDockerTag(dockerDeployment.getUrl());
+
+        project.createImageStream(imageStreamName, dockerTag);
     }
 }

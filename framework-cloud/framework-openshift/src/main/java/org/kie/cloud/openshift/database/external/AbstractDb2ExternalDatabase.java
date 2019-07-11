@@ -16,8 +16,6 @@
 package org.kie.cloud.openshift.database.external;
 
 
-import java.util.Optional;
-
 import org.kie.cloud.openshift.database.driver.Db2ExternalDriver;
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
 
@@ -31,17 +29,7 @@ public abstract class AbstractDb2ExternalDatabase implements ExternalDatabase {
     }
 
     @Override
-    public Optional<ExternalDriver> getExternalDriver() {
-        return Optional.of(driver);
-    }
-
-    @Override
-    public String getDriverImageName() {
-        return "jboss-kie-db2-extension-openshift-image";
-    }
-
-    @Override
-    public String getDriverImageVersion() {
-        return "11.1.4.4";
+    public ExternalDriver getExternalDriver() {
+        return driver;
     }
 }

@@ -16,7 +16,6 @@
 package org.kie.cloud.openshift.database.external;
 
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
 
@@ -26,27 +25,17 @@ import org.kie.cloud.openshift.database.driver.ExternalDriver;
 public interface ExternalDatabase {
 
     /**
-     * @return Name of the database driver. Needs to be aligned to database property for datasource based timer service.
+     * @return Name of the database driver. It is used by EAP to use correct EJB database initialization scripts.
      */
     String getDriverName();
 
     /**
-     * @return Custom external driver if required, otherwise empty.
+     * @return Custom external driver.
      */
-    Optional<ExternalDriver> getExternalDriver();
+    ExternalDriver getExternalDriver();
 
     /**
      * @return All environment variables required for connection to this database.
      */
     Map<String, String> getExternalDatabaseEnvironmentVariables();
-
-    /**
-     * @return Image name of driver image.
-     */
-    String getDriverImageName();
-
-    /**
-     * @return Image version of driver image.
-     */
-    String getDriverImageVersion();
 }
