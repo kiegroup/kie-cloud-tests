@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.openshift.deployment;
 
-import static java.util.stream.Collectors.toList;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,6 +28,12 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import cz.xtf.core.openshift.OpenShift;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.RouteList;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
@@ -38,14 +42,11 @@ import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.util.OpenshiftInstanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cz.xtf.core.openshift.OpenShift;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.openshift.api.model.Route;
-import io.fabric8.openshift.api.model.RouteList;
+
+import static java.util.stream.Collectors.toList;
 
 public abstract class OpenShiftDeployment implements Deployment {
 
@@ -109,12 +110,12 @@ public abstract class OpenShiftDeployment implements Deployment {
             String deploymentConfigName = getServiceName();
 
             List<Instance> instances = openShift.getPods().stream()
-                    .filter(pod -> {
-                        String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
-                        return deploymentConfigName.equals(podsDeploymentConfigName);
-                    })
-                    .map(pod -> createInstance(pod))
-                    .collect(toList());
+                                                .filter(pod -> {
+                                                    String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
+                                                    return deploymentConfigName.equals(podsDeploymentConfigName);
+                                                })
+                                                .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getNamespace(), pod))
+                                                .collect(toList());
 
             return instances;
         }
@@ -131,16 +132,16 @@ public abstract class OpenShiftDeployment implements Deployment {
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {
         try {
             openShift.waiters()
-                    .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
-                    .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                    .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become ready.")
-                    .waitFor();
+                     .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                     .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become ready.")
+                     .waitFor();
 
             openShift.waiters()
-                    .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
-                    .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                    .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become runnning.")
-                    .waitFor();
+                     .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                     .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become runnning.")
+                     .waitFor();
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
         }
@@ -149,73 +150,67 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void setRouterTimeout(Duration timeoutValue) {
         RouteList list = getRoutes();
-        for(Route r : list.getItems()) {
+        for (Route r : list.getItems()) {
             openShift
-              .routes()
-              .withName(r.getMetadata().getName())
-              .edit()
-              .editMetadata()
-              .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds()+"s")
-              .endMetadata()
-              .done();
+                     .routes()
+                     .withName(r.getMetadata().getName())
+                     .edit()
+                     .editMetadata()
+                     .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds() + "s")
+                     .endMetadata()
+                     .done();
         }
     }
 
     @Override
     public void resetRouterTimeout() {
         RouteList list = getRoutes();
-        for(Route r : list.getItems()) {
-          openShift
-              .routes()
-              .withName(r.getMetadata().getName())
-              .edit()
-              .editMetadata()
-              .removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT)
-              .endMetadata()
-              .done();
+        for (Route r : list.getItems()) {
+            openShift
+                     .routes()
+                     .withName(r.getMetadata().getName())
+                     .edit()
+                     .editMetadata()
+                     .removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT)
+                     .endMetadata()
+                     .done();
         }
     }
-    
+
     @Override
     public void setRouterBalance(String balance) {
         RouteList list = getRoutes();
-        for(Route r : list.getItems()) {
-          openShift
-              .routes()
-              .withName(r.getMetadata().getName())
-              .edit()
-              .editMetadata()
-              .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_BALANCE, balance)
-              .endMetadata()
-              .done();
+        for (Route r : list.getItems()) {
+            openShift
+                     .routes()
+                     .withName(r.getMetadata().getName())
+                     .edit()
+                     .editMetadata()
+                     .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_BALANCE, balance)
+                     .endMetadata()
+                     .done();
         }
     }
-    
+
     @Override
-    public void setResources(Map<String,String> requests, Map<String,String> limits) {
+    public void setResources(Map<String, String> requests, Map<String, String> limits) {
         openShift
-            .deploymentConfigs()
-            .withName(getServiceName()) // Deployment config has same name as its service.
-            .edit()
-            .editOrNewSpec()
-            .editTemplate()
-            .editOrNewSpec()
-            .editContainer(0)
-            .editResources()
-            .addToRequests(transformMap(requests))
-            .addToLimits(transformMap(limits))  
-            .endResources()
-            .endContainer()
-            .endSpec()
-            .endTemplate()
-            .endSpec()
-            .done();       
-    }
-
-    private Instance createInstance(Pod pod) {
-        String instanceName = pod.getMetadata().getName();
-
-        return new OpenShiftInstance(openShift, getNamespace(), instanceName);
+                 .deploymentConfigs()
+                 .withName(getServiceName()) // Deployment config has same name as its service.
+                 .edit()
+                 .editOrNewSpec()
+                 .editTemplate()
+                 .editOrNewSpec()
+                 .editContainer(0)
+                 .editResources()
+                 .addToRequests(transformMap(requests))
+                 .addToLimits(transformMap(limits))
+                 .endResources()
+                 .endContainer()
+                 .endSpec()
+                 .endTemplate()
+                 .endSpec()
+                 .done();
     }
 
     protected Optional<URL> getHttpRouteUrl(String serviceName) {
@@ -247,12 +242,12 @@ public abstract class OpenShiftDeployment implements Deployment {
     protected Optional<URI> getWebSocketRouteUri(String serviceName) {
         return getRouteUri(Protocol.ws, serviceName);
     }
-    
-    protected RouteList getRoutes(){
+
+    protected RouteList getRoutes() {
         return openShift
-                   .routes()
-                   .withLabel("service", getServiceName())
-                   .list();
+                        .routes()
+                        .withLabel("service", getServiceName())
+                        .list();
     }
 
     private Optional<URI> getRouteUri(Protocol protocol, String serviceName) {
@@ -262,7 +257,7 @@ public abstract class OpenShiftDeployment implements Deployment {
         Predicate<Route> httpPredicate = n -> n.getSpec().getTls() == null;
 
         String routeHost = null;
-        if(service == null) {
+        if (service == null) {
             // Service doesn't exist, create URL using default subdomain
             String defaultRoutingSubdomain = DeploymentConstants.getDefaultDomainSuffix();
             routeHost = getServiceName() + "-" + getNamespace() + defaultRoutingSubdomain;
@@ -305,13 +300,12 @@ public abstract class OpenShiftDeployment implements Deployment {
                 throw new IllegalArgumentException("Unrecognized protocol '" + protocol + "'");
         }
     }
-    
-    private Map<String, Quantity> transformMap(Map<String, String> x){
+
+    private Map<String, Quantity> transformMap(Map<String, String> x) {
         return x.entrySet().stream()
                 .collect(Collectors.toMap(
                                           e -> e.getKey(),
-                                          e -> new Quantity(e.getValue())
-                                      ));
+                                          e -> new Quantity(e.getValue())));
     }
-    
+
 }
