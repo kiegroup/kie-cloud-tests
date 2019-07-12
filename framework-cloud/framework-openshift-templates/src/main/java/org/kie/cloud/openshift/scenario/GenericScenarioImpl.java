@@ -38,6 +38,7 @@ import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeploymentTemplates;
 import org.kie.cloud.openshift.settings.GenericScenarioSettings;
 import org.kie.cloud.openshift.template.ProjectProfile;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -99,7 +100,7 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         kieServerDeployments.clear();
         smartRouterDeployments.clear();
 
-        if(scenarioSettings.getDeploySso()) {
+        if (scenarioSettings.getDeploySso()) {
             ssoDeployment = SsoDeployer.deploy(project);
 
             scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
@@ -111,16 +112,14 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
 
                 ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
                 envVariables.put(propertyNames.workbenchSsoClient(),
-                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-"
-                                + projectProfile.getWorkbenchName() + "-client");
+                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-" + projectProfile.getWorkbenchName() + "-client");
                 envVariables.put(propertyNames.workbenchSsoSecret(),
-                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-"
-                                + projectProfile.getWorkbenchName() + "-secret");
+                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-" + projectProfile.getWorkbenchName() + "-secret");
 
                 envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT,
-                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-client");
+                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-client");
                 envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET,
-                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-secret");
+                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-secret");
             });
 
         }
@@ -162,7 +161,7 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
             workbenchDeployment.waitForScale();
         }
         logger.info("Waiting for Controller deployment to become ready.");
-        for(ControllerDeployment controllerDeployment : controllerDeployments) {
+        for (ControllerDeployment controllerDeployment : controllerDeployments) {
             controllerDeployment.waitForScale();
         }
         logger.info("Waiting for Kie server deployment to become ready.");
@@ -238,6 +237,15 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         controllerDeployment.scale(1);
 
         return controllerDeployment;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExtraDeployments() {
+        scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
+            Map<String, String> envVariables = deploymentSettings.getEnvVariables();
+            getExtraScenarioDeployments().stream()
+                                         .forEach(extraDeployment -> ((ExtraScenarioDeploymentTemplates) extraDeployment).configure(envVariables));
+        });
     }
 
 }

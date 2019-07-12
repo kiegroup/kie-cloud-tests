@@ -19,6 +19,7 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentS
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerDatabasePersistentScenario> {
+
     /**
      * Return setup builder with additional configuration of external maven
      * repo.
@@ -29,6 +30,15 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @return Builder with configured external maven repo.
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+
+    /**
+     * Return setup builder with additional configuration of internal maven repo.
+     * 
+     * Parameters will be used automatically
+     * 
+     * @return Builder with configured internal maven repo.
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalMavenRepo();
 
     /**
      * Return setup builder with configured Git hooks dir.

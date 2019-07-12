@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.WaiterException;
@@ -48,9 +47,8 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftOperatorScenario<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements ClusteredWorkbenchKieServerDatabasePersistentScenario {
-
-    private KieApp kieApp;
+public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftOperatorScenario<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements
+                                                                       ClusteredWorkbenchKieServerDatabasePersistentScenario {
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
@@ -61,7 +59,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(KieApp kieApp, boolean deploySso) {
-        this.kieApp = kieApp;
+        super(kieApp);
         this.deploySso = deploySso;
     }
 
@@ -138,7 +136,8 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
         logNodeNameOfAllInstances();
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
@@ -167,5 +166,5 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 }

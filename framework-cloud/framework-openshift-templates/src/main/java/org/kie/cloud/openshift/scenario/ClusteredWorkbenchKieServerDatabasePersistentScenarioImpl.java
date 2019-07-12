@@ -80,6 +80,8 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
 
     @Override
     protected void deployKieDeployments() {
+        configureWithExtraDeployments();
+
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 
@@ -127,7 +129,8 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
         logNodeNameOfAllInstances();
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, databaseDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
@@ -156,5 +159,5 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 }

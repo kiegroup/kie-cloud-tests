@@ -17,18 +17,14 @@ package org.kie.cloud.openshift.scenario;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.fluent.Request;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.HACepDeployment;
 import org.kie.cloud.api.scenario.HACepScenario;
@@ -67,7 +63,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         topicOperator.createTopic(SNAPSHOTS_TOPIC);
 
         project.runOcCommandAsAdmin("create", "clusterrolebinding", "permissive-binding",
-                                               "--clusterrole=cluster-admin", "--group=system:serviceaccounts");
+                                    "--clusterrole=cluster-admin", "--group=system:serviceaccounts");
 
         project.createResourcesFromYamlAsAdmin(OpenShiftConstants.getHaCepResourcesList());
         haCepDeployment = new HACepDeploymentImpl(project);
@@ -104,7 +100,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static void filterNamespaceInInstallationFiles(final File amqStreamsInstallDirectory,
                                                            final String projectName) {
         final List<File> installationFiles = Arrays.asList(amqStreamsInstallDirectory.listFiles());
-        for (File file: installationFiles) {
+        for (File file : installationFiles) {
             if (file.isFile() && file.getName().contains("RoleBinding")) {
                 try {
                     String fileContent = FileUtils.readFileToString(file, "UTF-8");
@@ -120,10 +116,10 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     private static List<String> sortedFolderContent(final File folder) {
         return Arrays.asList(folder.listFiles())
-                .stream()
-                .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
-                .map(f -> f.getAbsolutePath())
-                .collect(Collectors.toList());
+                     .stream()
+                     .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
+                     .map(f -> f.getAbsolutePath())
+                     .collect(Collectors.toList());
     }
 
     @Override

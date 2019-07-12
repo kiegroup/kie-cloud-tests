@@ -37,6 +37,7 @@ import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SmartRouter;
 import org.kie.cloud.openshift.operator.resources.OpenShiftResource;
+import org.kie.cloud.openshift.operator.scenario.extra.ExtraScenarioDeploymentOperator;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.OpenShiftScenario;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
@@ -47,8 +48,11 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftOperatorScenario.class);
 
-    public OpenShiftOperatorScenario() {
+    protected KieApp kieApp;
+
+    public OpenShiftOperatorScenario(KieApp kieApp) {
         super(false);
+        this.kieApp = kieApp;
     }
 
     @Override
@@ -71,12 +75,12 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void createCustomResourceDefinitionsInOpenShift(OpenShiftBinary adminBinary) {
         // TODO: Commented out due to UnrecognizedPropertyException, uncomment with raised Fabric8 version to check if it is fixed already.
-//        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
-//        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
-//        if(!operatorCrdExists) {
-            logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
-            adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
-//        }
+        //        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
+        //        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
+        //        if(!operatorCrdExists) {
+        logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
+        adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
+        //        }
     }
 
     private void createServiceAccountInProject(Project project) {
@@ -142,5 +146,11 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     protected NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> getKieAppClient() {
         CustomResourceDefinition customResourceDefinition = OpenShifts.master().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
         return OpenShifts.master().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExtraDeployments() {
+        getExtraScenarioDeployments().stream()
+                                     .forEach(extraDeployment -> ((ExtraScenarioDeploymentOperator) extraDeployment).configure(kieApp));
     }
 }

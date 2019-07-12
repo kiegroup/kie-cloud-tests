@@ -26,12 +26,19 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
+import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeploymentFactory;
+import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeploymentFactoryImpl;
+import org.kie.cloud.openshift.scenario.extra.MavenRepositoryExtraScenarioDeployment;
 
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
     private boolean deploySso = false;
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
+
+    private boolean deployInternalMaven = false;
+
+    private ExtraScenarioDeploymentFactory extraDeploymentFactory = new ExtraScenarioDeploymentFactoryImpl();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
@@ -50,7 +57,11 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenario build() {
-        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(envVariables, deploySso);
+        ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl scenario = new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(envVariables, deploySso);
+        if (deployInternalMaven) {
+            scenario.addExtraDeployment(extraDeploymentFactory.get(MavenRepositoryExtraScenarioDeployment.ID, new HashMap<String, String>()));
+        }
+        return scenario;
     }
 
     @Override
@@ -58,6 +69,12 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalMavenRepo() {
+        deployInternalMaven = true;
         return this;
     }
 

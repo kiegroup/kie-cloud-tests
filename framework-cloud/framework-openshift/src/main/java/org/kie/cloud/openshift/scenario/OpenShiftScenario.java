@@ -33,6 +33,7 @@ import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
 import org.kie.cloud.openshift.log.EventsRecorder;
 import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeployment;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,8 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     private InstancesLogCollectorRunnable instancesLogCollectorRunnable;
 
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
+
+    private List<ExtraScenarioDeployment<?, ?>> extraDeployments = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
 
@@ -108,6 +111,12 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             deploymentScenarioListener.beforeDeploymentStarted((T) this);
         }
 
+        for (ExtraScenarioDeployment<?, ?> extraDeployment : this.extraDeployments) {
+            Deployment deployment = extraDeployment.deploy(project);
+            deployment.waitForScheduled();
+        }
+        configureWithExtraDeployments();
+
         deployKieDeployments();
     }
 
@@ -115,6 +124,10 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      * Deploy Kie deployments for this scenario and wait until deployments are ready for use.
      */
     protected abstract void deployKieDeployments();
+
+    protected void configureWithExtraDeployments() {
+        // Do nothing by default
+    }
 
     @Override
     public void undeploy() {
@@ -153,5 +166,13 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     @Override
     public void addDeploymentScenarioListener(DeploymentScenarioListener<T> deploymentScenarioListener) {
         deploymentScenarioListeners.add(deploymentScenarioListener);
+    }
+
+    public void addExtraDeployment(ExtraScenarioDeployment<?, ?> extraDeployment) {
+        extraDeployments.add(extraDeployment);
+    }
+
+    protected List<ExtraScenarioDeployment<?, ?>> getExtraScenarioDeployments() {
+        return extraDeployments;
     }
 }

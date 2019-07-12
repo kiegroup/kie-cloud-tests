@@ -23,6 +23,7 @@ import cz.xtf.core.openshift.OpenShift;
 import io.fabric8.kubernetes.api.model.Service;
 
 public class ServiceUtil {
+
     //TODO: regex patterns should be rather moved into the Deployment? classes responsible for individual applications
     private static final Pattern CONTROLLER_REGEXP = Pattern.compile("(?!secure-).*-controller");
     private static final Pattern WORKBENCH_REGEXP = Pattern.compile("(?!secure-).*(-rhpamcentr|-rhdmcentr)");
@@ -33,6 +34,7 @@ public class ServiceUtil {
     private static final Pattern SSO_REGEXP = Pattern.compile("(?!secure-).*sso");
     private static final Pattern SECURE_SSO_REGEXP = Pattern.compile("secure-sso");
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
+    private static final Pattern MAVEN_NEXUS_REPOSITORY_REGEXP = Pattern.compile("nexus");
     private static final Pattern PROMETHEUS_REGEXP = Pattern.compile("prometheus-operated");
 
     public static String getControllerServiceName(OpenShift openShift) {
@@ -69,6 +71,10 @@ public class ServiceUtil {
 
     public static String getDockerServiceName(OpenShift openShift) {
         return getServiceName(openShift, DOCKER_REGEXP);
+    }
+
+    public static String getMavenNexusServiceName(OpenShift openShift) {
+        return getServiceName(openShift, MAVEN_NEXUS_REPOSITORY_REGEXP);
     }
 
     public static String getPrometheusServiceName(OpenShift openShift) {
