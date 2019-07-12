@@ -66,6 +66,11 @@ public class OpenShiftOperatorConstants implements Constants {
      */
     public static final String KIE_OPERATOR_IMAGE_TAG = "kie.operator.image.tag";
 
+    /**
+     * Set to true if you don't need Kie Operator UI up and running. Skipping of this check can save around 30 seconds.
+     */
+    public static final String KIE_OPERATOR_CONSOLE_CHECK_SKIP = "kie.operator.console.check.skip";
+
     public static Optional<String> getKieImageRegistryCustom() {
         String kieOperatorImageTag = System.getProperty(KIE_IMAGE_REGISTRY_CUSTOM);
         if (kieOperatorImageTag != null && !kieOperatorImageTag.isEmpty()) {
@@ -80,6 +85,11 @@ public class OpenShiftOperatorConstants implements Constants {
             throw new RuntimeException("System property " + KIE_OPERATOR_IMAGE_TAG + " has to be defined so specific Kie Operator version is deployed.");
         }
         return kieOperatorImageTag;
+    }
+
+    public static boolean skipKieOperatorConsoleCheck() {
+        String skipKieOperatorConsoleCheck = System.getProperty(KIE_OPERATOR_CONSOLE_CHECK_SKIP, "false");
+        return Boolean.valueOf(skipKieOperatorConsoleCheck);
     }
 
     @Override
