@@ -32,6 +32,10 @@
       <groupId>cz.xtf</groupId>
       <artifactId>builder</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.reactivex</groupId>
+      <artifactId>rxjava</artifactId>
+    </dependency>
 
     <!-- RH SSO dependencies  -->
     <dependency>
