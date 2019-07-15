@@ -48,6 +48,21 @@ public class OpenShiftController {
     }
 
     /**
+     * @return OpenShift admin with project namespace configured.
+     */
+    public static OpenShift getOpenShiftAdmin() {
+        return getOpenShiftAdmin(OpenShiftConfig.namespace());
+    }
+
+    /**
+     * @param projectName Namespace to be set to OpenShift.
+     * @return OpenShift admin with project namespace configured.
+     */
+    public static OpenShift getOpenShiftAdmin(String projectName) {
+        return OpenShifts.admin(projectName);
+    }
+
+    /**
      * @param projectName Project name.
      * @return Project object representing created project.
      */
