@@ -28,7 +28,9 @@ import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
+import org.kie.cloud.openshift.operator.deployment.external.ExternalDeploymentOperator;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.KieAppDoneable;
 import org.kie.cloud.openshift.operator.model.KieAppList;
@@ -37,7 +39,6 @@ import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SmartRouter;
 import org.kie.cloud.openshift.operator.resources.OpenShiftResource;
-import org.kie.cloud.openshift.operator.scenario.extra.ExtraScenarioDeploymentOperator;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.OpenShiftScenario;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
@@ -148,9 +149,10 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         return OpenShifts.master().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
     }
 
+    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    protected void configureWithExtraDeployments() {
-        getExtraScenarioDeployments().stream()
-                                     .forEach(extraDeployment -> ((ExtraScenarioDeploymentOperator) extraDeployment).configure(kieApp));
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentOperator) externalDeployment).configure(kieApp);
     }
+
 }

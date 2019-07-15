@@ -1,8 +1,8 @@
-package org.kie.cloud.openshift.scenario.extra;
+package org.kie.cloud.openshift.deployment.external;
 
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 
-public interface MavenRepositoryExtraScenarioDeployment<U> extends ExtraScenarioDeployment<MavenRepositoryDeployment, U> {
+public interface MavenRepositoryExternalDeployment<U> extends ExternalDeployment<MavenRepositoryDeployment, U> {
 
     static String ID = "MavenRepositoryExtraScenarioDeployment";
 

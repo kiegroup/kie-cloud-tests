@@ -1,4 +1,4 @@
-package org.kie.cloud.openshift.scenario.extra;
+package org.kie.cloud.openshift.deployment.external;
 
 import java.util.Map;
 import java.util.Objects;
@@ -6,13 +6,13 @@ import java.util.Objects;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.openshift.resource.Project;
 
-public abstract class AbstractExtraScenarionDeployment<T extends Deployment, U> implements ExtraScenarioDeployment<T, U> {
+public abstract class AbstractExternalDeployment<T extends Deployment, U> implements ExternalDeployment<T, U> {
 
     protected Map<String, String> deploymentConfig;
 
     private T deployment;
 
-    public AbstractExtraScenarionDeployment(Map<String, String> deploymentConfig) {
+    public AbstractExternalDeployment(Map<String, String> deploymentConfig) {
         super();
         this.deploymentConfig = deploymentConfig;
     }

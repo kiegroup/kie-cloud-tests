@@ -1,4 +1,4 @@
-package org.kie.cloud.openshift.scenario.extra;
+package org.kie.cloud.openshift.deployment.external;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import org.kie.cloud.openshift.resource.Project;
 /**
  * Definition of a deployment which should be launched parallel or not to scenario
  */
-public interface ExtraScenarioDeployment<T extends Deployment, U> {
+public interface ExternalDeployment<T extends Deployment, U> {
 
     /** 
      * @return Key used to identity the extra deployment

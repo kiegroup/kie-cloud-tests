@@ -80,7 +80,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
 
     @Override
     protected void deployKieDeployments() {
-        configureWithExtraDeployments();
 
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);

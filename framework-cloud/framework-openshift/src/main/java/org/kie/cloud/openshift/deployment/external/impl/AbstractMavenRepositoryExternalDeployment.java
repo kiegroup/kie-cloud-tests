@@ -1,17 +1,17 @@
-package org.kie.cloud.openshift.scenario.extra.impl;
+package org.kie.cloud.openshift.deployment.external.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
+import org.kie.cloud.openshift.deployment.external.AbstractExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.scenario.extra.AbstractExtraScenarionDeployment;
-import org.kie.cloud.openshift.scenario.extra.MavenRepositoryExtraScenarioDeployment;
 import org.kie.cloud.openshift.util.MavenRepositoryDeployer;
 
-public abstract class AbstractMavenRepositoryExtraScenarioDeployment<U> extends AbstractExtraScenarionDeployment<MavenRepositoryDeployment, U> implements MavenRepositoryExtraScenarioDeployment<U> {
+public abstract class AbstractMavenRepositoryExternalDeployment<U> extends AbstractExternalDeployment<MavenRepositoryDeployment, U> implements MavenRepositoryExternalDeployment<U> {
 
-    public AbstractMavenRepositoryExtraScenarioDeployment(Map<String, String> config) {
+    public AbstractMavenRepositoryExternalDeployment(Map<String, String> config) {
         super(config);
     }
 

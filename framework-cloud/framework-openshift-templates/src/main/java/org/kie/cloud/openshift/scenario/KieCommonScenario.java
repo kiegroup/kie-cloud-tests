@@ -18,7 +18,8 @@ package org.kie.cloud.openshift.scenario;
 import java.util.Map;
 
 import org.kie.cloud.api.scenario.DeploymentScenario;
-import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeploymentTemplates;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentTemplates;
 
 public abstract class KieCommonScenario<T extends DeploymentScenario<T>> extends OpenShiftScenario<T> {
 
@@ -28,10 +29,10 @@ public abstract class KieCommonScenario<T extends DeploymentScenario<T>> extends
         this.envVariables = envVariables;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    protected void configureWithExtraDeployments() {
-        getExtraScenarioDeployments().stream()
-                                     .forEach(extraDeployment -> ((ExtraScenarioDeploymentTemplates) extraDeployment).configure(envVariables));
-    }
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+		((ExternalDeploymentTemplates) externalDeployment).configure(envVariables);
+	}
 
 }

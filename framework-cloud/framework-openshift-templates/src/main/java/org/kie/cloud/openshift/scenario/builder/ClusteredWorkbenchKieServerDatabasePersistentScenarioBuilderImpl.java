@@ -25,10 +25,10 @@ import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactory;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactoryImpl;
+import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
-import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeploymentFactory;
-import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeploymentFactoryImpl;
-import org.kie.cloud.openshift.scenario.extra.MavenRepositoryExtraScenarioDeployment;
 
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
@@ -38,7 +38,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     private boolean deployInternalMaven = false;
 
-    private ExtraScenarioDeploymentFactory extraDeploymentFactory = new ExtraScenarioDeploymentFactoryImpl();
+    private ExternalDeploymentFactory extraDeploymentFactory = new ExternalDeploymentFactoryImpl();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
@@ -59,7 +59,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
     public ClusteredWorkbenchKieServerDatabasePersistentScenario build() {
         ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl scenario = new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(envVariables, deploySso);
         if (deployInternalMaven) {
-            scenario.addExtraDeployment(extraDeploymentFactory.get(MavenRepositoryExtraScenarioDeployment.ID, new HashMap<String, String>()));
+            scenario.addExtraDeployment(extraDeploymentFactory.get(MavenRepositoryExternalDeployment.ID, new HashMap<String, String>()));
         }
         return scenario;
     }

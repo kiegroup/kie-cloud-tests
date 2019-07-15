@@ -37,8 +37,9 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentTemplates;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeploymentTemplates;
 import org.kie.cloud.openshift.settings.GenericScenarioSettings;
 import org.kie.cloud.openshift.template.ProjectProfile;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -239,13 +240,13 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         return controllerDeployment;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    protected void configureWithExtraDeployments() {
-        scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
-            Map<String, String> envVariables = deploymentSettings.getEnvVariables();
-            getExtraScenarioDeployments().stream()
-                                         .forEach(extraDeployment -> ((ExtraScenarioDeploymentTemplates) extraDeployment).configure(envVariables));
+    @Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+    	scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
+    		((ExternalDeploymentTemplates) externalDeployment).configure(deploymentSettings.getEnvVariables());
         });
-    }
+		
+	}
 
 }

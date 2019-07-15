@@ -53,7 +53,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
 
     private List<ExtraScenarioDeployment<?, ?>> extraDeployments = new ArrayList<>();
-
+    
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
 
     public OpenShiftScenario() {
@@ -111,12 +111,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             deploymentScenarioListener.beforeDeploymentStarted((T) this);
         }
 
-        for (ExtraScenarioDeployment<?, ?> extraDeployment : this.extraDeployments) {
-            Deployment deployment = extraDeployment.deploy(project);
-            deployment.waitForScheduled();
-        }
-        configureWithExtraDeployments();
-
         deployKieDeployments();
     }
 
@@ -124,10 +118,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      * Deploy Kie deployments for this scenario and wait until deployments are ready for use.
      */
     protected abstract void deployKieDeployments();
-
-    protected void configureWithExtraDeployments() {
-        // Do nothing by default
-    }
 
     @Override
     public void undeploy() {
@@ -168,11 +158,15 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         deploymentScenarioListeners.add(deploymentScenarioListener);
     }
 
-    public void addExtraDeployment(ExtraScenarioDeployment<?, ?> extraDeployment) {
-        extraDeployments.add(extraDeployment);
-    }
+    public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
 
-    protected List<ExtraScenarioDeployment<?, ?>> getExtraScenarioDeployments() {
-        return extraDeployments;
+            @Override
+            public void beforeDeploymentStarted(T deploymentScenario) {
+                Deployment deployment = externalDeployment.deploy(project);
+                deployment.waitForScheduled();
+                configureWithExternalDeployment(externalDeployment);
+            }
+        });
     }
 }
