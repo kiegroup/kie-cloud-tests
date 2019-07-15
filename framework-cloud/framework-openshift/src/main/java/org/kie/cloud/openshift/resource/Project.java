@@ -44,6 +44,11 @@ public interface Project extends AutoCloseable {
     public OpenShift getOpenShift();
 
     /**
+     * @return OpenShift admin client.
+     */
+    public OpenShift getOpenShiftAdmin();
+
+    /**
      * Process template and create all resources defined there.
      *
      * @param templateUrl URL of template to be processed

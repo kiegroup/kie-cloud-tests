@@ -19,11 +19,13 @@ import java.util.Collections;
 
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
+import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.rbac.KubernetesRole;
+import io.fabric8.kubernetes.api.model.rbac.KubernetesRoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
-import io.fabric8.openshift.client.NamespacedOpenShiftClient;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
@@ -61,9 +63,9 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         OpenShiftBinary adminBinary = OpenShifts.adminBinary();
 
         createCustomResourceDefinitionsInOpenShift(adminBinary);
-        createServiceAccountInProject(adminBinary, project);
-        createRoleInProject(adminBinary, project);
-        createRoleBindingsInProject(adminBinary, project);
+        createServiceAccountInProject(project);
+        createRoleInProject(project);
+        createRoleBindingsInProject(project);
         createOperatorInProject(project);
     }
 
@@ -77,30 +79,29 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 //        }
     }
 
-    private void createServiceAccountInProject(OpenShiftBinary adminBinary, Project project) {
+    private void createServiceAccountInProject(Project project) {
         logger.info("Creating service account in project '" + project.getName() + "' from " + OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
-        adminBinary.project(project.getName());
-        adminBinary.execute("create", "-f", OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl().toString());
+        ServiceAccount serviceAccount = project.getOpenShiftAdmin().serviceAccounts().load(OpenShiftResource.SERVICE_ACCOUNT.getResourceUrl()).get();
+        project.getOpenShiftAdmin().serviceAccounts().inNamespace(project.getName()).create(serviceAccount);
     }
 
-    private void createRoleInProject(OpenShiftBinary adminBinary, Project project) {
+    private void createRoleInProject(Project project) {
         logger.info("Creating role in project '" + project.getName() + "' from " + OpenShiftResource.ROLE.getResourceUrl().toString());
-        adminBinary.project(project.getName());
-        adminBinary.execute("create", "-f", OpenShiftResource.ROLE.getResourceUrl().toString());
+        KubernetesRole role = project.getOpenShiftAdmin().rbac().kubernetesRoles().load(OpenShiftResource.ROLE.getResourceUrl()).get();
+        project.getOpenShiftAdmin().rbac().kubernetesRoles().inNamespace(project.getName()).create(role);
     }
 
-    private void createRoleBindingsInProject(OpenShiftBinary adminBinary, Project project) {
+    private void createRoleBindingsInProject(Project project) {
         logger.info("Creating role bindings in project '" + project.getName() + "' from " + OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
-        adminBinary.project(project.getName());
-        adminBinary.execute("create", "-f", OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
+        KubernetesRoleBinding roleBinding = project.getOpenShiftAdmin().rbac().kubernetesRoleBindings().load(OpenShiftResource.ROLE_BINDING.getResourceUrl()).get();
+        project.getOpenShiftAdmin().rbac().kubernetesRoleBindings().inNamespace(project.getName()).create(roleBinding);
     }
 
     private void createOperatorInProject(Project project) {
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
-        NamespacedOpenShiftClient client = OpenShifts.master(project.getName());
-        Deployment deployment = client.apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
+        Deployment deployment = project.getOpenShift().apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
         deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(OpenShiftOperatorConstants.getKieOperatorImageTag());
-        client.apps().deployments().create(deployment);
+        project.getOpenShift().apps().deployments().create(deployment);
 
         // wait until operator is ready
         project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "kie-cloud-operator").waitFor();

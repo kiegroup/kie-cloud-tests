@@ -56,10 +56,12 @@ public class ProjectImpl implements Project {
 
     private String projectName;
     private OpenShift openShift;
+    private OpenShift openShiftAdmin;
 
     public ProjectImpl(String projectName) {
         this.projectName = projectName;
         this.openShift = OpenShiftController.getOpenShift(projectName);
+        this.openShiftAdmin = OpenShiftController.getOpenShiftAdmin(projectName);
     }
 
     @Override
@@ -67,8 +69,14 @@ public class ProjectImpl implements Project {
         return projectName;
     }
 
+    @Override
     public OpenShift getOpenShift() {
         return openShift;
+    }
+
+    @Override
+    public OpenShift getOpenShiftAdmin() {
+        return openShiftAdmin;
     }
 
     @Override
