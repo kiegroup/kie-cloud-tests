@@ -45,7 +45,7 @@ public class KieServerControllerClientProvider {
         while (Instant.now().isBefore(timeoutTime)) {
 
             ServerTemplateList serverTemplates = getKieServerControllerClient(workbenchDeployment).listServerTemplates();
-            if(serverTemplates.getServerTemplates().length == numberOfServerTemplates) {
+            if(serverTemplates.getServerTemplates() != null && serverTemplates.getServerTemplates().length == numberOfServerTemplates) {
                 return;
             }
 
