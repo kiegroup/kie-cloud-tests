@@ -15,15 +15,24 @@
  */
 package org.kie.cloud.openshift.deployment;
 
+import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import cz.xtf.core.openshift.OpenShift;
+import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerStateRunning;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.Instance;
 import rx.Observable;
+import rx.observables.StringObservable;
 
 import static org.kie.cloud.openshift.util.CommandUtil.runCommandImpl;
 
@@ -85,11 +94,53 @@ public class OpenShiftInstance implements Instance {
 
     @Override
     public String getLogs() {
-        Pod pod = openshift.getPod(name);
-        return openshift.getPodLog(pod);
+        // Get logs from first container (or null if none ?...)
+        return getLogs(getContainers()
+                                      .stream()
+                                      .findFirst()
+                                      .map(Container::getName)
+                                      .orElse(null));
     }
 
-    public Observable<String> observeLogs() {
-        return openshift.observePodLog(openshift.getPod(getName()));
+    /**
+     * Return a map (containerName/logs) of all containers logs from the pod
+     * @return
+     */
+    public Map<String, String> getAllContainerLogs() {
+        return getContainers()
+                              .stream()
+                              .map(Container::getName)
+                              .collect(Collectors.toMap(Function.identity(), this::getLogs));
+    }
+
+    /**
+     * Return logs from a specific container of the pod
+     * @param containerName
+     * @return
+     */
+    public String getLogs(String containerName) {
+        return Optional.ofNullable(containerName)
+                       .map(cname -> openshift.pods().withName(name).inContainer(cname).getLog())
+                       .orElse(openshift.getPodLog(openshift.getPod(name)));
+    }
+
+    private List<Container> getContainers() {
+        return openshift.getPod(name).getSpec().getContainers();
+    }
+
+    public Map<String, Observable<String>> observeAllContainersLogs() {
+        return getContainers()
+                              .stream()
+                              .map(Container::getName)
+                              .collect(Collectors.toMap(Function.identity(), this::observeContainerLogs));
+    }
+
+    public Observable<String> observeContainerLogs(String containerName) {
+        return Optional.ofNullable(containerName)
+                       .map(cname -> {
+                           LogWatch watcher = openshift.pods().withName(name).inContainer(cname).watchLog();
+                           return StringObservable.byLine(StringObservable.from(new InputStreamReader(watcher.getOutput())));
+                       })
+                       .orElse(openshift.observePodLog(openshift.getPod(name)));
     }
 }
