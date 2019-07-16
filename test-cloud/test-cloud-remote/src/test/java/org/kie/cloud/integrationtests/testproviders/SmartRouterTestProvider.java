@@ -86,7 +86,9 @@ public class SmartRouterTestProvider {
             assertLogMessages(kieServerDeploymentTwo);
         } finally {
             kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId);
+            kieServerDeploymentOne.waitForContainerRespin();
             kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId);
+            kieServerDeploymentTwo.waitForContainerRespin();
         }
     }
 
@@ -95,6 +97,7 @@ public class SmartRouterTestProvider {
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(),
                 containerId, containerAlias, Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
         KieServerClientProvider.waitForContainerStart(deployment, containerId);
+        deployment.waitForContainerRespin();
     }
 
     private static void assertLogMessages(KieServerDeployment kieServerDeployment) {
