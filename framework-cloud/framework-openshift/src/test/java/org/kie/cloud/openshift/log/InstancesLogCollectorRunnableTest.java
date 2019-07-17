@@ -3,13 +3,16 @@ package org.kie.cloud.openshift.log;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +34,7 @@ public class InstancesLogCollectorRunnableTest {
     private static final String PROJECT_NAME = "PROJECT_NAME";
     private static final String LOG_OUTPUT_DIRECTORY = "instances";
     private static final String LOG_SUFFIX = ".log";
+    private static final String CONTAINER_NAME = "container";
 
     private static final Integer DEFAULT_WAIT_FOR_COMPLETION_IN_MS = 5000;
 
@@ -46,6 +50,11 @@ public class InstancesLogCollectorRunnableTest {
         Mockito.when(projectMock.getName()).thenReturn(PROJECT_NAME);
 
         cut = new InstancesLogCollectorRunnable(projectMock, LOG_FOLDER_NAME);
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        FileUtils.deleteDirectory(new File(LOG_OUTPUT_DIRECTORY));
     }
 
     @Test
@@ -129,6 +138,27 @@ public class InstancesLogCollectorRunnableTest {
         checkLog("BONJOUR", false);
     }
 
+    @Test
+    public void killBeforeFinishedAndFlush() {
+        List<OpenShiftInstance> instances = setInstanceMocks("BONJOUR");
+        setObserveLogCallable(instances, 2000);
+        instances.forEach(inst -> Mockito.when(inst.exists()).thenReturn(true));
+        ExecutorService executorService = retrieveExecutorService();
+
+        cut.run();
+
+        assertEquals(1, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances("BONJOUR");
+
+        // Here we wait less than the time for the message to be delivered
+        cut.closeAndFlushRemainingInstanceCollectors(1000);
+
+        assertEquals(0, ((ThreadPoolExecutor) executorService).getActiveCount());
+        checkObservedInstances();
+
+        checkLog("BONJOUR", true);
+    }
+
     private List<OpenShiftInstance> setInstanceMocks(String... messages) {
         List<OpenShiftInstance> instances = Arrays.asList(messages)
                                                   .stream()
@@ -151,13 +181,20 @@ public class InstancesLogCollectorRunnableTest {
 
     private void setObserveLogCallable(List<OpenShiftInstance> instances, Integer waitForMessage) {
         instances.forEach(instance -> {
-            Mockito.when(instance.observeLogs()).then((invocation) -> {
-                return Observable.fromCallable(() -> {
+            Mockito.when(instance.observeAllContainersLogs()).then((invocation) -> {
+                Map<String, Observable<String>> observes = new HashMap<>();
+                observes.put(CONTAINER_NAME, Observable.fromCallable(() -> {
                     if (Objects.nonNull(waitForMessage)) {
                         Thread.sleep(waitForMessage);
                     }
                     return instance.getName();
-                });
+                }));
+                return observes;
+            });
+            Mockito.when(instance.getAllContainerLogs()).then((invocation) -> {
+                Map<String, String> observes = new HashMap<>();
+                observes.put(CONTAINER_NAME, instance.getName());
+                return observes;
             });
         });
     }
@@ -195,6 +232,6 @@ public class InstancesLogCollectorRunnableTest {
     private static File getOutputFile(String instanceName) {
         File outputDirectory = new File(LOG_OUTPUT_DIRECTORY, LOG_FOLDER_NAME);
         outputDirectory.mkdirs();
-        return new File(outputDirectory, instanceName + LOG_SUFFIX);
+        return new File(outputDirectory, instanceName + "-" + CONTAINER_NAME + LOG_SUFFIX);
     }
 }
