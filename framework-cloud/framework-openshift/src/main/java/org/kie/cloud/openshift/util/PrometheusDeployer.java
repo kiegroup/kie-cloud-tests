@@ -77,6 +77,8 @@ public class PrometheusDeployer {
     private static final String METRIC_SECRET_USERNAME_KEY = "username";
     private static final String METRIC_SECRET_PASSWORD_KEY = "password";
 
+    private static final String PROMETHEUS_OPERATOR_NAME = "prometheus";
+
     public static PrometheusDeployment deploy(Project project, KieServerDeployment kieServerDeployment) {
         addClusterRoleToAdminUser(project);
 
@@ -101,7 +103,7 @@ public class PrometheusDeployer {
     }
 
     public static PrometheusDeployment deployAsOperator(Project project, KieServerDeployment kieServerDeployment) {
-        OperatorDeployer.deploy(project, "prometheus", "beta");
+        OperatorDeployer.deploy(project, PROMETHEUS_OPERATOR_NAME, "beta");
 
         createServiceAccount(project, PROMETHEUS_SERVICE_ACCOUNT);
         createPrometheusOperatorClusterRole(project, PROMETHEUS_CLUSTER_ROLE);
@@ -114,6 +116,10 @@ public class PrometheusDeployer {
 
         PrometheusDeployment prometheusDeployment = new PrometheusDeploymentImpl(project);
         return prometheusDeployment;
+    }
+
+    public static void undeployOperator(Project project) {
+        OperatorDeployer.undeploy(project, PROMETHEUS_OPERATOR_NAME);
     }
 
     private static void addClusterRoleToAdminUser(Project project) {
