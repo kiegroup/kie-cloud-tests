@@ -29,6 +29,7 @@ import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactory;
 import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactoryImpl;
 import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
+import org.slf4j.LoggerFactory;
 
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl implements ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
@@ -74,6 +75,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalMavenRepo() {
+        LoggerFactory.getLogger(this.getClass()).info("Builder withInternalMavenRepo");
         deployInternalMaven = true;
         return this;
     }

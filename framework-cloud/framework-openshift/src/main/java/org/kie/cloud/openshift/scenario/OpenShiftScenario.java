@@ -159,10 +159,12 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     }
 
     public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        logger.info("Added externalDeployment {} as DeploymentScenarioListener", externalDeployment.getKey());
         addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
 
             @Override
             public void beforeDeploymentStarted(T deploymentScenario) {
+                logger.info("beforeDeploymentStarted with externalDeployment {}", externalDeployment.getKey());
                 Deployment deployment = externalDeployment.deploy(project);
                 deployment.waitForScheduled();
                 configureWithExternalDeployment(externalDeployment);

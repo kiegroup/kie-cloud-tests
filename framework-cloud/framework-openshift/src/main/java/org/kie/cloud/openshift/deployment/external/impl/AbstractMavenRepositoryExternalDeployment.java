@@ -8,8 +8,12 @@ import org.kie.cloud.openshift.deployment.external.AbstractExternalDeployment;
 import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.MavenRepositoryDeployer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMavenRepositoryExternalDeployment<U> extends AbstractExternalDeployment<MavenRepositoryDeployment, U> implements MavenRepositoryExternalDeployment<U> {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractMavenRepositoryExternalDeployment.class);
 
     public AbstractMavenRepositoryExternalDeployment(Map<String, String> config) {
         super(config);
@@ -17,6 +21,7 @@ public abstract class AbstractMavenRepositoryExternalDeployment<U> extends Abstr
 
     @Override
     protected MavenRepositoryDeployment deployToProject(Project project) {
+        logger.info("Maven deployToProject for deplyment {}", this.getKey());
         return MavenRepositoryDeployer.deploy(project, false);
     }
 

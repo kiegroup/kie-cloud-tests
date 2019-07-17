@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.slf4j.LoggerFactory;
 
 public class MavenUtil {
     private final Verifier maven;

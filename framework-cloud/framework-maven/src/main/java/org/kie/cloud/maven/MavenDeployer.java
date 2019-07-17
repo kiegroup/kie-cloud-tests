@@ -17,13 +17,16 @@ package org.kie.cloud.maven;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.it.VerificationException;
 import org.kie.cloud.api.constants.ConfigurationInitializer;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.maven.util.MavenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class MavenDeployer {
 
@@ -33,6 +36,7 @@ public class MavenDeployer {
 
     static {
         ConfigurationInitializer.initConfigProperties();
+        logger.info("Repo url is {}", MavenConstants.getMavenRepoUrl());
     }
 
     /**
@@ -63,6 +67,7 @@ public class MavenDeployer {
         try {
             MavenUtil mavenUtil = MavenUtil.forProject(Paths.get(basedir)).forkJvm();
             addSettingsXmlPathIfExists(mavenUtil);
+            addDistributionRepository(mavenUtil);
             mavenUtil.executeGoals(buildCommand);
 
             logger.debug("Maven project successfully built and deployed!");
@@ -85,5 +90,18 @@ public class MavenDeployer {
                 throw new RuntimeException("Path to settings.xml file with value " + SETTINGS_XML_PATH + " points to non existing location.");
             }
         }
+    }
+
+    /**
+     * Add settings.xml file to maven build if it was defined and exists.
+     *
+     * @param mavenUtil
+     */
+    private static void addDistributionRepository(MavenUtil mavenUtil) {
+        List<String> cliOptions = new ArrayList<String>();
+        Optional.ofNullable(MavenConstants.getMavenRepoUrl()).map(url -> "-Dmaven.repo.url=" + url.replaceAll("\\/\\/", "\\/\\/\\/")).ifPresent(cliOptions::add);
+        Optional.ofNullable(MavenConstants.getMavenRepoUser()).map(username -> "-Dmaven.repo.username=" + username).ifPresent(cliOptions::add);
+        Optional.ofNullable(MavenConstants.getMavenRepoPassword()).map(password -> "-Dmaven.repo.password=" + password).ifPresent(cliOptions::add);
+        mavenUtil.addCliOptions(cliOptions);
     }
 }
