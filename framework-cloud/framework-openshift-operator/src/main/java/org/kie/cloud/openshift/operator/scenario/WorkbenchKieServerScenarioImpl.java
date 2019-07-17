@@ -100,6 +100,12 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     }
 
     @Override
+    public void undeploy() {
+        PrometheusDeployer.undeployOperator(project);
+        super.undeploy();
+    }
+
+    @Override
     public WorkbenchDeployment getWorkbenchDeployment() {
         return workbenchDeployment;
     }
