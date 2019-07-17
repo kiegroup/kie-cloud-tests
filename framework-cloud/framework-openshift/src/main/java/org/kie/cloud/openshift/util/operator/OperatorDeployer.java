@@ -42,6 +42,12 @@ public class OperatorDeployer {
         createSubscription(project, catalogSourceName, operatorName, updateChannel);
     }
 
+    public static void undeploy(Project project, String operatorName) {
+        String catalogSourceName = project.getName() + "-" + operatorName;
+
+        deleteCatalogSourceConfig(project, catalogSourceName);
+    }
+
     private static void createCatalogSourceConfig(Project project, String catalogSourceName, String operatorName) {
         String catalogSourceConfig = "apiVersion: operators.coreos.com/v1\n" +
                 "kind: CatalogSourceConfig\n" +
@@ -52,6 +58,11 @@ public class OperatorDeployer {
                 "  targetNamespace: " + project.getName() + "\n" +
                 "  packages: " + operatorName;
         executeYaml(project, catalogSourceConfig);
+    }
+
+    private static void deleteCatalogSourceConfig(Project project, String catalogSourceName) {
+        String execute = project.runOcCommandAsAdmin("delete", "CatalogSourceConfig", catalogSourceName, "-n", "openshift-marketplace");
+        logger.info(execute);
     }
 
     private static void createOperatorGroup(Project project, String operatorName) {
