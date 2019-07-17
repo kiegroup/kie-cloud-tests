@@ -51,7 +51,7 @@ public class InstancesLogCollectorRunnable implements Runnable {
 
     public void closeAndFlushRemainingInstanceCollectors(int waitForCompletionInMs) {
         // Make a copy before stopping collector threads
-        List<Instance> instances = new ArrayList<>(observedInstances);
+        List<OpenShiftInstance> instances = new ArrayList<>(observedInstances);
 
         // Stop all collectors
         executorService.shutdown(); // Disable new tasks from being submitted
@@ -80,10 +80,15 @@ public class InstancesLogCollectorRunnable implements Runnable {
     private void observeInstanceLog(OpenShiftInstance instance) {
         Future<?> future = executorService.submit(() -> {
             try {
-                instance.observeLogs().buffer(DEFAULT_OBERVABLE_BUFFER_IN_SECONDS, TimeUnit.SECONDS)
-                        .subscribe(logLines -> instanceLogLines(instance, logLines), error -> {
-                            throw new RuntimeException(error);
+                instance.observeAllContainersLogs()
+                        .entrySet()
+                        .forEach(entry -> {
+                            entry.getValue().buffer(DEFAULT_OBERVABLE_BUFFER_IN_SECONDS, TimeUnit.SECONDS)
+                                 .subscribe(logLines -> instanceLogLines(instance, entry.getKey(), logLines), error -> {
+                                     throw new RuntimeException(error);
+                                 });
                         });
+
             } catch (Exception e) {
                 logger.error("Problem observing logs for instance " + instance.getName(), e);
             } finally {
@@ -93,19 +98,29 @@ public class InstancesLogCollectorRunnable implements Runnable {
         setInstanceAsObserved(instance, future);
     }
 
-    private void instanceLogLines(OpenShiftInstance instance, Collection<String> logLines) {
+    private void instanceLogLines(OpenShiftInstance instance, String containerName, Collection<String> logLines) {
         logger.trace("Write log lines {}", logLines);
-        InstanceLogUtil.appendInstanceLogLines(instance.getName(), logLines, logFolderName);
+        InstanceLogUtil.appendInstanceLogLines(getName(instance, containerName), logFolderName, logLines);
     }
 
-    private void flushInstanceLogs(Instance instance) {
+    private void flushInstanceLogs(OpenShiftInstance instance) {
         logger.trace("Flushing logs from {}", instance.getName());
         if (instance.exists()) {
             logger.trace("Flush logs from {}", instance.getName());
-            InstanceLogUtil.writeInstanceLogs(instance, logFolderName);
+            instance.getAllContainerLogs()
+                    .entrySet()
+                    .forEach(entry -> {
+                        writeInstanceLogs(instance, entry.getKey(), entry.getValue());
+                    });
+
         } else {
             logger.trace("Ignoring instance {} as not running", instance.getName());
         }
+    }
+
+    private void writeInstanceLogs(OpenShiftInstance instance, String containerName, String logs) {
+        logger.trace("Write log lines {}", logs);
+        InstanceLogUtil.writeInstanceLogs(getName(instance, containerName), logFolderName, logs);
     }
 
     private boolean isInstanceObserved(OpenShiftInstance instance) {
@@ -123,6 +138,10 @@ public class InstancesLogCollectorRunnable implements Runnable {
     private void removeInstanceObserved(OpenShiftInstance instance) {
         logger.trace("finished observing instance {}", instance.getName());
         this.observedInstances.remove(instance);
+    }
+
+    private static String getName(OpenShiftInstance instance, String containerName) {
+        return instance.getName() + "-" + containerName;
     }
 
 }

@@ -17,12 +17,9 @@ package org.kie.cloud.common.logs;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,26 +32,19 @@ public class InstanceLogUtil {
     private static final String LOG_SUFFIX = ".log";
 
     public static void writeInstanceLogs(Instance instance, String customLogFolderName) {
-        File logFile = getOutputFile(instance.getName(), customLogFolderName);
+        writeInstanceLogs(instance.getName(), customLogFolderName, instance.getLogs());
+    }
+
+    public static void writeInstanceLogs(String name, String customLogFolderName, String logs) {
+        File logFile = getOutputFile(name, customLogFolderName);
         try {
-            FileUtils.write(logFile, instance.getLogs(), "UTF-8");
+            FileUtils.write(logFile, logs, "UTF-8");
         } catch (Exception e) {
             logger.error("Error writting instance logs", e);
         }
     }
 
-    public static void writeDeploymentLogs(DeploymentScenario<?> deploymentScenario) {
-        for (Deployment deployment : deploymentScenario.getDeployments()) {
-            if (deployment != null) {
-                List<Instance> instances = deployment.getInstances();
-                for (Instance instance : instances) {
-                    writeInstanceLogs(instance, deploymentScenario.getLogFolderName());
-                }
-            }
-        }
-    }
-
-    public static void appendInstanceLogLines(String instanceName, Collection<String> lines, String customLogFolderName) {
+    public static void appendInstanceLogLines(String instanceName, String customLogFolderName, Collection<String> lines) {
         File logFile = getOutputFile(instanceName, customLogFolderName);
         try {
             FileUtils.writeLines(logFile, "UTF-8", lines, true);
