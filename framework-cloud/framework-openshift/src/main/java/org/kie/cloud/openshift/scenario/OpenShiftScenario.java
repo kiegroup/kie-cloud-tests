@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.scenario;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,10 +31,10 @@ import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.log.EventsRecorder;
 import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.scenario.extra.ExtraScenarioDeployment;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +53,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
 
-    private List<ExtraScenarioDeployment<?, ?>> extraDeployments = new ArrayList<>();
-    
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
 
     public OpenShiftScenario() {
@@ -115,18 +114,29 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     }
 
     /**
-     * Deploy Kie deployments for this scenario and wait until deployments are ready for use.
+     * Deploy Kie deployments for this scenario and wait until deployments are ready
+     * for use.
      */
     protected abstract void deployKieDeployments();
+
+    // TODO need to do APB
+    protected abstract void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment);
+
+    // TODO need to do APB
+    protected abstract void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment);
 
     @Override
     public void undeploy() {
         try {
             logger.info("Release log collector(s)");
             try {
-                logCollectorExecutorService.shutdownNow();
-                logCollectorExecutorService = null;
-                instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors(5000);
+                if (Objects.nonNull(logCollectorExecutorService)) {
+                    logCollectorExecutorService.shutdownNow();
+                    logCollectorExecutorService = null;
+                }
+                if (Objects.nonNull(instancesLogCollectorRunnable)) {
+                    instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors(5000);
+                }
             } catch (Exception e) {
                 logger.error("Error killing log collector thread", e);
             }
@@ -136,6 +146,10 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
             project.delete();
             project.close();
+
+            for (DeploymentScenarioListener<T> deploymentScenarioListener : deploymentScenarioListeners) {
+                deploymentScenarioListener.afterUndeployment((T) this);
+            }
         } catch (Exception e) {
             logger.error("Error undeploy", e);
             throw new RuntimeException("Error while undeploying scenario.", e);
@@ -169,6 +183,13 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
                 deployment.waitForScheduled();
                 configureWithExternalDeployment(externalDeployment);
             }
+
+            @Override
+            public void afterUndeployment(T deploymentScenario) {
+                logger.info("beforeDeploymentStarted with externalDeployment {}", externalDeployment.getKey());
+                removeConfigurationFromExternalDeployment(externalDeployment);
+            }
+
         });
     }
 }

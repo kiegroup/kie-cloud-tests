@@ -26,6 +26,7 @@ import org.kie.cloud.api.scenario.EmployeeRosteringScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.EmployeeRosteringDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,16 @@ public class EmployeeRosteringScenarioImpl extends OpenShiftScenario<EmployeeRos
         LOGGER.info("Waiting for OptaWeb Employee Rostering deployment to become ready.");
         employeeRosteringDeployment.waitForScale();
         LOGGER.info("Waiting for OptaWeb Employee Rostering has been deployed.");
+    }
+
+    @Override
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        // Nothing done
+    }
+
+    @Override
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        // Nothing done
     }
 
     @Override

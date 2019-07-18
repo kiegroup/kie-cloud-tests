@@ -15,6 +15,12 @@ public abstract class AbstractMavenRepositoryExternalDeployment<U> extends Abstr
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMavenRepositoryExternalDeployment.class);
 
+    protected static final String SYSTEM_MAVEN_REPO_URL = "maven.repo.url";
+    protected static final String SYSTEM_MAVEN_REPO_USERNAME = "maven.repo.username";
+    protected static final String SYSTEM_MAVEN_REPO_PASSWORD = "maven.repo.password";
+
+    protected Map<String, String> oldValues = new HashMap<String, String>();
+
     public AbstractMavenRepositoryExternalDeployment(Map<String, String> config) {
         super(config);
     }
@@ -35,4 +41,34 @@ public abstract class AbstractMavenRepositoryExternalDeployment<U> extends Abstr
         return variables;
     }
 
+    @Override
+    public void configure(U obj) {
+        // TODO to change once not using system properties anymore for kjars ...
+        // Save old configuration
+        saveSystemProperty(SYSTEM_MAVEN_REPO_URL);
+        saveSystemProperty(SYSTEM_MAVEN_REPO_USERNAME);
+        saveSystemProperty(SYSTEM_MAVEN_REPO_PASSWORD);
+
+        // Setup new system properties
+        MavenRepositoryDeployment deployment = getDeploymentInformation();
+        System.setProperty(SYSTEM_MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
+        System.setProperty(SYSTEM_MAVEN_REPO_USERNAME, deployment.getUsername());
+        System.setProperty(SYSTEM_MAVEN_REPO_PASSWORD, deployment.getPassword());
+    }
+
+    @Override
+    public void removeConfiguration(U object) {
+        // Restore system properties
+        restoreSystemProperty(SYSTEM_MAVEN_REPO_URL);
+        restoreSystemProperty(SYSTEM_MAVEN_REPO_USERNAME);
+        restoreSystemProperty(SYSTEM_MAVEN_REPO_PASSWORD);
+    }
+
+    private void saveSystemProperty(String key) {
+        oldValues.put(key, System.getProperty(key));
+    }
+
+    private void restoreSystemProperty(String key) {
+        System.setProperty(key, oldValues.get(key));
+    }
 }

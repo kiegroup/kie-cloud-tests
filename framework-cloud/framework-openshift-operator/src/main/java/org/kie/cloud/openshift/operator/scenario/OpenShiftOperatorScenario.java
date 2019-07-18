@@ -155,4 +155,10 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         ((ExternalDeploymentOperator) externalDeployment).configure(kieApp);
     }
 
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentOperator) externalDeployment).removeConfiguration(kieApp);
+    }
+
 }

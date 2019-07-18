@@ -28,9 +28,16 @@ public interface ExternalDeployment<T extends Deployment, U> {
     Map<String, String> getDeploymentVariables();
 
     /**
-     * Configure the given object with deployment variables
+     * Configure the given object with this external deployment information
      * 
      * @param object This object should be specific for deployment process (templates, operator, apb ...)
      */
     void configure(U object);
+    
+    /**
+     * Remove configuration from the given object with this external deployment information
+     * 
+     * @param object This object should be specific for deployment process (templates, operator, apb ...)
+     */
+    void removeConfiguration(U object);
 }

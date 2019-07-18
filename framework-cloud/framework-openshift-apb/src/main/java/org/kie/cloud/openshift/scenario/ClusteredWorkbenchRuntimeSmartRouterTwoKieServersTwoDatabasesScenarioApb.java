@@ -36,6 +36,8 @@ import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
@@ -43,7 +45,8 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioApb extends OpenShiftScenario<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario {
+public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioApb extends OpenShiftScenario<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> implements
+                                                                                      ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario {
 
     private WorkbenchDeployment workbenchRuntimeDeployment;
     private SmartRouterDeployment smartRouterDeployment;
@@ -125,20 +128,31 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logNodeNameOfAllInstances();
     }
 
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).configure(extraVars);
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).removeConfiguration(extraVars);
+    }
 
     private void deployCustomTrustedSecret() {
         project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(),
-                Collections.emptyMap());
+                                                  Collections.emptyMap());
 
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_SECRET_NAME,
-                DeploymentConstants.getCustomTrustedSecretName());
+                      DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
+                      DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_PWD,
-                DeploymentConstants.getCustomTrustedKeystorePwd());
+                      DeploymentConstants.getCustomTrustedKeystorePwd());
         extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
+                      DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
         extraVars.put(OpenShiftApbConstants.SMARTROUTER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.SMARTROUTER_KEYSTORE_ALIAS, DeploymentConstants.getCustomTrustedKeystoreAlias());
@@ -177,7 +191,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment,
+                                                                               databaseTwoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
@@ -234,5 +249,5 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     @Override
     public SsoDeployment getSsoDeployment() {
         throw new UnsupportedOperationException("Not supported yet.");
-	}
+    }
 }

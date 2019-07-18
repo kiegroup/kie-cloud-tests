@@ -36,7 +36,6 @@ public class MavenDeployer {
 
     static {
         ConfigurationInitializer.initConfigProperties();
-        logger.info("Repo url is {}", MavenConstants.getMavenRepoUrl());
     }
 
     /**

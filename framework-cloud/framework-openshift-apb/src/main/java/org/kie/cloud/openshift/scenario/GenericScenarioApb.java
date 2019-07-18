@@ -34,6 +34,8 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
@@ -55,7 +57,8 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
 
     private static final Logger logger = LoggerFactory.getLogger(GenericScenarioApb.class);
 
-    public GenericScenarioApb(List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList, List<DeploymentSettings> monitoringSettingsList, List<DeploymentSettings> smartRouterSettingsList, List<DeploymentSettings> controllerSettingsList) {
+    public GenericScenarioApb(List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList, List<DeploymentSettings> monitoringSettingsList,
+                              List<DeploymentSettings> smartRouterSettingsList, List<DeploymentSettings> controllerSettingsList) {
         this.kieServerSettingsList = kieServerSettingsList;
         this.workbenchSettingsList = workbenchSettingsList;
         this.monitoringSettingsList = monitoringSettingsList;
@@ -139,7 +142,7 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
             workbenchDeployment.waitForScale();
         }
         logger.info("Waiting for Controller deployment to become ready.");
-        for(ControllerDeployment controllerDeployment : controllerDeployments) {
+        for (ControllerDeployment controllerDeployment : controllerDeployments) {
             controllerDeployment.waitForScale();
         }
         logger.info("Waiting for Kie server deployment to become ready.");
@@ -148,6 +151,16 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
         }
 
         logNodeNameOfAllInstances();
+    }
+
+    @Override
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        // Nothing done
+    }
+
+    @Override
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        // Nothing done
     }
 
     private void deployApbWithSettings(Project project, DeploymentSettings deploymentSettings) {

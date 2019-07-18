@@ -36,6 +36,8 @@ import org.kie.cloud.openshift.database.driver.ExternalDriver;
 import org.kie.cloud.openshift.database.external.ApbExternalDatabaseProvider;
 import org.kie.cloud.openshift.database.external.ExternalDatabase;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
 import org.kie.cloud.openshift.util.DockerRegistryDeployer;
@@ -55,7 +57,8 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
         this.extraVars = extraVars;
     }
 
-    @Override public KieServerDeployment getKieServerDeployment() {
+    @Override
+    public KieServerDeployment getKieServerDeployment() {
         return kieServerDeployment;
     }
 
@@ -89,7 +92,20 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
         logNodeNameOfAllInstances();
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).configure(extraVars);
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).removeConfiguration(extraVars);
+    }
+
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(kieServerDeployment, dockerDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
@@ -140,11 +156,11 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
 
     private void deployCustomTrustedSecret() {
         project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(),
-                Collections.emptyMap());
+                                                  Collections.emptyMap());
 
         extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
+                      DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
     }
 }

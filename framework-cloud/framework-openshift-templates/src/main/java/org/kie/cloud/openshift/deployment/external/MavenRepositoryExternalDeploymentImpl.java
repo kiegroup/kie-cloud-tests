@@ -14,15 +14,12 @@ public class MavenRepositoryExternalDeploymentImpl extends AbstractMavenReposito
 
     @Override
     public void configure(Map<String, String> envVariables) {
+        super.configure(envVariables);
+
         MavenRepositoryDeployment deployment = getDeploymentInformation();
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, deployment.getUsername());
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, deployment.getPassword());
 
-        // TODO to change ...
-        System.setProperty("maven.repo.url", deployment.getSnapshotsRepositoryUrl().toString());
-        System.setProperty("maven.repo.username", deployment.getUsername());
-        System.setProperty("maven.repo.password", deployment.getPassword());
     }
-
 }

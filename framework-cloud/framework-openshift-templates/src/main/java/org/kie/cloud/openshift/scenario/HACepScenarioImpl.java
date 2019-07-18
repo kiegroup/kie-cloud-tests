@@ -30,6 +30,7 @@ import org.kie.cloud.api.deployment.HACepDeployment;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.HACepDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.strimzi.TopicOperator;
 
 public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implements HACepScenario {
@@ -120,6 +121,16 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
                      .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
                      .map(f -> f.getAbsolutePath())
                      .collect(Collectors.toList());
+    }
+
+    @Override
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        // Nothing done
+    }
+
+    @Override
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        // Nothing done
     }
 
     @Override

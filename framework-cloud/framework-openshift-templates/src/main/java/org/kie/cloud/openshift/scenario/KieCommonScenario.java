@@ -20,12 +20,8 @@ import java.util.Map;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.deployment.external.ExternalDeploymentTemplates;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class KieCommonScenario<T extends DeploymentScenario<T>> extends OpenShiftScenario<T> {
-
-    private static final Logger logger = LoggerFactory.getLogger(KieCommonScenario.class);
 
     protected Map<String, String> envVariables;
 
@@ -36,8 +32,12 @@ public abstract class KieCommonScenario<T extends DeploymentScenario<T>> extends
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        logger.info("configureWithExternalDeployment {}", externalDeployment.getKey());
         ((ExternalDeploymentTemplates) externalDeployment).configure(envVariables);
     }
 
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentTemplates) externalDeployment).removeConfiguration(envVariables);
+    }
 }

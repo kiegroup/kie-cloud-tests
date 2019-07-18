@@ -35,6 +35,8 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -106,6 +108,18 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<W
         storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/kie");
     }
 
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).configure(extraVars);
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).removeConfiguration(extraVars);
+    }
+
     private void storeProjectInfoToPersistentVolume(Deployment deployment, String persistentVolumeMountPath) {
         String storeCommand = "echo \"Project " + projectName + ", time " + Instant.now() + "\" > " + persistentVolumeMountPath + "/info.txt";
         workbenchDeployment.getInstances().get(0).runCommand("/bin/bash", "-c", storeCommand);
@@ -113,17 +127,17 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<W
 
     private void deployCustomTrustedSecret() {
         project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(),
-                Collections.emptyMap());
+                                                  Collections.emptyMap());
 
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_SECRET_NAME,
-                DeploymentConstants.getCustomTrustedSecretName());
+                      DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
+                      DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_PWD,
-                DeploymentConstants.getCustomTrustedKeystorePwd());
+                      DeploymentConstants.getCustomTrustedKeystorePwd());
         extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
+                      DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
     }
 
