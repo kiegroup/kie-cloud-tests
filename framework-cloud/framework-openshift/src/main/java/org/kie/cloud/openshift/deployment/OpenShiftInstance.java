@@ -17,6 +17,7 @@ package org.kie.cloud.openshift.deployment;
 
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +29,7 @@ import cz.xtf.core.openshift.OpenShift;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerStateRunning;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 import org.kie.cloud.api.deployment.Instance;
@@ -119,13 +121,17 @@ public class OpenShiftInstance implements Instance {
      * @return
      */
     public String getLogs(String containerName) {
-        return Optional.ofNullable(containerName)
-                       .map(cname -> openshift.pods().withName(name).inContainer(cname).getLog())
-                       .orElse(openshift.getPodLog(openshift.getPod(name)));
+        if (Objects.nonNull(containerName)) {
+            return openshift.pods().withName(name).inContainer(containerName).getLog();
+        } else {
+            return openshift.getPodLog(openshift.getPod(name));
+        }
     }
 
     private List<Container> getContainers() {
-        return openshift.getPod(name).getSpec().getContainers();
+        return Optional.ofNullable(openshift.getPod(name).getSpec())
+                       .map(PodSpec::getContainers)
+                       .orElse(new ArrayList<>());
     }
 
     public Map<String, Observable<String>> observeAllContainersLogs() {
@@ -136,11 +142,11 @@ public class OpenShiftInstance implements Instance {
     }
 
     public Observable<String> observeContainerLogs(String containerName) {
-        return Optional.ofNullable(containerName)
-                       .map(cname -> {
-                           LogWatch watcher = openshift.pods().withName(name).inContainer(cname).watchLog();
-                           return StringObservable.byLine(StringObservable.from(new InputStreamReader(watcher.getOutput())));
-                       })
-                       .orElse(openshift.observePodLog(openshift.getPod(name)));
+        if (Objects.nonNull(containerName)) {
+            LogWatch watcher = openshift.pods().withName(name).inContainer(containerName).watchLog();
+            return StringObservable.byLine(StringObservable.from(new InputStreamReader(watcher.getOutput())));
+        } else {
+            return openshift.observePodLog(openshift.getPod(name));
+        }
     }
 }
