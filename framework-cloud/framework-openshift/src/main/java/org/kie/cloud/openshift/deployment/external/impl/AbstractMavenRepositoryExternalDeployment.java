@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.deployment.external.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.openshift.deployment.external.AbstractExternalDeployment;
@@ -69,6 +70,6 @@ public abstract class AbstractMavenRepositoryExternalDeployment<U> extends Abstr
     }
 
     private void restoreSystemProperty(String key) {
-        System.setProperty(key, oldValues.get(key));
+        Optional.ofNullable(oldValues.get(key)).ifPresent(value -> System.setProperty(key, value));
     }
 }

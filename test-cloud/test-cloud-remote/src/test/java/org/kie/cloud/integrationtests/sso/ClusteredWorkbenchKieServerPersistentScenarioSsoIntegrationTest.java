@@ -92,24 +92,24 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
         ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }
 
-    //    @Test
+    @Test
     @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
         ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
                                                               deploymentScenario.getKieServerDeployment());
     }
 
-    //    @Test
+    @Test
     public void testRulesFromExternalMavenRepo() {
         FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
     }
 
-    //    @Test
+    @Test
     public void testSolverFromExternalMavenRepo() {
         OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
-    //    @Test
+    @Test
     public void testDeployContainerFromWorkbench() {
         FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
     }
