@@ -127,6 +127,10 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
     @Override
     public void undeploy() {
+        for (DeploymentScenarioListener<T> deploymentScenarioListener : deploymentScenarioListeners) {
+            deploymentScenarioListener.afterScenarioFinished((T) this);
+        }
+
         try {
             logger.info("Release log collector(s)");
             try {
@@ -146,10 +150,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
             project.delete();
             project.close();
-
-            for (DeploymentScenarioListener<T> deploymentScenarioListener : deploymentScenarioListeners) {
-                deploymentScenarioListener.afterScenarioFinished((T) this);
-            }
         } catch (Exception e) {
             logger.error("Error undeploy", e);
             throw new RuntimeException("Error while undeploying scenario.", e);
@@ -173,12 +173,10 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     }
 
     public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        logger.info("Added externalDeployment {} as DeploymentScenarioListener", externalDeployment.getKey());
         addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
 
             @Override
             public void beforeDeploymentStarted(T deploymentScenario) {
-                logger.info("beforeDeploymentStarted with externalDeployment {}", externalDeployment.getKey());
                 Deployment deployment = externalDeployment.deploy(project);
                 deployment.waitForScheduled();
                 configureWithExternalDeployment(externalDeployment);
@@ -186,7 +184,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
             @Override
             public void afterScenarioFinished(T deploymentScenario) {
-                logger.info("beforeDeploymentStarted with externalDeployment {}", externalDeployment.getKey());
                 removeConfigurationFromExternalDeployment(externalDeployment);
             }
 
