@@ -30,6 +30,7 @@ import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
+import org.kie.cloud.openshift.log.EventsRecorder;
 import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
@@ -126,6 +127,9 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             } catch (Exception e) {
                 logger.error("Error killing log collector thread", e);
             }
+
+            logger.info("Store project events.");
+            EventsRecorder.recordProjectEvents(project, logFolderName);
 
             project.delete();
             project.close();
