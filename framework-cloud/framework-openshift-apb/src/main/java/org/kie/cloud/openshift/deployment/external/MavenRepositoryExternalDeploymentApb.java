@@ -6,9 +6,9 @@ import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.deployment.external.impl.AbstractMavenRepositoryExternalDeployment;
 
-public class MavenRepositoryExternalDeploymentImpl extends AbstractMavenRepositoryExternalDeployment<Map<String, String>> implements ExternalDeploymentApb<MavenRepositoryDeployment> {
+public class MavenRepositoryExternalDeploymentApb extends AbstractMavenRepositoryExternalDeployment<Map<String, String>> implements ExternalDeploymentApb<MavenRepositoryDeployment> {
 
-    public MavenRepositoryExternalDeploymentImpl(Map<String, String> config) {
+    public MavenRepositoryExternalDeploymentApb(Map<String, String> config) {
         super(config);
     }
 

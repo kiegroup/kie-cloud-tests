@@ -148,7 +148,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             project.close();
 
             for (DeploymentScenarioListener<T> deploymentScenarioListener : deploymentScenarioListeners) {
-                deploymentScenarioListener.afterUndeployment((T) this);
+                deploymentScenarioListener.afterScenarioFinished((T) this);
             }
         } catch (Exception e) {
             logger.error("Error undeploy", e);
@@ -185,7 +185,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             }
 
             @Override
-            public void afterUndeployment(T deploymentScenario) {
+            public void afterScenarioFinished(T deploymentScenario) {
                 logger.info("beforeDeploymentStarted with externalDeployment {}", externalDeployment.getKey());
                 removeConfigurationFromExternalDeployment(externalDeployment);
             }

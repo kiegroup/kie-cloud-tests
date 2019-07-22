@@ -28,5 +28,5 @@ public interface DeploymentScenarioListener<T extends DeploymentScenario<T>> {
      *
      * @param deploymentScenario Deployment scenario which has been undeployed.
      */
-    default void afterUndeployment(T deploymentScenario) {};
+    default void afterScenarioFinished(T deploymentScenario) {};
 }

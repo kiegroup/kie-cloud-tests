@@ -26,7 +26,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactory;
-import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactoryImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactoryTemplates;
 import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     private boolean deployInternalMaven = false;
 
-    private ExternalDeploymentFactory extraDeploymentFactory = new ExternalDeploymentFactoryImpl();
+    private ExternalDeploymentFactory extraDeploymentFactory = new ExternalDeploymentFactoryTemplates();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
@@ -75,7 +75,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalMavenRepo() {
-        LoggerFactory.getLogger(this.getClass()).info("Builder withInternalMavenRepo");
         deployInternalMaven = true;
         return this;
     }

@@ -9,9 +9,9 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
 
-public class MavenRepositoryExternalDeploymentImpl extends AbstractMavenRepositoryExternalDeployment<KieApp> implements ExternalDeploymentOperator<MavenRepositoryDeployment> {
+public class MavenRepositoryExternalDeploymentOperator extends AbstractMavenRepositoryExternalDeployment<KieApp> implements ExternalDeploymentOperator<MavenRepositoryDeployment> {
 
-    public MavenRepositoryExternalDeploymentImpl(Map<String, String> config) {
+    public MavenRepositoryExternalDeploymentOperator(Map<String, String> config) {
         super(config);
     }
 

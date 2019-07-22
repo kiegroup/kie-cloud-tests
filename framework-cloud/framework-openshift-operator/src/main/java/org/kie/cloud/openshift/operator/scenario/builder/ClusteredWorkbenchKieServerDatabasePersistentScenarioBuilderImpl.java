@@ -30,7 +30,7 @@ import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeploy
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
-import org.kie.cloud.openshift.operator.deployment.external.ExternalDeploymentFactoryImpl;
+import org.kie.cloud.openshift.operator.deployment.external.ExternalDeploymentFactoryOperator;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
@@ -51,7 +51,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
     private boolean deploySSO = false;
     private boolean deployInternalMaven = false;
 
-    private ExternalDeploymentFactory extraDeploymentFactory = new ExternalDeploymentFactoryImpl();
+    private ExternalDeploymentFactory extraDeploymentFactory = new ExternalDeploymentFactoryOperator();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
         isScenarioAllowed();
