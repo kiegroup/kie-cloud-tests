@@ -119,10 +119,8 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      */
     protected abstract void deployKieDeployments();
 
-    // TODO need to do APB
     protected abstract void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment);
 
-    // TODO need to do APB
     protected abstract void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment);
 
     @Override

@@ -57,8 +57,7 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
 
     private static final Logger logger = LoggerFactory.getLogger(GenericScenarioApb.class);
 
-    public GenericScenarioApb(List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList, List<DeploymentSettings> monitoringSettingsList,
-                              List<DeploymentSettings> smartRouterSettingsList, List<DeploymentSettings> controllerSettingsList) {
+    public GenericScenarioApb(List<DeploymentSettings> kieServerSettingsList, List<DeploymentSettings> workbenchSettingsList, List<DeploymentSettings> monitoringSettingsList, List<DeploymentSettings> smartRouterSettingsList, List<DeploymentSettings> controllerSettingsList) {
         this.kieServerSettingsList = kieServerSettingsList;
         this.workbenchSettingsList = workbenchSettingsList;
         this.monitoringSettingsList = monitoringSettingsList;

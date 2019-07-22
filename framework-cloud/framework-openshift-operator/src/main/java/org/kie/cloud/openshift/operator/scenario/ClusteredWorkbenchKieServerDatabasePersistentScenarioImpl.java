@@ -47,8 +47,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftOperatorScenario<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements
-                                                                       ClusteredWorkbenchKieServerDatabasePersistentScenario {
+public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends OpenShiftOperatorScenario<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements ClusteredWorkbenchKieServerDatabasePersistentScenario {
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
@@ -166,5 +165,5 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-    }
+	}
 }

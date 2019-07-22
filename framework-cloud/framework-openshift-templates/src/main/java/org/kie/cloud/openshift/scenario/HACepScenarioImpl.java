@@ -64,7 +64,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         topicOperator.createTopic(SNAPSHOTS_TOPIC);
 
         project.runOcCommandAsAdmin("create", "clusterrolebinding", "permissive-binding",
-                                    "--clusterrole=cluster-admin", "--group=system:serviceaccounts");
+                                               "--clusterrole=cluster-admin", "--group=system:serviceaccounts");
 
         project.createResourcesFromYamlAsAdmin(OpenShiftConstants.getHaCepResourcesList());
         haCepDeployment = new HACepDeploymentImpl(project);

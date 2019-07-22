@@ -174,12 +174,11 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-    }
+	}
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment,
-                                                                               databaseTwoDeployment, ssoDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchRuntimeDeployment, smartRouterDeployment, kieServerOneDeployment, kieServerTwoDeployment, databaseOneDeployment, databaseTwoDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }

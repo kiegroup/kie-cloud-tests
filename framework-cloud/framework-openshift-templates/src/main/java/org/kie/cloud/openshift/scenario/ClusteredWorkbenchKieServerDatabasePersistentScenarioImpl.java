@@ -80,7 +80,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
 
     @Override
     protected void deployKieDeployments() {
-
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 
@@ -158,5 +157,5 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-    }
+	}
 }

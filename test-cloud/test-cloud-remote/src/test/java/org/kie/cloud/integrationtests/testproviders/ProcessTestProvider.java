@@ -33,8 +33,6 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProcessTestProvider {
 
@@ -58,9 +56,7 @@ public class ProcessTestProvider {
         String containerId = "testProcessWithUserTask";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getName(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getVersion())));
+        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
         kieServerDeployment.waitForContainerRespin();
 
@@ -95,9 +91,7 @@ public class ProcessTestProvider {
         String containerId = "testProcessWithSignal";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getName(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getVersion())));
+        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
         kieServerDeployment.waitForContainerRespin();
 

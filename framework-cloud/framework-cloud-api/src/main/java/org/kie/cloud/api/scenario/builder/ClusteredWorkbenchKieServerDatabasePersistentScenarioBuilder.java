@@ -19,7 +19,6 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentS
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerDatabasePersistentScenario> {
-
     /**
      * Return setup builder with additional configuration of external maven
      * repo.

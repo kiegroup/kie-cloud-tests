@@ -156,11 +156,11 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
 
     private void deployCustomTrustedSecret() {
         project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(),
-                                                  Collections.emptyMap());
+                Collections.emptyMap());
 
         extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
-                      DeploymentConstants.getCustomTrustedKeystoreAlias());
+                DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
     }
 }

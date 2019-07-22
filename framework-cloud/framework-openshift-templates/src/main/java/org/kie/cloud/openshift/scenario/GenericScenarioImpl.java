@@ -113,14 +113,16 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
 
                 ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
                 envVariables.put(propertyNames.workbenchSsoClient(),
-                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-" + projectProfile.getWorkbenchName() + "-client");
+                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-"
+                                + projectProfile.getWorkbenchName() + "-client");
                 envVariables.put(propertyNames.workbenchSsoSecret(),
-                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-" + projectProfile.getWorkbenchName() + "-secret");
+                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-"
+                                + projectProfile.getWorkbenchName() + "-secret");
 
                 envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT,
-                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-client");
+                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-client");
                 envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET,
-                                 envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-secret");
+                        envVariables.get(OpenShiftTemplateConstants.APPLICATION_NAME) + "-kie-server-secret");
             });
 
         }

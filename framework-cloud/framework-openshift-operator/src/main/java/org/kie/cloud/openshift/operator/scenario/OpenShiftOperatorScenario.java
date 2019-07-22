@@ -76,12 +76,12 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void createCustomResourceDefinitionsInOpenShift(OpenShiftBinary adminBinary) {
         // TODO: Commented out due to UnrecognizedPropertyException, uncomment with raised Fabric8 version to check if it is fixed already.
-        //        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
-        //        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
-        //        if(!operatorCrdExists) {
-        logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
-        adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
-        //        }
+//        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
+//        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
+//        if(!operatorCrdExists) {
+            logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
+            adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
+//        }
     }
 
     private void createServiceAccountInProject(Project project) {
