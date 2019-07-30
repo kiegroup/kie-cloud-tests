@@ -86,6 +86,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
+        logger.info("Deploy with Kie server url {}", deploymentScenario.getKieServerDeployment().getUrl());
         ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }
 
