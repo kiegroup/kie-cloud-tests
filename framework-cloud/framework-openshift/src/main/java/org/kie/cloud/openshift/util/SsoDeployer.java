@@ -21,6 +21,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.openshift.OpenShifts;
+import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -32,10 +36,6 @@ import org.kie.cloud.openshift.util.sso.SsoApi;
 import org.kie.cloud.openshift.util.sso.SsoApiFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cz.xtf.core.openshift.OpenShift;
-import cz.xtf.core.openshift.OpenShifts;
-import io.fabric8.kubernetes.api.model.KubernetesList;
-import io.fabric8.kubernetes.client.KubernetesClientException;
 
 public class SsoDeployer {
 
@@ -148,5 +148,15 @@ public class SsoDeployer {
                 Arrays.asList(KIE_SERVER));
         ssoApi.createUser(DeploymentConstants.getWorkbenchMavenUser(),
                 DeploymentConstants.getWorkbenchMavenPassword());
+    }
+
+    public static void createUsers(SsoDeployment ssoDeployment, Map<String, String> users) {
+        String authUrl = ssoDeployment.getUrl().toString() + "/auth"; 
+        logger.info("Creating custom users in SSO at URL {} in Realm {}", authUrl, SSO_REALM);
+        SsoApi ssoApi = SsoApiFactory.getRestApi(authUrl, SSO_REALM);
+
+        users.forEach((String name, String pwd) -> {
+            ssoApi.createUser(name, pwd, Arrays.asList(ADMIN, KIE_SERVER, REST_ALL));
+        });
     }
 }

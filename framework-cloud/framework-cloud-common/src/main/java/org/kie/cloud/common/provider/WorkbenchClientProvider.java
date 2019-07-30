@@ -24,8 +24,12 @@ public class WorkbenchClientProvider {
     private static final Integer DEFAULT_TIMEOUT_IN_SEC = 120;
 
     public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment) {
+        return getWorkbenchClient(workbenchDeployment, workbenchDeployment.getUsername(),  workbenchDeployment.getPassword());
+    }
+
+    public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
         WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(),
-                workbenchDeployment.getUsername(), workbenchDeployment.getPassword(), DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC);
+                username, password, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC);
         return workbenchClient;
     }
 }

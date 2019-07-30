@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <artifactId>test-cloud</artifactId>
+    <groupId>org.kie.cloud</groupId>
+    <version>7.25.0-SNAPSHOT</version>
+  </parent>
+  
+  
+  <artifactId>test-cloud-workbench-ha</artifactId>
+  
+  <name>KIE :: Cloud :: Workbench HA tests</name>
+  <description>Test suite for Workbench HA scenario deployed in a cloud. Test focused on REST api.</description>
+  
+  <properties>
+    <skipTests>true</skipTests>
+    <kjars.build.settings.xml>${project.build.testOutputDirectory}/settings.xml</kjars.build.settings.xml>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-cloud-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>test-cloud-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-cloud-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-git</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-maven</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-openshift</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- XTF dependencies -->
+    <dependency>
+      <groupId>cz.xtf</groupId>
+      <artifactId>http-client</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>openshift</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+    <profile>
+      <id>openshift-operator</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+    <profile>
+      <id>openshift-apb</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+  </profiles>
+  
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <pluginManagement>
+      <plugins>
+        <!-- XTF use tmp folder as temp folder, need to be deleted too when rerunning tests. -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <configuration>
+            <filesets>
+              <fileset>
+                <directory>${project.basedir}/tmp</directory>
+              </fileset>
+            </filesets>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <trimStackTrace>false</trimStackTrace>
+            <systemProperties>
+              <kjars.build.settings.xml>${kjars.build.settings.xml}</kjars.build.settings.xml>
+              <instance.logs>${project.build.directory}/instances</instance.logs>
+              <apb.build.logs>${project.build.directory}/apbBuilds</apb.build.logs>
+              <kie.operator.console.check.skip>true</kie.operator.console.check.skip>
+            </systemProperties>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>keytool-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

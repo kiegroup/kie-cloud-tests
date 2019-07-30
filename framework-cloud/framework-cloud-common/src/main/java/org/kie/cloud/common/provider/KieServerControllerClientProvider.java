@@ -26,8 +26,12 @@ import org.kie.server.controller.client.KieServerControllerClientFactory;
 public class KieServerControllerClientProvider {
 
     public static KieServerControllerClient getKieServerControllerClient(WorkbenchDeployment workbenchDeployment) {
+        return getKieServerControllerClient(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
+    }
+
+    public static KieServerControllerClient getKieServerControllerClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
         KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
-                workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
+                username, password);
         return kieServerControllerClient;
     }
 
