@@ -18,20 +18,18 @@ package org.kie.cloud.integrationtests.ldap;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.settings.LdapSettings;
-import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
-import org.kie.cloud.maven.constants.MavenConstants;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
 
@@ -55,8 +53,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
 
         try {
         deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                .withLdapSettings(ldapSettings).withExternalMavenRepo(MavenConstants.getMavenRepoUrl(),
-                        MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withLdapSettings(ldapSettings).withInternalMavenRepo()
                 .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -78,7 +75,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
         ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
                 deploymentScenario.getKieServerDeployment());
