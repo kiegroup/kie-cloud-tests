@@ -15,33 +15,27 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
-import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.SmartRouterDeployment;
-import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.settings.DeploymentSettings;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
+import org.kie.cloud.integrationtests.smoke.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioIntegrationTest;
+import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
-import org.kie.cloud.provider.git.Git;
-import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.SmartRouterUtils;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -61,22 +55,16 @@ import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Category({JBPMOnly.class, ApbNotSupported.class, OperatorNotSupported.class})
-public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class);
 
-    private static final String SMART_ROUTER_ID = "test-kie-router";
+    private static ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario deploymentScenario;
 
-    private static final String CONTROLLER_NAME = "controller";
-    private static final String SMART_ROUTER_NAME = "smart-router";
-    private static final String KIE_SERVER_NAME = "kie-server";
-
-    private static final String PORT = "80";
-
-    private DeploymentSettings controllerSettings;
-    private DeploymentSettings smartRouterSettings;
-    private DeploymentSettings kieServerSettings;
+    private static final String SMART_ROUTER_ID = "kie-server-router";
 
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -86,69 +74,33 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
     private ProcessServicesClient kieServerProcessClient;
     private ProcessServicesClient smartRouterProcessClient;
 
-    private String repositoryName;
-
-    private final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
-
-    private final String CONTROLLER_HOSTNAME = RANDOM_URL_PREFIX + CONTROLLER_NAME + DeploymentConstants.getDefaultDomainSuffix();
-    private final String SMART_ROUTER_HOSTNAME = RANDOM_URL_PREFIX + SMART_ROUTER_NAME + DeploymentConstants.getDefaultDomainSuffix();
-    private final String KIE_SERVER_HOSTNAME = RANDOM_URL_PREFIX + KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
-
     private static final String SORT_BY_DATE = "start_date";
 
-    @Override
-    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        controllerSettings = deploymentScenarioFactory.getWorkbenchSettingsBuilder()
-                .withApplicationName(CONTROLLER_NAME)
-                .withHostame(CONTROLLER_HOSTNAME)
-                .build();
+    @BeforeClass
+    public static void initializeDeployment() {
+        deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+                                                      .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                                                      .build();
+        deploymentScenario.setLogFolderName(KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class.getSimpleName());
+        ScenarioDeployer.deployScenario(deploymentScenario);
 
-        smartRouterSettings = deploymentScenarioFactory.getSmartRouterSettingsBuilder()
-                .withApplicationName(SMART_ROUTER_NAME)
-                .withSmartRouterID(SMART_ROUTER_ID)
-                .withControllerConnection(CONTROLLER_NAME + "-rhpamcentr")
-                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                .withHostame(SMART_ROUTER_HOSTNAME)
-                .withSmartRouterExternalUrl("http://" + SMART_ROUTER_HOSTNAME + ":" + PORT)
-                .build();
-
-        kieServerSettings = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder()
-                .withApplicationName(KIE_SERVER_NAME)
-                .withHostame(KIE_SERVER_HOSTNAME)
-                .withAdminUser(DeploymentConstants.getWorkbenchUser(), DeploymentConstants.getWorkbenchPassword())
-                .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                .withControllerConnection(CONTROLLER_NAME + "-rhpamcentr")
-                .withSmartRouterConnection(SMART_ROUTER_NAME + "-smartrouter")
-                .withMavenRepoService(CONTROLLER_NAME + "-rhpamcentr")
-                .withMavenRepoServiceUser(DeploymentConstants.getWorkbenchMavenUser(), DeploymentConstants.getWorkbenchMavenPassword())
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-
-        return deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withWorkbench(controllerSettings)
-                .withSmartRouter(smartRouterSettings)
-                .withKieServer(kieServerSettings)
-                .build();
+        MavenDeployer.buildAndDeployMavenProject(KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
     }
 
     @Before
     public void setUp() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(controllerDeployment().getNamespace(), KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
-
-        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), controllerDeployment(), DEFINITION_PROJECT_NAME);
-
-        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(controllerDeployment());
-        kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment());
-        smartRouterClient = KieServerClientProvider.getSmartRouterClient(smartRouterDeployment(), kieServerDeployment().getUsername(), kieServerDeployment().getPassword());
-        smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(smartRouterDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
+        smartRouterClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment().getUsername(), deploymentScenario.getKieServerOneDeployment().getPassword());
+        smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment());
 
         kieServerProcessClient = kieServerClient.getServicesClient(ProcessServicesClient.class);
         smartRouterProcessClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
     }
 
-    @After
-    public void tearDown() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+    @AfterClass
+    public static void cleanEnvironment() {
+        ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     @Test
@@ -156,8 +108,8 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
         logger.debug("Register Kie Container to Kie Server");
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION, KieContainerStatus.STARTED);
-        KieServerClientProvider.waitForContainerStart(kieServerDeployment(), CONTAINER_ID);
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
+        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerOneDeployment(), CONTAINER_ID);
         SmartRouterUtils.waitForContainerStart(smartRouterAdminClient, CONTAINER_ID);
         WorkbenchUtils.waitForContainerRegistration(kieControllerClient, SMART_ROUTER_ID, CONTAINER_ID);
 
@@ -242,29 +194,17 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
     }
 
     private void scaleKieServerTo(int count) {
-        kieServerDeployment().scale(count);
-        kieServerDeployment().waitForScale();
+        deploymentScenario.getKieServerOneDeployment().scale(count);
+        deploymentScenario.getKieServerOneDeployment().waitForScale();
     }
 
     private void scaleControllerTo(int count) {
-        controllerDeployment().scale(count);
-        controllerDeployment().waitForScale();
+        deploymentScenario.getWorkbenchRuntimeDeployment().scale(count);
+        deploymentScenario.getWorkbenchRuntimeDeployment().waitForScale();
     }
 
     private void scaleSmartRouterTo(int count) {
-        smartRouterDeployment().scale(count);
-        smartRouterDeployment().waitForScale();
-    }
-
-    private WorkbenchDeployment controllerDeployment() {
-        return deploymentScenario.getWorkbenchDeployments().get(0);
-    }
-
-    private KieServerDeployment kieServerDeployment() {
-        return deploymentScenario.getKieServerDeployments().get(0);
-    }
-
-    private SmartRouterDeployment smartRouterDeployment() {
-        return deploymentScenario.getSmartRouterDeployments().get(0);
+        deploymentScenario.getSmartRouterDeployment().scale(count);
+        deploymentScenario.getSmartRouterDeployment().waitForScale();
     }
 }

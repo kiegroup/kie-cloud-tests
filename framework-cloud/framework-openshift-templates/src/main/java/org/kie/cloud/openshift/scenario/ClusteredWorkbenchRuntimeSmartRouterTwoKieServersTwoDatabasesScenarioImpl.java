@@ -132,6 +132,12 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logger.info("Waiting for Kie servers and Smart router to register itself to the Workbench.");
         KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment, 3);
 
+        // Restart Smart router due to problems with Monitoring console clustering, should be fixed for 7.5.
+        smartRouterDeployment.scale(0);
+        smartRouterDeployment.waitForScale();
+        smartRouterDeployment.scale(1);
+        smartRouterDeployment.waitForScale();
+
         logNodeNameOfAllInstances();
     }
 
