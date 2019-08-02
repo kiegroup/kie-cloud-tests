@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.openshift.deployment.external;
 
-import java.util.Map;
-
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.openshift.resource.Project;
 
@@ -38,17 +36,12 @@ public interface ExternalDeployment<T extends Deployment, U> {
     T deploy(Project project);
 
     /**
-     * Retrieve the deployment variables
-     */
-    Map<String, String> getDeploymentVariables();
-
-    /**
      * Configure the given object with this external deployment information
      * 
      * @param object This object should be specific for deployment process (templates, operator, apb ...)
      */
     void configure(U object);
-    
+
     /**
      * Remove configuration from the given object with this external deployment information
      * 
