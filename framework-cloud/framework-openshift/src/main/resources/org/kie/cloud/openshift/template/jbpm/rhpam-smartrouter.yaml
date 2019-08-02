@@ -3,11 +3,11 @@ kind: Template
 apiVersion: v1
 metadata:
   annotations:
-    description: Application template for Process Automation Manager 7.2 which include Smart Router.
+    description: Application template for Process Automation Manager 7.4 which include Smart Router.
     iconClass: icon-jboss
     tags: rhpam,jboss,xpaas
     version: 1.4.0
-    openshift.io/display-name: Red Hat Process Automation Manager 7.2 Smart router
+    openshift.io/display-name: Red Hat Process Automation Manager 7.4 Smart router
   name: rhpam${rhba.images.version.prefix}-smartrouter
 labels:
   template: rhpam${rhba.images.version.prefix}-smartrouter
@@ -30,7 +30,7 @@ parameters:
 - displayName: ImageStream Tag
   description: A named pointer to an image in an image stream. Default is "1.0".
   name: IMAGE_STREAM_TAG
-  value: "1.0"
+  value: "1.1"
   required: false
 - displayName: Smart Router Custom http Route Hostname
   description: Custom hostname for http service route.  Leave blank for default hostname, e.g. <application-name>-smartrouter-<project>.<default-domain-suffix>'

@@ -3,11 +3,11 @@ kind: Template
 apiVersion: v1
 metadata:
   annotations:
-    description: Application template for Red Hat Business Central 7.2 which includes just Business Central Monitoring
+    description: Application template for Red Hat Business Central 7.4 which includes just Business Central Monitoring
     iconClass: icon-jboss
     tags: rhpam,jboss,xpaas
     version: 1.4.0
-    openshift.io/display-name: Red Hat Business Central 7.2 Monitoring
+    openshift.io/display-name: Red Hat Business Central 7.4 Monitoring
   name: rhpam${rhba.images.version.prefix}-businesscentral-monitoring
 labels:
   template: rhpam${rhba.images.version.prefix}-businesscentral-monitoring
@@ -86,7 +86,7 @@ parameters:
 - displayName: ImageStream Tag
   description: A named pointer to an image in an image stream. Default is "1.0".
   name: IMAGE_STREAM_TAG
-  value: "1.0"
+  value: "1.1"
   required: false
 - displayName: Business Central Container Memory Limit
   description: Business Central Container memory limit
