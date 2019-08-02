@@ -47,6 +47,6 @@ public class PrometheusIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         Function<String, Boolean> doesResponseContainsStrings = response -> {
             return response.contains("kieserver") && response.contains("version") && response.contains("location") && response.contains("value") && response.contains("kie_server_start_time");
         };
-        new SupplierWaiter<String>(() -> Https.getContent(prometheusKieServerStartupTimeUrl), doesResponseContainsStrings).reason("Waiting for Prometheus REST response to contain Kie server start time.").timeout(TimeUnit.MINUTES, 1L).waitFor();
+        new SupplierWaiter<String>(() -> Https.getContent(prometheusKieServerStartupTimeUrl), doesResponseContainsStrings).reason("Waiting for Prometheus REST response to contain Kie server start time.").timeout(TimeUnit.MINUTES, 5L).waitFor();
     }
 }
