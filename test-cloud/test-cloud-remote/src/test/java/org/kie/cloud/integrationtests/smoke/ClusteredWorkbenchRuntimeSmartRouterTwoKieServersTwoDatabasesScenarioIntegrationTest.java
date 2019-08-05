@@ -15,6 +15,8 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
+import java.time.Duration;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,6 +69,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
             KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
             KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
+            kieServerDeployment.setRouterTimeout(Duration.ofMinutes(3));
             kieServerDeployment.scale(0);
             kieServerDeployment.waitForScale();
 

@@ -64,6 +64,7 @@ public class WorkbenchKieServerPersistentScenarioIntegrationTest extends Abstrac
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
+        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
         deploymentScenario.getKieServerDeployment().scale(0);
         deploymentScenario.getKieServerDeployment().waitForScale();
 

@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.integrationtests.ldap;
 
+import java.time.Duration;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -85,6 +87,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
+        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
         deploymentScenario.getKieServerDeployment().scale(0);
         deploymentScenario.getKieServerDeployment().waitForScale();
 
