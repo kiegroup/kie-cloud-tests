@@ -15,6 +15,8 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
+import java.time.Duration;
+
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
@@ -69,6 +71,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
+        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
         deploymentScenario.getKieServerDeployment().scale(0);
         deploymentScenario.getKieServerDeployment().waitForScale();
 
