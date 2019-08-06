@@ -129,7 +129,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             }
 
             logger.info("Store project events.");
-            EventsRecorder.recordProjectEvents(project, logFolderName);
+            EventsRecorder.recordProjectEvents(project, getLogFolderName());
 
             project.delete();
             project.close();
