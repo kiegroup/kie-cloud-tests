@@ -245,18 +245,20 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
-            ((ExternalDeploymentTemplates) externalDeployment).configure(deploymentSettings.getEnvVariables());
-        });
+        scenarioSettings.getAllSettings()
+                        .stream()
+                        .map(DeploymentSettings::getEnvVariables)
+                        .forEach(((ExternalDeploymentTemplates) externalDeployment)::configure);
 
     }
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
-            ((ExternalDeploymentTemplates) externalDeployment).removeConfiguration(deploymentSettings.getEnvVariables());
-        });
+        scenarioSettings.getAllSettings()
+                        .stream()
+                        .map(DeploymentSettings::getEnvVariables)
+                        .forEach(((ExternalDeploymentTemplates) externalDeployment)::removeConfiguration);
     }
 
 }

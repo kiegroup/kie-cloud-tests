@@ -27,6 +27,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.EmployeeRosteringDeploymentImpl;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentTemplates;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +38,13 @@ public class EmployeeRosteringScenarioImpl extends OpenShiftScenario<EmployeeRos
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeRosteringScenarioImpl.class);
 
+    private Map<String, String> env = new HashMap<>();
     private EmployeeRosteringDeployment employeeRosteringDeployment;
 
     @Override
     protected void deployKieDeployments() {
         this.employeeRosteringDeployment = new EmployeeRosteringDeploymentImpl(project);
 
-        Map<String, String> env = new HashMap<>();
         env.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
         env.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, project.getName());
         env.put(OPTAWEB_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
@@ -56,13 +57,15 @@ public class EmployeeRosteringScenarioImpl extends OpenShiftScenario<EmployeeRos
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        // Nothing done
+        ((ExternalDeploymentTemplates) externalDeployment).configure(env);
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        // Nothing done
+        ((ExternalDeploymentTemplates) externalDeployment).removeConfiguration(env);
     }
 
     @Override

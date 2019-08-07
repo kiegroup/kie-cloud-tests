@@ -153,13 +153,21 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        // Nothing done
+        getAllDeploymentSettings()
+                                  .stream()
+                                  .map(DeploymentSettings::getEnvVariables)
+                                  .forEach(((ExternalDeploymentApb) externalDeployment)::configure);
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        // Nothing done
+        getAllDeploymentSettings()
+                                  .stream()
+                                  .map(DeploymentSettings::getEnvVariables)
+                                  .forEach(((ExternalDeploymentApb) externalDeployment)::removeConfiguration);
     }
 
     private void deployApbWithSettings(Project project, DeploymentSettings deploymentSettings) {
@@ -179,6 +187,15 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
         deployments.addAll(kieServerDeployments);
         deployments.addAll(smartRouterDeployments);
         deployments.addAll(controllerDeployments);
+        return deployments;
+    }
+
+    private List<DeploymentSettings> getAllDeploymentSettings() {
+        List<DeploymentSettings> deployments = new ArrayList<>();
+        deployments.addAll(workbenchSettingsList);
+        deployments.addAll(kieServerSettingsList);
+        deployments.addAll(smartRouterSettingsList);
+        deployments.addAll(controllerSettingsList);
         return deployments;
     }
 
