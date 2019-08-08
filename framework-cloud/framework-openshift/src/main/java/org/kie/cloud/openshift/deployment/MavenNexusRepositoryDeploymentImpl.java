@@ -52,11 +52,6 @@ public class MavenNexusRepositoryDeploymentImpl extends OpenShiftDeployment impl
     }
 
     @Override
-    public void waitForScale() {
-        super.waitForScale();
-    }
-
-    @Override
     public URL getReleasesRepositoryUrl() {
         try {
             return getUrl().toURI().resolve(NEXUS_RELEASES_REPO_PATH).toURL();
@@ -76,13 +71,11 @@ public class MavenNexusRepositoryDeploymentImpl extends OpenShiftDeployment impl
 
     @Override
     public String getUsername() {
-        // TODO Auto-generated method stub
         return "admin";
     }
 
     @Override
     public String getPassword() {
-        // TODO Auto-generated method stub
         return "admin123";
     }
 }

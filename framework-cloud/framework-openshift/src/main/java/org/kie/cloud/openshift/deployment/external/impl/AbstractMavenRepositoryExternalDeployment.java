@@ -31,7 +31,7 @@ public abstract class AbstractMavenRepositoryExternalDeployment<U> extends Abstr
     protected static final String SYSTEM_MAVEN_REPO_USERNAME = "maven.repo.username";
     protected static final String SYSTEM_MAVEN_REPO_PASSWORD = "maven.repo.password";
 
-    protected Map<String, String> oldValues = new HashMap<String, String>();
+    protected Map<String, String> oldValues = new HashMap<>();
 
     public AbstractMavenRepositoryExternalDeployment(Map<String, String> config) {
         super(config);

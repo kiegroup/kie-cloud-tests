@@ -119,9 +119,13 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      */
     protected abstract void deployKieDeployments();
 
-    protected abstract void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment);
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        logger.warn("No configuration with external deployment done in {}", this.getClass().getName());
+    }
 
-    protected abstract void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment);
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        logger.warn("No remove configuration from external deployment done in {}", this.getClass().getName());
+    }
 
     @Override
     public void undeploy() {

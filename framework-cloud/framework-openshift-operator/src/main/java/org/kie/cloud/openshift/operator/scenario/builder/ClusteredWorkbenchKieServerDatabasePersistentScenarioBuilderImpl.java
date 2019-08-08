@@ -25,8 +25,8 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePer
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactory;
-import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
@@ -49,7 +49,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
     private KieApp kieApp = new KieApp();
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySSO = false;
-    private boolean deployInternalMaven = false;
+    private boolean setupMavenExtraDeployment = false;
 
     private ExternalDeploymentFactory extraDeploymentFactory = new ExternalDeploymentFactoryOperator();
 
@@ -95,8 +95,8 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenario build() {
         ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl scenario = new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(kieApp, deploySSO);
-        if (deployInternalMaven) {
-            scenario.addExtraDeployment(extraDeploymentFactory.get(MavenRepositoryExternalDeployment.ID, new HashMap<String, String>()));
+        if (setupMavenExtraDeployment) {
+            scenario.addExtraDeployment(extraDeploymentFactory.get(ExternalDeploymentID.MAVEN_REPOSITORY, new HashMap<String, String>()));
         }
         return scenario;
     }
@@ -113,7 +113,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl im
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalMavenRepo() {
-        deployInternalMaven = true;
+        setupMavenExtraDeployment = true;
         return this;
     }
 

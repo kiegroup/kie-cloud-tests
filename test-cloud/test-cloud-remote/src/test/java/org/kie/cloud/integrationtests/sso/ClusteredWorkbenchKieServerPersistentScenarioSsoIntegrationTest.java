@@ -31,12 +31,8 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest.class);
 
     private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
 
@@ -84,7 +80,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromExternalMavenRepo() {
-        logger.info("Deploy with Kie server url {}", deploymentScenario.getKieServerDeployment().getUrl());
         ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }
 

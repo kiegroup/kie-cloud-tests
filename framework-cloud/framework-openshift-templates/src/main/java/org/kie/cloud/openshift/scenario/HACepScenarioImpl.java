@@ -30,15 +30,10 @@ import org.kie.cloud.api.deployment.HACepDeployment;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.HACepDeploymentImpl;
-import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.strimzi.TopicOperator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implements HACepScenario {
 
-    private static final Logger logger = LoggerFactory.getLogger(HACepScenarioImpl.class);
-    
     private static final String AMQ_STREAMS_INSTALL_SUBDIRECTORY = "install/cluster-operator";
     private static final String AMQ_STREAMS_TEMPLATES_SUBDIRECTORY = "examples/templates/cluster-operator";
     private static final String KAFKA_EPHEMERAL = "examples/kafka/kafka-ephemeral.yaml";
@@ -125,16 +120,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
                      .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
                      .map(f -> f.getAbsolutePath())
                      .collect(Collectors.toList());
-    }
-
-    @Override
-    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        logger.warn("No configuration with external deployment done in {}", this.getClass().getName());
-    }
-
-    @Override
-    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        logger.warn("No remove configuration from external deployment done in {}", this.getClass().getName());
     }
 
     @Override

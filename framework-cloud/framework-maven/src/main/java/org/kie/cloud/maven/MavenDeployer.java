@@ -93,7 +93,7 @@ public class MavenDeployer {
     }
 
     /**
-     * Add settings.xml file to maven build if it was defined and exists.
+     * Setup the Maven distribution repository information if available as system property. 
      *
      * @param mavenUtil
      */

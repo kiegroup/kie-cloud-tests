@@ -23,10 +23,14 @@ import org.kie.cloud.openshift.resource.Project;
  */
 public interface ExternalDeployment<T extends Deployment, U> {
 
+    enum ExternalDeploymentID {
+        MAVEN_REPOSITORY;
+    }
+
     /** 
-     * @return Key used to identity the extra deployment
+     * @return ID used to identify the extra deployment
      */
-    String getKey();
+    ExternalDeploymentID getKey();
 
     /**
      * Launch deployment into the given project
