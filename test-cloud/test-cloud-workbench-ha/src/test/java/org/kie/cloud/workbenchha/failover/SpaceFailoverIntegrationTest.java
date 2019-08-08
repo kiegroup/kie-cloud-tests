@@ -19,68 +19,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.guvnor.rest.client.Space;
-import org.junit.AfterClass;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
-import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
-import org.kie.cloud.openshift.util.SsoDeployer;
-import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
-import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.util.Users;
+import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 import org.kie.cloud.workbenchha.runners.SpaceRunner;
-import org.kie.wb.test.rest.client.WorkbenchClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SpaceFailoverIntegrationTest extends AbstractCloudIntegrationTest {
-
-    private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
-
-    private WorkbenchClient defaultWorkbenchClient;
-
-    @BeforeClass
-    public static void initializeDeployment() {
-        try {
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
-                            MavenConstants.getMavenRepoPassword())
-                    .deploySso()
-                    .build();
-        } catch (UnsupportedOperationException ex) {
-            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
-        }
-        deploymentScenario.setLogFolderName(SpaceFailoverIntegrationTest.class.getSimpleName());
-        ScenarioDeployer.deployScenario(deploymentScenario);
-
-        
-        Map<String, String> users = Stream.of(Users.class.getEnumConstants()).collect(Collectors.toMap(Users::getName, Users::getPassword));
-        SsoDeployer.createUsers(deploymentScenario.getSsoDeployment(), users);
-    }
-
-    @AfterClass
-    public static void cleanEnvironment() {
-        ScenarioDeployer.undeployScenario(deploymentScenario);
-    }
-
-    @Before
-    public void setUp() {
-        defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
-    }
+public class SpaceFailoverIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     @Test
     public void testCreateAndDeleteFailoverSpaces() throws InterruptedException,ExecutionException {
@@ -98,23 +52,10 @@ public class SpaceFailoverIntegrationTest extends AbstractCloudIntegrationTest {
         List<Instance>[] twoLists = split(deploymentScenario.getWorkbenchDeployment().getInstances());
         deploymentScenario.getWorkbenchDeployment().deleteInstances(twoLists[0]);
 
-        List<String> expectedList = new ArrayList<>();
-        //Wait to all threads finish and save all created spaces names
-        futures.forEach(future -> {
-            try {
-                expectedList.addAll(future.get());
-            } catch (InterruptedException | ExecutionException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        });
+        List<String> expectedList = getAllStringFromFutures(futures);
 
         //Check that all spaces where created
-        assertThat(expectedList).isNotEmpty().hasSize(runners.size() * 5);        
-        Collection<Space> spaces = defaultWorkbenchClient.getSpaces();
-        assertThat(spaces).isNotNull();
-        List<String> resultList = spaces.stream().collect(Collectors.mapping(Space::getName, Collectors.toList()));
-        assertThat(resultList).containsExactlyInAnyOrder(resultList.stream().toArray(String[]::new));
+        checkSpacesWereCreated(expectedList, runners.size(), 5);
 
         //DELETE ALL
 
@@ -134,26 +75,10 @@ public class SpaceFailoverIntegrationTest extends AbstractCloudIntegrationTest {
         //Execute task and wait for all threads to finished
         List<Future<Void>> deleteFutures = executorService.invokeAll(deleteTasks);
         deploymentScenario.getWorkbenchDeployment().deleteInstances(twoLists[1]);
-        deleteFutures.forEach(t -> {
-            try {
-                t.get();
-            } catch (InterruptedException | ExecutionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }); // To wait for all tasks to complete
+        getAllDeleteDone(deleteFutures);
 
         //Check all spaces was deleted
         assertThat(defaultWorkbenchClient.getSpaces()).isNotNull().isEmpty();
     }
 
-    // Generic function to split a list into two sublists in Java
-    private <T> List[] split(List<T> list) {
-        int size = list.size();
-
-        List<T> first = new ArrayList<>(list.subList(0, (size + 1) / 2));
-        List<T> second = new ArrayList<>(list.subList((size + 1) / 2, size));
-
-        return new List[] { first, second };
-    }
 }

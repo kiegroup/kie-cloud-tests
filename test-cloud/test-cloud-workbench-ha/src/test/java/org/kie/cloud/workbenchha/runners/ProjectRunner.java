@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.guvnor.rest.client.ProjectResponse;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 public class ProjectRunner extends AbstractRunner {
@@ -46,6 +47,15 @@ public class ProjectRunner extends AbstractRunner {
         };
     }
 
+    public Callable<Collection<ProjectResponse>> getProjects(String spaceName) {
+        return new Callable<Collection<ProjectResponse>>() {
+            @Override
+            public Collection<ProjectResponse> call() {
+                return workbenchClient.getProjects(spaceName);
+            }
+        };
+    }
+
     public Callable<Void> deleteProjects(String spaceName, Collection<String> projectNames) {
         return new Callable<Void>() {
             @Override
@@ -58,5 +68,42 @@ public class ProjectRunner extends AbstractRunner {
         };
     }
 
+    public Callable<Collection<String>> createProjectsWithDelays(String spaceName, String projectName, int startSuffix, int retries) {
+        return new Callable<Collection<String>>() {
+            @Override
+            public Collection<String> call() {
+                List<String> createdProjects = new ArrayList<>(retries);
+                for (int i = startSuffix; i < startSuffix + retries; i++) {
+                    workbenchClient.createProject(spaceName,projectName + "-" + i, GROUP_ID, VERSION);
+                    createdProjects.add(projectName + "-" + i);
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } // random value in (0,5 s - 3 s)
+                }
+                return createdProjects;
+            }
+        };
+    }
+
+    public Callable<Void> deleteProjectsWithDelays(String spaceName, Collection<String> projectNames) {
+        return new Callable<Void>() {
+            @Override
+            public Void call() {
+                projectNames.forEach(name->{
+                    workbenchClient.deleteProject(spaceName, name);
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } // random value in (0,5 s - 3 s)
+                });
+                return null;
+            }
+        };
+    }
 
 }

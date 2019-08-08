@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.guvnor.rest.client.Space;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 // Runner class witch can run command in series repeatedly as a new thread
@@ -40,6 +41,15 @@ public class SpaceRunner extends AbstractRunner {
                     createdSpaces.add(spaceName + "-" + i);
                 }
                 return createdSpaces;
+            }
+        };
+    }
+
+    public Callable<Collection<Space>> getAllSpaces() {
+        return new Callable<Collection<Space>>() {
+            @Override
+            public Collection<Space> call() {
+                return workbenchClient.getSpaces();
             }
         };
     }

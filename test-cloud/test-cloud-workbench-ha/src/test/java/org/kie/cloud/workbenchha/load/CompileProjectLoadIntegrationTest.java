@@ -16,11 +16,10 @@
 package org.kie.cloud.workbenchha.load;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +28,9 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.guvnor.rest.client.Space;
+import org.guvnor.rest.client.CloneProjectRequest;
+import org.guvnor.rest.client.ProjectResponse;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
@@ -39,17 +40,20 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.openshift.util.SsoDeployer;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.util.Users;
-import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
-import org.kie.cloud.workbenchha.runners.SpaceRunner;
+import org.kie.cloud.workbenchha.runners.CompileRunner;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SpaceLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
+public class CompileProjectLoadIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
+
+    private static final String SPACE_NAME = "test-space";
+    private static final String PROJECT_NAME = "test-project";
 
     private WorkbenchClient defaultWorkbenchClient;
 
@@ -64,7 +68,7 @@ public class SpaceLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTest
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
-        deploymentScenario.setLogFolderName(SpaceLoadIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(CompileProjectLoadIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         
@@ -80,60 +84,51 @@ public class SpaceLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTest
     @Before
     public void setUp() {
         defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
+        defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+        // TODO import project
+        final CloneProjectRequest cloneProjectRequest = new CloneProjectRequest();
+        cloneProjectRequest.setName(PROJECT_NAME);
+        cloneProjectRequest.setGitURL(""); // TODO add some resource
+        defaultWorkbenchClient.cloneRepository(SPACE_NAME, cloneProjectRequest);
+    }
+
+    @After
+    public void cleanUp(){
+        defaultWorkbenchClient.deleteSpace(SPACE_NAME);
     }
 
     @Test
-    public void testCreateAndDeleteSpaces() throws InterruptedException,ExecutionException {
+    public void testImportProjects() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
-        List<SpaceRunner> runners = new ArrayList<>();
-        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
+        List<CompileRunner> runners = new ArrayList<>();
+        runners.add(new CompileRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
         //... TODO
+
+        // TODO need to be updated - not finished !!!
 
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
-        //Create task to create spaces for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createSpaces(UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
-        List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
+        //Create task to create projects for all users
+        List<Callable<Void>> createTasks = runners.stream().map(runner -> runner.compileProjects(SPACE_NAME,Arrays.asList(PROJECT_NAME))).collect(Collectors.toList());
+        List<Future<Void>> futures = executorService.invokeAll(createTasks);
 
-        List<String> expectedList = getAllStringFromFutures(futures);
-
-        //Check that all spaces where created
-        checkSpacesWereCreated(expectedList, runners.size(), 5);
-
-        //GET ALL
-
-        List<Callable<Collection<Space>>> getAllTask = runners.stream().map(SpaceRunner::getAllSpaces).collect(Collectors.toList());
-        List<Future<Collection<Space>>> futuresSpaces = executorService.invokeAll(getAllTask);
-        futuresSpaces.forEach(futureSpaces -> {
+        List<String> expectedList = new ArrayList<>();
+        //Wait to all threads finish and save all created projects names
+        futures.forEach(future -> {
             try {
-                assertThat(futureSpaces.get().stream().collect(Collectors.mapping(Space::getName, Collectors.toList()))).isNotNull().isNotEmpty().containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
+            future.get();
             } catch (InterruptedException | ExecutionException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         });
 
-        
-        //DELETE ALL
+        //Check that all projects where created
+        assertThat(expectedList).isNotEmpty().hasSize(runners.size() * 5);        
+        Collection<ProjectResponse> projects = defaultWorkbenchClient.getProjects(SPACE_NAME);
+        assertThat(projects).isNotNull();
+        List<String> resultList = projects.stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()));
+        assertThat(resultList).containsExactlyInAnyOrder(resultList.stream().toArray(String[]::new));
 
-        //Create tasks to delete spaces
-        List<Callable<Void>> deleteTasks = new ArrayList<>(runners.size());
-        //Add list to delete from previous create task
-        assertThat(runners).as("Check size of iterating lists.").hasSameSizeAs(futures);
-        Iterator runnersIterator = runners.iterator();
-        Iterator futureIterator = futures.iterator();
-        while(runnersIterator.hasNext() && futureIterator.hasNext()) {
-            SpaceRunner sr = (SpaceRunner) runnersIterator.next();
-            Future<Collection<String>> f = (Future<Collection<String>>) futureIterator.next();
-            
-            deleteTasks.add(sr.deleteSpaces(f.get()));
-        }
-
-        //Execute task and wait for all threads to finished
-        List<Future<Void>> deleteFutures = executorService.invokeAll(deleteTasks);
-        getAllDeleteDone(deleteFutures);
-
-        //Check all spaces was deleted
-        assertThat(defaultWorkbenchClient.getSpaces()).isNotNull().isEmpty();
     }
 }

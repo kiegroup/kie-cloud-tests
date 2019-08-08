@@ -27,11 +27,13 @@ public abstract class AbstractRunner {
     protected KieServerControllerClient kieControllerClient;
     protected KieServicesClient kieServerClient;
     protected WorkbenchClient workbenchClient;
+    protected WorkbenchClient asyncWorkbenchClient;
     protected String wbUser;
 
     public AbstractRunner(WorkbenchDeployment workbenchDeployment, String user, String password) {
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment, user, password);
         workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment, user, password);
+        asyncWorkbenchClient = WorkbenchClientProvider.getAsyncWorkbenchClient(workbenchDeployment, user, password);
         wbUser = workbenchDeployment.getUsername();
     }
     

@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.load;
+package org.kie.cloud.workbenchha.scaling;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import org.guvnor.rest.client.ProjectResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,7 @@ import org.kie.cloud.workbenchha.runners.ProjectRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProjectLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
+public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 
@@ -63,29 +62,33 @@ public class ProjectLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTe
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjects(SPACE_NAME,"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
+
+        int originalWorkbenchPods = deploymentScenario.getWorkbenchDeployment().getInstances().size();
+        deploymentScenario.getWorkbenchDeployment().scale(originalWorkbenchPods/2);
 
         List<String> expectedList = getAllStringFromFutures(futures);
 
         //Check that all projects where created
         checkProjectsWereCreated(SPACE_NAME, expectedList, runners.size(), 5);
 
-        //GET ALL
+        //Another run with scale up of WB
+        createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,"RANDOM GENERATE NAME", 6, 5)).collect(Collectors.toList());
+        futures = executorService.invokeAll(createTasks);
 
-        List<Callable<Collection<ProjectResponse>>> getAllProjects = runners.stream().map(pr -> pr.getProjects(SPACE_NAME)).collect(Collectors.toList());
-        List<Future<Collection<ProjectResponse>>> futuresProjects = executorService.invokeAll(getAllProjects);
-        futuresProjects.forEach(futureProjects -> {
-            try {
-                assertThat(futureProjects.get().stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()))).isNotNull().isNotEmpty().containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
-            } catch (InterruptedException | ExecutionException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        });
+        deploymentScenario.getWorkbenchDeployment().scale(originalWorkbenchPods);
+        
+
+        List<String> secondExpectedList = new ArrayList<>(expectedList);
+        secondExpectedList.addAll(getAllStringFromFutures(futures));        
+
+        //Check that all spaces where created
+        checkSpacesWereCreated(secondExpectedList, runners.size(), 10);
         
         //DELETE ALL
 
+        
         //Create tasks to delete projects
         List<Callable<Void>> deleteTasks = new ArrayList<>(runners.size());
         //Add list to delete from previous create task
@@ -96,14 +99,17 @@ public class ProjectLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTe
             ProjectRunner sr = (ProjectRunner) runnersIterator.next();
             Future<Collection<String>> f = (Future<Collection<String>>) futureIterator.next();
             
-            deleteTasks.add(sr.deleteProjects(SPACE_NAME,f.get()));
+            deleteTasks.add(sr.deleteProjectsWithDelays(SPACE_NAME,f.get()));
         }
 
         //Execute task and wait for all threads to finished
         List<Future<Void>> deleteFutures = executorService.invokeAll(deleteTasks);
+        
+        deploymentScenario.getWorkbenchDeployment().scale(originalWorkbenchPods/2);
+
         getAllDeleteDone(deleteFutures);
 
-        //Check all projects was deleted
-        assertThat(defaultWorkbenchClient.getProjects(SPACE_NAME)).isNotNull().isEmpty();
+        //Check all projects from second create run was deleted
+        checkSpacesWereCreated(expectedList, runners.size(), 5);
     }
 }
