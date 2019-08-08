@@ -94,9 +94,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
         // Init the log collector
         logger.info("Launch instances log collector on project {}", projectName);
-        logCollectorExecutorService = Executors.newScheduledThreadPool(1);
-        instancesLogCollectorRunnable = new InstancesLogCollectorRunnable(project, getLogFolderName());
-        logCollectorExecutorService.scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, DEFAULT_SCHEDULED_FIX_RATE_LOG_COLLECTOR_IN_SECONDS, TimeUnit.SECONDS);
+        initLogCollectors();
 
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
@@ -135,17 +133,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
         try {
             logger.info("Release log collector(s)");
-            try {
-                if (Objects.nonNull(logCollectorExecutorService)) {
-                    logCollectorExecutorService.shutdownNow();
-                    logCollectorExecutorService = null;
-                }
-                if (Objects.nonNull(instancesLogCollectorRunnable)) {
-                    instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors(5000);
-                }
-            } catch (Exception e) {
-                logger.error("Error killing log collector thread", e);
-            }
+            releaseLogCollectors();
 
             logger.info("Store project events.");
             EventsRecorder.recordProjectEvents(project, getLogFolderName());
@@ -169,11 +157,41 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         }
     }
 
+    private void initLogCollectors() {
+        logCollectorExecutorService = Executors.newScheduledThreadPool(1);
+        instancesLogCollectorRunnable = new InstancesLogCollectorRunnable(project, getLogFolderName());
+        logCollectorExecutorService.scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, DEFAULT_SCHEDULED_FIX_RATE_LOG_COLLECTOR_IN_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private void releaseLogCollectors() {
+        try {
+            if (Objects.nonNull(logCollectorExecutorService)) {
+                logCollectorExecutorService.shutdownNow();
+                logCollectorExecutorService = null;
+            }
+            if (Objects.nonNull(instancesLogCollectorRunnable)) {
+                instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors(5000);
+            }
+        } catch (Exception e) {
+            logger.error("Error killing log collector thread", e);
+        }
+    }
+
     @Override
     public void addDeploymentScenarioListener(DeploymentScenarioListener<T> deploymentScenarioListener) {
         deploymentScenarioListeners.add(deploymentScenarioListener);
     }
 
+    /**
+     * Add an external deployment to be executed before the specific scenario deployments are done
+     * and undeployed when scenario is over.
+     * 
+     * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
+     * 
+     * <b>Note that the deployment does NOT wait for the deployment to be ready.</b>
+     * 
+     * @param externalDeployment External deployment to add to the scenario
+     */
     public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
         addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
 
@@ -181,6 +199,33 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             public void beforeDeploymentStarted(T deploymentScenario) {
                 Deployment deployment = externalDeployment.deploy(project);
                 deployment.waitForScheduled();
+                configureWithExternalDeployment(externalDeployment);
+            }
+
+            @Override
+            public void afterScenarioFinished(T deploymentScenario) {
+                removeConfigurationFromExternalDeployment(externalDeployment);
+            }
+
+        });
+    }
+
+    /**
+     * Add an external deployment to be executed before the specific scenario deployments are done
+     * and undeployed when scenario is over, in a synchronized manner, meaning that it is waiting
+     * that the deployment is ready to going further.
+     * 
+     * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
+     * 
+     * @param externalDeployment External deployment to add to the scenario
+     */
+    public void addExtraDeploymentSynchronized(ExternalDeployment<?, ?> externalDeployment) {
+        addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
+
+            @Override
+            public void beforeDeploymentStarted(T deploymentScenario) {
+                Deployment deployment = externalDeployment.deploy(project);
+                deployment.waitForScale();
                 configureWithExternalDeployment(externalDeployment);
             }
 
