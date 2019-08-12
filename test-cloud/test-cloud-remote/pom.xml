@@ -46,9 +46,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-integ-tests-common</artifactId>
-        <scope>test</scope>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-integ-tests-common</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -100,16 +100,6 @@
   </profiles>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>false</filtering>
-      </testResource>
-      <testResource>
-        <directory>src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
     <pluginManagement>
       <plugins>
         <!-- XTF use tmp folder as temp folder, need to be deleted too when rerunning tests. -->
@@ -123,6 +113,31 @@
               </fileset>
             </filesets>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>generate-test-resources</phase>
+              <goals>
+                <goal>testResources</goal>
+              </goals>
+              <configuration>
+                <resources>
+                  <resource>
+                    <directory>src/test/filtered-resources</directory>
+                    <filtering>true</filtering>
+                  </resource>
+                  <testResource>
+                    <directory>src/test/resources</directory>
+                    <filtering>false</filtering>
+                  </testResource>
+                </resources>
+                <escapeString>\</escapeString>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

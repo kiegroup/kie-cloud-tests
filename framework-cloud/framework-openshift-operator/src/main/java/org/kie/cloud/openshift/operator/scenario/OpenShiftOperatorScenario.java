@@ -28,7 +28,9 @@ import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
+import org.kie.cloud.openshift.operator.deployment.external.ExternalDeploymentOperator;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.KieAppDoneable;
 import org.kie.cloud.openshift.operator.model.KieAppList;
@@ -47,8 +49,11 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftOperatorScenario.class);
 
-    public OpenShiftOperatorScenario() {
+    protected KieApp kieApp;
+
+    public OpenShiftOperatorScenario(KieApp kieApp) {
         super(false);
+        this.kieApp = kieApp;
     }
 
     @Override
@@ -143,4 +148,17 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         CustomResourceDefinition customResourceDefinition = OpenShifts.master().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
         return OpenShifts.master().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
     }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentOperator) externalDeployment).configure(kieApp);
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentOperator) externalDeployment).removeConfiguration(kieApp);
+    }
+
 }

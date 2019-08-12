@@ -22,4 +22,11 @@ public interface DeploymentScenarioListener<T extends DeploymentScenario<T>> {
      * @param deploymentScenario Deployment scenario which is going to be deployed.
      */
     default void beforeDeploymentStarted(T deploymentScenario) {};
+    
+    /**
+     * Invoked after the scenario has run. 
+     *
+     * @param deploymentScenario Deployment scenario which has been run.
+     */
+    default void afterScenarioFinished(T deploymentScenario) {};
 }

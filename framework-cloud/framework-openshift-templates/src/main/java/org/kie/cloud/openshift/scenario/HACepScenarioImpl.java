@@ -151,7 +151,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static void filterNamespaceInInstallationFiles(final File amqStreamsInstallDirectory,
                                                            final String projectName) {
         final List<File> installationFiles = Arrays.asList(amqStreamsInstallDirectory.listFiles());
-        for (File file: installationFiles) {
+        for (File file : installationFiles) {
             if (file.isFile() && file.getName().contains("RoleBinding")) {
                 try {
                     String fileContent = FileUtils.readFileToString(file, "UTF-8");
@@ -167,10 +167,10 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     private static List<String> sortedFolderContent(final File folder) {
         return Arrays.asList(folder.listFiles())
-                .stream()
-                .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
-                .map(f -> f.getAbsolutePath())
-                .collect(Collectors.toList());
+                     .stream()
+                     .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
+                     .map(f -> f.getAbsolutePath())
+                     .collect(Collectors.toList());
     }
 
     @Override

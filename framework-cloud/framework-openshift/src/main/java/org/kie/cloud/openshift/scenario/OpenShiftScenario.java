@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.scenario;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,6 +31,7 @@ import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.log.EventsRecorder;
 import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
@@ -92,9 +94,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
         // Init the log collector
         logger.info("Launch instances log collector on project {}", projectName);
-        logCollectorExecutorService = Executors.newScheduledThreadPool(1);
-        instancesLogCollectorRunnable = new InstancesLogCollectorRunnable(project, getLogFolderName());
-        logCollectorExecutorService.scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, DEFAULT_SCHEDULED_FIX_RATE_LOG_COLLECTOR_IN_SECONDS, TimeUnit.SECONDS);
+        initLogCollectors();
 
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
         project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
@@ -112,21 +112,28 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     }
 
     /**
-     * Deploy Kie deployments for this scenario and wait until deployments are ready for use.
+     * Deploy Kie deployments for this scenario and wait until deployments are ready
+     * for use.
      */
     protected abstract void deployKieDeployments();
 
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        logger.warn("No configuration with external deployment done in {}", this.getClass().getName());
+    }
+
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        logger.warn("No remove configuration from external deployment done in {}", this.getClass().getName());
+    }
+
     @Override
     public void undeploy() {
+        for (DeploymentScenarioListener<T> deploymentScenarioListener : deploymentScenarioListeners) {
+            deploymentScenarioListener.afterScenarioFinished((T) this);
+        }
+
         try {
             logger.info("Release log collector(s)");
-            try {
-                logCollectorExecutorService.shutdownNow();
-                logCollectorExecutorService = null;
-                instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors(5000);
-            } catch (Exception e) {
-                logger.error("Error killing log collector thread", e);
-            }
+            releaseLogCollectors();
 
             logger.info("Store project events.");
             EventsRecorder.recordProjectEvents(project, getLogFolderName());
@@ -150,8 +157,83 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         }
     }
 
+    private void initLogCollectors() {
+        logCollectorExecutorService = Executors.newScheduledThreadPool(1);
+        instancesLogCollectorRunnable = new InstancesLogCollectorRunnable(project, getLogFolderName());
+        logCollectorExecutorService.scheduleWithFixedDelay(instancesLogCollectorRunnable, 0, DEFAULT_SCHEDULED_FIX_RATE_LOG_COLLECTOR_IN_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private void releaseLogCollectors() {
+        try {
+            if (Objects.nonNull(logCollectorExecutorService)) {
+                logCollectorExecutorService.shutdownNow();
+                logCollectorExecutorService = null;
+            }
+            if (Objects.nonNull(instancesLogCollectorRunnable)) {
+                instancesLogCollectorRunnable.closeAndFlushRemainingInstanceCollectors(5000);
+            }
+        } catch (Exception e) {
+            logger.error("Error killing log collector thread", e);
+        }
+    }
+
     @Override
     public void addDeploymentScenarioListener(DeploymentScenarioListener<T> deploymentScenarioListener) {
         deploymentScenarioListeners.add(deploymentScenarioListener);
+    }
+
+    /**
+     * Add an external deployment to be executed before the specific scenario deployments are done
+     * and undeployed when scenario is over.
+     * 
+     * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
+     * 
+     * <b>Note that the deployment does NOT wait for the deployment to be ready.</b>
+     * 
+     * @param externalDeployment External deployment to add to the scenario
+     */
+    public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
+
+            @Override
+            public void beforeDeploymentStarted(T deploymentScenario) {
+                Deployment deployment = externalDeployment.deploy(project);
+                deployment.waitForScheduled();
+                configureWithExternalDeployment(externalDeployment);
+            }
+
+            @Override
+            public void afterScenarioFinished(T deploymentScenario) {
+                removeConfigurationFromExternalDeployment(externalDeployment);
+            }
+
+        });
+    }
+
+    /**
+     * Add an external deployment to be executed before the specific scenario deployments are done
+     * and undeployed when scenario is over, in a synchronized manner, meaning that it is waiting
+     * that the deployment is ready to going further.
+     * 
+     * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
+     * 
+     * @param externalDeployment External deployment to add to the scenario
+     */
+    public void addExtraDeploymentSynchronized(ExternalDeployment<?, ?> externalDeployment) {
+        addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
+
+            @Override
+            public void beforeDeploymentStarted(T deploymentScenario) {
+                Deployment deployment = externalDeployment.deploy(project);
+                deployment.waitForScale();
+                configureWithExternalDeployment(externalDeployment);
+            }
+
+            @Override
+            public void afterScenarioFinished(T deploymentScenario) {
+                removeConfigurationFromExternalDeployment(externalDeployment);
+            }
+
+        });
     }
 }

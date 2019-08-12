@@ -47,8 +47,6 @@ import org.slf4j.LoggerFactory;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorScenario<ClusteredWorkbenchKieServerPersistentScenario> implements ClusteredWorkbenchKieServerPersistentScenario {
 
-    private KieApp kieApp;
-
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private SsoDeployment ssoDeployment;
@@ -57,7 +55,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
     public ClusteredWorkbenchKieServerPersistentScenarioImpl(KieApp kieApp, boolean deploySso) {
-        this.kieApp = kieApp;
+        super(kieApp);
         this.deploySso = deploySso;
     }
 
@@ -123,7 +121,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
         logNodeNameOfAllInstances();
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;

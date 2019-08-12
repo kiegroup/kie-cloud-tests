@@ -45,8 +45,6 @@ import org.slf4j.LoggerFactory;
 
 public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<WorkbenchKieServerScenario> implements WorkbenchKieServerScenario {
 
-    private KieApp kieApp;
-
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private boolean deployPrometheus;
@@ -55,7 +53,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
     public WorkbenchKieServerScenarioImpl(KieApp kieApp, boolean deployPrometheus) {
-        this.kieApp = kieApp;
+        super(kieApp);
         this.deployPrometheus = deployPrometheus;
     }
 
