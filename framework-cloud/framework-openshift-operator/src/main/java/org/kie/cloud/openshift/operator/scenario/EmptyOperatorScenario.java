@@ -29,6 +29,10 @@ import org.kie.cloud.openshift.operator.deployment.OperatorConsoleDeployment;
  */
 public class EmptyOperatorScenario extends OpenShiftOperatorScenario<EmptyOperatorScenario> {
 
+    public EmptyOperatorScenario() {
+        super(null);
+    }
+
     private OperatorConsoleDeployment consoleDeployment;
 
     @Override

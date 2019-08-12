@@ -36,6 +36,8 @@ import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
@@ -125,6 +127,17 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logNodeNameOfAllInstances();
     }
 
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).configure(extraVars);
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).removeConfiguration(extraVars);
+    }
 
     private void deployCustomTrustedSecret() {
         project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(),

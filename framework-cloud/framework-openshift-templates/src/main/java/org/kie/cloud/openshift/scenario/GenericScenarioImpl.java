@@ -37,6 +37,8 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentTemplates;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.settings.GenericScenarioSettings;
 import org.kie.cloud.openshift.template.ProjectProfile;
@@ -99,7 +101,7 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         kieServerDeployments.clear();
         smartRouterDeployments.clear();
 
-        if(scenarioSettings.getDeploySso()) {
+        if (scenarioSettings.getDeploySso()) {
             ssoDeployment = SsoDeployer.deploy(project);
 
             scenarioSettings.getAllSettings().stream().forEach((DeploymentSettings deploymentSettings) -> {
@@ -162,7 +164,7 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
             workbenchDeployment.waitForScale();
         }
         logger.info("Waiting for Controller deployment to become ready.");
-        for(ControllerDeployment controllerDeployment : controllerDeployments) {
+        for (ControllerDeployment controllerDeployment : controllerDeployments) {
             controllerDeployment.waitForScale();
         }
         logger.info("Waiting for Kie server deployment to become ready.");
@@ -238,6 +240,25 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         controllerDeployment.scale(1);
 
         return controllerDeployment;
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        scenarioSettings.getAllSettings()
+                        .stream()
+                        .map(DeploymentSettings::getEnvVariables)
+                        .forEach(((ExternalDeploymentTemplates) externalDeployment)::configure);
+
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        scenarioSettings.getAllSettings()
+                        .stream()
+                        .map(DeploymentSettings::getEnvVariables)
+                        .forEach(((ExternalDeploymentTemplates) externalDeployment)::removeConfiguration);
     }
 
 }

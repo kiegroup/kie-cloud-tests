@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.WaiterException;
@@ -50,8 +49,6 @@ import org.slf4j.LoggerFactory;
 
 public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorScenario<WorkbenchKieServerScenario> implements WorkbenchKieServerPersistentScenario {
 
-    private KieApp kieApp;
-
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private SsoDeployment ssoDeployment;
@@ -60,7 +57,7 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerPersistentScenarioImpl.class);
 
     public WorkbenchKieServerPersistentScenarioImpl(KieApp kieApp, boolean deploySso) {
-        this.kieApp = kieApp;
+        super(kieApp);
         this.deploySso = deploySso;
     }
 
