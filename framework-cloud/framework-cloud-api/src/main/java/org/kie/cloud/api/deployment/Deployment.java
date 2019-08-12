@@ -48,6 +48,13 @@ public interface Deployment {
     void waitForScale() throws DeploymentTimeoutException;
 
     /**
+     * Wait until Deployment is scheduled. This method waits until all
+     * instances of deployment are scheduled.
+     * @throws DeploymentTimeoutException In case deployment isn't scheduled in defined timeout.
+     */
+    void waitForScheduled() throws DeploymentTimeoutException;
+
+    /**
      * Return list of all already running instances of the deployment.
      *
      * @return List of Instances
@@ -88,7 +95,7 @@ public interface Deployment {
      * This method resets a router timeout for the cloud deployment back to original value.
      */
     void resetRouterTimeout();
-    
+
     /**
      * This method sets a router balance strategy for the cloud deployment.
      *

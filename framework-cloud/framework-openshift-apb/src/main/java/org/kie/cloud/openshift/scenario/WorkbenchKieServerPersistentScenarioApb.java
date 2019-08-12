@@ -35,6 +35,8 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -104,6 +106,18 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<W
 
         // Used to track persistent volume content due to issues with volume cleanup
         storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/kie");
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).configure(extraVars);
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        ((ExternalDeploymentApb) externalDeployment).removeConfiguration(extraVars);
     }
 
     private void storeProjectInfoToPersistentVolume(Deployment deployment, String persistentVolumeMountPath) {

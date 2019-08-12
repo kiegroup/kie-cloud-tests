@@ -34,6 +34,8 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
@@ -139,7 +141,7 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
             workbenchDeployment.waitForScale();
         }
         logger.info("Waiting for Controller deployment to become ready.");
-        for(ControllerDeployment controllerDeployment : controllerDeployments) {
+        for (ControllerDeployment controllerDeployment : controllerDeployments) {
             controllerDeployment.waitForScale();
         }
         logger.info("Waiting for Kie server deployment to become ready.");
@@ -148,6 +150,24 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
         }
 
         logNodeNameOfAllInstances();
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        getAllDeploymentSettings()
+                                  .stream()
+                                  .map(DeploymentSettings::getEnvVariables)
+                                  .forEach(((ExternalDeploymentApb) externalDeployment)::configure);
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        getAllDeploymentSettings()
+                                  .stream()
+                                  .map(DeploymentSettings::getEnvVariables)
+                                  .forEach(((ExternalDeploymentApb) externalDeployment)::removeConfiguration);
     }
 
     private void deployApbWithSettings(Project project, DeploymentSettings deploymentSettings) {
@@ -167,6 +187,15 @@ public class GenericScenarioApb extends OpenShiftScenario<GenericScenario> imple
         deployments.addAll(kieServerDeployments);
         deployments.addAll(smartRouterDeployments);
         deployments.addAll(controllerDeployments);
+        return deployments;
+    }
+
+    private List<DeploymentSettings> getAllDeploymentSettings() {
+        List<DeploymentSettings> deployments = new ArrayList<>();
+        deployments.addAll(workbenchSettingsList);
+        deployments.addAll(kieServerSettingsList);
+        deployments.addAll(smartRouterSettingsList);
+        deployments.addAll(controllerSettingsList);
         return deployments;
     }
 

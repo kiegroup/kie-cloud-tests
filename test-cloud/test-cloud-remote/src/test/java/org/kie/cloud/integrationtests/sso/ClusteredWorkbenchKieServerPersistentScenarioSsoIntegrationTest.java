@@ -20,7 +20,6 @@ import java.util.UUID;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -30,7 +29,6 @@ import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
@@ -50,22 +48,22 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
         if (deploymentScenarioFactory.getCloudAPIImplementationName().equals("openshift-operator")) {
             try {
                 deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                        .deploySso()
-                        .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                        .build();
+                      .deploySso()
+                      .withInternalMavenRepo()
+                      .build();
             } catch (UnsupportedOperationException ex) {
                 Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
             }
         } else {
             try {
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                    .deploySso()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                    .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                    .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                    .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                    .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                    .build();
+                deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
+                          .deploySso()
+                          .withInternalMavenRepo()
+                          .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                          .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                          .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                          .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                          .build();
             } catch (UnsupportedOperationException ex) {
                 Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
             }
@@ -86,10 +84,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
         ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
-                deploymentScenario.getKieServerDeployment());
+              deploymentScenario.getKieServerDeployment());
     }
 
     @Test
