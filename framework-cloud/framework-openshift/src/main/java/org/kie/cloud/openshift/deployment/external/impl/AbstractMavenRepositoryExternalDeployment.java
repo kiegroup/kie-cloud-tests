@@ -21,11 +21,10 @@ import java.util.Optional;
 
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.openshift.deployment.external.AbstractExternalDeployment;
-import org.kie.cloud.openshift.deployment.external.MavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.MavenRepositoryDeployer;
 
-public abstract class AbstractMavenRepositoryExternalDeployment<U> extends AbstractExternalDeployment<MavenRepositoryDeployment, U> implements MavenRepositoryExternalDeployment<U> {
+public abstract class AbstractMavenRepositoryExternalDeployment<U> extends AbstractExternalDeployment<MavenRepositoryDeployment, U> {
 
     protected static final String SYSTEM_MAVEN_REPO_URL = "maven.repo.url";
     protected static final String SYSTEM_MAVEN_REPO_USERNAME = "maven.repo.username";
@@ -35,6 +34,11 @@ public abstract class AbstractMavenRepositoryExternalDeployment<U> extends Abstr
 
     public AbstractMavenRepositoryExternalDeployment(Map<String, String> config) {
         super(config);
+    }
+
+    @Override
+    public ExternalDeploymentID getKey() {
+        return ExternalDeploymentID.MAVEN_REPOSITORY;
     }
 
     @Override
