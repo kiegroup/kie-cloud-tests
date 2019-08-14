@@ -13,73 +13,41 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.load;
+package org.kie.cloud.workbenchha.functional;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.guvnor.rest.client.ProjectResponse;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assume;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
-import org.kie.cloud.openshift.util.SsoDeployer;
-import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
-import org.kie.cloud.tests.common.ScenarioDeployer;
+import org.kie.cloud.tests.common.provider.git.Git;
 import org.kie.cloud.util.Users;
+import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 import org.kie.cloud.workbenchha.runners.ImportRunner;
-import org.kie.wb.test.rest.client.WorkbenchClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ImportGitProjectLoadIntegrationTest extends AbstractCloudIntegrationTest {
-
-    private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
+public class ImportGitProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static final String SPACE_NAME = "test-space";
 
-    private WorkbenchClient defaultWorkbenchClient;
-
-    @BeforeClass
-    public static void initializeDeployment() {
-        try {
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
-                            MavenConstants.getMavenRepoPassword())
-                    .deploySso()
-                    .build();
-        } catch (UnsupportedOperationException ex) {
-            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
-        }
-        deploymentScenario.setLogFolderName(ImportGitProjectLoadIntegrationTest.class.getSimpleName());
-        ScenarioDeployer.deployScenario(deploymentScenario);
-
-        
-        Map<String, String> users = Stream.of(Users.class.getEnumConstants()).collect(Collectors.toMap(Users::getName, Users::getPassword));
-        SsoDeployer.createUsers(deploymentScenario.getSsoDeployment(), users);
-    }
-
-    @AfterClass
-    public static void cleanEnvironment() {
-        ScenarioDeployer.undeployScenario(deploymentScenario);
-    }
+    private String repositoryName;
 
     @Before
     public void setUp() {
+        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("ImportGitProjectFunctionalIntegrationTest", ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+        // TODO add kjar sources for tests with projects
+
         defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
         defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
     }
@@ -87,6 +55,8 @@ public class ImportGitProjectLoadIntegrationTest extends AbstractCloudIntegratio
     @After
     public void cleanUp(){
         defaultWorkbenchClient.deleteSpace(SPACE_NAME);
+
+        Git.getProvider().deleteGitRepository(repositoryName);
     }
 
     @Test
@@ -99,7 +69,7 @@ public class ImportGitProjectLoadIntegrationTest extends AbstractCloudIntegratio
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.importProjects(SPACE_NAME,"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.importProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         List<String> expectedList = new ArrayList<>();

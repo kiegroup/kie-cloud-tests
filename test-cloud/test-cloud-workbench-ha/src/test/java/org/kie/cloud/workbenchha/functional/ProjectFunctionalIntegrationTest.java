@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.load;
+package org.kie.cloud.workbenchha.functional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +37,7 @@ import org.kie.cloud.workbenchha.runners.ProjectRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProjectLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
+public class ProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 

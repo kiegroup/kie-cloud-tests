@@ -31,6 +31,10 @@
       <artifactId>framework-cloud-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-git</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>

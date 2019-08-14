@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.load;
+package org.kie.cloud.workbenchha.functional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +47,7 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SpaceLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
+public class SpaceFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 
@@ -64,7 +64,7 @@ public class SpaceLoadIntegrationTest extends AbstractWorkbenchHaIntegrationTest
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
-        deploymentScenario.setLogFolderName(SpaceLoadIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(SpaceFunctionalIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         

@@ -97,4 +97,40 @@ public class ProjectFailoverIntegrationTest extends AbstractWorkbenchHaIntegrati
         //Check all projects was deleted
         assertThat(defaultWorkbenchClient.getProjects(SPACE_NAME)).isNotNull().isEmpty();
     }
+
+    @Test
+    public void testCreateProjectsAndDeleteOldPod() throws InterruptedException,ExecutionException {
+        //Create Runners with different users.
+        List<ProjectRunner> runners = new ArrayList<>();
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
+        //... TODO
+
+        List<Instance> oldPods = deploymentScenario.getWorkbenchDeployment().getInstances();
+
+        //Create executor service to run every tasks in own thread
+        ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
+        //Create task to create projects for all users
+        
+        List<String> expectedList = new ArrayList<>();
+        oldPods.stream().forEach(pod->{
+            List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,"RANDOM GENERATE NAME"+pod.getName(), 1, 5)).collect(Collectors.toList());
+            List<Future<Collection<String>>> futures;
+            try {
+                futures = executorService.invokeAll(createTasks);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                throw new RuntimeException(e); // TODO
+            }
+            
+            deploymentScenario.getWorkbenchDeployment().deleteInstances(pod);
+            deploymentScenario.getWorkbenchDeployment().waitForScale();
+
+            expectedList.addAll(getAllStringFromFutures(futures));
+        });
+
+
+        //Check that all projects where created
+        checkProjectsWereCreated(SPACE_NAME, expectedList, runners.size(), oldPods.size()*5);
+    }
 }

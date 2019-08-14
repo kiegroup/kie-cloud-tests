@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class ImportRunner extends AbstractRunner {
 
@@ -30,23 +31,40 @@ public class ImportRunner extends AbstractRunner {
         // TODO Auto-generated constructor stub
     }
 
-    public Callable<Collection<String>> importProjects(String spaceName, String projectName, int startSuffix,
+    public Callable<Collection<String>> asyncImportProjects(String spaceName, String gitURL, String projectName, int startSuffix, int retries) {
+        return new Callable<Collection<String>>() {
+            @Override
+            public Collection<String> call() {
+                List<String> importedProjects = new ArrayList<>(retries);
+                for (int i = startSuffix; i < startSuffix + retries; i++) {
+                    importProject(asyncWorkbenchClient, spaceName, gitURL, projectName + "-" + i);
+                    importedProjects.add(projectName + "-" + i);
+                }
+                return importedProjects;
+            }
+        };
+    }
+
+    public Callable<Collection<String>> importProjects(String spaceName, String gitURL, String projectName, int startSuffix,
             int retries) {
         return new Callable<Collection<String>>() {
             @Override
             public Collection<String> call() {
                 List<String> importedProjects = new ArrayList<>(retries);
                 for (int i = startSuffix; i < startSuffix + retries; i++) {
-                    final CloneProjectRequest cloneProjectRequest = new CloneProjectRequest();
-                    cloneProjectRequest.setName(projectName + "-" + i);
-                    cloneProjectRequest.setGitURL(""); // TODO add some resource
-
-                    workbenchClient.cloneRepository(spaceName, cloneProjectRequest);
-
+                    importProject(workbenchClient, spaceName, gitURL, projectName + "-" + i);
                     importedProjects.add(projectName + "-" + i);
                 }
                 return importedProjects;
             }
         };
+    }
+
+    private void importProject(WorkbenchClient client, String spaceName, String gitURL, String name) {
+        final CloneProjectRequest cloneProjectRequest = new CloneProjectRequest();
+        cloneProjectRequest.setName(name);
+        cloneProjectRequest.setGitURL(gitURL);
+
+        client.cloneRepository(spaceName, cloneProjectRequest);
     }
 }

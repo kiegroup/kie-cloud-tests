@@ -13,42 +13,34 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.load;
+package org.kie.cloud.workbenchha.functional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.guvnor.rest.client.ProjectResponse;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assume;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
-import org.kie.cloud.openshift.util.SsoDeployer;
-import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
-import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.util.Users;
+import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 import org.kie.cloud.workbenchha.runners.CompileRunner;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CompileProjectLoadIntegrationTest extends AbstractCloudIntegrationTest {
+public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 
@@ -56,30 +48,6 @@ public class CompileProjectLoadIntegrationTest extends AbstractCloudIntegrationT
     private static final String PROJECT_NAME = "test-project";
 
     private WorkbenchClient defaultWorkbenchClient;
-
-    @BeforeClass
-    public static void initializeDeployment() {
-        try {
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
-                            MavenConstants.getMavenRepoPassword())
-                    .deploySso()
-                    .build();
-        } catch (UnsupportedOperationException ex) {
-            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
-        }
-        deploymentScenario.setLogFolderName(CompileProjectLoadIntegrationTest.class.getSimpleName());
-        ScenarioDeployer.deployScenario(deploymentScenario);
-
-        
-        Map<String, String> users = Stream.of(Users.class.getEnumConstants()).collect(Collectors.toMap(Users::getName, Users::getPassword));
-        SsoDeployer.createUsers(deploymentScenario.getSsoDeployment(), users);
-    }
-
-    @AfterClass
-    public static void cleanEnvironment() {
-        ScenarioDeployer.undeployScenario(deploymentScenario);
-    }
 
     @Before
     public void setUp() {

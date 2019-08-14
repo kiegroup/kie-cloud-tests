@@ -80,5 +80,4 @@ public class SpaceFailoverIntegrationTest extends AbstractWorkbenchHaIntegration
         //Check all spaces was deleted
         assertThat(defaultWorkbenchClient.getSpaces()).isNotNull().isEmpty();
     }
-
 }
