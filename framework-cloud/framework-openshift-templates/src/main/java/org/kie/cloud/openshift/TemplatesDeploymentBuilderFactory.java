@@ -23,6 +23,7 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTw
 import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
@@ -42,6 +43,8 @@ import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeSmartRo
 import org.kie.cloud.openshift.scenario.builder.EmployeeRosteringScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.HACepScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithMySqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithPostgreSqlScenarioBuilderImpl;
@@ -103,6 +106,16 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
     @Override
     public KieServerWithDatabaseScenarioBuilder getKieServerWithPostgreSqlScenarioBuilder() {
         return new KieServerWithPostgreSqlScenarioBuilderImpl();
+    }
+
+    @Override
+    public ImmutableKieServerScenarioBuilder getImmutableKieServerWithPostgreSqlScenarioBuilder() {
+        return new ImmutableKieServerWithPostgreSqlScenarioBuilderImpl();
+    }
+
+    @Override
+    public ImmutableKieServerScenarioBuilder getImmutableKieServerScenarioBuilder() {
+        return new ImmutableKieServerScenarioBuilderImpl();
     }
 
     @Override
