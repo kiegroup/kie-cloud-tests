@@ -35,9 +35,8 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
+import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
+import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.provider.git.Git;
@@ -53,7 +52,7 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
-public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ImmutableKieServerScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iOptaplannerIntegrationTest.class);
 
@@ -61,7 +60,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+    public ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder;
 
     private static final String CLOUD_BALANCE_SOLVER_ID = "cloudsolver";
     private static final String CLOUD_BALANCE_SOLVER_CONFIG = "cloudbalance-solver.xml";
@@ -92,27 +91,29 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
-            scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+            ImmutableKieServerScenarioBuilder immutableKieServerWithDatabaseScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerWithPostgreSqlScenarioBuilder();
+            scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenarioBuilder });
         } catch (UnsupportedOperationException ex) {
-            logger.info("KIE Server HTTPS S2I is skipped.", ex);
+            logger.info("Immutable KIE Server Database S2I is skipped.", ex);
+        }
+
+        try {
+            ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder();
+            scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenarioBuilder });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("Immutable KIE Server S2I is skipped.", ex);
         }
 
         return scenarios;
     }
 
     @Override
-    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected ImmutableKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", KieServerS2iOptaplannerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
-        DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
-                .build();
-
-        return deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerS2Isettings)
-                .build();
+        return immutableKieServerScenarioBuilder.withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                .build();
     }
 
     @BeforeClass
@@ -126,7 +127,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
         kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
 
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(
-                deploymentScenario.getKieServerDeployments().get(0),
+                deploymentScenario.getKieServerDeployment(),
                 extraClasses(kieContainer));
         solverClient = kieServerClient.getServicesClient(SolverServicesClient.class);
     }

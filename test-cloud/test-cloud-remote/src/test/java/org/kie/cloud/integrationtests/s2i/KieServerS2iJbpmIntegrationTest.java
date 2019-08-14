@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.s2i;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,9 +29,8 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
+import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
+import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.provider.git.Git;
@@ -50,8 +47,11 @@ import org.kie.server.client.UserTaskServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @RunWith(Parameterized.class)
-public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+@Category({JBPMOnly.class})
+public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ImmutableKieServerScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iJbpmIntegrationTest.class);
 
@@ -59,7 +59,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+    public ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -67,10 +67,10 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
-            scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+            ImmutableKieServerScenarioBuilder immutableKieServerWithDatabaseScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerWithPostgreSqlScenarioBuilder();
+            scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenarioBuilder });
         } catch (UnsupportedOperationException ex) {
-            logger.info("KIE Server HTTPS S2I is skipped.", ex);
+            logger.info("Immutable KIE Server Database S2I is skipped.", ex);
         }
 
         return scenarios;
@@ -88,24 +88,19 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
     private String repositoryName;
 
     @Override
-    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected ImmutableKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", KieServerS2iJbpmIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
-        DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
-                .build();
-
-        return deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerS2Isettings)
-                .build();
+        return immutableKieServerScenarioBuilder.withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                                                .build();
     }
 
     @Before
     public void setUp() {
-        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
-        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
-        taskServicesClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployments().get(0));
+        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
+        taskServicesClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
     }
 
     @After
@@ -114,7 +109,6 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractMethodIsolatedCloud
     }
 
     @Test
-    @Category(JBPMOnly.class)
     public void testContainerAfterExecServerS2IStart() {
         List<KieContainerResource> containers = kieServicesClient.listContainers().getResult().getContainers();
         assertThat(containers).isNotNull().hasSize(1);

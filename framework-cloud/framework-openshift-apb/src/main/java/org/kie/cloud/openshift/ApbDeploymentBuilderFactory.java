@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.openshift;
 
+import cz.xtf.core.openshift.OpenShift;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
@@ -23,6 +24,7 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTw
 import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
@@ -42,7 +44,6 @@ import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilde
 import org.kie.cloud.openshift.settings.builder.KieServerS2ISettingsBuilderApb;
 import org.kie.cloud.openshift.settings.builder.LdapSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderApb;
-import cz.xtf.core.openshift.OpenShift;
 
 public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
 
@@ -88,6 +89,16 @@ public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFac
 
     @Override
     public KieServerWithDatabaseScenarioBuilder getKieServerWithPostgreSqlScenarioBuilder() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ImmutableKieServerScenarioBuilder getImmutableKieServerWithPostgreSqlScenarioBuilder() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ImmutableKieServerScenarioBuilder getImmutableKieServerScenarioBuilder() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
