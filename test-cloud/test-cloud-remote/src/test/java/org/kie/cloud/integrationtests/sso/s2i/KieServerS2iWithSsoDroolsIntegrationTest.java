@@ -39,9 +39,8 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
+import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
+import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.maven.MavenDeployer;
@@ -61,7 +60,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 @Category(ApbNotSupported.class) // Because DroolsServerFilterClasses not supported yet
-public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ImmutableKieServerScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iWithSsoDroolsIntegrationTest.class);
 
@@ -69,7 +68,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+    public ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -77,10 +76,17 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
-            scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+            ImmutableKieServerScenarioBuilder immutableKieServerWithDatabaseScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerWithPostgreSqlScenarioBuilder();
+            scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenarioBuilder });
         } catch (UnsupportedOperationException ex) {
-            logger.info("KIE Server HTTPS S2I is skipped.", ex);
+            logger.info("Immutable KIE Server Database S2I is skipped.", ex);
+        }
+
+        try {
+            ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder();
+            scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenarioBuilder });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("Immutable KIE Server S2I is skipped.", ex);
         }
 
         return scenarios;
@@ -113,22 +119,18 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
     private static final String KIE_SERVER_NAME = "kieserver-sso-drools";
     private static final String KIE_SERVER_HOSTNAME = KIE_SERVER_NAME + DeploymentConstants.getDefaultDomainSuffix();
 
+
     @Override
-    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+    protected ImmutableKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", KieServerS2iWithSsoDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
-        DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
-                .withDroolsServerFilterClasses(false)
-                .withHostame(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                .withSecuredHostame(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                .build();
-
-        return deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withSso()
-                .withKieServer(kieServerS2Isettings)
-                .build();
+        return immutableKieServerScenarioBuilder.withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                .withDroolsServerFilterClasses(false)
+                                                .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                                                .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                                                .deploySso()
+                                                .build();
     }
 
     @BeforeClass
