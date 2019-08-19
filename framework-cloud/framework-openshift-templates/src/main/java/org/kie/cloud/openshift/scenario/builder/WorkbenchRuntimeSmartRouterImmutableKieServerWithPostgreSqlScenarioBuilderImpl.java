@@ -20,36 +20,40 @@ import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
-import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
-import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.scenario.ImmutableKieServerWithPostgreSqlScenarioImpl;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
+import org.kie.cloud.openshift.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioImpl;
 
-public class ImmutableKieServerWithPostgreSqlScenarioBuilderImpl extends KieScenarioBuilderImpl<ImmutableKieServerScenarioBuilder, ImmutableKieServerScenario> implements ImmutableKieServerScenarioBuilder {
+public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilderImpl extends KieScenarioBuilderImpl<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> implements WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySso = false;
 
-    public ImmutableKieServerWithPostgreSqlScenarioBuilderImpl() {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ROUTER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(propertyNames.workbenchHttpsSecret(), OpenShiftConstants.getKieApplicationSecretName());
 
         // TODO: Workaround until Maven repo with released artifacts is implemented
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_MODE, "DEVELOPMENT");
     }
 
     @Override
-    protected DeploymentScenario<ImmutableKieServerScenario> getDeploymentScenarioInstance() {
-        return new ImmutableKieServerWithPostgreSqlScenarioImpl(envVariables, deploySso);
+    protected DeploymentScenario<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> getDeploymentScenarioInstance() {
+        return new WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioImpl(envVariables, deploySso);
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
         envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
@@ -57,19 +61,19 @@ public class ImmutableKieServerWithPostgreSqlScenarioBuilderImpl extends KieScen
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withKieServerId(String kieServerId) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withKieServerId(String kieServerId) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_ID, kieServerId);
         return this;
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTAINER_DEPLOYMENT, kieContainerDeployment);
         return this;
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
         envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
         envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
         envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
@@ -77,7 +81,7 @@ public class ImmutableKieServerWithPostgreSqlScenarioBuilderImpl extends KieScen
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
         envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
         envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
         envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
@@ -86,7 +90,7 @@ public class ImmutableKieServerWithPostgreSqlScenarioBuilderImpl extends KieScen
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder deploySso() {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder deploySso() {
         deploySso = true;
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
@@ -94,25 +98,25 @@ public class ImmutableKieServerWithPostgreSqlScenarioBuilderImpl extends KieScen
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withHttpKieServerHostname(String hostname) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withHttpKieServerHostname(String hostname) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTP, hostname);
         return this;
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withHttpsKieServerHostname(String hostname) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withHttpsKieServerHostname(String hostname) {
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HOSTNAME_HTTPS, hostname);
         return this;
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withDroolsServerFilterClasses(boolean droolsFilter) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withDroolsServerFilterClasses(boolean droolsFilter) {
         envVariables.put(OpenShiftTemplateConstants.DROOLS_SERVER_FILTER_CLASSES, Boolean.toString(droolsFilter));
         return this;
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
     }

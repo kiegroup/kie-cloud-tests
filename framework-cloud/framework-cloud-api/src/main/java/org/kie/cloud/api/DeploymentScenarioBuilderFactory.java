@@ -27,6 +27,7 @@ import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -46,7 +47,7 @@ public interface DeploymentScenarioBuilderFactory {
     KieServerWithDatabaseScenarioBuilder getKieServerWithMySqlScenarioBuilder();
     KieServerWithDatabaseScenarioBuilder getKieServerWithPostgreSqlScenarioBuilder();
     ImmutableKieServerScenarioBuilder getImmutableKieServerScenarioBuilder();
-    ImmutableKieServerScenarioBuilder getImmutableKieServerWithPostgreSqlScenarioBuilder();
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder();
     ClusteredWorkbenchKieServerPersistentScenarioBuilder getClusteredWorkbenchKieServerPersistentScenarioBuilder();
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder();
     GenericScenarioBuilder getGenericScenarioBuilder();

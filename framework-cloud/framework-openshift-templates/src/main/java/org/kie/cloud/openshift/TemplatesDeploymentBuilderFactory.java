@@ -28,6 +28,7 @@ import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
@@ -43,7 +44,7 @@ import org.kie.cloud.openshift.scenario.builder.EmployeeRosteringScenarioBuilder
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.HACepScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerWithPostgreSqlScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithMySqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithPostgreSqlScenarioBuilderImpl;
@@ -107,8 +108,8 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder getImmutableKieServerWithPostgreSqlScenarioBuilder() {
-        return new ImmutableKieServerWithPostgreSqlScenarioBuilderImpl();
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder() {
+        return new WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilderImpl();
     }
 
     @Override
