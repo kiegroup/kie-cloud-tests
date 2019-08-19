@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,8 +37,7 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
-import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
@@ -60,7 +59,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 @Category(ApbNotSupported.class) // Because DroolsServerFilterClasses not supported yet
-public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ImmutableKieServerScenario> {
+public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iWithLdapDroolsIntegrationTest.class);
 
@@ -68,23 +67,45 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder;
+    public KieDeploymentScenario<?> deploymentScenario;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-
+        LdapSettings ldapSettings = deploymentScenarioFactory.getLdapSettingsBuilder()
+                                                             .withLdapBindDn(LdapSettingsConstants.BIND_DN)
+                                                             .withLdapBindCredential(LdapSettingsConstants.BIND_CREDENTIAL)
+                                                             .withLdapBaseCtxDn(LdapSettingsConstants.BASE_CTX_DN)
+                                                             .withLdapBaseFilter(LdapSettingsConstants.BASE_FILTER)
+                                                             .withLdapSearchScope(LdapSettingsConstants.SEARCH_SCOPE)
+                                                             .withLdapSearchTimeLimit(LdapSettingsConstants.SEARCH_TIME_LIMIT)
+                                                             .withLdapRoleAttributeId(LdapSettingsConstants.ROLE_ATTRIBUTE_ID)
+                                                             .withLdapRolesCtxDn(LdapSettingsConstants.ROLES_CTX_DN)
+                                                             .withLdapRoleFilter(LdapSettingsConstants.ROLE_FILTER)
+                                                             .withLdapRoleRecursion(LdapSettingsConstants.ROLE_RECURSION)
+                                                             .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE)
+                                                             .build();
         try {
-            ImmutableKieServerScenarioBuilder immutableKieServerWithDatabaseScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerWithPostgreSqlScenarioBuilder();
-            scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenarioBuilder });
+            KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
+                                                                                                       .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                                                                       .withDroolsServerFilterClasses(false)
+                                                                                                       .withLdapSettings(ldapSettings)
+                                                                                                       .build();
+            scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
         } catch (UnsupportedOperationException ex) {
             logger.info("Immutable KIE Server Database S2I is skipped.", ex);
         }
 
         try {
-            ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder();
-            scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenarioBuilder });
+            KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder()
+                                                                                           .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                                                           .withDroolsServerFilterClasses(false)
+                                                                                           .withLdapSettings(ldapSettings)
+                                                                                           .build();
+            scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenario });
         } catch (UnsupportedOperationException ex) {
             logger.info("Immutable KIE Server S2I is skipped.", ex);
         }
@@ -110,34 +131,14 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
     private static final String REPO_BRANCH = "master";
     private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
-    private String repositoryName;
+    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", KieServerS2iWithLdapDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
     private ClassLoader kjarClassLoader;
     private KieCommands commandsFactory = KieServices.Factory.get().getCommands();
     private Set<Class<?>> extraClasses;
 
     @Override
-    protected ImmutableKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository",
-                                                                         KieServerS2iWithLdapDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
-        LdapSettings ldapSettings = deploymentScenarioFactory.getLdapSettingsBuilder()
-                .withLdapBindDn(LdapSettingsConstants.BIND_DN)
-                .withLdapBindCredential(LdapSettingsConstants.BIND_CREDENTIAL)
-                .withLdapBaseCtxDn(LdapSettingsConstants.BASE_CTX_DN)
-                .withLdapBaseFilter(LdapSettingsConstants.BASE_FILTER)
-                .withLdapSearchScope(LdapSettingsConstants.SEARCH_SCOPE)
-                .withLdapSearchTimeLimit(LdapSettingsConstants.SEARCH_TIME_LIMIT)
-                .withLdapRoleAttributeId(LdapSettingsConstants.ROLE_ATTRIBUTE_ID)
-                .withLdapRolesCtxDn(LdapSettingsConstants.ROLES_CTX_DN)
-                .withLdapRoleFilter(LdapSettingsConstants.ROLE_FILTER)
-                .withLdapRoleRecursion(LdapSettingsConstants.ROLE_RECURSION)
-                .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
-
-        return immutableKieServerScenarioBuilder.withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
-                                                .withDroolsServerFilterClasses(false)
-                                                .withLdapSettings(ldapSettings)
-                                                .build();
+    protected KieDeploymentScenario<?> createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenario;
     }
 
     @BeforeClass
@@ -156,9 +157,9 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
         ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
     }
 
-    @After
-    public void deleteRepo() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+    @AfterClass
+    public static void deleteRepo() {
+        Git.getProvider().deleteGitRepository(gitRepositoryName);
     }
 
     @Test
