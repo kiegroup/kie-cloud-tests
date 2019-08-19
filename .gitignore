@@ -16,3 +16,6 @@ target
 
 # Repository wide ignore mac DS_Store files
 .DS_Store
+
+# Ignore temp files created by test scripts
+/templates_tmp
