@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -30,8 +30,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
-import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.provider.git.Git;
@@ -52,7 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 @Category(JBPMOnly.class)
-public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ImmutableKieServerScenario> {
+public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iHierarchicalIntegrationTest.class);
 
@@ -60,7 +59,7 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder;
+    public KieDeploymentScenario<?> deploymentScenario;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -68,15 +67,21 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            ImmutableKieServerScenarioBuilder immutableKieServerWithDatabaseScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerWithPostgreSqlScenarioBuilder();
-            scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenarioBuilder });
+            KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
+                                                                                                       .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
+                                                                                                       .build();
+            scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
         } catch (UnsupportedOperationException ex) {
             logger.info("Immutable KIE Server Database S2I is skipped.", ex);
         }
 
         try {
-            ImmutableKieServerScenarioBuilder immutableKieServerScenarioBuilder = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder();
-            scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenarioBuilder });
+            KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder()
+                                                                                           .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
+                                                                                           .build();
+            scenarios.add(new Object[]{"Immutable KIE Server S2I", immutableKieServerScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Immutable KIE Server S2I is skipped.", ex);
         }
@@ -98,27 +103,23 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
     private static final String GIT_CONTEXT_DIR = "multimodule-project";
     private static final String BUILT_KJAR_FOLDER = "usertask-project/target,signaltask-project/target";
 
-    private String repositoryName;
+    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, KieServerS2iHierarchicalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
     @Override
-    protected ImmutableKieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, KieServerS2iHierarchicalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
-        return immutableKieServerScenarioBuilder.withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
-                                                .build();
+    protected KieDeploymentScenario<?> createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenario;
     }
 
     @Before
     public void setUp() {
-        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
-        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
-        taskServicesClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployment());
+        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
+        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
+        taskServicesClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployments().get(0));
     }
 
-    @After
-    public void deleteRepo() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+    @AfterClass
+    public static void deleteRepo() {
+        Git.getProvider().deleteGitRepository(gitRepositoryName);
     }
 
     @Test
