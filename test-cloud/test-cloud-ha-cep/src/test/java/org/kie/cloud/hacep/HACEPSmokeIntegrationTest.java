@@ -24,7 +24,7 @@ import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 
 public class HACEPSmokeIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<HACepScenario> {
 
-    private static final String HEALTH_URL = "/health";
+    private static final String HEALTH_URL = "/liveness";
 
     @Override
     protected HACepScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
