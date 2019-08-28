@@ -118,7 +118,7 @@ public class KieServerS2iAmqJbpmIntegrationTest extends AbstractMethodIsolatedCl
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No AMQ deployment founded."));
 
-        kieServicesClient = KieServerClientProvider.getKieServerJmsClient(amqDeployment.getTcpUrl());
+        kieServicesClient = KieServerClientProvider.getKieServerJmsClient(amqDeployment.getTcpSslUrl());
         processServicesClient = KieServerClientProvider.getProcessJmsClient(kieServicesClient);
         taskServicesClient = KieServerClientProvider.getTaskJmsClient(kieServicesClient);
     }

@@ -193,7 +193,6 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
             logger.info("Searching for AMQ.");
             ServiceUtil.getAmqJolokiaServiceName(project.getOpenShift());
             amqDeployment = createAmqDeployment(project);
-            addAmqSecretToAmqServiceAccount();
             logger.info("AMQ found and deployment created.");
         } catch (RuntimeException e) {
             if (!e.getMessage().contains("not found.")) {
@@ -207,17 +206,6 @@ public class GenericScenarioImpl extends OpenShiftScenario<GenericScenario> impl
         logNodeNameOfAllInstances();
     }
 
-    private void addAmqSecretToAmqServiceAccount() {
-        project.getOpenShift()
-            .serviceAccounts()
-            .inNamespace(getNamespace())
-            .withName("amq-service-account")
-                .edit()
-                    .addNewSecret()
-                        .withName("amq-app-secret")
-                    .endSecret()
-                .done();
-    }
     private void createAmqSecret() {
         try {
             project.getOpenShift().secrets().createOrReplaceWithNew()

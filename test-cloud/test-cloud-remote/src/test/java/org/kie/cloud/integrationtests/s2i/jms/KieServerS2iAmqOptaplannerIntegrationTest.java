@@ -137,7 +137,7 @@ public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIso
 
         kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
 
-        kieServicesClient = KieServerClientProvider.getKieServerJmsClient(amqDeployment.getTcpUrl(), extraClasses(kieContainer));
+        kieServicesClient = KieServerClientProvider.getKieServerJmsClient(amqDeployment.getTcpSslUrl(), extraClasses(kieContainer));
         solverClient = KieServerClientProvider.getSolverJmsClient(kieServicesClient);
     }
 

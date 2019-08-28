@@ -140,7 +140,7 @@ public class KieServerS2iAmqDroolsIntegrationTest extends AbstractMethodIsolated
         kjarClassLoader = KieServices.Factory.get().newKieContainer(RELEASE_ID).getClassLoader();
         extraClasses = Collections.singleton(Class.forName(PERSON_CLASS_NAME, true, kjarClassLoader));
 
-        kieServicesClient = KieServerClientProvider.getKieServerJmsClient(amqDeployment.getTcpUrl(), extraClasses);
+        kieServicesClient = KieServerClientProvider.getKieServerJmsClient(amqDeployment.getTcpSslUrl(), extraClasses);
         ruleClient = KieServerClientProvider.getRuleJmsClient(kieServicesClient);
     }
 
