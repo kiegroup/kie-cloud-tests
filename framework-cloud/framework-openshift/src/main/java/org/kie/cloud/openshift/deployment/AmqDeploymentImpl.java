@@ -25,7 +25,7 @@ public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeploym
 
     private String serviceName, tcpServiceName;
     private Optional<URL> secureUrl;
-    private Optional<URL> tcpUrl;
+    private Optional<URL> tcpSslUrl;
     private String username;
     private String password;
 
@@ -41,19 +41,19 @@ public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeploym
         return serviceName;
     }
 
-    private String getAmqTcpServiceName() {
+    private String getAmqTcpSslServiceName() {
         if (tcpServiceName == null) {
-            tcpServiceName = ServiceUtil.getAmqTcpServiceName(getOpenShift());
+            tcpServiceName = ServiceUtil.getAmqTcpSslServiceName(getOpenShift());
         }
         return tcpServiceName;
     }
 
     @Override
-    public URL getTcpUrl() {
-        if (tcpUrl == null) {
-            tcpUrl = getHttpRouteUrl(getAmqTcpServiceName());
+    public URL getTcpSslUrl() {
+        if (tcpSslUrl == null) {
+            tcpSslUrl = getHttpsRouteUrl(getAmqTcpSslServiceName());
         }
-        return tcpUrl.orElseThrow(() -> new RuntimeException("No Amq URL is available."));
+        return tcpSslUrl.orElseThrow(() -> new RuntimeException("No Amq SSL URL is available."));
     }
 
     @Override
