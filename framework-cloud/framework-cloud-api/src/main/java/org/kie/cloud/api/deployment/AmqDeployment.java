@@ -35,7 +35,7 @@ public interface AmqDeployment extends Deployment {
      *
      * @return Amq tcp URL
      */
-    URL getTcpUrl();
+    URL getTcpSslUrl();
 
     /**
      * Get HTTPS URL for Amq service (deployment).
