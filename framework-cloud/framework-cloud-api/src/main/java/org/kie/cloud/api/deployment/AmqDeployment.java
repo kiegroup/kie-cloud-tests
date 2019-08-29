@@ -16,19 +16,11 @@
 package org.kie.cloud.api.deployment;
 
 import java.net.URL;
-import java.util.Optional;
 
 /**
  * Amq deployment representation in cloud.
  */
 public interface AmqDeployment extends Deployment {
-
-    /**
-     * Get URL for Amq service (deployment).
-     *
-     * @return Amq URL
-     */
-    URL getUrl();
 
     /**
      * Get URL for Amq tcp service (deployment).
@@ -38,11 +30,11 @@ public interface AmqDeployment extends Deployment {
     URL getTcpSslUrl();
 
     /**
-     * Get HTTPS URL for Amq service (deployment).
+     * Get URL for Amq Jolokia service (deployment).
      *
-     * @return Amq URL
+     * @return Amq Jolokia SSL URL
      */
-    Optional<URL> getSecureUrl();
+    URL getAmqJolokiaUrl();
 
     /**
      * Get Amq user name.
