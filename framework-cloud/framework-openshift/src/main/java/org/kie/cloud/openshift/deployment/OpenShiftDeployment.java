@@ -88,9 +88,13 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     public abstract String getServiceName();
 
+    public String getDeploymentConfigName() {
+        return getServiceName();
+    }
+
     @Override
     public void scale(int instances) {
-        openShift.deploymentConfigs().inNamespace(getNamespace()).withName(getServiceName()).scale(instances, true);
+        openShift.deploymentConfigs().inNamespace(getNamespace()).withName(getDeploymentConfigName()).scale(instances, true);
     }
 
     @Override
@@ -106,8 +110,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public List<Instance> getInstances() {
         if (isReady()) {
-            // Deployment config has a same name as its service.
-            String deploymentConfigName = getServiceName();
+            String deploymentConfigName = getDeploymentConfigName();
 
             List<Instance> instances = openShift.getPods().stream()
                                                 .filter(pod -> {
@@ -125,13 +128,13 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void waitForScale() {
-        int expectedPods = openShift.getDeploymentConfig(getServiceName()).getSpec().getReplicas().intValue();
+        int expectedPods = openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
         waitUntilAllPodsAreReadyAndRunning(expectedPods);
     }
 
     @Override
     public void waitForScheduled() {
-        int expectedPods = openShift.getDeploymentConfig(getServiceName()).getSpec().getReplicas().intValue();
+        int expectedPods = openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
         waitUntilAllPodsAreReady(expectedPods);
     }
 
@@ -143,9 +146,9 @@ public abstract class OpenShiftDeployment implements Deployment {
     protected void waitUntilAllPodsAreReady(int expectedPods) {
         try {
             openShift.waiters()
-                     .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                     .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
                      .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                     .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become ready.")
+                     .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become ready.")
                      .waitFor();
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
@@ -155,9 +158,9 @@ public abstract class OpenShiftDeployment implements Deployment {
     protected void waitUntilAllPodsAreRunning(int expectedPods) {
         try {
             openShift.waiters()
-                     .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getServiceName())
+                     .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
                      .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                     .reason("Waiting for " + expectedPods + " pods of service " + getServiceName() + " to become runnning.")
+                     .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
                      .waitFor();
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
@@ -213,7 +216,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     public void setResources(Map<String, String> requests, Map<String, String> limits) {
         openShift
                  .deploymentConfigs()
-                 .withName(getServiceName()) // Deployment config has same name as its service.
+                 .withName(getDeploymentConfigName())
                  .edit()
                  .editOrNewSpec()
                  .editTemplate()
