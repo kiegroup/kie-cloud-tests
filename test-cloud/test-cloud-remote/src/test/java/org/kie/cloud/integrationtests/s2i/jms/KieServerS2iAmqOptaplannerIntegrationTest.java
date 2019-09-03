@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,12 +37,11 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.AmqDeployment;
-import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.api.settings.builder.KieServerS2IAmqSettingsBuilder;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
+import org.kie.cloud.integrationtests.s2i.KieServerS2iOptaplannerIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
@@ -58,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 @Category({ApbNotSupported.class, OperatorNotSupported.class})
-public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iAmqOptaplannerIntegrationTest.class);
 
@@ -66,7 +65,7 @@ public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIso
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public KieServerS2IAmqSettingsBuilder kieServerS2IAmqSettingsBuilder;
+    public KieDeploymentScenario<?> deploymentScenario;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -74,10 +73,23 @@ public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIso
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            KieServerS2IAmqSettingsBuilder kieServerS2IAmqSettings = deploymentScenarioFactory.getKieServerS2IAmqSettingsBuilder();
-            scenarios.add(new Object[] { "KIE Server S2I AMQ", kieServerS2IAmqSettings });
+            KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilder()
+                                                                                                       .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                                                                       .build();
+            scenarios.add(new Object[] { "Immutable KIE Server AMQ Database S2I", immutableKieServerWithDatabaseScenario });
         } catch (UnsupportedOperationException ex) {
-            logger.info("KIE Server AMQ S2I is skipped.", ex);
+            logger.info("Immutable KIE Server AMQ Database S2I is skipped.", ex);
+        }
+
+        try {
+            KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerAmqScenarioBuilder()
+                                                                                           .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                                                           .build();
+            scenarios.add(new Object[] { "Immutable KIE Server AMQ S2I", immutableKieServerScenario });
+        } catch (UnsupportedOperationException ex) {
+            logger.info("Immutable KIE Server AMQ S2I is skipped.", ex);
         }
 
         return scenarios;
@@ -101,24 +113,15 @@ public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIso
 
     private static final String REPO_BRANCH = "master";
     private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
+    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", KieServerS2iOptaplannerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
-    private String repositoryName;
     private KieContainer kieContainer;
     private KieServicesClient kieServicesClient;
     private SolverServicesClient solverClient;
 
     @Override
-    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", KieServerS2iAmqOptaplannerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
-        DeploymentSettings kieServerS2Isettings = kieServerS2IAmqSettingsBuilder
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
-                .build();
-
-        return deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerS2Isettings)
-                .build();
+    protected KieDeploymentScenario<?> createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenario;
     }
 
     @BeforeClass
@@ -141,9 +144,9 @@ public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIso
         solverClient = KieServerClientProvider.getSolverJmsClient(kieServicesClient);
     }
 
-    @After
-    public void deleteRepo() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+    @AfterClass
+    public static void deleteRepo() {
+        Git.getProvider().deleteGitRepository(gitRepositoryName);
     }
 
     @Test

@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.smoke.KieServerWithMySqlScenarioIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
@@ -56,7 +55,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
 
-        deploymentScenario.setLogFolderName(KieServerWithMySqlScenarioIntegrationTest.class.getSimpleName());
+        deploymentScenario.setLogFolderName(KieServerS2iJbpmIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
 
