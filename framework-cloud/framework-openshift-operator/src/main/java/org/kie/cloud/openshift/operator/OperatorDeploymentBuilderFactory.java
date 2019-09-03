@@ -24,11 +24,13 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTw
 import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.ImmutableKieServerAmqScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2IAmqSettingsBuilder;
@@ -99,7 +101,17 @@ public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuild
     }
 
     @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilder() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public ImmutableKieServerScenarioBuilder getImmutableKieServerScenarioBuilder() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ImmutableKieServerAmqScenarioBuilder getImmutableKieServerAmqScenarioBuilder() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

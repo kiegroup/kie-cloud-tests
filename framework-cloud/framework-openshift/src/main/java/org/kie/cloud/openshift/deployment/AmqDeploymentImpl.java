@@ -16,16 +16,17 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.AmqDeployment;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
 
 public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeployment {
 
-    private String serviceName, tcpServiceName;
-    private Optional<URL> secureUrl;
-    private Optional<URL> tcpSslUrl;
+    private String amqJolokiaServiceName;
+    private String tcpServiceName;
+    private URL amqJolokiaUrl;
+    private URL tcpSslUrl;
     private String username;
     private String password;
 
@@ -35,10 +36,20 @@ public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeploym
 
     @Override
     public String getServiceName() {
-        if (serviceName == null) {
-            serviceName = ServiceUtil.getAmqJolokiaServiceName(getOpenShift());
+        return getAmqTcpSslServiceName();
+    }
+
+    @Override
+    public String getDeploymentConfigName() {
+        // TODO: convert to some reliable openshift resource selector
+        return OpenShiftConstants.getKieApplicationName() + "-amq";
+    }
+
+    private String getAmqJolokiaServiceName() {
+        if (amqJolokiaServiceName == null) {
+            amqJolokiaServiceName = ServiceUtil.getAmqJolokiaServiceName(getOpenShift());
         }
-        return serviceName;
+        return amqJolokiaServiceName;
     }
 
     private String getAmqTcpSslServiceName() {
@@ -49,24 +60,19 @@ public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeploym
     }
 
     @Override
+    public URL getAmqJolokiaUrl() {
+        if (amqJolokiaUrl == null) {
+            amqJolokiaUrl = getHttpsRouteUrl(getAmqJolokiaServiceName()).orElseThrow(() -> new RuntimeException("No Amq Jolokia SSL URL is available."));
+        }
+        return amqJolokiaUrl;
+    }
+
+    @Override
     public URL getTcpSslUrl() {
         if (tcpSslUrl == null) {
-            tcpSslUrl = getHttpsRouteUrl(getAmqTcpSslServiceName());
+            tcpSslUrl = getHttpsRouteUrl(getAmqTcpSslServiceName()).orElseThrow(() -> new RuntimeException("No Amq SSL URL is available."));
         }
-        return tcpSslUrl.orElseThrow(() -> new RuntimeException("No Amq SSL URL is available."));
-    }
-
-    @Override
-    public URL getUrl() {
-        return getSecureUrl().orElseThrow(() -> new RuntimeException("No Amq URL is available."));
-    }
-
-    @Override
-    public Optional<URL> getSecureUrl() {
-        if (secureUrl == null) {
-            secureUrl = getHttpsRouteUrl(getServiceName());
-        }
-        return secureUrl;
+        return tcpSslUrl;
     }
 
     @Override
@@ -90,9 +96,10 @@ public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeploym
     @Override
     public void waitForScale() {
         super.waitForScale();
-        if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl());
-        }
+        // Skip waiting for router as we cannot process AMQ certificate at this moment.
+//        if (!getInstances().isEmpty()) {
+//            RouterUtil.waitForRouter(getAmqJolokiaUrl());
+//        }
     }
 
 }
