@@ -23,11 +23,13 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTw
 import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.ImmutableKieServerAmqScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.KieServerS2IAmqSettingsBuilder;
@@ -44,6 +46,7 @@ import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeSmartRo
 import org.kie.cloud.openshift.scenario.builder.EmployeeRosteringScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.HACepScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerAmqScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
@@ -51,6 +54,7 @@ import org.kie.cloud.openshift.scenario.builder.KieServerWithMySqlScenarioBuilde
 import org.kie.cloud.openshift.scenario.builder.KieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.ControllerSettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.KieServerMySqlSettingsBuilderImpl;
@@ -115,8 +119,18 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
     }
 
     @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilder() {
+        return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilderImpl();
+    }
+
+    @Override
     public ImmutableKieServerScenarioBuilder getImmutableKieServerScenarioBuilder() {
         return new ImmutableKieServerScenarioBuilderImpl();
+    }
+
+    @Override
+    public ImmutableKieServerAmqScenarioBuilder getImmutableKieServerAmqScenarioBuilder() {
+        return new ImmutableKieServerAmqScenarioBuilderImpl();
     }
 
     @Override
