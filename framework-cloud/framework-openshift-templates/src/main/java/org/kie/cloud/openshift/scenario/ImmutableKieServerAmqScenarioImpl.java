@@ -130,7 +130,7 @@ public class ImmutableKieServerAmqScenarioImpl extends KieCommonScenario<Immutab
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 
     @Override
     public AmqDeployment getAmqDeployment() {

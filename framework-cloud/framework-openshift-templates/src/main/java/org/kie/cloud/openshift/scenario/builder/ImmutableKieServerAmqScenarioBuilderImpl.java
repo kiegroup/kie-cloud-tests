@@ -44,6 +44,7 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends KieScenarioBuilder
 
         envVariables.put(OpenShiftTemplateConstants.AMQ_USERNAME, DeploymentConstants.getAmqUsername());
         envVariables.put(OpenShiftTemplateConstants.AMQ_PASSWORD, DeploymentConstants.getAmqPassword());
+        // These values are defined in pom.xml where keystore and truststore are generated
         envVariables.put(OpenShiftTemplateConstants.AMQ_SECRET, "amq-app-secret");
         envVariables.put(OpenShiftTemplateConstants.AMQ_TRUSTSTORE, "broker.ts");
         envVariables.put(OpenShiftTemplateConstants.AMQ_TRUSTSTORE_PASSWORD, "changeit");
