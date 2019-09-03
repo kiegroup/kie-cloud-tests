@@ -14,7 +14,6 @@
  */
 package org.kie.cloud.integrationtests.smoke;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,16 +33,15 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.scenario.GenericScenario;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
+import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
-import org.kie.cloud.api.settings.DeploymentSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -108,12 +106,9 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
         }
 
         try {
-            DeploymentSettings kieServerSettings = deploymentScenarioFactory.getKieServerSettingsBuilder()
+            KieServerScenario kieServerScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
                 .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                 .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .build();
-            GenericScenario kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerSettings)
                 .build();
             scenarios.add(new Object[] { "KIE Server", kieServerScenario });
         } catch (UnsupportedOperationException ex) {

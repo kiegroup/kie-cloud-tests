@@ -26,6 +26,7 @@ import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerAmqScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
+import org.kie.cloud.api.scenario.builder.KieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
@@ -84,6 +85,11 @@ public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFac
     @Override
     public KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder() {
         return new KieServerWithExternalDatabaseScenarioBuilderApb();
+    }
+
+    @Override
+    public KieServerScenarioBuilder getKieServerScenarioBuilder() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
