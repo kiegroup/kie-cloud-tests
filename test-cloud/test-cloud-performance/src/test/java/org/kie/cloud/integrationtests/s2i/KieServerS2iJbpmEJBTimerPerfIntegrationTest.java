@@ -33,6 +33,7 @@ import java.util.function.BooleanSupplier;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -43,9 +44,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.scenario.GenericScenario;
-import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
+import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.Performance;
 import org.kie.cloud.provider.git.Git;
@@ -71,7 +70,7 @@ import static org.jbpm.process.instance.ProcessInstance.STATE_ACTIVE;
 import static org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED;
 
 @RunWith(Parameterized.class)
-public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<GenericScenario> {
+public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> {
 
     private static final String MEMORY = "memory";
     private static final String CPU = "cpu";
@@ -104,7 +103,7 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
     public String testScenarioName;
 
     @Parameter(value = 1)
-    public KieServerS2ISettingsBuilder kieServerS2ISettingsBuilder;
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario deploymentScenario;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -112,9 +111,14 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            KieServerS2ISettingsBuilder kieServerHttpsS2ISettings = deploymentScenarioFactory.getKieServerHttpsS2ISettingsBuilder();
+            WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
+                                                                                                                                                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                                                                                                                                                .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                                                                                                                                                .withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(REFRESH_INTERVAL))
+                                                                                                                                                .withKieServerMemoryLimit(HEAP)
+                                                                                                                                                .build();
             for (int i=0;i<REPETITIONS;i++) {
-                scenarios.add(new Object[] { "KIE Server HTTPS S2I", kieServerHttpsS2ISettings });
+                scenarios.add(new Object[] { "KIE Server HTTPS S2I", immutableKieServerWithDatabaseScenario });
             }
         } catch (UnsupportedOperationException ex) {
             logger.info("KIE Server HTTPS S2I is skipped.", ex);
@@ -129,7 +133,7 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
     
     protected QueryServicesClient queryServicesClient;
 
-    protected String repositoryName;
+    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", KieServerS2iJbpmEJBTimerPerfIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
     
     protected List<String> pods = new ArrayList<String>();
     
@@ -137,61 +141,51 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
     protected Map<String, Integer> completedHostNameDistribution;
 
     @Override
-    protected GenericScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {       
-        logger.info("git provider:" + Git.getProvider());
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", ClassLoader.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
-        DeploymentSettings kieServerS2Isettings = kieServerS2ISettingsBuilder
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
-                .withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(REFRESH_INTERVAL))
-                .withKieServerMemoryLimit(HEAP)
-                .build();
-
-        return deploymentScenarioFactory.getGenericScenarioBuilder()
-                .withKieServer(kieServerS2Isettings)
-                .build();
+    protected WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenario;
     }
 
     @Before
     public void setUp() {
-        
-        if (SCALE_COUNT > 1) {
-            logger.info("starting to scale");
-            scaleKieServerTo(SCALE_COUNT);
-            logger.info("scaled to {} pods", SCALE_COUNT);
-        } else if (SCALE_COUNT == 1) {
-            pods.add(deploymentScenario.getKieServerDeployments().get(0).getInstances().get(0).getName());
-        } else {
-            throw new RuntimeException("wrong scale parameter, should be equal or greater than 1");
-        }
-        
-        
-        deploymentScenario.getKieServerDeployments().get(0).setRouterTimeout(Duration.ofMinutes(ROUTER_TIMEOUT));
-        deploymentScenario.getKieServerDeployments().get(0).setRouterBalance(ROUTER_BALANCE);
-        
+        // Scale Kie server to 0 to apply configuration changes.
+        deploymentScenario.getKieServerDeployment().scale(0);
+        deploymentScenario.getKieServerDeployment().waitForScale();
+
         Map<String, String> requests = new HashMap<String, String>();
         requests.put(CPU, System.getProperty("requests.cpu","1000m"));
         requests.put(MEMORY, System.getProperty("requests.memory","1Gi"));
         Map<String, String> limits = new HashMap<String, String>();
         limits.put(CPU, System.getProperty("limits.cpu","4000m"));
         limits.put(MEMORY, System.getProperty("limits.memory","4Gi"));
-        deploymentScenario.getKieServerDeployments().get(0).setResources(requests, limits);
+        deploymentScenario.getKieServerDeployment().setResources(requests, limits);
+
+        if (SCALE_COUNT >= 1) {
+            logger.info("starting to scale");
+            scaleKieServerTo(SCALE_COUNT);
+            logger.info("scaled to {} pods", SCALE_COUNT);
+        } else {
+            throw new RuntimeException("wrong scale parameter, should be equal or greater than 1");
+        }
         
-        //changing DC implies pods are also restarted, so to be sure we need to wait for this to be ready
-        deploymentScenario.getKieServerDeployments().get(0).waitForScale();
-        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0), Duration.ofMinutes(60).toMillis());
+        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(ROUTER_TIMEOUT));
+        deploymentScenario.getKieServerDeployment().setRouterBalance(ROUTER_BALANCE);
+        
+        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment(), Duration.ofMinutes(60).toMillis());
         
         logger.info("Setting timeout for kieServerClient to {}", Duration.ofMinutes(60).toMillis());
         
-        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployments().get(0));
-        queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployments().get(0));
+        processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
+        queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
     }
 
     @After
-    public void deleteRepo() {
-        Git.getProvider().deleteGitRepository(repositoryName);
-        deploymentScenario.getKieServerDeployments().get(0).resetRouterTimeout();        
+    public void resetRouterTimeout() {
+        deploymentScenario.getKieServerDeployment().resetRouterTimeout();
+    }
+
+    @AfterClass
+    public static void deleteRepo() {
+        Git.getProvider().deleteGitRepository(gitRepositoryName);
     }
 
     @Test
@@ -352,9 +346,9 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
     }
     
     private void scaleKieServerTo(int count) {
-        deploymentScenario.getKieServerDeployments().get(0).scale(count);
-        deploymentScenario.getKieServerDeployments().get(0).waitForScale();
-        List<Instance> osInstances = deploymentScenario.getKieServerDeployments().get(0).getInstances();
+        deploymentScenario.getKieServerDeployment().scale(count);
+        deploymentScenario.getKieServerDeployment().waitForScale();
+        List<Instance> osInstances = deploymentScenario.getKieServerDeployment().getInstances();
         for (Instance i : osInstances) {
             pods.add(i.getName());
         }
