@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.scaling;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.Duration;
 import java.util.Collection;
 
@@ -24,28 +22,20 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.rules.TestName;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.protocol.Protocol;
-import org.kie.cloud.api.scenario.GenericScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.api.scenario.MissingResourceException;
-import org.kie.cloud.api.settings.DeploymentSettings;
-import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
-import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.maven.constants.MavenConstants;
+import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.cloud.tests.common.time.TimeUtils;
@@ -59,16 +49,14 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Category(Baseline.class)
 public class KieServerWebSocketScalingIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWebSocketScalingIntegrationTest.class);
 
-    private GenericScenario workbenchMonitoringScenario;
-    private GenericScenario kieServerScenario;
-
-    private WorkbenchDeployment workbenchDeployment;
-    private KieServerDeployment kieServerDeployment;
+    private ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario deploymentScenario;
 
     private KieServerControllerClient kieControllerClient;
     private KieServicesClient kieServerClient;
@@ -78,9 +66,6 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     private static final String WEBSOCKET_CONNECTION = "Connection to Kie Controller over Web Socket is now open";
     private static final String STARTED_CONTAINER = "Container cont-id (for release id org.kie.server.testing:definition-project-snapshot:1.0.0-SNAPSHOT) successfully started";
-
-    @Rule
-    public TestName testName = new TestName();
 
     @BeforeClass
     public static void buildKjar() {
@@ -92,31 +77,12 @@ public class KieServerWebSocketScalingIntegrationTest {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
         try {
-            WorkbenchMonitoringSettingsBuilder workbenchMonitoringSettingsBuilder = deploymentScenarioFactory.getWorkbenchMonitoringSettingsBuilder();
-            KieServerSettingsBuilder kieServerMysqlSettingsBuilder = deploymentScenarioFactory.getKieServerMySqlSettingsBuilder();
-
-            DeploymentSettings workbenchMonitoringSettings = workbenchMonitoringSettingsBuilder
-                    .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                    .build();
-            workbenchMonitoringScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                    .withMonitoring(workbenchMonitoringSettings)
-                    .build();
-            workbenchMonitoringScenario.setLogFolderName(testName.getMethodName());
-            workbenchMonitoringScenario.deploy();
-            workbenchDeployment = workbenchMonitoringScenario.getWorkbenchDeployments().get(0);
-
-            DeploymentSettings kieServerSettings = kieServerMysqlSettingsBuilder
-                    .withControllerUser(DeploymentConstants.getControllerUser(), DeploymentConstants.getControllerPassword())
-                    .withControllerConnection(Protocol.ws.name(), workbenchDeployment.getWebSocketUri().get().getHost(), String.valueOf(workbenchDeployment.getWebSocketUri().get().getPort()))
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                    .withKieServerSyncDeploy(true)
-                    .build();
-            kieServerScenario = deploymentScenarioFactory.getGenericScenarioBuilder()
-                    .withKieServer(kieServerSettings)
-                    .build();
-            kieServerScenario.setLogFolderName(testName.getMethodName());
-            kieServerScenario.deploy();
-            kieServerDeployment = kieServerScenario.getKieServerDeployments().get(0);
+            // Only RHPAM prod template is using WebSockets now.
+            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
+                                                          .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                                                          .build();
+            deploymentScenario.setLogFolderName(KieServerWebSocketScalingIntegrationTest.class.getSimpleName());
+            ScenarioDeployer.deployScenario(deploymentScenario);
         } catch (MissingResourceException e) {
             logger.warn("Skipping test because of missing resource.", e);
             Assume.assumeNoException(e);
@@ -125,18 +91,13 @@ public class KieServerWebSocketScalingIntegrationTest {
             Assume.assumeNoException(e);
         }
 
-        kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
-        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
+        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
+        kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
     }
 
     @After
     public void cleanEnvironment() {
-        if (workbenchMonitoringScenario != null) {
-            workbenchMonitoringScenario.undeploy();
-        }
-        if (kieServerScenario != null) {
-            kieServerScenario.undeploy();
-        }
+        ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     @Test
@@ -170,13 +131,13 @@ public class KieServerWebSocketScalingIntegrationTest {
     }
 
     private void verifyKieServerLogsContain(String logMessage) {
-        for (Instance kieServerInstance : kieServerDeployment.getInstances()) {
+        for (Instance kieServerInstance : deploymentScenario.getKieServerOneDeployment().getInstances()) {
             assertThat(kieServerInstance.getLogs()).contains(logMessage);
         }
     }
 
     private void waitUntilKieServerLogsContain(String logMessage) {
-        for (Instance kieServerInstance : kieServerDeployment.getInstances()) {
+        for (Instance kieServerInstance : deploymentScenario.getKieServerOneDeployment().getInstances()) {
             TimeUtils.wait(Duration.ofMinutes(1), Duration.ofSeconds(1), () -> kieServerInstance.getLogs().contains(logMessage));
         }
     }
@@ -188,7 +149,7 @@ public class KieServerWebSocketScalingIntegrationTest {
     }
 
     private void verifyServerDeploymentContainInstances(int numberOfKieServerInstances) {
-        assertThat(kieServerDeployment.getInstances()).hasSize(numberOfKieServerInstances);
+        assertThat(deploymentScenario.getKieServerOneDeployment().getInstances()).hasSize(numberOfKieServerInstances);
     }
 
     private void verifyServerTemplateContainsKieServers(String serverTemplate, int numberOfKieServers) {
@@ -202,7 +163,7 @@ public class KieServerWebSocketScalingIntegrationTest {
     }
 
     private void scaleKieServerTo(int count) {
-        kieServerDeployment.scale(count);
-        kieServerDeployment.waitForScale();
+        deploymentScenario.getKieServerOneDeployment().scale(count);
+        deploymentScenario.getKieServerOneDeployment().waitForScale();
     }
 }
