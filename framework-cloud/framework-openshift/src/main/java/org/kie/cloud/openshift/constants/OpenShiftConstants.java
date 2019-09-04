@@ -136,27 +136,6 @@ public class OpenShiftConstants implements Constants {
     public static final String CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT = "kie.app.template.clustered-workbench.kieserver.database";
 
     /**
-     * URL pointing to OpenShift template file containing Workbench monitoring console.
-     */
-    public static final String KIE_APP_TEMPLATE_CONSOLE = "kie.app.template.workbench-monitoring";
-
-    /**
-     * URL pointing to OpenShift template file containing Smart router.
-     */
-    public static final String KIE_APP_TEMPLATE_SMARTROUTER = "kie.app.template.smartrouter";
-
-    /**
-     * URL pointing to OpenShift template file containing Controller.
-     */
-    public static final String KIE_APP_TEMPLATE_CONTROLLER = "kie.app.template.controller";
-    /**
-     * URL pointing to OpenShift template file containing Workbench.
-     */
-    public static final String KIE_APP_TEMPLATE_WORKBENCH = "kie.app.template.workbench";
-
-    public static final String KIE_APP_TEMPLATE_PROD_IMMUTABLE_MONITOR = "kie.app.template.prod.immutable.monitor";
-
-    /**
      * A key pointing to a URL to OpenShift template for optaweb-employee-rostering app.
      */
     public static final String OPTAWEB_EMPLOYEE_ROSTERING_TEMPLATE = "kie.app.template.optaweb.employee-rostering";

@@ -21,7 +21,6 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentS
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerAmqScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
@@ -32,41 +31,24 @@ import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBu
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
-import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
-import org.kie.cloud.api.settings.builder.KieServerS2IAmqSettingsBuilder;
-import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
-import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
-import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
-import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
-import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.EmployeeRosteringScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.GenericScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.HACepScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerAmqScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.ImmutableKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerScenarioBuilderImpl;
-import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithMySqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.KieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.ControllerSettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerHttpsS2ISettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerMySqlSettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerPostgreSqlSettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerS2IAmqSettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.KieServerSettingsBuilderImpl;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilderImpl;
 import org.kie.cloud.openshift.settings.builder.LdapSettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.SmartRouterSettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.WorkbenchMonitoringSettingsBuilderImpl;
-import org.kie.cloud.openshift.settings.builder.WorkbenchSettingsBuilderImpl;
 
 public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
 
@@ -148,56 +130,6 @@ public class TemplatesDeploymentBuilderFactory implements DeploymentScenarioBuil
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder() {
         return new ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl();
-    }
-
-    @Override
-    public GenericScenarioBuilder getGenericScenarioBuilder() {
-        return new GenericScenarioBuilderImpl();
-    }
-
-    @Override
-    public KieServerSettingsBuilder getKieServerSettingsBuilder() {
-        return new KieServerSettingsBuilderImpl();
-    }
-
-    @Override
-    public KieServerSettingsBuilder getKieServerMySqlSettingsBuilder() {
-        return new KieServerMySqlSettingsBuilderImpl();
-    }
-
-    @Override
-    public KieServerSettingsBuilder getKieServerPostgreSqlSettingsBuilder() {
-        return new KieServerPostgreSqlSettingsBuilderImpl();
-    }
-
-    @Override
-    public ControllerSettingsBuilder getControllerSettingsBuilder() {
-        return new ControllerSettingsBuilderImpl();
-    }
-
-    @Override
-    public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
-        return new KieServerHttpsS2ISettingsBuilderImpl();
-    }
-
-    @Override
-    public KieServerS2IAmqSettingsBuilder getKieServerS2IAmqSettingsBuilder() {
-        return new KieServerS2IAmqSettingsBuilderImpl();
-    }
-
-    @Override
-    public WorkbenchSettingsBuilder getWorkbenchSettingsBuilder() {
-        return new WorkbenchSettingsBuilderImpl();
-    }
-
-    @Override
-    public WorkbenchMonitoringSettingsBuilder getWorkbenchMonitoringSettingsBuilder() {
-        return new WorkbenchMonitoringSettingsBuilderImpl();
-    }
-
-    @Override
-    public SmartRouterSettingsBuilder getSmartRouterSettingsBuilder() {
-        return new SmartRouterSettingsBuilderImpl();
     }
 
     @Override

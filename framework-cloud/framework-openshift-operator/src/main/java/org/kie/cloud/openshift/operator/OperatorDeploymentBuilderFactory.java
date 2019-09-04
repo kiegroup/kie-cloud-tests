@@ -15,14 +15,12 @@
 package org.kie.cloud.openshift.operator;
 
 import cz.xtf.core.openshift.OpenShift;
-
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.EmployeeRosteringScenarioBuilder;
-import org.kie.cloud.api.scenario.builder.GenericScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerAmqScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
@@ -33,14 +31,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBu
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
-import org.kie.cloud.api.settings.builder.ControllerSettingsBuilder;
-import org.kie.cloud.api.settings.builder.KieServerS2IAmqSettingsBuilder;
-import org.kie.cloud.api.settings.builder.KieServerS2ISettingsBuilder;
-import org.kie.cloud.api.settings.builder.KieServerSettingsBuilder;
 import org.kie.cloud.api.settings.builder.LdapSettingsBuilder;
-import org.kie.cloud.api.settings.builder.SmartRouterSettingsBuilder;
-import org.kie.cloud.api.settings.builder.WorkbenchMonitoringSettingsBuilder;
-import org.kie.cloud.api.settings.builder.WorkbenchSettingsBuilder;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl;
@@ -129,56 +120,6 @@ public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuild
     @Override
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder getClusteredWorkbenchKieServerPersistentScenarioBuilder() {
         return new ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl();
-    }
-
-    @Override
-    public GenericScenarioBuilder getGenericScenarioBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public KieServerSettingsBuilder getKieServerSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public KieServerSettingsBuilder getKieServerMySqlSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public KieServerSettingsBuilder getKieServerPostgreSqlSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public ControllerSettingsBuilder getControllerSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public KieServerS2ISettingsBuilder getKieServerHttpsS2ISettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public KieServerS2IAmqSettingsBuilder getKieServerS2IAmqSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public WorkbenchSettingsBuilder getWorkbenchSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public WorkbenchMonitoringSettingsBuilder getWorkbenchMonitoringSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public SmartRouterSettingsBuilder getSmartRouterSettingsBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
