@@ -27,8 +27,5 @@ class OpenShiftTemplatePropertiesLoader {
 
         templateUrlProperties.putAll(PropertyLoader.loadProperties(OpenShiftTemplatePropertiesLoader.class, secretConfigFile));
         templateUrlProperties.putAll(PropertyLoader.loadProperties(OpenShiftTemplatePropertiesLoader.class, projectSpecificTemplate));
-
-        // Load custom single testing templates
-        templateUrlProperties.putAll(PropertyLoader.loadProperties(OpenShiftTemplatePropertiesLoader.class, "single-jbpm-templates.properties"));
     }
 }
