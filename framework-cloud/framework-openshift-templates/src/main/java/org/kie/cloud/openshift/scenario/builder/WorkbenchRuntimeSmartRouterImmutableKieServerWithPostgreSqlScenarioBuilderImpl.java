@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.scenario.builder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -118,6 +119,19 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
         envVariables.putAll(ldapSettings.getEnvVariables());
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withTimerServiceDataStoreRefreshInterval(
+            Duration timerServiceDataStoreRefreshInterval) {
+        envVariables.put(OpenShiftTemplateConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, Long.toString(timerServiceDataStoreRefreshInterval.toMillis()));
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withKieServerMemoryLimit(String limit) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_MEMORY_LIMIT, limit);
         return this;
     }
 }
