@@ -15,6 +15,8 @@
 
 package org.kie.cloud.api.scenario.builder;
 
+import java.time.Duration;
+
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
 import org.kie.cloud.api.settings.LdapSettings;
 
@@ -105,4 +107,20 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenar
      * @return Builder
      */
     WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+
+    /**
+     * Return setup builder with specified timer service data store refresh interval.
+     *
+     * @param timerServiceDataStoreRefreshInterval timer service data store refresh interval.
+     * @return Builder with configured timer service data store refresh interval.
+     */
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval);
+
+    /**
+     * Return setup builder with specified memory limit.
+     *
+     * @param limit memory limit (e.g.: 4Gi, etc).
+     * @return Builder with configured memory limit.
+     */
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withKieServerMemoryLimit(String limit);
 }
