@@ -172,6 +172,21 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-remote</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>sample-hacep-project-kjar</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>openshift-kie-hacep</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
         <groupId>org.gitlab</groupId>
         <artifactId>java-gitlab-api</artifactId>
         <version>${version.org.gitlab}</version>

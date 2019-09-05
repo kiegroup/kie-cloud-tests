@@ -16,13 +16,34 @@
 package org.kie.cloud.openshift.scenario;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.openshift.api.model.Route;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.kie.cloud.api.deployment.Deployment;
@@ -37,8 +58,8 @@ import org.kie.cloud.strimzi.deployment.ZookeeperDeployment;
 import org.kie.cloud.strimzi.resources.KafkaCluster;
 import org.kie.cloud.strimzi.resources.KafkaClusterBuilder;
 import org.kie.cloud.strimzi.resources.KafkaTopic;
-import org.kie.cloud.strimzi.resources.KafkaTopicSpec;
 import org.kie.cloud.strimzi.resources.KafkaTopicBuilder;
+import sun.security.pkcs.PKCS8Key;
 
 public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implements HACepScenario {
 
@@ -48,7 +69,16 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static final String KAFKA_CLUSTER_NAME = "my-cluster";
     private static final String MASTER_EVENTS_TOPIC = "control";
     private static final String USER_INPUT_TOPIC = "events";
+    private static final String SESSION_INFOS_TOPIC = "kiesessioninfos";
     private static final String SNAPSHOTS_TOPIC = "snapshot";
+
+    private static final String KAFKA_CLUSTER_CA_SECRET_SUFFIX = "-cluster-ca-cert";
+    private static final String KAFKA_CLUSTER_CA_KEY = "ca.crt";
+    private static final String KAFKA_CLUSTER_CA_FILE = "ca.crt";
+    private static final String KAFKA_CLUSTER_KEYSTORE_FILE = "keystore.jks";
+    private static final String KAFKA_CLUSTER_KEYSTORE_PASSWD = "changeit";
+
+    private static final String KAFKA_BOOTSTRAP_ROUTE = "my-cluster-kafka-bootstrap";
 
     private StrimziOperator strimziOperator;
     private HACepDeployment haCepDeployment;
@@ -91,6 +121,11 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         project.runOcCommandAsAdmin("expose", "service",
                                     ((HACepDeploymentImpl) haCepDeployment).getServiceName());
         haCepDeployment.waitForScale();
+        try {
+            Thread.sleep(30000); // RHPAM-2380
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -120,7 +155,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     private void createTopics() {
         final KafkaTopic masterEventsTopic = new KafkaTopicBuilder(MASTER_EVENTS_TOPIC, KAFKA_CLUSTER_NAME)
-                .withPartitions(3)
+                .withPartitions(1)
                 .withReplicas(3)
                 .addConfigItem("retention.ms", "7200000")
                 .addConfigItem("segment.bytes", "1073741824")
@@ -128,15 +163,23 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         strimziOperator.createTopic(masterEventsTopic);
 
         final KafkaTopic userInputTopic = new KafkaTopicBuilder(USER_INPUT_TOPIC, KAFKA_CLUSTER_NAME)
-                .withPartitions(3)
+                .withPartitions(1)
                 .withReplicas(3)
                 .addConfigItem("retention.ms", "7200000")
                 .addConfigItem("segment.bytes", "1073741824")
                 .build();
         strimziOperator.createTopic(userInputTopic);
 
+        final KafkaTopic sessionInfosTopic = new KafkaTopicBuilder(SESSION_INFOS_TOPIC, KAFKA_CLUSTER_NAME)
+                .withPartitions(1)
+                .withReplicas(3)
+                .addConfigItem("retention.ms", "7200000")
+                .addConfigItem("segment.bytes", "1073741824")
+                .build();
+        strimziOperator.createTopic(sessionInfosTopic);
+
         final KafkaTopic snapshotsTopic = new KafkaTopicBuilder(SNAPSHOTS_TOPIC, KAFKA_CLUSTER_NAME)
-                .withPartitions(3)
+                .withPartitions(1)
                 .withReplicas(3)
                 .addConfigItem("retention.ms", "7200000")
                 .addConfigItem("segment.bytes", "1073741824")
@@ -186,5 +229,64 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         final File amqStreamsDirectory = new File(OpenShiftConstants.getAMQStreamsDir());
 
         return amqStreamsDirectory;
+    }
+
+    @Override
+    public File getKafkaKeyStore() {
+        final File kafkaCertificateFile = getKafkaCertificate();
+        final File kafkaKSFile = new File(OpenShiftConstants.getProjectBuildDirectory(), KAFKA_CLUSTER_KEYSTORE_FILE);
+
+        X509Certificate certificate;
+        try (InputStream is = new FileInputStream(kafkaCertificateFile)) {
+            CertificateFactory cf = CertificateFactory.getInstance("X509");
+            certificate = (X509Certificate) cf.generateCertificate(is);
+            certificate.verify(certificate.getPublicKey());
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to read file with Kafka key", e);
+        }
+
+        try (final OutputStream kafkaKSOutputStream = new FileOutputStream(kafkaKSFile)) {
+            final KeyStore kafkaKS = KeyStore.getInstance("JKS");
+            kafkaKS.load(null, KAFKA_CLUSTER_KEYSTORE_PASSWD.toCharArray());
+            kafkaKS.setCertificateEntry("test", certificate);
+            kafkaKS.store(kafkaKSOutputStream, KAFKA_CLUSTER_KEYSTORE_PASSWD.toCharArray());
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to create key store", e);
+        }
+
+        return kafkaKSFile;
+    }
+
+    @Override
+    public Properties getKafkaConnectionProperties() {
+        final Route kafkaBootstrapRoute = project.getOpenShift().getRoute(KAFKA_BOOTSTRAP_ROUTE);
+        final String kafkaBootstrapHost = kafkaBootstrapRoute.getSpec().getHost();
+        final File keyStore = getKafkaKeyStore();
+
+        final Properties properties = new Properties();
+        properties.put("bootstrap.servers", kafkaBootstrapHost + ":443");
+        properties.put("security.protocol", "SSL");
+        properties.put("ssl.keystore.location", keyStore.getAbsolutePath());
+        properties.put("ssl.keystore.password", KAFKA_CLUSTER_KEYSTORE_PASSWD);
+        properties.put("ssl.truststore.location", keyStore.getAbsolutePath());
+        properties.put("ssl.truststore.password", KAFKA_CLUSTER_KEYSTORE_PASSWD);
+
+        return properties;
+    }
+
+    private File getKafkaCertificate() {
+        final File certificateFile = new File(OpenShiftConstants.getProjectBuildDirectory(), KAFKA_CLUSTER_CA_FILE);
+
+        final Secret secret = project.getOpenShift()
+                .getSecret(KAFKA_CLUSTER_NAME + KAFKA_CLUSTER_CA_SECRET_SUFFIX);
+        final Map<String, String> data = secret.getData();
+        final String certificate = data.get(KAFKA_CLUSTER_CA_KEY);
+        try {
+            FileUtils.writeByteArrayToFile(certificateFile, Base64.getDecoder().decode(certificate));
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing file with Kafka SSL certificate", e);
+        }
+
+        return certificateFile;
     }
 }

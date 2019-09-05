@@ -164,6 +164,7 @@ public class OpenShiftConstants implements Constants {
     public static final String AMQ_STREAMS_ZIP = "amq.streams.zip";
     public static final String AMQ_STREAMS_DIR = "amqStreamsDirectory";
     public static final String HA_CEP_RESOURCES_LIST = "ha.cep.resources";
+    public static final String PROJECT_BUILD_DIRECTORY = "project.build.directory";
 
     /**
      * File path pointing to folder containing JDBC driver scripts.
@@ -254,6 +255,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getAMQStreamsDir() {
         return System.getProperty(AMQ_STREAMS_DIR);
+    }
+
+    public static String getProjectBuildDirectory() {
+        return System.getProperty(PROJECT_BUILD_DIRECTORY);
     }
 
     public static String getHaCepResourcesList() {
