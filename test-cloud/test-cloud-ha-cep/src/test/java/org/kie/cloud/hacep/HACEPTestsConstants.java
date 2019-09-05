@@ -13,13 +13,11 @@
  * limitations under the License.
  */
 
-package org.kie.cloud.api.scenario;
+package org.kie.cloud.hacep;
 
-import java.io.File;
-import java.util.Properties;
+public class HACEPTestsConstants {
+    public static final int DEFAULT_COMPLETABLE_FUTURE_TIMEOUT = 30;
 
-public interface HACepScenario extends DeploymentScenario<HACepScenario> {
-    File getAMQStreamsDirectory();
-    File getKafkaKeyStore();
-    Properties getKafkaConnectionProperties();
+    public static final String LEADERS_CONFIG_MAP = "default-leaders";
+    public static final String LEADER_POD_KEY = "leader.pod.null";
 }
