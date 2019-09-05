@@ -20,6 +20,19 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-remote</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>openshift-kie-hacep</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>sample-hacep-project-kjar</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-api</artifactId>
       <scope>test</scope>
@@ -92,6 +105,7 @@
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
+              <project.build.directory>${project.build.directory}</project.build.directory>
               <amqStreamsDirectory>${project.build.directory}/amqStreamsDirectory</amqStreamsDirectory>
             </systemPropertyVariables>
           </configuration>
