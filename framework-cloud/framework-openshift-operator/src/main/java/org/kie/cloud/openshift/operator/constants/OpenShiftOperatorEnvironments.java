@@ -21,6 +21,7 @@ public class OpenShiftOperatorEnvironments {
 
     public static final String TRIAL = getEnvironmentPrefix() + "trial";
     public static final String PRODUCTION = getEnvironmentPrefix() + "production";
+    public static final String PRODUCTION_IMMUTABLE = getEnvironmentPrefix() + "production-immutable";
     public static final String AUTHORING = getEnvironmentPrefix() + "authoring";
     public static final String AUTHORING_HA = getEnvironmentPrefix() + "authoring-ha";
 

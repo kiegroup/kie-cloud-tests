@@ -18,27 +18,36 @@ package org.kie.cloud.openshift.operator.model.components;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * KieApp upgrades.
+ * Kie server GIT source configuration.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Upgrades {
+public class GitSource {
 
-    private Boolean enabled;
-    private Boolean minor;
+    private String contextDir;
+    private String reference;
+    private String uri;
 
-    public Boolean getEnabled() {
-        return enabled;
+    public String getContextDir() {
+        return contextDir;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setContextDir(String contextDir) {
+        this.contextDir = contextDir;
     }
 
-    public Boolean getMinor() {
-        return minor;
+    public String getReference() {
+        return reference;
     }
 
-    public void setMinor(Boolean minor) {
-        this.minor = minor;
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

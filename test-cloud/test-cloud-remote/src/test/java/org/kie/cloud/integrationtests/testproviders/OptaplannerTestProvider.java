@@ -58,7 +58,7 @@ public class OptaplannerTestProvider {
         String containerId = "testExecuteSolver";
 
         KieContainer kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
-        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment, extraClasses(kieContainer));
+        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment, extraClasses(kieContainer), Duration.ofMinutes(3).toMillis());
         KieServerUtils.createContainer(kieServerClient, new KieContainerResource(containerId, CLOUD_BALANCE_RELEASE_ID), Duration.ofMinutes(3));
 
         kieServerDeployment.waitForContainerRespin();

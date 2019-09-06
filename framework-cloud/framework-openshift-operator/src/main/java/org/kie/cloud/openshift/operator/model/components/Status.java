@@ -26,6 +26,7 @@ public class Status {
     private Conditions[] conditions;
     private String consoleHost;
     private Deployments deployments;
+    private String phase;
 
     public Conditions[] getConditions() {
         return conditions;
@@ -49,5 +50,13 @@ public class Status {
 
     public void setDeployments(Deployments deployments) {
         this.deployments = deployments;
+    }
+
+    public String getPhase() {
+        return phase;
+    }
+
+    public void setPhase(String phase) {
+        this.phase = phase;
     }
 }
