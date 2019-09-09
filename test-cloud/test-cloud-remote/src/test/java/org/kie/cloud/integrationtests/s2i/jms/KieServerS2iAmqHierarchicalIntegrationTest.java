@@ -143,7 +143,7 @@ public class KieServerS2iAmqHierarchicalIntegrationTest extends AbstractMethodIs
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(containerReleaseId.getGroupId()).isEqualTo(Kjar.USERTASK.getGroupId());
-            softly.assertThat(containerReleaseId.getArtifactId()).isEqualTo(Kjar.USERTASK.getName());
+            softly.assertThat(containerReleaseId.getArtifactId()).isEqualTo(Kjar.USERTASK.getArtifactName());
             softly.assertThat(containerReleaseId.getVersion()).isEqualTo(Kjar.USERTASK.getVersion());
         });
 

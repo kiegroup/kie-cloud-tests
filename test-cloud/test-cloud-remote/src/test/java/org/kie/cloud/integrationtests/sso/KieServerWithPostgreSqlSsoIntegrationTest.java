@@ -24,18 +24,22 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
-import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 
 public class KieServerWithPostgreSqlSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static KieServerWithDatabaseScenario deploymentScenario;
+
+    private static FireRulesTestProvider fireRulesTestProvider;
+    private static ProcessTestProvider processTestProvider;
+    private static OptaplannerTestProvider optaplannerTestProvider;
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
 
     private static final String SECURED_URL_PREFIX = "secured-";
     private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
@@ -47,8 +51,7 @@ public class KieServerWithPostgreSqlSsoIntegrationTest extends AbstractCloudInte
         try {
             deploymentScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
                     .deploySso()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
-                            MavenConstants.getMavenRepoPassword())
+                    .withInternalMavenRepo(false)
                     .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                     .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                     .build();
@@ -57,6 +60,12 @@ public class KieServerWithPostgreSqlSsoIntegrationTest extends AbstractCloudInte
         }
         deploymentScenario.setLogFolderName(KieServerWithPostgreSqlSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
     }
 
     @AfterClass
@@ -65,24 +74,24 @@ public class KieServerWithPostgreSqlSsoIntegrationTest extends AbstractCloudInte
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
+    public void testRulesFromMavenRepo() {
+        fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     @Category(JBPMOnly.class)
-    public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
+    public void testProcessFromMavenRepo() {
+        processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
+    public void testSolverFromMavenRepo() {
+        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testKieServerHttps() {
-        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), true);
-        HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), true);
+        httpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), true);
+        httpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), true);
     }
 }

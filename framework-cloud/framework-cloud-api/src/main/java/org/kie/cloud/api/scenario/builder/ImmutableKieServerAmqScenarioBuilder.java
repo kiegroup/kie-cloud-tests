@@ -21,13 +21,13 @@ import org.kie.cloud.api.settings.LdapSettings;
 public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScenarioBuilder<ImmutableKieServerAmqScenarioBuilder, ImmutableKieServerAmqScenario> {
 
     /**
-     * Return setup builder with additional configuration of external maven repo.
-     * @param repoUrl Maven repo URL.
-     * @param repoUserName Maven repo user name.
-     * @param repoPassword Maven repo user password.
-     * @return Builder with configured external maven repo.
+     * Return setup builder with additional configuration of internal maven repo.
+     * 
+     * Parameters will be used automatically
+     * 
+     * @return Builder with configured internal maven repo.
      */
-    ImmutableKieServerAmqScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+    ImmutableKieServerAmqScenarioBuilder withInternalMavenRepo();
 
     /**
      * @param kieServerId kie-server id

@@ -18,6 +18,7 @@ package org.kie.cloud.integrationtests.sso.s2i;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -77,7 +78,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
         try {
             KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
                                                                                                        .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                                        .withDroolsServerFilterClasses(false)
                                                                                                        .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                                                                                                        .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
@@ -91,7 +92,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
         try {
             KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder()
                                                                                            .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getName())
+                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                            .withDroolsServerFilterClasses(false)
                                                                                            .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                                                                                            .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
@@ -116,7 +117,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
     private static final String PERSON_OUT_IDENTIFIER = "person1";
 
     private static final Kjar DEPLOYED_KJAR = Kjar.STATELESS_SESSION;
-    private static final ReleaseId RELEASE_ID = new ReleaseId(DEPLOYED_KJAR.getGroupId(), DEPLOYED_KJAR.getName(), DEPLOYED_KJAR.getVersion());
+    private static final ReleaseId RELEASE_ID = new ReleaseId(DEPLOYED_KJAR.getGroupId(), DEPLOYED_KJAR.getArtifactName(), DEPLOYED_KJAR.getVersion());
     private static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "=" + DEPLOYED_KJAR.toString();
 
     private static final String REPO_BRANCH = "master";
@@ -139,7 +140,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndInstallMavenProject(KieServerS2iWithSsoDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile());
+        MavenDeployer.buildAndInstallMavenProject(KieServerS2iWithSsoDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile(), new HashMap<>());
     }
 
     @Before
@@ -168,7 +169,7 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
         ReleaseId containerReleaseId = container.getResolvedReleaseId();
         assertThat(containerReleaseId).isNotNull();
         assertThat(containerReleaseId.getGroupId()).isEqualTo(DEPLOYED_KJAR.getGroupId());
-        assertThat(containerReleaseId.getArtifactId()).isEqualTo(DEPLOYED_KJAR.getName());
+        assertThat(containerReleaseId.getArtifactId()).isEqualTo(DEPLOYED_KJAR.getArtifactName());
         assertThat(containerReleaseId.getVersion()).isEqualTo(DEPLOYED_KJAR.getVersion());
 
         List<Command<?>> commands = new ArrayList<Command<?>>();

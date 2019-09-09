@@ -29,6 +29,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -332,5 +333,9 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         }
 
         return certificateFile;
+    }
+
+    public Map<String, String> getScenarioEnvironment() {
+        return new HashMap<>();
     }
 }

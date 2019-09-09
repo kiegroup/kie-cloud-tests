@@ -21,13 +21,13 @@ import org.kie.cloud.api.settings.LdapSettings;
 public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder extends KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> {
 
     /**
-     * Return setup builder with additional configuration of external maven repo.
-     * @param repoUrl Maven repo URL.
-     * @param repoUserName Maven repo user name.
-     * @param repoPassword Maven repo user password.
-     * @return Builder with configured external maven repo.
+     * Return setup builder with additional configuration of internal maven repo.
+     *
+     * Parameters will be used automatically
+     *
+     * @return Builder with configured internal maven repo.
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withInternalMavenRepo();
 
     /**
      * @param kieServerId kie-server id

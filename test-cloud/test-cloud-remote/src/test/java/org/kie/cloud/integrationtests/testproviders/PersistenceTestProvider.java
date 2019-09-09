@@ -15,7 +15,9 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Map;
+import java.util.Objects;
+
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
@@ -29,9 +31,39 @@ import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class PersistenceTestProvider {
 
-    public static void testControllerPersistence(WorkbenchKieServerScenario deploymentScenario) {
+    private PersistenceTestProvider() {}
+
+    /**
+     * Create provider instance
+     * 
+     * @return provider instance
+     */
+    public static PersistenceTestProvider create() {
+        return create(null);
+    }
+
+    /**
+     * Create provider instance and init it with given environment
+     * 
+     * @param environment if not null, initialize this provider with the environment
+     * 
+     * @return provider instance
+     */
+    public static PersistenceTestProvider create(Map<String, String> environment) {
+        PersistenceTestProvider provider = new PersistenceTestProvider();
+        if (Objects.nonNull(environment)) {
+            provider.init(environment);
+        }
+        return provider;
+    }
+
+    private void init(Map<String, String> environment) {}
+
+    public void testControllerPersistence(WorkbenchKieServerScenario deploymentScenario) {
         String containerId = "testControllerPersistence";
 
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());

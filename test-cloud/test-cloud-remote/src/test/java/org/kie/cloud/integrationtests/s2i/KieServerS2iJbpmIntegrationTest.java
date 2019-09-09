@@ -36,6 +36,9 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
 
     private static WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario deploymentScenario;
     private static String repositoryName;
+    private static ProcessTestProvider processTestProvider;
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
+    private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
 
     private static final String CONTAINER_ALIAS_ID = "cont-alias";
     private static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "(" + CONTAINER_ALIAS_ID + ")=" + Kjar.DEFINITION.toString();
@@ -49,15 +52,20 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
 
         try {
             deploymentScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
-                                                          .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                          .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
-                                                          .build();
+                    .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                    .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                    .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
 
         deploymentScenario.setLogFolderName(KieServerS2iJbpmIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create();
+        httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
+        processTestProvider = ProcessTestProvider.create();
     }
 
     @AfterClass
@@ -68,24 +76,24 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
 
     @Test
     public void testContainerAfterExecServerS2IStart() {
-        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
-        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), CONTAINER_ALIAS_ID);
+        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), CONTAINER_ALIAS_ID);
     }
 
     @Test
     @Category({OperatorNotSupported.class}) // Skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2267
     public void testProcessUsingSmartRouter() {
-        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
-        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ALIAS_ID);
+        processTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
+        processTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ALIAS_ID);
     }
 
     @Test
     public void testKieServerHttps() {
-        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
+        httpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
     }
 
     @Test
     public void testWorkbenchHttps() {
-        HttpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
+        httpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
     }
 }

@@ -14,15 +14,14 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.atIndex;
-
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.Constants;
 import org.kie.server.api.model.KieContainerResource;
@@ -35,20 +34,49 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.atIndex;
+
 public class ProcessTestProvider {
 
     private static final int TASKS_PAGE_SIZE = 10000;
 
-    static {
-        MavenDeployer.buildAndDeployMavenProject(ProcessTestProvider.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
+    private ProcessTestProvider() {}
+
+    /**
+     * Create provider instance
+     * 
+     * @return provider instance
+     */
+    public static ProcessTestProvider create() {
+        return create(null);
     }
 
-    public static void testDeployFromKieServerAndExecuteProcesses(KieServerDeployment kieServerDeployment) {
+    /**
+     * Create provider instance and init it with given environment
+     * 
+     * @param environment if not null, initialize this provider with the environment
+     * 
+     * @return provider instance
+     */
+    public static ProcessTestProvider create(Map<String, String> environment) {
+        ProcessTestProvider provider = new ProcessTestProvider();
+        if (Objects.nonNull(environment)) {
+            provider.init(environment);
+        }
+        return provider;
+    }
+
+    private void init(Map<String, String> environment) {
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(environment);
+    }
+
+    public void testDeployFromKieServerAndExecuteProcesses(KieServerDeployment kieServerDeployment) {
         testDeployFromKieServerAndExecuteProcessWithUserTask(kieServerDeployment);
         testDeployFromKieServerAndExecuteProcessWithSignal(kieServerDeployment);
     }
 
-    public static void testExecuteProcesses(KieServerDeployment kieServerDeployment, String containerId) {
+    public void testExecuteProcesses(KieServerDeployment kieServerDeployment, String containerId) {
         ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(kieServerDeployment);
         UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(kieServerDeployment);
 
@@ -56,7 +84,7 @@ public class ProcessTestProvider {
         testExecuteProcessWithSignal(processClient, containerId);
     }
 
-    public static void testExecuteProcesses(SmartRouterDeployment smartRouterDeployment, KieServerDeployment kieServerDeployment, String containerId) {
+    public void testExecuteProcesses(SmartRouterDeployment smartRouterDeployment, KieServerDeployment kieServerDeployment, String containerId) {
         KieServicesClient smartRouterClient = KieServerClientProvider.getSmartRouterClient(smartRouterDeployment, kieServerDeployment.getUsername(), kieServerDeployment.getPassword());
         ProcessServicesClient processClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
         UserTaskServicesClient taskClient = smartRouterClient.getServicesClient(UserTaskServicesClient.class);
@@ -65,11 +93,13 @@ public class ProcessTestProvider {
         testExecuteProcessWithSignal(processClient, containerId);
     }
 
-    private static void testDeployFromKieServerAndExecuteProcessWithUserTask(KieServerDeployment kieServerDeployment) {
+    private void testDeployFromKieServerAndExecuteProcessWithUserTask(KieServerDeployment kieServerDeployment) {
         String containerId = "testProcessWithUserTask";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
+        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
+                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getArtifactName(),
+                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
         kieServerDeployment.waitForContainerRespin();
 
@@ -83,7 +113,7 @@ public class ProcessTestProvider {
         }
     }
 
-    private static void testExecuteProcessWithUserTask(ProcessServicesClient processClient, UserTaskServicesClient taskClient, String containerId) {
+    private void testExecuteProcessWithUserTask(ProcessServicesClient processClient, UserTaskServicesClient taskClient, String containerId) {
         int tasksCount = taskClient.findTasks(Constants.User.YODA, 0, TASKS_PAGE_SIZE).size();
 
         Long userTaskPid = processClient.startProcess(containerId, Constants.ProcessId.USERTASK);
@@ -99,12 +129,14 @@ public class ProcessTestProvider {
         assertThat(userTaskPi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
     }
 
-    private static void testDeployFromKieServerAndExecuteProcessWithSignal(KieServerDeployment kieServerDeployment) {
+    private void testDeployFromKieServerAndExecuteProcessWithSignal(KieServerDeployment kieServerDeployment) {
         String containerId = "testProcessWithSignal";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(kieServerDeployment);
 
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(), Kjar.DEFINITION_SNAPSHOT.getName(), Kjar.DEFINITION_SNAPSHOT.getVersion())));
+        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
+                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getArtifactName(),
+                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
         kieServerDeployment.waitForContainerRespin();
 
@@ -116,7 +148,7 @@ public class ProcessTestProvider {
         }
     }
 
-    private static void testExecuteProcessWithSignal(ProcessServicesClient processClient, String containerId) {
+    private void testExecuteProcessWithSignal(ProcessServicesClient processClient, String containerId) {
         Long signalTaskPid = processClient.startProcess(containerId, Constants.ProcessId.SIGNALTASK);
         assertThat(signalTaskPid).isNotNull();
 

@@ -24,9 +24,11 @@ import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchRuntimeClusteredKieS
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl;
 
-public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilderImpl implements ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder {
+public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenario> implements
+                                                                                    ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
 
@@ -48,15 +50,13 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilderI
     }
 
     @Override
-    public ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenario build() {
+    public ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenario getDeploymentScenarioInstance() {
         return new ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl(envVariables);
     }
 
     @Override
-    public ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+    public ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 }

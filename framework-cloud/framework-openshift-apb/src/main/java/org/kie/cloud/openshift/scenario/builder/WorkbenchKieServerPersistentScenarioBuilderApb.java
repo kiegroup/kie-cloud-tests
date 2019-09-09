@@ -26,11 +26,12 @@ import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.ProjectApbSpecificPropertyNames;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerPersistentScenarioApb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchKieServerPersistentScenarioBuilderApb implements WorkbenchKieServerPersistentScenarioBuilder {
+public class WorkbenchKieServerPersistentScenarioBuilderApb extends AbstractOpenshiftScenarioBuilderApb<WorkbenchKieServerPersistentScenario> implements WorkbenchKieServerPersistentScenarioBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerPersistentScenarioBuilderApb.class);
     private final Map<String, String> extraVars = new HashMap<>();
@@ -54,15 +55,13 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb implements Workbench
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenario build() {
+    public WorkbenchKieServerPersistentScenario getDeploymentScenarioInstance() {
         return new WorkbenchKieServerPersistentScenarioApb(extraVars, deploySSO);
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_URL, repoUrl);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_USER, repoUserName);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_PWD, repoPassword);
+    public WorkbenchKieServerPersistentScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 

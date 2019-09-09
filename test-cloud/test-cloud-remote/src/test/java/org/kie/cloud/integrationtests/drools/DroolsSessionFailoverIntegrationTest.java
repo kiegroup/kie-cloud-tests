@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -31,14 +30,13 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
@@ -74,20 +72,18 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractMethodIsolated
     @Override
     protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withInternalMavenRepo()
                 .withSmartRouterId(SMART_ROUTER_ID)
                 .build();
     }
 
-    @BeforeClass
-    public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(DroolsSessionFailoverIntegrationTest.class.getResource("/kjars-sources/rule-project").getFile());
-    }
-
     @Before
     public void setUp() {
+        KjarDeployer.create(Kjar.RULE_SNAPSHOT).deploy(deploymentScenario.getScenarioEnvironment());
+
         kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
-        smartRouterServicesClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment().getUsername(), deploymentScenario.getKieServerOneDeployment().getPassword(), TimeUnit.MINUTES.toMillis(10));
+        smartRouterServicesClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment().getUsername(), deploymentScenario
+                .getKieServerOneDeployment().getPassword(), TimeUnit.MINUTES.toMillis(10));
         smartRouterRuleServiceClient = smartRouterServicesClient.getServicesClient(RuleServicesClient.class);
 
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());

@@ -18,14 +18,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.server.api.model.KieContainerResource;
@@ -36,7 +38,7 @@ import org.kie.server.client.SolverServicesClient;
 
 public class OptaplannerTestProvider {
 
-    private static final ReleaseId CLOUD_BALANCE_RELEASE_ID = new ReleaseId(Kjar.CLOUD_BALANCE_SNAPSHOT.getGroupId(), Kjar.CLOUD_BALANCE_SNAPSHOT.getName(), Kjar.CLOUD_BALANCE_SNAPSHOT.getVersion());
+    private static final ReleaseId CLOUD_BALANCE_RELEASE_ID = new ReleaseId(Kjar.CLOUD_BALANCE_SNAPSHOT.getGroupId(), Kjar.CLOUD_BALANCE_SNAPSHOT.getArtifactName(), Kjar.CLOUD_BALANCE_SNAPSHOT.getVersion());
     private static final String CLOUD_BALANCE_SOLVER_ID = "cloudsolver";
     private static final String CLOUD_BALANCE_SOLVER_CONFIG = "cloudbalance-solver.xml";
 
@@ -49,11 +51,37 @@ public class OptaplannerTestProvider {
             "org.kie.server.testing.DeleteComputerProblemFactChange";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
 
-    static {
-        MavenDeployer.buildAndDeployMavenProject(OptaplannerTestProvider.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
+    private OptaplannerTestProvider() {}
+
+    /**
+     * Create provider instance
+     * 
+     * @return provider instance
+     */
+    public static OptaplannerTestProvider create() {
+        return create(null);
     }
 
-    public static void testDeployFromKieServerAndExecuteSolver(KieServerDeployment kieServerDeployment) {
+    /**
+     * Create provider instance and init it with given environment
+     * 
+     * @param environment if not null, initialize this provider with the environment
+     * 
+     * @return provider instance
+     */
+    public static OptaplannerTestProvider create(Map<String, String> environment) {
+        OptaplannerTestProvider provider = new OptaplannerTestProvider();
+        if (Objects.nonNull(environment)) {
+            provider.init(environment);
+        }
+        return provider;
+    }
+
+    private void init(Map<String, String> environment) {
+        KjarDeployer.create(Kjar.CLOUD_BALANCE_SNAPSHOT).deploy(environment);
+    }
+
+    public void testDeployFromKieServerAndExecuteSolver(KieServerDeployment kieServerDeployment) {
         kieServerDeployment.setRouterTimeout(Duration.ofMinutes(3));
         String containerId = "testExecuteSolver";
 
@@ -77,13 +105,14 @@ public class OptaplannerTestProvider {
         }
     }
 
-    public static void testExecuteSolver(KieServerDeployment kieServerDeployment, String containerId) throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, InterruptedException {
+    public void testExecuteSolver(KieServerDeployment kieServerDeployment,
+                                  String containerId) throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, InterruptedException {
         KieContainer kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment, extraClasses(kieContainer));
 
         SolverServicesClient solverClient = kieServerClient.getServicesClient(SolverServicesClient.class);
         SolverInstance solverInstance = solverClient.createSolver(containerId,
-                CLOUD_BALANCE_SOLVER_ID, CLOUD_BALANCE_SOLVER_CONFIG);
+                                                                  CLOUD_BALANCE_SOLVER_ID, CLOUD_BALANCE_SOLVER_CONFIG);
         Assertions.assertThat(solverInstance).isNotNull();
 
         Object planningProblem = loadPlanningProblem(kieContainer, 5, 15);
@@ -118,17 +147,17 @@ public class OptaplannerTestProvider {
         return extra;
     }
 
-    private static Object loadPlanningProblem(KieContainer kieContainer, int computerListSize,
-            int processListSize) throws NoSuchMethodException, ClassNotFoundException,
-            IllegalAccessException, InstantiationException, InvocationTargetException {
+    private static Object loadPlanningProblem(KieContainer kieContainer,
+                                              int computerListSize,
+                                              int processListSize) throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
         Class<?> cbgc = kieContainer.getClassLoader().loadClass(CLASS_CLOUD_GENERATOR);
         Object cbgi = cbgc.newInstance();
 
         Method method = cbgc.getMethod("createCloudBalance",
-                int.class,
-                int.class);
+                                       int.class,
+                                       int.class);
         return method.invoke(cbgi,
-                computerListSize,
-                processListSize);
+                             computerListSize,
+                             processListSize);
     }
 }

@@ -25,13 +25,11 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeClusteredKieServerDat
 public interface ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenario> {
 
     /**
-     * Return setup builder with additional configuration of external maven
-     * repo.
-     * @param repoUrl Maven repo URL.
-     * @param repoUserName Maven repo user name.
-     * @param repoPassword Maven repo user password.
-     * @return Builder with configured external maven repo.
+     * Return setup builder with additional configuration of internal maven repo.
+     * 
+     * Parameters will be used automatically
+     * 
+     * @return Builder with configured internal maven repo.
      */
-    ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
-
+    ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder withInternalMavenRepo();
 }

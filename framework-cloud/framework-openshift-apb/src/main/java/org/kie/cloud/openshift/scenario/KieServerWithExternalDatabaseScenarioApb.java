@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -162,5 +163,9 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
                 DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
+    }
+
+    public Map<String, String> getScenarioEnvironment() {
+        return new HashMap<>(extraVars);
     }
 }
