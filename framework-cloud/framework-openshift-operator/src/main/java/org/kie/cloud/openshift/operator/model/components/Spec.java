@@ -29,6 +29,7 @@ public class Spec {
     private Auth auth;
     private ImageRegistry imageRegistry;
     private Upgrades upgrades;
+    private String version;
 
     public CommonConfig getCommonConfig() {
         return commonConfig;
@@ -76,5 +77,13 @@ public class Spec {
 
     public void setUpgrades(Upgrades upgrades) {
         this.upgrades = upgrades;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

@@ -48,4 +48,6 @@ public class ImageEnvVariables {
     public static final String GIT_HOOKS_DIR = "GIT_HOOKS_DIR";
 
     public static final String PROMETHEUS_SERVER_EXT_DISABLED = "PROMETHEUS_SERVER_EXT_DISABLED";
+
+    public static final String DROOLS_SERVER_FILTER_CLASSES = "DROOLS_SERVER_FILTER_CLASSES";
 }
