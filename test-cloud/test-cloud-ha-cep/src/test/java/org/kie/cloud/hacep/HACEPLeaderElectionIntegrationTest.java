@@ -46,38 +46,29 @@ public class HACEPLeaderElectionIntegrationTest extends AbstractMethodIsolatedCl
                     .stream().map(instance -> instance.getName())
                     .collect(Collectors.toList());
 
-            final ConfigMap leadersConfigMap = project.getOpenShift().configMaps()
-                    .withName(HACEPTestsConstants.LEADERS_CONFIG_MAP).get();
-            Assertions.assertThat(leadersConfigMap.getData()).containsKey(HACEPTestsConstants.LEADER_POD_KEY);
-            Assertions.assertThat(leadersConfigMap.getData().get(HACEPTestsConstants.LEADER_POD_KEY)).isIn(podNames);
+            final String leaderPodName = HACEPTestsUtils.leaderPodName(project);
+            Assertions.assertThat(leaderPodName).isIn(podNames);
         }
     }
 
     @Test
     public void testLeaderElectionFailOver() throws Exception {
         try (Project project = new ProjectImpl(deploymentScenario.getNamespace())) {
-            ConfigMap leadersConfigMap = project.getOpenShift().configMaps()
-                    .withName(HACEPTestsConstants.LEADERS_CONFIG_MAP).get();
-            Assertions.assertThat(leadersConfigMap.getData()).containsKey(HACEPTestsConstants.LEADER_POD_KEY);
-            final String leaderToRemovePod = leadersConfigMap.getData().get(HACEPTestsConstants.LEADER_POD_KEY);
-            final Pod oldLeader = project.getOpenShift().getPod(leaderToRemovePod);
-            Assertions.assertThat(oldLeader).isNotNull();
+            final String oldLeaderName = HACEPTestsUtils.leaderPodName(project);
+            final Pod oldLeader = HACEPTestsUtils.leaderPod(project);
             project.getOpenShift().deletePod(oldLeader);
 
             deploymentScenario.getDeployments().get(0).waitForScale();
 
-            leadersConfigMap = project.getOpenShift().configMaps()
-                    .withName(HACEPTestsConstants.LEADERS_CONFIG_MAP).get();
-            Assertions.assertThat(leadersConfigMap.getData()).containsKey(HACEPTestsConstants.LEADER_POD_KEY);
-            Assertions.assertThat(leadersConfigMap.getData().get(HACEPTestsConstants.LEADER_POD_KEY))
-                    .isNotEqualTo(leaderToRemovePod);
+            final String newLeaderName = HACEPTestsUtils.leaderPodName(project);
+            Assertions.assertThat(newLeaderName).isNotEqualTo(oldLeaderName);
             final List<String> podNames = deploymentScenario
                     .getDeployments()
                     .get(0)
                     .getInstances()
                     .stream().map(instance -> instance.getName())
                     .collect(Collectors.toList());
-            Assertions.assertThat(leadersConfigMap.getData().get(HACEPTestsConstants.LEADER_POD_KEY)).isIn(podNames);
+            Assertions.assertThat(newLeaderName).isIn(podNames);
         }
     }
 }
