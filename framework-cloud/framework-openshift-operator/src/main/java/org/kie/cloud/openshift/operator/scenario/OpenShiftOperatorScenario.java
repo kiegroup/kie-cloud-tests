@@ -15,10 +15,9 @@
 
 package org.kie.cloud.openshift.operator.scenario;
 
-import java.util.Collections;
-
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
+import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -120,7 +119,9 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     protected abstract void deployCustomResource();
 
     private void deployCustomTrustedSecret() {
-        project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(), Collections.emptyMap());
+        logger.info("Creating custom trusted secret from {}.", OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl());
+        Secret secret = project.getOpenShift().secrets().load(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl()).get();
+        project.getOpenShift().secrets().create(secret);
     }
 
     protected void registerCustomTrustedSecret(Console console) {

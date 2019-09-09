@@ -34,6 +34,7 @@ public class Server {
     private Integer replicas;
     private SsoClient ssoClient;
     private Resources resources;
+    private Build build;
 
     public String getName() {
         return name;
@@ -97,5 +98,13 @@ public class Server {
 
     public void setResources(Resources resources) {
         this.resources = resources;
+    }
+
+    public Build getBuild() {
+        return build;
+    }
+
+    public void setBuild(Build build) {
+        this.build = build;
     }
 }
