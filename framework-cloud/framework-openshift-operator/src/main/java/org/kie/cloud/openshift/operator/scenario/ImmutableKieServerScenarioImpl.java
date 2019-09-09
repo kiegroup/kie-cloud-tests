@@ -104,7 +104,7 @@ public class ImmutableKieServerScenarioImpl extends OpenShiftOperatorScenario<Im
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<>(Arrays.asList(kieServerDeployment));
+        List<Deployment> deployments = new ArrayList<>(Arrays.asList(kieServerDeployment,ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
