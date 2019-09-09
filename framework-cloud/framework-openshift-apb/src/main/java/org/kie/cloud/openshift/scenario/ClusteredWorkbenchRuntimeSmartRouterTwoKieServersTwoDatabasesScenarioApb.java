@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.scenario;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -247,5 +248,9 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     @Override
     public SsoDeployment getSsoDeployment() {
         throw new UnsupportedOperationException("Not supported yet.");
-	}
+    }
+
+    public Map<String, String> getScenarioEnvironment() {
+        return new HashMap<>(extraVars);
+    }
 }

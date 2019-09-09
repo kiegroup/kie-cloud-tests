@@ -15,10 +15,13 @@
 
 package org.kie.cloud.tests.common.client.util;
 
+/**
+ * By default, projectname will be artifactname
+ */
 public enum Kjar {
     DEFINITION("org.kie.server.testing", "definition-project", "1.0.0.Final"),
     DEFINITION_SNAPSHOT("org.kie.server.testing", "definition-project-snapshot", "1.0.0-SNAPSHOT"),
-    DEFINITION_101_SNAPSHOT("org.kie.server.testing", "definition-project-snapshot", "1.0.1-SNAPSHOT"),
+    DEFINITION_101_SNAPSHOT("org.kie.server.testing", "definition-project-snapshot", "1.0.1-SNAPSHOT", "definition-project-101-snapshot"),
     CLOUD_BALANCE_SNAPSHOT("org.kie.server.testing", "cloudbalance-snapshot", "1.0.0-SNAPSHOT"),
     TIMER("org.kie.server.testing", "timer-project", "1.0.0-SNAPSHOT"),
     RULE_SNAPSHOT("org.kie.server.testing", "rule-project", "1.0.0-SNAPSHOT"),
@@ -28,28 +31,38 @@ public enum Kjar {
     STATELESS_SESSION("org.kie.server.testing", "stateless-session", "1.0.0.Final");
 
     private String groupId;
-    private String name;
+    private String artifactName;
     private String version;
+    private String projectName;
 
-    private Kjar(String groupId, String name, String version) {
+    private Kjar(String groupId, String artifactName, String version) {
+        this(groupId, artifactName, version, artifactName);
+    }
+
+    private Kjar(String groupId, String artifactName, String version, String projectName) {
         this.groupId = groupId;
-        this.name = name;
+        this.artifactName = artifactName;
         this.version = version;
+        this.projectName = projectName;
     }
 
     public String getGroupId() {
         return groupId;
     }
 
-    public String getName() {
-        return name;
+    public String getArtifactName() {
+        return artifactName;
     }
 
     public String getVersion() {
         return version;
     }
 
+    public String getProjectName() {
+        return projectName;
+    }
+
     public String toString() {
-        return groupId + ":" + name + ":" + version;
+        return groupId + ":" + artifactName + ":" + version;
     }
 }

@@ -15,6 +15,7 @@
 
 package org.kie.cloud.openshift.scenario;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.scenario.DeploymentScenario;
@@ -39,5 +40,9 @@ public abstract class KieCommonScenario<T extends DeploymentScenario<T>> extends
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
         ((ExternalDeploymentTemplates) externalDeployment).removeConfiguration(envVariables);
+    }
+
+    public Map<String, String> getScenarioEnvironment() {
+        return new HashMap<>(envVariables);
     }
 }

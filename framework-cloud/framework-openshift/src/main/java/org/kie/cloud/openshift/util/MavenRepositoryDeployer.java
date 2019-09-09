@@ -47,8 +47,7 @@ public class MavenRepositoryDeployer {
         logger.info("Creating internal Maven Repository.");
 
         // Login is part of binary retrieval
-        OpenShiftBinary masterBinary = OpenShifts.masterBinary();
-        masterBinary.project(project.getName());
+        OpenShiftBinary masterBinary = OpenShifts.masterBinary(project.getName());
         masterBinary.execute("new-app", "sonatype/nexus", "-l", "deploymentConfig=maven-nexus");
         masterBinary.execute("expose", "service", "nexus");
     }

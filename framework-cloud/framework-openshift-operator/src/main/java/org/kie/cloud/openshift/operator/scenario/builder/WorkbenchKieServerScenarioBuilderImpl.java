@@ -24,6 +24,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.model.KieApp;
@@ -34,7 +35,7 @@ import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerScenarioImpl;
 
-public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServerScenarioBuilder {
+public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<WorkbenchKieServerScenario> implements WorkbenchKieServerScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
     private boolean deployPrometheus = false;
@@ -69,17 +70,13 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     }
 
     @Override
-    public WorkbenchKieServerScenario build() {
+    public WorkbenchKieServerScenario getDeploymentScenarioInstance() {
         return new WorkbenchKieServerScenarioImpl(kieApp, deployPrometheus);
     }
 
     @Override
-    public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_URL, repoUrl));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_USERNAME, repoUserName));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_PASSWORD, repoPassword));
-        }
+    public WorkbenchKieServerScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 

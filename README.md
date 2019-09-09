@@ -64,16 +64,6 @@ Supported providers can be found in framework-git, class org.kie.cloud.git.const
 | gogs.username       |        | Username for logging into Gogs        |
 | gogs.password       |        | Password for logging into Gogs        |
 
-### Maven properties
-
-Can be found in framework-maven, class org.kie.cloud.maven.constants.MavenConstants
-
-| \<specific-params\>  | Default value  |  Meaning                                                             |
-| -------------------- | -------------- | -------------------------------------------------------------------- |
-| maven.repo.url       |                | URL pointing to remote Maven repository accepting snapshot artifacts |
-| maven.repo.username  |                | Username for remote Maven repository                                 |
-| maven.repo.password  |                | Password for remote Maven repository                                 |
-
 ### Deployment properties
 
 Properties required for configuration of specific deployments.

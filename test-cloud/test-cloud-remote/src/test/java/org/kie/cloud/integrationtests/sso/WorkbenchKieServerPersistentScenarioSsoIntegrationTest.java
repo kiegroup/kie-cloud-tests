@@ -32,7 +32,6 @@ import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
@@ -41,21 +40,38 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
 
     private static WorkbenchKieServerScenario deploymentScenario;
 
+    private static FireRulesTestProvider fireRulesTestProvider;
+    private static ProcessTestProvider processTestProvider;
+    private static OptaplannerTestProvider optaplannerTestProvider;
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
+    private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
+    private static PersistenceTestProvider persistenceTestProvider;
+    private static ProjectBuilderTestProvider projectBuilderTestProvider;
+
     @BeforeClass
     public static void initializeDeployment() {
         if (deploymentScenarioFactory.getCloudAPIImplementationName().equals("openshift-operator")) {
             deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                     .deploySso()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .withInternalMavenRepo()
                     .build();
         } else {
             deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                     .deploySso()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                    .withInternalMavenRepo()
                     .build();
         }
         deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
+        persistenceTestProvider = PersistenceTestProvider.create();
+        projectBuilderTestProvider = ProjectBuilderTestProvider.create();
     }
 
     @AfterClass
@@ -66,50 +82,49 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
     @Test
     @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
-        PersistenceTestProvider.testControllerPersistence(deploymentScenario);
+        persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
 
     @Test
     @Category(JBPMOnly.class)
-    public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
+    public void testProcessFromMavenRepo() {
+        processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
-        ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
-                deploymentScenario.getKieServerDeployment());
+        projectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
+                                                              deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
+    public void testRulesFromMavenRepo() {
+        fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
+    public void testSolverFromMavenRepo() {
+        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testKieServerHttps() {
         for (KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
-            HttpsKieServerTestProvider.testKieServerInfo(kieServerDeployment, true);
-            HttpsKieServerTestProvider.testDeployContainer(kieServerDeployment, true);
+            httpsKieServerTestProvider.testKieServerInfo(kieServerDeployment, true);
+            httpsKieServerTestProvider.testDeployContainer(kieServerDeployment, true);
         }
     }
 
     @Test
     public void testWorkbenchHttps() {
         for (WorkbenchDeployment workbenchDeployment : deploymentScenario.getWorkbenchDeployments()) {
-            HttpsWorkbenchTestProvider.testLoginScreen(workbenchDeployment, true);
-            HttpsWorkbenchTestProvider.testControllerOperations(workbenchDeployment, true);
+            httpsWorkbenchTestProvider.testLoginScreen(workbenchDeployment, true);
+            httpsWorkbenchTestProvider.testControllerOperations(workbenchDeployment, true);
         }
     }
 }

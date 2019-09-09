@@ -19,12 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.KieServerWithDatabaseScenarioBuilder;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.KieServerWithMySqlScenarioImpl;
 
 public class KieServerWithMySqlScenarioBuilderImpl extends KieScenarioBuilderImpl<KieServerWithDatabaseScenarioBuilder, KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenarioBuilder {
@@ -44,15 +44,13 @@ public class KieServerWithMySqlScenarioBuilderImpl extends KieScenarioBuilderImp
     }
 
     @Override
-    protected DeploymentScenario<KieServerWithDatabaseScenario> getDeploymentScenarioInstance() {
+    protected KieServerWithDatabaseScenario getDeploymentScenarioInstance() {
         return new KieServerWithMySqlScenarioImpl(envVariables, deploySso);
     }
 
     @Override
-    public KieServerWithDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+    public KieServerWithDatabaseScenarioBuilder withInternalMavenRepo(boolean waitForRunning) {
+        setExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY, waitForRunning);
         return this;
     }
 
@@ -74,7 +72,7 @@ public class KieServerWithMySqlScenarioBuilderImpl extends KieScenarioBuilderImp
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
         return this;
-	}
+    }
 
     @Override
     public KieServerWithDatabaseScenarioBuilder withHttpKieServerHostname(String hostname) {

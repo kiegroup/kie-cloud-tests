@@ -35,10 +35,9 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.time.TimeUtils;
-import org.kie.cloud.integrationtests.category.Baseline;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +58,8 @@ public class LivenessProbeIntegrationTest extends AbstractMethodIsolatedCloudInt
 
         try {
             WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
+                    .withInternalMavenRepo()
+                    .build();
             scenarios.add(new Object[]{"Workbench + KIE Server", workbenchKieServerScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Workbench + KIE Server is skipped.", ex);
@@ -68,9 +67,9 @@ public class LivenessProbeIntegrationTest extends AbstractMethodIsolatedCloudInt
 
         try {
             WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-            scenarios.add(new Object[] { "Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario });
+                    .withInternalMavenRepo()
+                    .build();
+            scenarios.add(new Object[]{"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Workbench + KIE Server - Persistent is skipped.", ex);
         }

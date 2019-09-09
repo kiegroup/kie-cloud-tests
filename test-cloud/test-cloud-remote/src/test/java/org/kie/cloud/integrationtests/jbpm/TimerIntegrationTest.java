@@ -15,32 +15,28 @@
 
 package org.kie.cloud.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.integrationtests.category.ApbNotSupported;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.cloud.tests.common.time.Constants;
 import org.kie.cloud.tests.common.time.TimeUtils;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
-import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -48,6 +44,8 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Category({ApbNotSupported.class, OperatorNotSupported.class, JBPMOnly.class}) // Because TimerServiceDataStoreRefreshInterval is not supported yet, Operator is skipped as scenario use different startup strategy than template.
 public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
@@ -61,18 +59,15 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
     @Override
     protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withInternalMavenRepo()
                 .withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(1))
                 .build();
     }
 
-    @BeforeClass
-    public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(TimerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEPLOYED_KJAR.getName()).getFile());
-    }
-
     @Before
     public void setUp() {
+        KjarDeployer.create(DEPLOYED_KJAR).deploy(deploymentScenario.getScenarioEnvironment());
+
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
     }
 
@@ -93,9 +88,9 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
         KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, pid);
 
         List<NodeInstance> nodeInstances = queryClient.findCompletedNodeInstances(pid, 0, 100).stream()
-                                                                                              .filter(n -> n.getName().equals(NODE_INSTANCE_NAME))
-                                                                                              .sorted((n1,n2) -> n1.getDate().compareTo(n2.getDate()))
-                                                                                              .collect(Collectors.toList());
+                .filter(n -> n.getName().equals(NODE_INSTANCE_NAME))
+                .sorted((n1, n2) -> n1.getDate().compareTo(n2.getDate()))
+                .collect(Collectors.toList());
         assertThat(nodeInstances).hasSize(3);
 
         long firstInstance = nodeInstances.get(0).getDate().getTime();
@@ -106,8 +101,8 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
         long distance2 = secondInstance - firstInstance;
 
         // TODO: Skip time distance checks as they are unstable, needs to be investigated and properly addressed.
-//        assertThat(distance1).isBetween(3000L, 7000L);
-//        assertThat(distance2).isBetween(3000L, 7000L);
+        //        assertThat(distance1).isBetween(3000L, 7000L);
+        //        assertThat(distance2).isBetween(3000L, 7000L);
     }
 
     private void waitUntilKieServerLogsContain(KieServerDeployment kieServerDeployment, String logMessage) {

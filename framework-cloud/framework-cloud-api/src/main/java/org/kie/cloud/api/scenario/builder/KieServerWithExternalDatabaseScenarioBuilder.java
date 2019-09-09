@@ -19,7 +19,16 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 
 public interface KieServerWithExternalDatabaseScenarioBuilder extends DeploymentScenarioBuilder<KieServerWithExternalDatabaseScenario> {
 
-    KieServerWithExternalDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+    /**
+     * Return setup builder with additional configuration of internal maven repo.
+     * 
+     * Parameters will be used automatically
+     * 
+     * @param waitForRunning By default, the deployment will not wait for Maven Repository to be running. Set to true if you want to wait for the Maven Repository to be fully running
+     * 
+     * @return Builder with configured internal maven repo.
+     */
+    KieServerWithExternalDatabaseScenarioBuilder withInternalMavenRepo(boolean waitForRunning);
 
     KieServerWithExternalDatabaseScenarioBuilder withKieServerId(String kieServerId);
 }
