@@ -78,4 +78,12 @@ public class MavenNexusRepositoryDeploymentImpl extends OpenShiftDeployment impl
     public String getPassword() {
         return "admin123";
     }
+
+    @Override
+    public void waitForScale() {
+        super.waitForScale();
+        if (getInstances().size() > 0) {
+            RouterUtil.waitForRouter(getUrl());
+        }
+    }
 }

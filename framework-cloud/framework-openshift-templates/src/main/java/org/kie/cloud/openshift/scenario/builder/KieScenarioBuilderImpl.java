@@ -23,7 +23,8 @@ import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.api.scenario.builder.DeploymentScenarioBuilder;
 import org.kie.cloud.api.scenario.builder.KieDeploymentScenarioBuilder;
 
-public abstract class KieScenarioBuilderImpl<T extends DeploymentScenarioBuilder<U>, U extends DeploymentScenario<U>> implements KieDeploymentScenarioBuilder<T, U> {
+public abstract class KieScenarioBuilderImpl<T extends DeploymentScenarioBuilder<U>, U extends DeploymentScenario<U>> extends AbstractOpenshiftScenarioBuilderTemplates<U>
+                                            implements KieDeploymentScenarioBuilder<T, U> {
 
     protected List<DeploymentScenarioListener<U>> deploymentScenarioListeners = new ArrayList<>();
 
@@ -37,7 +38,7 @@ public abstract class KieScenarioBuilderImpl<T extends DeploymentScenarioBuilder
     @Override
     @SuppressWarnings("unchecked")
     public U build() {
-        DeploymentScenario<U> deploymentScenarioInstance = getDeploymentScenarioInstance();
+        DeploymentScenario<U> deploymentScenarioInstance = super.build();
 
         for (DeploymentScenarioListener<U> deploymentScenarioListener : deploymentScenarioListeners) {
             deploymentScenarioInstance.addDeploymentScenarioListener(deploymentScenarioListener);
@@ -45,6 +46,4 @@ public abstract class KieScenarioBuilderImpl<T extends DeploymentScenarioBuilder
 
         return (U) deploymentScenarioInstance;
     }
-
-    protected abstract DeploymentScenario<U> getDeploymentScenarioInstance();
 }

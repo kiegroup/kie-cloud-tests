@@ -25,6 +25,7 @@ import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.model.KieApp;
@@ -41,7 +42,7 @@ import org.kie.cloud.openshift.operator.scenario.ImmutableKieServerScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
 import org.kie.cloud.openshift.template.ProjectProfile;
 
-public class ImmutableKieServerScenarioBuilderImpl implements ImmutableKieServerScenarioBuilder {
+public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ImmutableKieServerScenario> implements ImmutableKieServerScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
     private boolean deploySSO = false;
@@ -78,17 +79,13 @@ public class ImmutableKieServerScenarioBuilderImpl implements ImmutableKieServer
     }
 
     @Override
-    public ImmutableKieServerScenario build() {
+    public ImmutableKieServerScenario getDeploymentScenarioInstance() {
         return new ImmutableKieServerScenarioImpl(kieApp, deploySSO);
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_URL, repoUrl));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_USERNAME, repoUserName));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_PASSWORD, repoPassword));
-        }
+    public ImmutableKieServerScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 
@@ -96,7 +93,7 @@ public class ImmutableKieServerScenarioBuilderImpl implements ImmutableKieServer
     public ImmutableKieServerScenarioBuilder deploySso() {
         deploySSO = true;
         Server[] servers = kieApp.getSpec().getObjects().getServers();
-        for (int i=0; i<servers.length; i++) {
+        for (int i = 0; i < servers.length; i++) {
             SsoClient ssoClient = new SsoClient();
             ssoClient.setName("kie-server-" + i + "-client");
             ssoClient.setSecret("kie-server-" + i + "-secret");

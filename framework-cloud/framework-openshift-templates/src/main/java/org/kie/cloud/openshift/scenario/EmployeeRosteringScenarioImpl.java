@@ -76,4 +76,8 @@ public class EmployeeRosteringScenarioImpl extends OpenShiftScenario<EmployeeRos
     public EmployeeRosteringDeployment getEmployeeRosteringDeployment() {
         return this.employeeRosteringDeployment;
     }
+
+    public Map<String, String> getScenarioEnvironment() {
+        return new HashMap<>(env);
+    }
 }

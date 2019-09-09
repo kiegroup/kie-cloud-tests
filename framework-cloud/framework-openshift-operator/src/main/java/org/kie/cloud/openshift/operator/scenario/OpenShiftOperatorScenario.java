@@ -17,6 +17,10 @@ package org.kie.cloud.openshift.operator.scenario;
 
 import java.util.Objects;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.Secret;
@@ -177,4 +181,11 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         ((ExternalDeploymentOperator) externalDeployment).removeConfiguration(kieApp);
     }
 
+    public Map<String, String> getScenarioEnvironment() {
+        Map<String, String> map = new HashMap<>();
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            Stream.of(server.getEnv()).forEach(e -> map.put(e.getName(), e.getValue()));
+        }
+        return map;
+    }
 }

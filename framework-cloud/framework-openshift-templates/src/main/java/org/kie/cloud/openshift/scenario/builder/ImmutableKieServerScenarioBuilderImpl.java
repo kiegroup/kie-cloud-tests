@@ -19,12 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.ImmutableKieServerScenarioImpl;
 
 public class ImmutableKieServerScenarioBuilderImpl extends KieScenarioBuilderImpl<ImmutableKieServerScenarioBuilder, ImmutableKieServerScenario> implements ImmutableKieServerScenarioBuilder {
@@ -44,15 +44,13 @@ public class ImmutableKieServerScenarioBuilderImpl extends KieScenarioBuilderImp
     }
 
     @Override
-    protected DeploymentScenario<ImmutableKieServerScenario> getDeploymentScenarioInstance() {
+    protected ImmutableKieServerScenario getDeploymentScenarioInstance() {
         return new ImmutableKieServerScenarioImpl(envVariables, deploySso);
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+    public ImmutableKieServerScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 

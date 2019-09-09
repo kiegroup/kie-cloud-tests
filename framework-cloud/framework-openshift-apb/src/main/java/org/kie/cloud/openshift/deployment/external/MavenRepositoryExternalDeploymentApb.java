@@ -32,9 +32,14 @@ public class MavenRepositoryExternalDeploymentApb extends AbstractMavenRepositor
         super.configure(extraVars);
 
         MavenRepositoryDeployment deployment = getDeploymentInformation();
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_USER, deployment.getUsername());
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_PWD, deployment.getPassword());
+        addEnvVar(extraVars, OpenShiftApbConstants.MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
+        addEnvVar(extraVars, OpenShiftApbConstants.MAVEN_REPO_USER, deployment.getUsername());
+        addEnvVar(extraVars, OpenShiftApbConstants.MAVEN_REPO_PWD, deployment.getPassword());
+    }
+
+    @Override
+    protected void addEnvVar(Map<String, String> extraVars, String key, String value) {
+        extraVars.put(key, value);
     }
 
 }

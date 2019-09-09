@@ -21,12 +21,12 @@ import java.util.Collection;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.api.scenario.MissingResourceException;
 import org.kie.cloud.common.provider.KieServerClientProvider;
@@ -34,8 +34,6 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -68,11 +66,6 @@ public class KieServerWebSocketScalingIntegrationTest {
     private static final String WEBSOCKET_CONNECTION = "Connection to Kie Controller over Web Socket is now open";
     private static final String STARTED_CONTAINER = "Container cont-id (for release id org.kie.server.testing:definition-project-snapshot:1.0.0-SNAPSHOT) successfully started";
 
-    @BeforeClass
-    public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(KieServerWebSocketScalingIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-    }
-
     @Before
     public void setUp() {
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
@@ -80,8 +73,8 @@ public class KieServerWebSocketScalingIntegrationTest {
         try {
             // Only RHPAM prod template is using WebSockets now.
             deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
-                                                          .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                                                          .build();
+                    .withInternalMavenRepo()
+                    .build();
             deploymentScenario.setLogFolderName(KieServerWebSocketScalingIntegrationTest.class.getSimpleName());
             ScenarioDeployer.deployScenario(deploymentScenario);
         } catch (MissingResourceException e) {
@@ -91,6 +84,8 @@ public class KieServerWebSocketScalingIntegrationTest {
             logger.warn("Skipping test", e);
             Assume.assumeNoException(e);
         }
+
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getScenarioEnvironment());
 
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());

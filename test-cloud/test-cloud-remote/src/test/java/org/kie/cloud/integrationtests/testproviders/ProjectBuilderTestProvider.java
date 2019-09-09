@@ -14,6 +14,9 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
+import java.util.Map;
+import java.util.Objects;
+
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.KieServerClientProvider;
@@ -27,8 +30,36 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class ProjectBuilderTestProvider {
 
-    public static void testCreateAndDeployProject(WorkbenchDeployment workbenchDeployment,
-            KieServerDeployment kieServerDeployment) {
+    private ProjectBuilderTestProvider() {}
+
+    /**
+     * Create provider instance
+     * 
+     * @return provider instance
+     */
+    public static ProjectBuilderTestProvider create() {
+        return create(null);
+    }
+
+    /**
+     * Create provider instance and init it with given environment
+     * 
+     * @param environment if not null, initialize this provider with the environment
+     * 
+     * @return provider instance
+     */
+    public static ProjectBuilderTestProvider create(Map<String, String> environment) {
+        ProjectBuilderTestProvider provider = new ProjectBuilderTestProvider();
+        if (Objects.nonNull(environment)) {
+            provider.init(environment);
+        }
+        return provider;
+    }
+
+    private void init(Map<String, String> environment) {}
+
+    public void testCreateAndDeployProject(WorkbenchDeployment workbenchDeployment,
+                                           KieServerDeployment kieServerDeployment) {
 
         final String spaceName = "testBuildProject-space";
         WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
@@ -36,7 +67,7 @@ public class ProjectBuilderTestProvider {
         final String projectName = "testBuildProject-project";
         final String projectVersion = "1.0";
         workbenchClient.createProject(spaceName, projectName, workbenchClient.getSpace(spaceName).getDefaultGroupId(),
-                projectVersion);
+                                      projectVersion);
 
         workbenchClient.deployProject(spaceName, projectName);
 
@@ -44,8 +75,9 @@ public class ProjectBuilderTestProvider {
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
         ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId,
-                new KieContainerResource(containerId, new ReleaseId(
-                        workbenchClient.getSpace(spaceName).getDefaultGroupId(), projectName, projectVersion)));
+                                                                                                new KieContainerResource(containerId, new ReleaseId(
+                                                                                                                                                    workbenchClient.getSpace(spaceName).getDefaultGroupId(), projectName,
+                                                                                                                                                    projectVersion)));
         KieServerAssert.assertSuccess(createContainer);
         kieServerDeployment.waitForContainerRespin();
     }

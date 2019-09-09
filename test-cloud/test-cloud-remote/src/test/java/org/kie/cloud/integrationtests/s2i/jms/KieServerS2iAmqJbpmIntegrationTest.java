@@ -51,6 +51,9 @@ public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegration
     private static WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario deploymentScenario;
     private static String repositoryName;
 
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
+    private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
+
     private KieServicesClient kieServicesClient;
     private ProcessServicesClient processServicesClient;
     private UserTaskServicesClient taskServicesClient;
@@ -66,15 +69,19 @@ public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegration
 
         try {
             deploymentScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilder()
-                                                          .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                          .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
-                                                          .build();
+                    .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                    .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                    .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
 
         deploymentScenario.setLogFolderName(KieServerS2iJbpmIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create();
+        httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
     }
 
     @AfterClass
@@ -120,12 +127,12 @@ public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegration
 
     @Test
     public void testKieServerHttps() {
-        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
+        httpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
     }
 
     @Test
     @Category({ApbNotSupported.class})
     public void testWorkbenchHttps() {
-        HttpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
+        httpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
     }
 }

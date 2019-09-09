@@ -18,16 +18,15 @@ package org.kie.cloud.api.scenario.builder;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 
 public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerPersistentScenario> {
+
     /**
-     * Return setup builder with additional configuration of external maven
-     * repo.
-     *
-     * @param repoUrl Maven repo URL.
-     * @param repoUserName Maven repo username.
-     * @param repoPassword Maven repo password.
-     * @return Builder with configured external maven repo.
+     * Return setup builder with additional configuration of internal maven repo.
+     * 
+     * Parameters will be used automatically
+     * 
+     * @return Builder with configured internal maven repo.
      */
-    ClusteredWorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+    ClusteredWorkbenchKieServerPersistentScenarioBuilder withInternalMavenRepo();
 
     /**
      * Return setup builder with configured Git hooks dir.
