@@ -15,9 +15,6 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -34,11 +30,11 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.Constants;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
@@ -48,6 +44,9 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @RunWith(Parameterized.class)
 public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerWithDatabaseScenario> {
@@ -65,8 +64,8 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
 
         try {
             KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
+                    .withInternalMavenRepo(false)
+                    .build();
             scenarios.add(new Object[]{"KIE Server + MySQL", kieServerMySqlScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("KIE Server + MySQL is skipped.", ex);
@@ -74,12 +73,12 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
 
         try {
             KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
+                    .withInternalMavenRepo(false)
+                    .build();
             scenarios.add(new Object[]{"KIE Server + PostgreSQL", kieServerPostgreSqlScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("KIE Server + PostgreSQL is skipped.", ex);
-        } 
+        }
 
         return scenarios;
     }
@@ -95,13 +94,10 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         return kieServerScenario;
     }
 
-    @BeforeClass
-    public static void deployMavenProject() {
-        MavenDeployer.buildAndDeployMavenProject(DbSurvivalIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-    }
-
     @Before
     public void setUp() {
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getScenarioEnvironment());
+
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());

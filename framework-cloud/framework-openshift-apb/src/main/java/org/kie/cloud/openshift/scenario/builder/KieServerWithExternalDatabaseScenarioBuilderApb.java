@@ -24,9 +24,10 @@ import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioB
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.KieServerWithExternalDatabaseScenarioApb;
 
-public class KieServerWithExternalDatabaseScenarioBuilderApb implements KieServerWithExternalDatabaseScenarioBuilder {
+public class KieServerWithExternalDatabaseScenarioBuilderApb extends AbstractOpenshiftScenarioBuilderApb<KieServerWithExternalDatabaseScenario> implements KieServerWithExternalDatabaseScenarioBuilder {
 
     private final Map<String, String> extraVars = new HashMap<>();
 
@@ -48,20 +49,18 @@ public class KieServerWithExternalDatabaseScenarioBuilderApb implements KieServe
         extraVars.put(OpenShiftApbConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
         extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_USER, DeploymentConstants.getControllerUser());
         extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
-        
+
         //extraVars.put(OpenShiftApbConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
     }
 
     @Override
-    public KieServerWithExternalDatabaseScenario build() {
+    public KieServerWithExternalDatabaseScenario getDeploymentScenarioInstance() {
         return new KieServerWithExternalDatabaseScenarioApb(extraVars);
     }
 
     @Override
-    public KieServerWithExternalDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_URL, repoUrl);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_USER, repoUserName);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_PWD, repoPassword);
+    public KieServerWithExternalDatabaseScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 

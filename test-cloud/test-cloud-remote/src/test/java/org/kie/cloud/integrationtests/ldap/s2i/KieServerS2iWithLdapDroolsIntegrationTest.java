@@ -18,6 +18,7 @@ package org.kie.cloud.integrationtests.ldap.s2i;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -144,7 +145,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndInstallMavenProject(
-                KieServerS2iWithLdapDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile());
+                KieServerS2iWithLdapDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile(), new HashMap<>());
     }
 
     @Before

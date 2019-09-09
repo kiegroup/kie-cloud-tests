@@ -25,9 +25,10 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerScenarioImpl;
 
-public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServerScenarioBuilder {
+public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<WorkbenchKieServerScenario> implements WorkbenchKieServerScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
     private boolean deployPrometheus = false;
@@ -40,15 +41,13 @@ public class WorkbenchKieServerScenarioBuilderImpl implements WorkbenchKieServer
     }
 
     @Override
-    public WorkbenchKieServerScenario build() {
+    public WorkbenchKieServerScenario getDeploymentScenarioInstance() {
         return new WorkbenchKieServerScenarioImpl(envVariables, deployPrometheus);
     }
 
     @Override
-    public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+    public WorkbenchKieServerScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 

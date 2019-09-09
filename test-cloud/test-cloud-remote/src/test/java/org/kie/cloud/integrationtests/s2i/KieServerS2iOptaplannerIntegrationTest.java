@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -121,7 +122,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndInstallMavenProject(
-                KieServerS2iOptaplannerIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
+                KieServerS2iOptaplannerIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile(), new HashMap<>());
     }
 
     @Before

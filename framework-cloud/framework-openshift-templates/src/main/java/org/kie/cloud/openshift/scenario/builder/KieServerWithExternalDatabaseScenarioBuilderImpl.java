@@ -23,9 +23,10 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.KieServerWithExternalDatabaseScenarioBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.KieServerWithExternalDatabaseScenarioImpl;
 
-public class KieServerWithExternalDatabaseScenarioBuilderImpl implements KieServerWithExternalDatabaseScenarioBuilder {
+public class KieServerWithExternalDatabaseScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<KieServerWithExternalDatabaseScenario> implements KieServerWithExternalDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
 
@@ -39,15 +40,13 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl implements KieServ
     }
 
     @Override
-    public KieServerWithExternalDatabaseScenario build() {
+    public KieServerWithExternalDatabaseScenario getDeploymentScenarioInstance() {
         return new KieServerWithExternalDatabaseScenarioImpl(envVariables);
     }
 
     @Override
-    public KieServerWithExternalDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, repoUrl);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, repoUserName);
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, repoPassword);
+    public KieServerWithExternalDatabaseScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 

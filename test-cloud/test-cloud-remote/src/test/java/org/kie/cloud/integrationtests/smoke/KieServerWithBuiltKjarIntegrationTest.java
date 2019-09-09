@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -36,10 +35,9 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
+import org.kie.cloud.api.scenario.KjarDeploymentScenarioListener;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.Smoke;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.server.api.model.KieContainerResource;
@@ -87,30 +85,33 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
 
         try {
             KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .build();
-            scenarios.add(new Object[] { "KIE Server + MySQL", kieServerMySqlScenario });
+                    .withInternalMavenRepo(true)
+                    .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                    .build();
+            KjarDeploymentScenarioListener.addKjarDeployment(kieServerMySqlScenario, DEPLOYED_KJAR);
+            scenarios.add(new Object[]{"KIE Server + MySQL", kieServerMySqlScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("KIE Server + MySQL is skipped.", ex);
         }
 
         try {
             KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .build();
-            scenarios.add(new Object[] { "KIE Server + PostgreSQL", kieServerPostgreSqlScenario });
+                    .withInternalMavenRepo(true)
+                    .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                    .build();
+            KjarDeploymentScenarioListener.addKjarDeployment(kieServerPostgreSqlScenario, DEPLOYED_KJAR);
+            scenarios.add(new Object[]{"KIE Server + PostgreSQL", kieServerPostgreSqlScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("KIE Server + PostgreSQL is skipped.", ex);
         }
 
         try {
             KieServerScenario kieServerScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                .build();
-            scenarios.add(new Object[] { "KIE Server", kieServerScenario });
+                    .withInternalMavenRepo(true)
+                    .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
+                    .build();
+            KjarDeploymentScenarioListener.addKjarDeployment(kieServerScenario, DEPLOYED_KJAR);
+            scenarios.add(new Object[]{"KIE Server", kieServerScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("KIE Server is skipped.", ex);
         }
@@ -123,11 +124,6 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
         return kieServerScenario;
     }
 
-    @BeforeClass
-    public static void deployMavenProject() {
-        MavenDeployer.buildAndDeployMavenProject(KieServerWithBuiltKjarIntegrationTest.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
-    }
-
     @Before
     public void initializeClients() {
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
@@ -135,7 +131,7 @@ public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolate
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
+    public void testRulesFromInternalMavenRepo() {
         ServiceResponse<KieContainerResource> containerInfo = kieServerClient.getContainerInfo(CONTAINER_ID);
         KieServerAssert.assertSuccess(containerInfo);
         assertThat(containerInfo.getResult().getReleaseId()).isEqualTo(RELEASE_ID);

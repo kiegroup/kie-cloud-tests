@@ -18,6 +18,7 @@ package org.kie.cloud.integrationtests.s2i.jms;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -128,7 +129,7 @@ public class KieServerS2iAmqDroolsIntegrationTest extends AbstractMethodIsolated
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndInstallMavenProject(KieServerS2iAmqDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile());
+        MavenDeployer.buildAndInstallMavenProject(KieServerS2iAmqDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile(), new HashMap<>());
     }
 
     @Before

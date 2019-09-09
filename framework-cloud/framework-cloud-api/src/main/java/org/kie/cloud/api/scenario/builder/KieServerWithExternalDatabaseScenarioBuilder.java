@@ -19,7 +19,14 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 
 public interface KieServerWithExternalDatabaseScenarioBuilder extends DeploymentScenarioBuilder<KieServerWithExternalDatabaseScenario> {
 
-    KieServerWithExternalDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+    /**
+     * Return setup builder with additional configuration of internal maven repo.
+     * 
+     * Parameters will be used automatically
+     * 
+     * @return Builder with configured internal maven repo.
+     */
+    KieServerWithExternalDatabaseScenarioBuilder withInternalMavenRepo();
 
     KieServerWithExternalDatabaseScenarioBuilder withKieServerId(String kieServerId);
 }

@@ -25,7 +25,6 @@ import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
@@ -34,17 +33,26 @@ public class KieServerScenarioIntegrationTest extends AbstractCloudIntegrationTe
 
     private static KieServerScenario deploymentScenario;
 
+    private static FireRulesTestProvider fireRulesTestProvider;
+    private static OptaplannerTestProvider optaplannerTestProvider;
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
+
     @BeforeClass
     public static void initializeDeployment() {
         try {
             deploymentScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
-                                                      .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                                                      .withInternalMavenRepo(false)
                                                       .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
         deploymentScenario.setLogFolderName(KieServerScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
     }
 
     @AfterClass
@@ -53,18 +61,18 @@ public class KieServerScenarioIntegrationTest extends AbstractCloudIntegrationTe
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
+    public void testRulesFromInternalMavenRepo() {
+        fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
+    public void testSolverFromInternalMavenRepo() {
+        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testKieServerHttps() {
-        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
-        HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
+        httpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
+        httpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
     }
 }

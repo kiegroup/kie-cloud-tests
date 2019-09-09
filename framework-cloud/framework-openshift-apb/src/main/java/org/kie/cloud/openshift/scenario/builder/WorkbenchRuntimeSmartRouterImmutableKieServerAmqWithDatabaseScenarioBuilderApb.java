@@ -26,11 +26,13 @@ import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderApb implements WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder {
+public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderApb extends AbstractOpenshiftScenarioBuilderApb<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> implements
+                                                                                            WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderApb.class);
     private final Map<String, String> extraVars = new HashMap<>();
@@ -69,7 +71,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario build() {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario getDeploymentScenarioInstance() {
         return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb(extraVars, deploySSO);
     }
 
@@ -82,10 +84,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_URL, repoUrl);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_USER, repoUserName);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_PWD, repoPassword);
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 
@@ -125,7 +125,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withDeploymentScenarioListener(DeploymentScenarioListener<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> deploymentScenarioListener) {
-                throw new UnsupportedOperationException("Not supported for APB.");
+        throw new UnsupportedOperationException("Not supported for APB.");
     }
 
     @Override

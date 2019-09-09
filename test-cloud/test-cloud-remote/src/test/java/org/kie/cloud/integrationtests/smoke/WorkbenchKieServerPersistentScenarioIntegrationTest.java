@@ -31,7 +31,6 @@ import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -46,6 +45,12 @@ public class WorkbenchKieServerPersistentScenarioIntegrationTest extends Abstrac
 
     private static WorkbenchKieServerScenario deploymentScenario;
 
+    private static FireRulesTestProvider fireRulesTestProvider;
+    private static ProcessTestProvider processTestProvider;
+    private static OptaplannerTestProvider optaplannerTestProvider;
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
+    private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
+
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
     private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
@@ -53,10 +58,17 @@ public class WorkbenchKieServerPersistentScenarioIntegrationTest extends Abstrac
     @BeforeClass
     public static void initializeDeployment() {
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                                                      .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                                                      .build();
+                .withInternalMavenRepo()
+                .build();
         deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
 
         // Workaround to speed test execution.
         // Create all containers while Kie servers are turned off to avoid expensive respins.
@@ -82,36 +94,36 @@ public class WorkbenchKieServerPersistentScenarioIntegrationTest extends Abstrac
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
+    public void testRulesFromInternalMavenRepo() {
+        fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
     }
 
     @Test
     @Category(JBPMOnly.class)
-    public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
+    public void testProcessFromInternalMavenRepo() {
+        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() throws Exception {
-        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
+    public void testSolverFromInternalMavenRepo() throws Exception {
+        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testKieServerHttps() {
-        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
+        httpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
         // Skipped as the check is too time consuming, the HTTPS functionality is verified by testKieServerInfo()
-        // HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
+        // httpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
     }
 
     @Test
     public void testWorkbenchHttps() {
-        HttpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchDeployment(), false);
-        HttpsWorkbenchTestProvider.testControllerOperations(deploymentScenario.getWorkbenchDeployment(), false);
+        httpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchDeployment(), false);
+        httpsWorkbenchTestProvider.testControllerOperations(deploymentScenario.getWorkbenchDeployment(), false);
     }
 }

@@ -21,13 +21,15 @@ import org.kie.cloud.api.settings.LdapSettings;
 public interface KieServerScenarioBuilder extends KieDeploymentScenarioBuilder<KieServerScenarioBuilder, KieServerScenario> {
 
     /**
-     * Return setup builder with additional configuration of external maven repo.
-     * @param repoUrl Maven repo URL.
-     * @param repoUserName Maven repo user name.
-     * @param repoPassword Maven repo user password.
-     * @return Builder with configured external maven repo.
+     * Return setup builder with additional configuration of internal maven repo.
+     * 
+     * Parameters will be used automatically
+     * 
+     * @param waitForRunning If true, wait for maven repository to be fully running
+     * 
+     * @return Builder with configured internal maven repo.
      */
-    KieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword);
+    KieServerScenarioBuilder withInternalMavenRepo(boolean waitForRunning);
 
     /**
      * @param kieServerId kie-server id

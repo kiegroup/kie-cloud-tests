@@ -16,10 +16,10 @@
 
 package org.kie.cloud.integrationtests.testproviders;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
@@ -27,12 +27,12 @@ import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.git.GitProvider;
 import org.kie.cloud.git.GitProviderService;
-import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResource;
@@ -45,6 +45,8 @@ import org.kie.server.client.RuleServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class FireRulesTestProvider {
 
     private static final String LIST_NAME = "list";
@@ -55,15 +57,43 @@ public class FireRulesTestProvider {
 
     private static KieCommands commandsFactory = KieServices.Factory.get().getCommands();
 
-    static {
-        MavenDeployer.buildAndDeployMavenProject(FireRulesTestProvider.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
+    private FireRulesTestProvider() {}
+
+    /**
+     * Create provider instance
+     * 
+     * @return provider instance
+     */
+    public static FireRulesTestProvider create() {
+        return create(null);
     }
 
-    public static void testDeployFromKieServerAndFireRules(KieServerDeployment kieServerDeployment) {
+    /**
+     * Create provider instance and init it with given environment
+     * 
+     * @param environment if not null, initialize this provider with the environment
+     * 
+     * @return provider instance
+     */
+    public static FireRulesTestProvider create(Map<String, String> environment) {
+        FireRulesTestProvider provider = new FireRulesTestProvider();
+        if (Objects.nonNull(environment)) {
+            provider.init(environment);
+        }
+        return provider;
+    }
+
+    private void init(Map<String, String> environment) {
+        KjarDeployer.create(Kjar.HELLO_RULES_SNAPSHOT).deploy(environment);
+    }
+
+    public void testDeployFromKieServerAndFireRules(KieServerDeployment kieServerDeployment) {
         String containerId = "testFireRules";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
 
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.HELLO_RULES_SNAPSHOT.getGroupId(), Kjar.HELLO_RULES_SNAPSHOT.getName(), Kjar.HELLO_RULES_SNAPSHOT.getVersion())));
+        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.HELLO_RULES_SNAPSHOT.getGroupId(),
+                                                                                                                                                                 Kjar.HELLO_RULES_SNAPSHOT.getName(),
+                                                                                                                                                                 Kjar.HELLO_RULES_SNAPSHOT.getVersion())));
         KieServerAssert.assertSuccess(createContainer);
         kieServerDeployment.waitForContainerRespin();
 
@@ -75,7 +105,7 @@ public class FireRulesTestProvider {
         }
     }
 
-    public static void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment) {
+    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment) {
         String containerId = "testDeployFromWorkbenchAndFireRules";
         String containerAlias = "alias-testDeployFromWorkbenchAndFireRules";
         GitProvider gitProvider = new GitProviderService().createGitProvider();
@@ -100,7 +130,7 @@ public class FireRulesTestProvider {
         }
     }
 
-    public static void testFireRules(KieServerDeployment kieServerDeployment, String containerId) {
+    public void testFireRules(KieServerDeployment kieServerDeployment, String containerId) {
         RuleServicesClient ruleClient = KieServerClientProvider.getRuleClient(kieServerDeployment);
 
         List<Command<?>> commands = new ArrayList<>();

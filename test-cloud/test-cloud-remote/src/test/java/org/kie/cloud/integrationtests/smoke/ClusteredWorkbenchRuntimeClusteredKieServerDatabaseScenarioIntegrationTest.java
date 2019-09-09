@@ -32,8 +32,6 @@ import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -48,6 +46,12 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
 
     private static ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenario deploymentScenario;
 
+    private static FireRulesTestProvider fireRulesTestProvider;
+    private static ProcessTestProvider processTestProvider;
+    private static OptaplannerTestProvider optaplannerTestProvider;
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
+    private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
+
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
     private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
@@ -56,13 +60,20 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
     public static void initializeDeployment() {
         try {
             deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioBuilder()
-                                                      .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                                                      .build();
+                    .withInternalMavenRepo()
+                    .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
         deploymentScenario.setLogFolderName(ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
 
         // Workaround to speed test execution.
         // Create all containers while Kie servers are turned off to avoid expensive respins.
@@ -82,41 +93,35 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
         deploymentScenario.getKieServerDeployment().waitForScale();
     }
 
-    static {
-        MavenDeployer.buildAndDeployMavenProject(ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrationTest.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
-        MavenDeployer.buildAndDeployMavenProject(ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-        MavenDeployer.buildAndDeployMavenProject(ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
-    }
-
     @AfterClass
     public static void cleanEnvironment() {
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
+    public void testRulesFromInternalMavenRepo() {
+        fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
     }
 
     @Test
     @Category(JBPMOnly.class)
-    public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
+    public void testProcessFromInternalMavenRepo() {
+        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() throws Exception {
-        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
+    public void testSolverFromInternalMavenRepo() throws Exception {
+        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
 
     @Test
     public void testKieServerHttps() {
-        HttpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
+        httpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
     }
 
     @Test
     public void testWorkbenchHttps() {
-        HttpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
-        HttpsWorkbenchTestProvider.testControllerOperations(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
+        httpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
+        httpsWorkbenchTestProvider.testControllerOperations(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
     }
 }

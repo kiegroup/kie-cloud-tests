@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.scenario;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,8 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb extends OpenShiftScenario<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> implements WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario {
+public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb extends OpenShiftScenario<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> implements
+                                                                                       WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario {
 
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
@@ -164,7 +166,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
         return databaseDeployment;
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<>(Arrays.asList(kieServerDeployment, databaseDeployment, ssoDeployment, amqDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
@@ -214,5 +217,10 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
         deployment.setPassword(DeploymentConstants.getAmqPassword());
 
         return deployment;
+    }
+
+    @Override
+    public Map<String, String> getScenarioEnvironment() {
+        return new HashMap<>(extraVars);
     }
 }

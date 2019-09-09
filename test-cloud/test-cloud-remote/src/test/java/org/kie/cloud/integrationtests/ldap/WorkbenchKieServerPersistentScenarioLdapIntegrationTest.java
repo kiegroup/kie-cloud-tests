@@ -37,7 +37,6 @@ import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -52,6 +51,14 @@ import org.kie.server.controller.client.KieServerControllerClient;
 public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static WorkbenchKieServerScenario deploymentScenario;
+
+    private static FireRulesTestProvider fireRulesTestProvider;
+    private static ProcessTestProvider processTestProvider;
+    private static OptaplannerTestProvider optaplannerTestProvider;
+    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
+    private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
+    private static PersistenceTestProvider persistenceTestProvider;
+    private static ProjectBuilderTestProvider projectBuilderTestProvider;
 
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
@@ -74,12 +81,21 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
 
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                .withLdapSettings(ldapSettings).withExternalMavenRepo(MavenConstants.getMavenRepoUrl(),
-                        MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
+                  .withLdapSettings(ldapSettings)
+                  .withInternalMavenRepo()
+                  .build();
         deploymentScenario
-                .setLogFolderName(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
+                  .setLogFolderName(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
+        persistenceTestProvider = PersistenceTestProvider.create();
+        projectBuilderTestProvider = ProjectBuilderTestProvider.create();
 
         // Workaround to speed test execution.
         // Create all containers while Kie servers are turned off to avoid expensive respins.
@@ -107,52 +123,51 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     @Test
     @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
-        PersistenceTestProvider.testControllerPersistence(deploymentScenario);
+        persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
 
     @Test
     @Category(JBPMOnly.class)
-    public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
+    public void testProcessFromInternalMavenRepo() {
+        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
-        ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
-                deploymentScenario.getKieServerDeployment());
+        projectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
+                                                              deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
+    public void testRulesFromInternalMavenRepo() {
+        fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() throws Exception {
-        OptaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
+    public void testSolverFromInternalMavenRepo() throws Exception {
+        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
-                deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
+                                                                  deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testKieServerHttps() {
         for (KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
-            HttpsKieServerTestProvider.testKieServerInfo(kieServerDeployment, false);
+            httpsKieServerTestProvider.testKieServerInfo(kieServerDeployment, false);
             // Skipped as the check is too time consuming, the HTTPS functionality is verified by testKieServerInfo()
-            // HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
+            // httpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
         }
     }
 
     @Test
     public void testWorkbenchHttps() {
         for (WorkbenchDeployment workbenchDeployment : deploymentScenario.getWorkbenchDeployments()) {
-            HttpsWorkbenchTestProvider.testLoginScreen(workbenchDeployment, false);
-            HttpsWorkbenchTestProvider.testControllerOperations(workbenchDeployment, false);
+            httpsWorkbenchTestProvider.testLoginScreen(workbenchDeployment, false);
+            httpsWorkbenchTestProvider.testControllerOperations(workbenchDeployment, false);
         }
     }
 }

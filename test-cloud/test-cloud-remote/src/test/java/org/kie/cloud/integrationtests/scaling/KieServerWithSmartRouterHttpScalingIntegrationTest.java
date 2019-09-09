@@ -15,28 +15,24 @@
  */
 package org.kie.cloud.integrationtests.scaling;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.cloud.integrationtests.category.ApbNotSupported;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.SmartRouterUtils;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
-import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -50,8 +46,11 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.router.Configuration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Category({ApbNotSupported.class, OperatorNotSupported.class}) // Because DroolsServerFilterClasses not supported yet, Operator skipped as there is discrepancy between deployment methods and Kie server connection, should be unified for 7.4  
 public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
+
     private static final String SMART_ROUTER_ID = "test-kie-router";
 
     private KieServerControllerClient kieControllerClient;
@@ -61,18 +60,15 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
     @Override
     protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
+                .withInternalMavenRepo()
                 .withSmartRouterId(SMART_ROUTER_ID)
                 .build();
     }
 
-    @BeforeClass
-    public static void buildKjar() {
-        MavenDeployer.buildAndDeployMavenProject(KieServerWithSmartRouterHttpScalingIntegrationTest.class.getResource("/kjars-sources/definition-project-snapshot").getFile());
-    }
-
     @Before
     public void setUp() {
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getScenarioEnvironment());
+
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
         kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerOneDeployment());
         smartRouterAdminClient = SmartRouterAdminClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment());
