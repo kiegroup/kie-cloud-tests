@@ -49,7 +49,6 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -86,8 +85,8 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
 
         try {
             WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
+                    .withInternalMavenRepo()
+                    .build();
             scenarios.add(new Object[]{"Workbench + KIE Server", workbenchKieServerScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Workbench + KIE Server is skipped.", ex);
@@ -95,9 +94,9 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
 
         try {
             WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                .build();
-            scenarios.add(new Object[] { "Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario });
+                    .withInternalMavenRepo()
+                    .build();
+            scenarios.add(new Object[]{"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Workbench + KIE Server - Persistent is skipped.", ex);
         }

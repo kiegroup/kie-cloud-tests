@@ -16,13 +16,13 @@
 package org.kie.cloud.openshift.operator.deployment.external;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.deployment.external.impl.AbstractMavenRepositoryExternalDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Env;
-import org.kie.cloud.openshift.operator.model.components.Server;
 
 public class MavenRepositoryExternalDeploymentOperator extends AbstractMavenRepositoryExternalDeployment<KieApp> implements ExternalDeploymentOperator<MavenRepositoryDeployment> {
 
@@ -35,11 +35,14 @@ public class MavenRepositoryExternalDeploymentOperator extends AbstractMavenRepo
         super.configure(kieApp);
 
         MavenRepositoryDeployment deployment = getDeploymentInformation();
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString()));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_USERNAME, deployment.getUsername()));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_PASSWORD, deployment.getPassword()));
-        }
+        addEnvVar(kieApp, ImageEnvVariables.EXTERNAL_MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
+        addEnvVar(kieApp, ImageEnvVariables.EXTERNAL_MAVEN_REPO_USERNAME, deployment.getUsername());
+        addEnvVar(kieApp, ImageEnvVariables.EXTERNAL_MAVEN_REPO_PASSWORD, deployment.getPassword());
     }
 
+    @Override
+    protected void addEnvVar(KieApp kieApp, String key, String value) {
+        Stream.of(kieApp.getSpec().getObjects().getServers())
+                .forEach(server -> server.addEnv(new Env(key, value)));
+    }
 }

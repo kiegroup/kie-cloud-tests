@@ -69,7 +69,7 @@ public class WorkbenchUtils {
 
     public static void saveContainerSpec(KieServerControllerClient kieControllerClient, String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, Kjar kjar, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
         ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
-        ReleaseId releasedId = new ReleaseId(kjar.getGroupId(), kjar.getName(), kjar.getVersion());
+        ReleaseId releasedId = new ReleaseId(kjar.getGroupId(), kjar.getArtifactName(), kjar.getVersion());
         ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);
         kieControllerClient.saveContainerSpec(serverTemplateId, containerSpec);
     }

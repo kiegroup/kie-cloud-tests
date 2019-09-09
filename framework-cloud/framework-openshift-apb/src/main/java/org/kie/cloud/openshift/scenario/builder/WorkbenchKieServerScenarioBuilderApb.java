@@ -25,9 +25,10 @@ import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerScenarioApb;
 
-public class WorkbenchKieServerScenarioBuilderApb implements WorkbenchKieServerScenarioBuilder {
+public class WorkbenchKieServerScenarioBuilderApb extends AbstractOpenshiftScenarioBuilderApb<WorkbenchKieServerScenario> implements WorkbenchKieServerScenarioBuilder {
 
     private final Map<String, String> extraVars = new HashMap<>();
     private boolean deployPrometheus = false;
@@ -41,15 +42,14 @@ public class WorkbenchKieServerScenarioBuilderApb implements WorkbenchKieServerS
     }
 
     @Override
-    public WorkbenchKieServerScenario build() {
+    public WorkbenchKieServerScenario getDeploymentScenarioInstance() {
         return new WorkbenchKieServerScenarioApb(extraVars, deployPrometheus);
+
     }
 
     @Override
-    public WorkbenchKieServerScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_URL, repoUrl);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_USER, repoUserName);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_PWD, repoPassword);
+    public WorkbenchKieServerScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 
@@ -81,7 +81,7 @@ public class WorkbenchKieServerScenarioBuilderApb implements WorkbenchKieServerS
     @Override
     public WorkbenchKieServerScenarioBuilder withAccessControlMaxAge(Duration maxAge) {
         throw new UnsupportedOperationException("Not supported for APB.");
-	}
+    }
 
     @Override
     public WorkbenchKieServerScenarioBuilder withPrometheusMonitoring() {

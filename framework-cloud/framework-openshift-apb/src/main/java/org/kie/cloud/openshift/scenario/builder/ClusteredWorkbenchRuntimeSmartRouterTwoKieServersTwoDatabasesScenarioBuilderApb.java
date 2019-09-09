@@ -26,11 +26,13 @@ import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioApb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderApb implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
+public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderApb extends AbstractOpenshiftScenarioBuilderApb<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> implements
+                                                                                             ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderApb.class);
     private final Map<String, String> extraVars = new HashMap<>();
@@ -41,7 +43,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         // Required values to create persistence values.
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.MANAGED);
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_DB_TYPE, ApbConstants.DbType.MYSQL);
-        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG,OpenShiftConstants.getApbKieImageStreamTag());
+        extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, OpenShiftConstants.getApbKieImageStreamTag());
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_SETS, "2");
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_REPLICAS, "2");
         extraVars.put(OpenShiftApbConstants.APB_BUSINESSCENTRAL_REPLICAS, "1"); //RHPAM-1662
@@ -58,15 +60,13 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Override
-    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario build() {
-        return new ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioApb(extraVars,deploySSO);
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario getDeploymentScenarioInstance() {
+        return new ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioApb(extraVars, deploySSO);
     }
 
     @Override
-    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_URL, repoUrl);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_USER, repoUserName);
-        extraVars.put(OpenShiftApbConstants.MAVEN_REPO_PWD, repoPassword);
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 
@@ -142,5 +142,5 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logger.warn("Hostname can be set only with 1 set of Kie Server deployment.");
         logger.info("Configuration skipped.");
         return this;
-	}
+    }
 }

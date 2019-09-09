@@ -24,6 +24,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBu
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
@@ -39,7 +40,7 @@ import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerPersistentScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
 
-public class WorkbenchKieServerPersistentScenarioBuilderImpl implements WorkbenchKieServerPersistentScenarioBuilder {
+public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<WorkbenchKieServerPersistentScenario> implements WorkbenchKieServerPersistentScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
@@ -80,17 +81,13 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenario build() {
+    public WorkbenchKieServerPersistentScenario getDeploymentScenarioInstance() {
         return new WorkbenchKieServerPersistentScenarioImpl(kieApp, deploySSO);
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_URL, repoUrl));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_USERNAME, repoUserName));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_PASSWORD, repoPassword));
-        }
+    public WorkbenchKieServerPersistentScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 
@@ -103,7 +100,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl implements Workbenc
         kieApp.getSpec().getObjects().getConsole().setSsoClient(ssoClient);
 
         Server[] servers = kieApp.getSpec().getObjects().getServers();
-        for (int i=0; i<servers.length; i++) {
+        for (int i = 0; i < servers.length; i++) {
             ssoClient = new SsoClient();
             ssoClient.setName("kie-server-" + i + "-client");
             ssoClient.setSecret("kie-server-" + i + "-secret");

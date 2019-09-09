@@ -136,7 +136,7 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(containerReleaseId.getGroupId()).isEqualTo(USERTASK.getGroupId());
-            softly.assertThat(containerReleaseId.getArtifactId()).isEqualTo(USERTASK.getName());
+            softly.assertThat(containerReleaseId.getArtifactId()).isEqualTo(USERTASK.getArtifactName());
             softly.assertThat(containerReleaseId.getVersion()).isEqualTo(USERTASK.getVersion());
         });
 

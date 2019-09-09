@@ -16,19 +16,21 @@
 
 package org.kie.cloud.integrationtests.testproviders;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import cz.xtf.client.Http;
+import cz.xtf.client.HttpResponseParser;
 import org.apache.http.entity.ContentType;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.maven.MavenDeployer;
+import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
@@ -43,9 +45,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.xtf.client.Http;
-import cz.xtf.client.HttpResponseParser;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpsKieServerTestProvider {
 
@@ -56,11 +56,37 @@ public class HttpsKieServerTestProvider {
     private static final String KIE_SERVER_INFO_REST_REQUEST_URL = "services/rest/server";
     private static final String KIE_CONTAINERS_REQUEST_URL = KIE_SERVER_INFO_REST_REQUEST_URL + "/containers";
 
-    static {
-        MavenDeployer.buildAndDeployMavenProject(HttpsKieServerTestProvider.class.getResource("/kjars-sources/hello-rules-snapshot").getFile());
+    private HttpsKieServerTestProvider() {}
+
+    /**
+     * Create provider instance
+     * 
+     * @return provider instance
+     */
+    public static HttpsKieServerTestProvider create() {
+        return create(null);
     }
 
-    public static void testKieServerInfo(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
+    /**
+     * Create provider instance and init it with given environment
+     * 
+     * @param environment if not null, initialize this provider with the environment
+     * 
+     * @return provider instance
+     */
+    public static HttpsKieServerTestProvider create(Map<String, String> environment) {
+        HttpsKieServerTestProvider provider = new HttpsKieServerTestProvider();
+        if (Objects.nonNull(environment)) {
+            provider.init(environment);
+        }
+        return provider;
+    }
+
+    private void init(Map<String, String> environment) {
+        KjarDeployer.create(Kjar.HELLO_RULES_SNAPSHOT).deploy(environment);
+    }
+
+    public void testKieServerInfo(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
             HttpResponseParser responseAndCode;
             String url = serverInforRequestUrl(kieServerDeployment, ssoScenario);
@@ -82,7 +108,7 @@ public class HttpsKieServerTestProvider {
         }
     }
 
-    public static void testDeployContainer(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
+    public void testDeployContainer(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         String containerId = "testDeployContainer";
         try {
             String urlPut = containerRequestUrl(kieServerDeployment, containerId, ssoScenario);
@@ -133,7 +159,7 @@ public class HttpsKieServerTestProvider {
         }
     }
 
-    private static String serverInforRequestUrl(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
+    private String serverInforRequestUrl(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
             if (ssoScenario) {
                 return createSSOEnvVariable(kieServerDeployment.getSecureUrl().get().toString()) + "/" + KIE_SERVER_INFO_REST_REQUEST_URL;
@@ -173,7 +199,7 @@ public class HttpsKieServerTestProvider {
     }
 
     private static String createContainerRequestContent(Kjar kjar) {
-        ReleaseId releasedId = new ReleaseId(kjar.getGroupId(), kjar.getName(), kjar.getVersion());
+        ReleaseId releasedId = new ReleaseId(kjar.getGroupId(), kjar.getArtifactName(), kjar.getVersion());
         KieContainerResource kieContainerResource = new KieContainerResource(releasedId);
         String requestContent = marshaller.marshall(kieContainerResource);
 

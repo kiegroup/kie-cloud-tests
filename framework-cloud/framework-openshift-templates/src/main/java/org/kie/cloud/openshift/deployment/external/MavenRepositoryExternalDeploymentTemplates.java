@@ -32,9 +32,13 @@ public class MavenRepositoryExternalDeploymentTemplates extends AbstractMavenRep
         super.configure(envVariables);
 
         MavenRepositoryDeployment deployment = getDeploymentInformation();
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, deployment.getUsername());
-        envVariables.put(OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, deployment.getPassword());
+        addEnvVar(envVariables, OpenShiftTemplateConstants.MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
+        addEnvVar(envVariables, OpenShiftTemplateConstants.MAVEN_REPO_USERNAME, deployment.getUsername());
+        addEnvVar(envVariables, OpenShiftTemplateConstants.MAVEN_REPO_PASSWORD, deployment.getPassword());
+    }
 
+    @Override
+    protected void addEnvVar(Map<String, String> envVariables, String key, String value) {
+        envVariables.put(key, value);
     }
 }

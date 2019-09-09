@@ -17,7 +17,6 @@ package org.kie.cloud.openshift.deployment.external.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.openshift.deployment.external.AbstractExternalDeployment;
@@ -26,9 +25,9 @@ import org.kie.cloud.openshift.util.MavenRepositoryDeployer;
 
 public abstract class AbstractMavenRepositoryExternalDeployment<U> extends AbstractExternalDeployment<MavenRepositoryDeployment, U> {
 
-    protected static final String SYSTEM_MAVEN_REPO_URL = "maven.repo.url";
-    protected static final String SYSTEM_MAVEN_REPO_USERNAME = "maven.repo.username";
-    protected static final String SYSTEM_MAVEN_REPO_PASSWORD = "maven.repo.password";
+    protected static final String MAVEN_DEPLOYER_REPO_URL = "MAVEN_DEPLOYER_REPO_URL";
+    protected static final String MAVEN_DEPLOYER_REPO_USERNAME = "MAVEN_DEPLOYER_REPO_USERNAME";
+    protected static final String MAVEN_DEPLOYER_REPO_PASSWORD = "MAVEN_DEPLOYER_REPO_PASSWORD";
 
     protected Map<String, String> oldValues = new HashMap<>();
 
@@ -48,32 +47,17 @@ public abstract class AbstractMavenRepositoryExternalDeployment<U> extends Abstr
 
     @Override
     public void configure(U obj) {
-        // TODO to change once not using system properties anymore for kjars ...
-        // Save old configuration
-        saveSystemProperty(SYSTEM_MAVEN_REPO_URL);
-        saveSystemProperty(SYSTEM_MAVEN_REPO_USERNAME);
-        saveSystemProperty(SYSTEM_MAVEN_REPO_PASSWORD);
-
-        // Setup new system properties
+        // Add maven properties to be reused by the maven deployer
         MavenRepositoryDeployment deployment = getDeploymentInformation();
-        System.setProperty(SYSTEM_MAVEN_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
-        System.setProperty(SYSTEM_MAVEN_REPO_USERNAME, deployment.getUsername());
-        System.setProperty(SYSTEM_MAVEN_REPO_PASSWORD, deployment.getPassword());
+        addEnvVar(obj, MAVEN_DEPLOYER_REPO_URL, deployment.getSnapshotsRepositoryUrl().toString());
+        addEnvVar(obj, MAVEN_DEPLOYER_REPO_USERNAME, deployment.getUsername());
+        addEnvVar(obj, MAVEN_DEPLOYER_REPO_PASSWORD, deployment.getPassword());
     }
+
+    protected abstract void addEnvVar(U obj, String key, String value);
 
     @Override
     public void removeConfiguration(U object) {
-        // Restore system properties
-        restoreSystemProperty(SYSTEM_MAVEN_REPO_URL);
-        restoreSystemProperty(SYSTEM_MAVEN_REPO_USERNAME);
-        restoreSystemProperty(SYSTEM_MAVEN_REPO_PASSWORD);
-    }
-
-    private void saveSystemProperty(String key) {
-        oldValues.put(key, System.getProperty(key));
-    }
-
-    private void restoreSystemProperty(String key) {
-        Optional.ofNullable(oldValues.get(key)).ifPresent(value -> System.setProperty(key, value));
+        // Nothing done
     }
 }

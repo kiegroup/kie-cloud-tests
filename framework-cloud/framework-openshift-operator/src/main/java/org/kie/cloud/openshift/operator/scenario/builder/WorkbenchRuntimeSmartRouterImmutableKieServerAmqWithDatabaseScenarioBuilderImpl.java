@@ -25,6 +25,7 @@ import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKi
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.model.KieApp;
@@ -44,7 +45,8 @@ import org.kie.cloud.openshift.operator.scenario.WorkbenchRuntimeSmartRouterImmu
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
 import org.kie.cloud.openshift.template.ProjectProfile;
 
-public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderImpl implements WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder {
+public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario>
+                                                                                             implements WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
     private boolean deploySSO = false;
@@ -100,17 +102,13 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario build() {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario getDeploymentScenarioInstance() {
         return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioImpl(kieApp, deploySSO);
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withExternalMavenRepo(String repoUrl, String repoUserName, String repoPassword) {
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_URL, repoUrl));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_USERNAME, repoUserName));
-            server.addEnv(new Env(ImageEnvVariables.EXTERNAL_MAVEN_REPO_PASSWORD, repoPassword));
-        }
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 
@@ -123,7 +121,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
         kieApp.getSpec().getObjects().getConsole().setSsoClient(ssoClient);
 
         Server[] servers = kieApp.getSpec().getObjects().getServers();
-        for (int i=0; i<servers.length; i++) {
+        for (int i = 0; i < servers.length; i++) {
             ssoClient = new SsoClient();
             ssoClient.setName("kie-server-" + i + "-client");
             ssoClient.setSecret("kie-server-" + i + "-secret");

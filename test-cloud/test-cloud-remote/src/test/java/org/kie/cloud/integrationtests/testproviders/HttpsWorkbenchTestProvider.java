@@ -16,11 +16,10 @@
 
 package org.kie.cloud.integrationtests.testproviders;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -37,6 +36,9 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 public class HttpsWorkbenchTestProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpsWorkbenchTestProvider.class);
@@ -49,7 +51,35 @@ public class HttpsWorkbenchTestProvider {
 
     private static final String WORKBENCH_CONTROLLER_MANAGEMENT_REST_REQUEST_URL = "rest/controller/management/servers";
 
-    public static void testLoginScreen(WorkbenchDeployment workbenchDeployment, boolean ssoScenario) {
+    private HttpsWorkbenchTestProvider() {}
+
+    /**
+     * Create provider instance
+     * 
+     * @return provider instance
+     */
+    public static HttpsWorkbenchTestProvider create() {
+        return create(null);
+    }
+
+    /**
+     * Create provider instance and init it with given environment
+     * 
+     * @param environment if not null, initialize this provider with the environment
+     * 
+     * @return provider instance
+     */
+    public static HttpsWorkbenchTestProvider create(Map<String, String> environment) {
+        HttpsWorkbenchTestProvider provider = new HttpsWorkbenchTestProvider();
+        if (Objects.nonNull(environment)) {
+            provider.init(environment);
+        }
+        return provider;
+    }
+
+    private void init(Map<String, String> environment) {}
+
+    public void testLoginScreen(WorkbenchDeployment workbenchDeployment, boolean ssoScenario) {
         final URL url = workbenchDeployment.getSecureUrl().get();
         logger.debug("Test login screen on url {}", url.toString());
 
@@ -76,7 +106,7 @@ public class HttpsWorkbenchTestProvider {
         }
     }
 
-    public static void testControllerOperations(WorkbenchDeployment workbenchDeployment, boolean ssoScenario) {
+    public void testControllerOperations(WorkbenchDeployment workbenchDeployment, boolean ssoScenario) {
         String serverId = "kie-server-id";
         String serverName = "kie-server-name";
         try {
@@ -121,8 +151,8 @@ public class HttpsWorkbenchTestProvider {
         JsonObject serverTemplatesJson = gson.fromJson(responseContent, JsonObject.class);
         JsonArray serverTemplatesJsonArray = serverTemplatesJson.get(SERVER_TEMPLATE_PARAMETER).getAsJsonArray();
         Stream<String> serverTemplateIds = StreamSupport.stream(serverTemplatesJsonArray.spliterator(), false)
-                                                        .map(x -> x.getAsJsonObject())
-                                                        .map(o -> o.get(SERVER_ID_PARAMETER).getAsString());
+                .map(x -> x.getAsJsonObject())
+                .map(o -> o.get(SERVER_ID_PARAMETER).getAsString());
         assertThat(serverTemplateIds).contains(serverTemplateId);
     }
 

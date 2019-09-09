@@ -30,13 +30,17 @@ import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
+
+    private static FireRulesTestProvider fireRulesTestProvider;
+    private static ProcessTestProvider processTestProvider;
+    private static OptaplannerTestProvider optaplannerTestProvider;
+    private static ProjectBuilderTestProvider projectBuilderTestProvider;
 
     private static final String SECURED_URL_PREFIX = "secured-";
     private static final String RANDOM_URL_PREFIX = UUID.randomUUID().toString().substring(0, 4) + "-";
@@ -50,32 +54,34 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
         if (deploymentScenarioFactory.getCloudAPIImplementationName().equals("openshift-operator")) {
             try {
                 deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                      .deploySso()
-                      // Using external Maven repo due to test instabilities, should be enabled once BAQE-1017 is fully implemented
-                      // .withInternalMavenRepo()
-                      .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                      .build();
+                        .deploySso()
+                        .withInternalMavenRepo()
+                        .build();
             } catch (UnsupportedOperationException ex) {
                 Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
             }
         } else {
             try {
                 deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                          .deploySso()
-                          // Using external Maven repo due to test instabilities, should be enabled once BAQE-1017 is fully implemented
-                          // .withInternalMavenRepo()
-                          .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
-                          .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                          .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
-                          .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                          .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                          .build();
+                        .deploySso()
+                        .withInternalMavenRepo()
+                        .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                        .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
+                        .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                        .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
+                        .build();
             } catch (UnsupportedOperationException ex) {
                 Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
             }
         }
         deploymentScenario.setLogFolderName(ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Setup test providers
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        projectBuilderTestProvider = ProjectBuilderTestProvider.create();
     }
 
     @AfterClass
@@ -85,29 +91,29 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
 
     @Test
     @Category(JBPMOnly.class)
-    public void testProcessFromExternalMavenRepo() {
-        ProcessTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
+    public void testProcessFromMavenRepo() {
+        processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
-        ProjectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
-              deploymentScenario.getKieServerDeployment());
+        projectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
+                                                              deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    public void testRulesFromExternalMavenRepo() {
-        FireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
+    public void testRulesFromMavenRepo() {
+        fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
-    public void testSolverFromExternalMavenRepo() {
-        OptaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
+    public void testSolverFromMavenRepo() {
+        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        FireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
     }
 }
