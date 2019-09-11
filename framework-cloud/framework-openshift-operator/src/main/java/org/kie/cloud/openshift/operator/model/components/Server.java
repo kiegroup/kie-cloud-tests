@@ -35,6 +35,7 @@ public class Server {
     private SsoClient ssoClient;
     private Resources resources;
     private Build build;
+    private Jms jms;
 
     public String getName() {
         return name;
@@ -106,5 +107,13 @@ public class Server {
 
     public void setBuild(Build build) {
         this.build = build;
+    }
+
+    public Jms getJms() {
+        return jms;
+    }
+
+    public void setJms(Jms jms) {
+        this.jms = jms;
     }
 }

@@ -26,12 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import cz.xtf.core.openshift.OpenShift;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteList;
 import org.kie.cloud.api.deployment.Deployment;
@@ -90,6 +92,22 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     public String getDeploymentConfigName() {
         return getServiceName();
+    }
+
+    protected String getDeploymentConfigName(OpenShift openShift, Pattern regexp) {
+        // Try to find deployment config name from all available deployment configs
+        List<DeploymentConfig> foundDeploymentConfigs = openShift.getDeploymentConfigs()
+                                                                 .stream()
+                                                                 .filter(deploymentConfig -> regexp.matcher(deploymentConfig.getMetadata().getName()).matches())
+                                                                 .collect(Collectors.toList());
+        if (foundDeploymentConfigs.isEmpty()) {
+            String deploymentConfigNames = openShift.getDeploymentConfigs().stream().map(s -> s.getMetadata().getName()).collect(Collectors.joining(", "));
+            throw new RuntimeException("Deployment config defined by regexp " + regexp.toString() + " not found. Available deployment configs: " + deploymentConfigNames);
+        } else if (foundDeploymentConfigs.size() > 1) {
+            String deploymentConfigNames = foundDeploymentConfigs.stream().map(s -> s.getMetadata().getName()).collect(Collectors.joining(", "));
+            throw new RuntimeException("Found multiple deployment configs defined by regexp " + regexp.toString() + " . Found deployment configs are : " + deploymentConfigNames);
+        }
+        return foundDeploymentConfigs.get(0).getMetadata().getName();
     }
 
     @Override

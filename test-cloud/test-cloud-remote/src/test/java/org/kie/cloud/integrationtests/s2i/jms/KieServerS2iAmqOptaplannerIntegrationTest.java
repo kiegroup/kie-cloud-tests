@@ -40,7 +40,6 @@ import org.kie.cloud.api.deployment.AmqDeployment;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
-import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.s2i.KieServerS2iOptaplannerIntegrationTest;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.provider.git.Git;
@@ -56,7 +55,7 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
-@Category({ApbNotSupported.class, OperatorNotSupported.class})
+@Category({ApbNotSupported.class})
 public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iAmqOptaplannerIntegrationTest.class);
