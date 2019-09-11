@@ -16,12 +16,14 @@
 package org.kie.cloud.openshift.deployment;
 
 import java.net.URL;
+import java.util.regex.Pattern;
 
 import org.kie.cloud.api.deployment.AmqDeployment;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
 
 public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeployment {
+
+    private static final Pattern AMQ_DEPLOYMENT_CONFIG_REGEXP = Pattern.compile(".*-amq");
 
     private String amqJolokiaServiceName;
     private String tcpServiceName;
@@ -29,6 +31,7 @@ public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeploym
     private URL tcpSslUrl;
     private String username;
     private String password;
+    private String deploymentConfigName;
 
     public AmqDeploymentImpl(Project project) {
         super(project);
@@ -41,8 +44,10 @@ public class AmqDeploymentImpl extends OpenShiftDeployment implements AmqDeploym
 
     @Override
     public String getDeploymentConfigName() {
-        // TODO: convert to some reliable openshift resource selector
-        return OpenShiftConstants.getKieApplicationName() + "-amq";
+        if (deploymentConfigName == null) {
+            deploymentConfigName = getDeploymentConfigName(getOpenShift(), AMQ_DEPLOYMENT_CONFIG_REGEXP);
+        }
+        return deploymentConfigName;
     }
 
     private String getAmqJolokiaServiceName() {
