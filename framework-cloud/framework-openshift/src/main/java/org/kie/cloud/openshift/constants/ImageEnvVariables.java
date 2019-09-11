@@ -28,6 +28,7 @@ public class ImageEnvVariables {
 
     public static final String KIE_SERVER_ID = "KIE_SERVER_ID";
     public static final String KIE_SERVER_MODE = "KIE_SERVER_MODE";
+    public static final String KIE_SERVER_MEMORY_LIMIT = "KIE_SERVER_MEMORY_LIMIT";
 
     public static final String KIE_SERVER_ROUTER_ID = "KIE_SERVER_ROUTER_ID";
 
