@@ -131,7 +131,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioIm
         logNodeNameOfAllInstances();
 
         // Used to track persistent volume content due to issues with volume cleanup
-        storeProjectInfoToPersistentVolume(workbenchRuntimeDeployment, "/opt/eap/standalone/data/kie");
+        storeProjectInfoToPersistentVolume(workbenchRuntimeDeployment, "/opt/kie/data");
     }
 
     @Override
