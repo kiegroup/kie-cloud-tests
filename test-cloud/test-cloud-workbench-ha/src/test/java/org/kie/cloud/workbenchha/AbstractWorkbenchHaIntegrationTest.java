@@ -26,11 +26,10 @@ import java.util.stream.Stream;
 
 import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.rest.client.Space;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -43,14 +42,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegrationTest {
 
-    protected static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
+    protected WorkbenchKieServerPersistentScenario deploymentScenario;
+    //protected ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 
     protected WorkbenchClient defaultWorkbenchClient;
 
-    @BeforeClass
-    public static void initializeDeployment() {
+    // TODO this needs to be configure different way, as this solution right now does not support 2 and more test running in parralle
+    // probably becuase deployment scenarios are (static) is override :( - my bad
+    @Before
+    public void initializeDeployment() {
         try {
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
+            deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+            //deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
                     .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
                             MavenConstants.getMavenRepoPassword())
                     .deploySso()
@@ -58,23 +61,25 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
-        deploymentScenario.setLogFolderName(AbstractWorkbenchHaIntegrationTest.class.getSimpleName()); // TODO check if works ok
+        deploymentScenario.setLogFolderName(this.getClass().getSimpleName()); // TODO check if works ok
         ScenarioDeployer.deployScenario(deploymentScenario);
         
         Map<String, String> users = Stream.of(Users.class.getEnumConstants()).collect(Collectors.toMap(Users::getName, Users::getPassword));
         SsoDeployer.createUsers(deploymentScenario.getSsoDeployment(), users);
+
+        defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
     }
 
-    @AfterClass
-    public static void cleanEnvironment() {
-        ScenarioDeployer.undeployScenario(deploymentScenario);
+    @After
+    public void cleanEnvironment() {
+        //ScenarioDeployer.undeployScenario(deploymentScenario);
     }
-
+/*
     @Before
     public void setUp() {
         defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
     }
-
+*/
     protected void checkSpacesWereCreated(Collection<String> expectedSpaceNames, int runnersSize, int retries) {
         assertThat(expectedSpaceNames).isNotEmpty().hasSize(runnersSize * retries);
         Collection<Space> spaces = defaultWorkbenchClient.getSpaces();

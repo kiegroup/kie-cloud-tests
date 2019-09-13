@@ -24,7 +24,7 @@
 
   <properties>
     <rhba.images.version.prefix>76</rhba.images.version.prefix>
-    <rhba.images.branch>master</rhba.images.branch>
+    <rhba.images.branch>7.5.x</rhba.images.branch> <!-- TODO revert change - set back to master -->
     <rhba.operator.branch>master</rhba.operator.branch>
 
     <findbugs.failOnViolation>true</findbugs.failOnViolation>

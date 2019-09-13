@@ -89,12 +89,13 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
         envVariables.put(OpenShiftTemplateConstants.AMQ_IMAGE_STREAM_NAMESPACE, project.getName());
+        envVariables.put("AMQ_REPLICAS","1");
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
-        workbenchDeployment.scale(1);
+        workbenchDeployment.scale(1); //- TODO remove this to tes HA scenarios
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());

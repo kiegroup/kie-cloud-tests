@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -30,7 +31,6 @@ import org.guvnor.rest.client.ProjectResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.util.Users;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 import org.kie.cloud.workbenchha.runners.ProjectRunner;
@@ -39,31 +39,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
-    private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
-
     private static final String SPACE_NAME = "test-space";
 
     @Before
-    public void setUp() {
-        defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+    public void createTestingSpace() {
+        //defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
     }
 
     @After
-    public void cleanUp(){
-        defaultWorkbenchClient.deleteSpace(SPACE_NAME);
+    public void deleteTestingSpace(){
+        //defaultWorkbenchClient.deleteSpace(SPACE_NAME);
     }
 
     @Test
     public void testCreateAndDeleteProjects() throws InterruptedException,ExecutionException {
+        defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
+
+        //assertThat(defaultWorkbenchClient.getSpace(SPACE_NAME)).isNotNull();
+
         //Create Runners with different users.
         List<ProjectRunner> runners = new ArrayList<>();
         runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
+        //runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.FRODO.getName(), Users.FRODO.getPassword()));
+        /*runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.SAM.getName(), Users.SAM.getPassword()));
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.MERRY.getName(), Users.MERRY.getPassword()));
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.PIPPIN.getName(), Users.PIPPIN.getPassword()));
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.ARAGORN.getName(), Users.ARAGORN.getPassword()));
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.LEGOLAS.getName(), Users.LEGOLAS.getPassword()));
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.GIMLI.getName(), Users.GIMLI.getPassword()));
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.GANDALF.getName(), Users.GANDALF.getPassword()));
+        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.BOROMIR.getName(), Users.BOROMIR.getPassword()));
+        */
         //... TODO
 
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjects(SPACE_NAME,"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjects(SPACE_NAME, UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         List<String> expectedList = getAllStringFromFutures(futures);
@@ -106,4 +118,8 @@ public class ProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegra
         //Check all projects was deleted
         assertThat(defaultWorkbenchClient.getProjects(SPACE_NAME)).isNotNull().isEmpty();
     }
+
+    // TODO add scenario when user tries to get one space (each user have it's own space) from that space get all projects.
+    // Mainly check that all spaces and projects are correctly returned.
+
 }

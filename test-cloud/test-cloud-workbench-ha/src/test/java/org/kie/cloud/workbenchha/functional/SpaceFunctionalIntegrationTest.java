@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -30,63 +29,33 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.guvnor.rest.client.Space;
-import org.junit.AfterClass;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
-import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.maven.constants.MavenConstants;
-import org.kie.cloud.openshift.util.SsoDeployer;
-import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.util.Users;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 import org.kie.cloud.workbenchha.runners.SpaceRunner;
-import org.kie.wb.test.rest.client.WorkbenchClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SpaceFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
-    private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
-
-    private WorkbenchClient defaultWorkbenchClient;
-
-    @BeforeClass
-    public static void initializeDeployment() {
-        try {
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
-                    .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
-                            MavenConstants.getMavenRepoPassword())
-                    .deploySso()
-                    .build();
-        } catch (UnsupportedOperationException ex) {
-            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
-        }
-        deploymentScenario.setLogFolderName(SpaceFunctionalIntegrationTest.class.getSimpleName());
-        ScenarioDeployer.deployScenario(deploymentScenario);
-
-        
-        Map<String, String> users = Stream.of(Users.class.getEnumConstants()).collect(Collectors.toMap(Users::getName, Users::getPassword));
-        SsoDeployer.createUsers(deploymentScenario.getSsoDeployment(), users);
-    }
-
-    @AfterClass
-    public static void cleanEnvironment() {
-        ScenarioDeployer.undeployScenario(deploymentScenario);
-    }
-
-    @Before
-    public void setUp() {
-        defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
-    }
 
     @Test
     public void testCreateAndDeleteSpaces() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
         List<SpaceRunner> runners = new ArrayList<>();
+        Stream.of(Users.class.getEnumConstants()).forEach(user -> {runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), user.getName(), user.getPassword()));});
+        /*
         runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.FRODO.getName(), Users.FRODO.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.SAM.getName(), Users.SAM.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.MERRY.getName(), Users.MERRY.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.PIPPIN.getName(), Users.PIPPIN.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.ARAGORN.getName(), Users.ARAGORN.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.LEGOLAS.getName(), Users.LEGOLAS.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.GIMLI.getName(), Users.GIMLI.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.GANDALF.getName(), Users.GANDALF.getPassword()));
+        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.BOROMIR.getName(), Users.BOROMIR.getPassword()));
+        */
         //... TODO
 
         //Create executor service to run every tasks in own thread
@@ -96,6 +65,7 @@ public class SpaceFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrati
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         List<String> expectedList = getAllStringFromFutures(futures);
+        System.out.println("\nExpectedList:\n"+expectedList);
 
         //Check that all spaces where created
         checkSpacesWereCreated(expectedList, runners.size(), 5);
@@ -106,7 +76,7 @@ public class SpaceFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrati
         List<Future<Collection<Space>>> futuresSpaces = executorService.invokeAll(getAllTask);
         futuresSpaces.forEach(futureSpaces -> {
             try {
-                assertThat(futureSpaces.get().stream().collect(Collectors.mapping(Space::getName, Collectors.toList()))).isNotNull().isNotEmpty().containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
+                assertThat(futureSpaces.get().stream().collect(Collectors.mapping(Space::getName, Collectors.toList()))).containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
             } catch (InterruptedException | ExecutionException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -120,6 +90,8 @@ public class SpaceFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrati
         List<Callable<Void>> deleteTasks = new ArrayList<>(runners.size());
         //Add list to delete from previous create task
         assertThat(runners).as("Check size of iterating lists.").hasSameSizeAs(futures);
+        // TODO assign to runner 1) Add all futures togehter and assign to them by runner size
+        // 2) return resutls from create run in pair where is runner and result together
         Iterator runnersIterator = runners.iterator();
         Iterator futureIterator = futures.iterator();
         while(runnersIterator.hasNext() && futureIterator.hasNext()) {

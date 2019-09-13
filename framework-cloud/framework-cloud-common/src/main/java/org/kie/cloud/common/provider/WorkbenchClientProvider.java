@@ -30,6 +30,7 @@ public class WorkbenchClientProvider {
     public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
         WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(),
                 username, password, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC);
+
         return workbenchClient;
     }
 
