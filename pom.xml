@@ -25,7 +25,7 @@
   <properties>
     <rhba.images.version.prefix>75</rhba.images.version.prefix>
     <rhba.images.branch>7.5.x</rhba.images.branch>
-    <rhba.operator.branch>7.5.x</rhba.operator.branch>
+    <rhba.operator.branch>release-v1.2.x</rhba.operator.branch>
 
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
