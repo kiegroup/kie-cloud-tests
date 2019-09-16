@@ -16,15 +16,17 @@
 
 package org.kie.cloud.openshift.constants.images.imagestream;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import io.fabric8.openshift.api.model.ImageStream;
+import io.fabric8.openshift.api.model.ImageStreamBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.Image;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.ProjectProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.fabric8.openshift.api.model.ImageStream;
-import io.fabric8.openshift.api.model.ImageStreamBuilder;
 
 /**
  * Creates image streams from file or generates them based on system properties.
@@ -41,9 +43,17 @@ public class ImageStreamProvider {
     public static void createImageStreamsInProject(Project project) {
         String kieImageStreams = OpenShiftConstants.getKieImageStreams();
 
+        boolean anyImageStreamTagPropertyIsSet = Stream.of(Image.values())
+                                                       .map(Image::getTag)
+                                                       .anyMatch(Objects::nonNull);
+
         if (kieImageStreams != null && !kieImageStreams.isEmpty()) {
             createImagesFromImageStreamFile(project, kieImageStreams);
-        } else {
+            if (anyImageStreamTagPropertyIsSet) {
+                replaceImagesFromImageStreamTags(project);
+            }
+        }
+        else {
             logger.info("Image stream file not found, creating image streams using image stream tags.");
             createImagesFromImageStreamTags(project);
         }
@@ -52,6 +62,12 @@ public class ImageStreamProvider {
     private static void createImagesFromImageStreamFile(Project project, String kieImageStreams) {
         logger.info("Creating image streams from " + kieImageStreams);
         project.createResources(kieImageStreams);
+    }
+
+    private static void replaceImagesFromImageStreamTags(Project project) {
+        Stream.of(Image.values())
+              .filter(image-> Objects.nonNull(image.getTag()))
+              .forEach(image -> createImageStreamForImage(project, image));
     }
 
     private static void createImagesFromImageStreamTags(Project project) {
@@ -76,6 +92,10 @@ public class ImageStreamProvider {
     }
 
     private static void createImageStreamForImage(Project project, Image image) {
+        if (image.getTag() == null || image.getTag().isEmpty() ) {
+            throw new RuntimeException("System property for image tag '" + image.getSystemPropertyForImageTag() + "' is not defined.");
+        }
+
         logger.info("Creating image stream for " + image.toString() + " image.");
         ImageStream imageStream = new ImageStreamBuilder().withApiVersion("v1")
                                                           .withNewMetadata()
@@ -102,6 +122,12 @@ public class ImageStreamProvider {
                                                               .endTag()
                                                           .endSpec()
                                                           .build();
+
+        ImageStream existingImageStream = project.getOpenShift().getImageStream(image.getImageName());
+        if(existingImageStream != null) {
+            logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", image.getImageName());
+            project.getOpenShift().deleteImageStream(existingImageStream);
+        }
         project.getOpenShift().createImageStream(imageStream);
     }
 }
