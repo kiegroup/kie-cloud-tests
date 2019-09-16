@@ -20,44 +20,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
+import org.slf4j.LoggerFactory;
 
 /**
  * OpenShift image
  */
 public enum Image {
-    AMQ(OpenShiftConstants.KIE_IMAGE_TAG_AMQ, "registry.access.redhat.com/amq-broker-7-tech-preview/amq-broker-71-openshift:1.0"),
+    AMQ(OpenShiftConstants.KIE_IMAGE_TAG_AMQ),
     CONSOLE(OpenShiftConstants.KIE_IMAGE_TAG_CONSOLE),
     CONTROLLER(OpenShiftConstants.KIE_IMAGE_TAG_CONTROLLER),
     KIE_SERVER(OpenShiftConstants.KIE_IMAGE_TAG_KIE_SERVER),
-    MYSQL(OpenShiftConstants.KIE_IMAGE_TAG_MYSQL, "registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7", "mysql", "5.7"),
-    POSTGRESQL(OpenShiftConstants.KIE_IMAGE_TAG_POSTGRESQL, "registry.access.redhat.com/rhscl/postgresql-10-rhel7", "postgresql", "10"),
+    MYSQL(OpenShiftConstants.KIE_IMAGE_TAG_MYSQL),
+    POSTGRESQL(OpenShiftConstants.KIE_IMAGE_TAG_POSTGRESQL),
     SMARTROUTER(OpenShiftConstants.KIE_IMAGE_TAG_SMARTROUTER),
     WORKBENCH(OpenShiftConstants.KIE_IMAGE_TAG_WORKBENCH),
     WORKBENCH_INDEXING(OpenShiftConstants.KIE_IMAGE_TAG_WORKBENCH_INDEXING);
 
+    private String systemPropertyForImageTag;
     private String imageGroup;
     private String imageName;
     private String imageRegistry;
     private String imageVersion;
-
+    
     private String tag;
 
     private Image(String systemPropertyForImageTag) {
-        this(systemPropertyForImageTag, null);
-    }
-
-    private Image(String systemPropertyForImageTag, String defaultImageTag) {
-        this(systemPropertyForImageTag, defaultImageTag, null, null);
-    }
-
-    private Image(String systemPropertyForImageTag, String defaultImageTag, String imageStreamName, String imageStreamVersion) {
+        this.systemPropertyForImageTag = systemPropertyForImageTag;
         Pattern imageTagPattern = Pattern.compile("^(?<registry>[a-zA-Z0-9-\\.:]*)/(?<group>[a-zA-Z0-9-]*)/(?<name>[a-zA-Z0-9-]*):?(?<version>[0-9\\\\.]*)-?([0-9\\.]*)$");
-        tag = System.getProperty(systemPropertyForImageTag, defaultImageTag);
+        tag = System.getProperty(systemPropertyForImageTag);
 
         if (tag == null || tag.isEmpty() ) {
-            throw new RuntimeException("System property for image tag '" + systemPropertyForImageTag + "' is not defined.");
+            LoggerFactory.getLogger(Image.class).warn("System property for image tag {} is not defined. RuntimeException can be thrown later.", systemPropertyForImageTag);
         } else {
-            parseImageTag(imageTagPattern, tag, systemPropertyForImageTag, imageStreamName, imageStreamVersion);
+            parseImageTag(imageTagPattern, tag, systemPropertyForImageTag);
         }
     }
 
@@ -81,13 +76,17 @@ public enum Image {
         return tag;
     }
 
-    private void parseImageTag(Pattern imageTagPattern, String imageTag, String systemPropertyForImageTag, String imageStreamName, String imageStreamVersion) {
+    public String getSystemPropertyForImageTag() {
+        return systemPropertyForImageTag;
+    }
+
+    private void parseImageTag(Pattern imageTagPattern, String imageTag, String systemPropertyForImageTag) {
         Matcher matcher = imageTagPattern.matcher(imageTag);
         if (matcher.find()) {
             imageRegistry = matcher.group("registry");
             imageGroup = matcher.group("group");
-            imageName = imageStreamName == null ? matcher.group("name") : imageStreamName;
-            imageVersion = imageStreamVersion == null ? matcher.group("version") : imageStreamVersion;
+            imageName = matcher.group("name");
+            imageVersion = matcher.group("version");
         } else {
             throw new RuntimeException("System property for image tag '" + systemPropertyForImageTag + "' with value '" + imageTag + "' doesn't match expected pattern '" + imageTagPattern.pattern() + "'.");
         }
