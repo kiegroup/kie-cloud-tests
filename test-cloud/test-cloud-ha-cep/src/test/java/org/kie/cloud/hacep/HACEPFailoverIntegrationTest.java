@@ -45,7 +45,6 @@ public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudInt
     }
 
     @Test
-    @Ignore("RHPAM-2382")
     public void testLeaderFailoverFactCountTest() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
