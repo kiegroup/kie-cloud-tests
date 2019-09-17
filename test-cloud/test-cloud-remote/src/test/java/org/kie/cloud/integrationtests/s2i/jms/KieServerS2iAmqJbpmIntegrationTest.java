@@ -27,7 +27,6 @@ import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerA
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.s2i.KieServerS2iJbpmIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
@@ -46,7 +45,7 @@ import org.kie.server.client.UserTaskServicesClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({ApbNotSupported.class, OperatorNotSupported.class, JBPMOnly.class})
+@Category({ApbNotSupported.class, JBPMOnly.class})
 public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario deploymentScenario;
