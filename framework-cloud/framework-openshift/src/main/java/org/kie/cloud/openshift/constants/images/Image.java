@@ -16,6 +16,7 @@
 
 package org.kie.cloud.openshift.constants.images;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,17 +43,17 @@ public enum Image {
     private String imageRegistry;
     private String imageVersion;
     
-    private String tag;
+    private Optional<String> tag;
 
     private Image(String systemPropertyForImageTag) {
         this.systemPropertyForImageTag = systemPropertyForImageTag;
         Pattern imageTagPattern = Pattern.compile("^(?<registry>[a-zA-Z0-9-\\.:]*)/(?<group>[a-zA-Z0-9-]*)/(?<name>[a-zA-Z0-9-]*):?(?<version>[0-9\\\\.]*)-?([0-9\\.]*)$");
-        tag = System.getProperty(systemPropertyForImageTag);
+        tag = Optional.ofNullable(System.getProperty(systemPropertyForImageTag)).filter(s -> !s.isEmpty()); // Set Optional to empty if the string is empty.
 
-        if (tag == null || tag.isEmpty() ) {
-            LoggerFactory.getLogger(Image.class).warn("System property for image tag {} is not defined. RuntimeException can be thrown later.", systemPropertyForImageTag);
+        if(tag.isPresent()) {
+            parseImageTag(imageTagPattern, tag.get(), systemPropertyForImageTag);
         } else {
-            parseImageTag(imageTagPattern, tag, systemPropertyForImageTag);
+            LoggerFactory.getLogger(Image.class).debug("System property for image tag {} is not defined. RuntimeException can be thrown later.", systemPropertyForImageTag);
         }
     }
 
@@ -72,7 +73,7 @@ public enum Image {
         return imageVersion;
     }
 
-    public String getTag() {
+    public Optional<String> getTag() {
         return tag;
     }
 

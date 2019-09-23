@@ -17,6 +17,7 @@
 package org.kie.cloud.openshift.constants.images.imagestream;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import io.fabric8.openshift.api.model.ImageStream;
@@ -45,7 +46,7 @@ public class ImageStreamProvider {
 
         boolean anyImageStreamTagPropertyIsSet = Stream.of(Image.values())
                                                        .map(Image::getTag)
-                                                       .anyMatch(Objects::nonNull);
+                                                       .anyMatch(Optional::isPresent);
 
         if (kieImageStreams != null && !kieImageStreams.isEmpty()) {
             createImagesFromImageStreamFile(project, kieImageStreams);
@@ -65,8 +66,9 @@ public class ImageStreamProvider {
     }
 
     private static void replaceImagesFromImageStreamTags(Project project) {
+        logger.info("Replacing image streams tags.");
         Stream.of(Image.values())
-              .filter(image-> Objects.nonNull(image.getTag()))
+              .filter(image -> image.getTag().isPresent())
               .forEach(image -> createImageStreamForImage(project, image));
     }
 
@@ -92,7 +94,7 @@ public class ImageStreamProvider {
     }
 
     private static void createImageStreamForImage(Project project, Image image) {
-        if (image.getTag() == null || image.getTag().isEmpty() ) {
+        if (!image.getTag().isPresent()) {
             throw new RuntimeException("System property for image tag '" + image.getSystemPropertyForImageTag() + "' is not defined.");
         }
 
@@ -114,7 +116,7 @@ public class ImageStreamProvider {
                                                                   .addToAnnotations("version", image.getImageVersion())
                                                                   .withNewFrom()
                                                                       .withKind("DockerImage")
-                                                                      .withName(image.getTag())
+                                                                      .withName(image.getTag().get())
                                                                   .endFrom()
                                                                   .withNewImportPolicy()
                                                                       .withInsecure(Boolean.TRUE)
