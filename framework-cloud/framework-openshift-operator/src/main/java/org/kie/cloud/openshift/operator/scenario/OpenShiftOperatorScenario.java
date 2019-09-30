@@ -51,7 +51,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     protected KieApp kieApp;
 
     public OpenShiftOperatorScenario(KieApp kieApp) {
-        super(false);
+        super(true);
         this.kieApp = kieApp;
     }
 
