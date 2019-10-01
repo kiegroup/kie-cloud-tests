@@ -119,7 +119,8 @@ public abstract class OpenShiftDeployment implements Deployment {
     public boolean isReady() {
         try {
             Service service = openShift.getService(getServiceName());
-            return service != null;
+            DeploymentConfig deploymentConfig = openShift.getDeploymentConfig(getDeploymentConfigName());
+            return service != null && deploymentConfig != null;
         } catch (Exception e) {
             return false;
         }
