@@ -32,12 +32,12 @@ public class OperatorDeployer {
 
     private static final Logger logger = LoggerFactory.getLogger(OperatorDeployer.class);
 
-    public static void deploy(Project project, String operatorName, String updateChannel) {
+    public static void deploy(Project project, String operatorName, String updateChannel, OperatorSource operatorSource) {
         String catalogSourceName = project.getName() + "-" + operatorName;
 
         addClusterRoleToAdminUser(project);
 
-        createCatalogSourceConfig(project, catalogSourceName, operatorName);
+        createCatalogSourceConfig(project, catalogSourceName, operatorName, operatorSource);
         createOperatorGroup(project, operatorName);
         createSubscription(project, catalogSourceName, operatorName, updateChannel);
     }
@@ -48,7 +48,7 @@ public class OperatorDeployer {
         deleteCatalogSourceConfig(project, catalogSourceName);
     }
 
-    private static void createCatalogSourceConfig(Project project, String catalogSourceName, String operatorName) {
+    private static void createCatalogSourceConfig(Project project, String catalogSourceName, String operatorName, OperatorSource operatorSource) {
         String catalogSourceConfig = "apiVersion: operators.coreos.com/v1\n" +
                 "kind: CatalogSourceConfig\n" +
                 "metadata:\n" +
@@ -56,7 +56,8 @@ public class OperatorDeployer {
                 "  namespace: openshift-marketplace\n" +
                 "spec:\n" +
                 "  targetNamespace: " + project.getName() + "\n" +
-                "  packages: " + operatorName;
+                "  packages: " + operatorName + "\n" +
+                "  source: " + operatorSource.getName();
         executeYaml(project, catalogSourceConfig);
     }
 
