@@ -53,6 +53,7 @@ import org.kie.cloud.openshift.prometheus.servicemonitor.components.Selector;
 import org.kie.cloud.openshift.prometheus.servicemonitor.components.Spec;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.operator.OperatorDeployer;
+import org.kie.cloud.openshift.util.operator.OperatorSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,7 @@ public class PrometheusDeployer {
     }
 
     public static PrometheusDeployment deployAsOperator(Project project, KieServerDeployment kieServerDeployment) {
-        OperatorDeployer.deploy(project, PROMETHEUS_OPERATOR_NAME, "beta");
+        OperatorDeployer.deploy(project, PROMETHEUS_OPERATOR_NAME, "beta", OperatorSource.COMMUNITY);
 
         createServiceAccount(project, PROMETHEUS_SERVICE_ACCOUNT);
         createPrometheusOperatorClusterRole(project, PROMETHEUS_CLUSTER_ROLE);
