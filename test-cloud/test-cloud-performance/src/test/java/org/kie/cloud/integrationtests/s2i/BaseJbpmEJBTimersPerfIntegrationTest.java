@@ -15,12 +15,8 @@
  */
 package org.kie.cloud.integrationtests.s2i;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -70,18 +64,17 @@ import static org.jbpm.process.instance.ProcessInstance.STATE_ACTIVE;
 import static org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED;
 
 @RunWith(Parameterized.class)
-public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> {
+public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> {
 
-    private static final String MEMORY = "memory";
-    private static final String CPU = "cpu";
+    protected static final String MEMORY = "memory";
+    protected static final String CPU = "cpu";
     protected static final List<Integer> ACTIVE_STATUS = Collections.singletonList(STATE_ACTIVE);
     protected static final List<Integer> COMPLETED_STATUS = Collections.singletonList(STATE_COMPLETED);
     
-    protected static final Logger logger = LoggerFactory.getLogger(KieServerS2iJbpmEJBTimerPerfIntegrationTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(BaseJbpmEJBTimersPerfIntegrationTest.class);
 
     protected static final int PROCESSES_COUNT = Integer.parseInt(System.getProperty("processesCount", "5000"));
-    protected static final int PROCESSES_PER_THREAD = 1000;
-    protected static final int STARTING_THREADS_COUNT = PROCESSES_COUNT / PROCESSES_PER_THREAD;
+    
     
     protected static final double PERF_INDEX = Double.parseDouble(System.getProperty("perfIndex", "3.0"));
     
@@ -91,7 +84,8 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
     protected static final int REFRESH_INTERVAL = Integer.parseInt(System.getProperty("refreshInterval", "30"));   
     protected static final int ROUTER_TIMEOUT = Integer.parseInt(System.getProperty("routerTimeout", "60"));   
     protected static final String ROUTER_BALANCE = System.getProperty("routerBalance", "roundrobin");   
-    protected static final String CSV_FILE = "./ejbTimer__"+PROCESSES_COUNT+"_processes__"+SCALE_COUNT+"_pods.csv";
+    
+    protected static final String ONE_TIMER_DURATION_PROCESS_ID = "timers-testing.OneTimerDate";
     
     protected static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "=" + Kjar.DEFINITION.toString();
 
@@ -133,11 +127,10 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
     
     protected QueryServicesClient queryServicesClient;
 
-    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", KieServerS2iJbpmEJBTimerPerfIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", BaseJbpmEJBTimersPerfIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
     
     protected List<String> pods = new ArrayList<String>();
-    
-    protected String startingTime, processTime;
+        
     protected Map<String, Integer> completedHostNameDistribution;
 
     @Override
@@ -214,61 +207,10 @@ public class KieServerS2iJbpmEJBTimerPerfIntegrationTest extends AbstractMethodI
         logger.info("============================= STATISTICS GATHERED =============================");       
     }
 
-    private void writeCSV() throws IOException {
-        ArrayList<Object> record = new ArrayList<Object>();
-        try (
-               CSVPrinter csvPrinter = new CSVPrinter(new FileWriter(Paths.get(CSV_FILE).toAbsolutePath().toFile(), true), 
-                        CSVFormat.DEFAULT);
-            ) {
-             record.add(Instant.now());
-             record.add(PROCESSES_COUNT); 
-             record.add(STARTING_THREADS_COUNT);
-             record.add(startingTime.substring(2));
-             record.add(processTime.substring(2));
-             record.add(HEAP);
-             record.addAll(completedHostNameDistribution.values());
-             csvPrinter.printRecord(record);
-             csvPrinter.flush();            
-            }
-        
-    }
+    protected abstract void writeCSV() throws IOException;
 
-    private void runSingleScenario() {
-        OffsetDateTime fireAtTime = calculateFireAtTime();
-        logger.info("Starting {} processes", PROCESSES_COUNT);
-        
-        Instant startTime = Instant.now();
-        Duration maxDuration = Duration.between(startTime.plus(1, ChronoUnit.HOURS), Instant.MAX);
-        Map<String, Object> params = Collections.singletonMap("fireAt", fireAtTime.toString());
-        
-        logger.info("Starting timers-testing.OneTimerDate");
-        
-        startAndWaitForStartingThreads(STARTING_THREADS_COUNT, maxDuration, PROCESSES_PER_THREAD, getStartingRunnable(CONTAINER_ID, "timers-testing.OneTimerDate", params));
-        startingTime = Duration.between(startTime, Instant.now()).toString();
-        logger.info("Starting processes took: {}", startingTime);
-
-        assertThat(Instant.now()).isBefore(fireAtTime.toInstant());
-
-        Duration waitForCompletionDuration = Duration.between(Instant.now(), fireAtTime).plus(Duration.of(40, ChronoUnit.MINUTES));
-
-        TimeUtils.wait(Duration.between(Instant.now(), fireAtTime.toInstant()));
-        
-        logger.info("Waiting for process instances to be completed, max waiting time is {}", waitForCompletionDuration);
-        waitForAllProcessesToComplete(waitForCompletionDuration);
-        processTime = Duration.between(fireAtTime.toInstant(), Instant.now()).toString();
-        logger.info("Process instances completed, took approximately {}", processTime);
-    }
-    
-    private OffsetDateTime calculateFireAtTime() {
-        OffsetDateTime currentTime = OffsetDateTime.now();
-        long offsetInSeconds = Math.round(PROCESSES_COUNT / STARTING_THREADS_COUNT / PERF_INDEX);
-        offsetInSeconds = offsetInSeconds < MINIMUM_OFFSET ? MINIMUM_OFFSET : offsetInSeconds;
-        OffsetDateTime fireAtTime = currentTime.plus(offsetInSeconds, ChronoUnit.SECONDS);
-        logger.info("fireAtTime set to {} which is the offset of {} seconds", fireAtTime, offsetInSeconds);
-
-        return fireAtTime;
-    }
-    
+    protected abstract void runSingleScenario();
+       
     protected void startAndWaitForStartingThreads(int numberOfThreads, Duration duration, Integer iterations, Runnable runnable) {
        List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
