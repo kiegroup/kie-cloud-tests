@@ -61,25 +61,22 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
-        deploymentScenario.setLogFolderName(this.getClass().getSimpleName()); // TODO check if works ok
+        deploymentScenario.setLogFolderName(this.getClass().getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
         
+        // Create users in SSO
         Map<String, String> users = Stream.of(Users.class.getEnumConstants()).collect(Collectors.toMap(Users::getName, Users::getPassword));
         SsoDeployer.createUsers(deploymentScenario.getSsoDeployment(), users);
 
+        // Create default Workbench user
         defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
     }
 
     @After
     public void cleanEnvironment() {
-        //ScenarioDeployer.undeployScenario(deploymentScenario);
+        ScenarioDeployer.undeployScenario(deploymentScenario);
     }
-/*
-    @Before
-    public void setUp() {
-        defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
-    }
-*/
+
     protected void checkSpacesWereCreated(Collection<String> expectedSpaceNames, int runnersSize, int retries) {
         assertThat(expectedSpaceNames).isNotEmpty().hasSize(runnersSize * retries);
         Collection<Space> spaces = defaultWorkbenchClient.getSpaces();
@@ -125,13 +122,17 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
     }
 
 
-    // Generic function to split a list into two sublists
-    protected <T> List[] split(List<T> list) {
+    // Generic function to split a list into two subLists
+    protected <T> List<List<T>> split(List<T> list) {
+        List<List<T>> parts = new ArrayList<List<T>>();
+
         int size = list.size();
+        if (size <= 1) {
+            throw new RuntimeException("List size is smaller then 2 so list cannot be split.");
+        }
+        parts.add(new ArrayList<>(list.subList(0, (size + 1) / 2)));
+        parts.add(new ArrayList<>(list.subList((size + 1) / 2, size)));
 
-        List<T> first = new ArrayList<>(list.subList(0, (size + 1) / 2));
-        List<T> second = new ArrayList<>(list.subList((size + 1) / 2, size));
-
-        return new List[] { first, second };
+        return parts;
     }
 }

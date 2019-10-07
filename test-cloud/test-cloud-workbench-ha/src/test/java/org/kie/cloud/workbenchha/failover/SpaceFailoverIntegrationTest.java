@@ -15,10 +15,9 @@
 
 package org.kie.cloud.workbenchha.failover;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -26,31 +25,31 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.util.Users;
+import org.kie.cloud.runners.SpaceRunner;
+import org.kie.cloud.runners.provider.SpaceRunnerProvider;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
-import org.kie.cloud.workbenchha.runners.SpaceRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore("Failover scenarios are not supported yet.")
 public class SpaceFailoverIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     @Test
     public void testCreateAndDeleteFailoverSpaces() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
-        List<SpaceRunner> runners = new ArrayList<>();
-        runners.add(new SpaceRunner(deploymentScenario.getWorkbenchDeployment(), Users.FRODO.getName(), Users.FRODO.getPassword()));
-        //... TODO
+        List<SpaceRunner> runners = SpaceRunnerProvider.getAllRunners(deploymentScenario.getWorkbenchDeployment());
 
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create spaces for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createSpacesWithDelays("RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createSpacesWithDelays(UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
-        List<Instance>[] twoLists = split(deploymentScenario.getWorkbenchDeployment().getInstances());
-        deploymentScenario.getWorkbenchDeployment().deleteInstances(twoLists[0]);
+        List<List<Instance>> twoLists = split(deploymentScenario.getWorkbenchDeployment().getInstances());
+        deploymentScenario.getWorkbenchDeployment().deleteInstances(twoLists.get(0));
 
         List<String> expectedList = getAllStringFromFutures(futures);
 
@@ -60,21 +59,11 @@ public class SpaceFailoverIntegrationTest extends AbstractWorkbenchHaIntegration
         //DELETE ALL
 
         //Create tasks to delete spaces
-        List<Callable<Void>> deleteTasks = new ArrayList<>(runners.size());
-        //Add list to delete from previous create task
-        assertThat(runners).as("Check size of iterating lists.").hasSameSizeAs(futures);
-        Iterator runnersIterator = runners.iterator();
-        Iterator futureIterator = futures.iterator();
-        while(runnersIterator.hasNext() && futureIterator.hasNext()) {
-            SpaceRunner sr = (SpaceRunner) runnersIterator.next();
-            Future<Collection<String>> f = (Future<Collection<String>>) futureIterator.next();
-            
-            deleteTasks.add(sr.deleteSpacesWithDelays(f.get()));
-        }
+        List<Callable<Void>> deleteTasks = runners.stream().map(SpaceRunner::deleteSpaces).collect(Collectors.toList());
 
         //Execute task and wait for all threads to finished
         List<Future<Void>> deleteFutures = executorService.invokeAll(deleteTasks);
-        deploymentScenario.getWorkbenchDeployment().deleteInstances(twoLists[1]);
+        deploymentScenario.getWorkbenchDeployment().deleteInstances(twoLists.get(1));
         getAllDeleteDone(deleteFutures);
 
         //Check all spaces was deleted

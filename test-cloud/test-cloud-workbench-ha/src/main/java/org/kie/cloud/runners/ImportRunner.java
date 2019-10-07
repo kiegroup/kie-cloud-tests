@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.runners;
+package org.kie.cloud.runners;
 
 import java.util.ArrayList;
 import java.util.Collection;

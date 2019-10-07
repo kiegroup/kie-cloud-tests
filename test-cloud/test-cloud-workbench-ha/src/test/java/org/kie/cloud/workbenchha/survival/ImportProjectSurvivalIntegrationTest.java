@@ -18,6 +18,7 @@ package org.kie.cloud.workbenchha.survival;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -28,17 +29,19 @@ import java.util.stream.Collectors;
 import org.guvnor.rest.client.ProjectResponse;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
+import org.kie.cloud.runners.ImportRunner;
 import org.kie.cloud.tests.common.provider.git.Git;
 import org.kie.cloud.util.Users;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
-import org.kie.cloud.workbenchha.runners.ImportRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore("Survival scenarios are not supported yet.")
 public class ImportProjectSurvivalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static final String SPACE_NAME = "test-space";
@@ -71,7 +74,7 @@ public class ImportProjectSurvivalIntegrationTest extends AbstractWorkbenchHaInt
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.asyncImportProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.asyncImportProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         // Delete all pods

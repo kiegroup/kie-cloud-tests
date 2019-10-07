@@ -17,8 +17,8 @@ package org.kie.cloud.workbenchha.scaling;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -28,14 +28,16 @@ import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
-import org.kie.cloud.util.Users;
+import org.kie.cloud.runners.ProjectRunner;
+import org.kie.cloud.runners.provider.ProjectRunnerProvider;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
-import org.kie.cloud.workbenchha.runners.ProjectRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore("Scaling scenarios are not supported yet.")
 public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
@@ -55,14 +57,12 @@ public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationT
     @Test
     public void testCreateAndDeleteProjects() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
-        List<ProjectRunner> runners = new ArrayList<>();
-        runners.add(new ProjectRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
-        //... TODO
+        List<ProjectRunner> runners = ProjectRunnerProvider.getAllRunners(deploymentScenario.getWorkbenchDeployment());
 
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         int originalWorkbenchPods = deploymentScenario.getWorkbenchDeployment().getInstances().size();
@@ -74,7 +74,7 @@ public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationT
         checkProjectsWereCreated(SPACE_NAME, expectedList, runners.size(), 5);
 
         //Another run with scale up of WB
-        createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,"RANDOM GENERATE NAME", 6, 5)).collect(Collectors.toList());
+        createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,UUID.randomUUID().toString().substring(0, 6), 6, 5)).collect(Collectors.toList());
         futures = executorService.invokeAll(createTasks);
 
         deploymentScenario.getWorkbenchDeployment().scale(originalWorkbenchPods);
@@ -90,17 +90,7 @@ public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationT
 
         
         //Create tasks to delete projects
-        List<Callable<Void>> deleteTasks = new ArrayList<>(runners.size());
-        //Add list to delete from previous create task
-        assertThat(runners).as("Check size of iterating lists.").hasSameSizeAs(futures);
-        Iterator runnersIterator = runners.iterator();
-        Iterator futureIterator = futures.iterator();
-        while(runnersIterator.hasNext() && futureIterator.hasNext()) {
-            ProjectRunner sr = (ProjectRunner) runnersIterator.next();
-            Future<Collection<String>> f = (Future<Collection<String>>) futureIterator.next();
-            
-            deleteTasks.add(sr.deleteProjectsWithDelays(SPACE_NAME,f.get()));
-        }
+        List<Callable<Void>> deleteTasks = runners.stream().map(pr -> pr.deleteProjects(SPACE_NAME)).collect(Collectors.toList());
 
         //Execute task and wait for all threads to finished
         List<Future<Void>> deleteFutures = executorService.invokeAll(deleteTasks);
@@ -109,7 +99,7 @@ public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationT
 
         getAllDeleteDone(deleteFutures);
 
-        //Check all projects from second create run was deleted
-        checkSpacesWereCreated(expectedList, runners.size(), 5);
+        // Check all projects was deleted
+        assertThat(defaultWorkbenchClient.getProjects(SPACE_NAME)).isNotNull().isEmpty();
     }
 }

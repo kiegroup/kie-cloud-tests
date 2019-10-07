@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.runners;
+package org.kie.cloud.runners;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;

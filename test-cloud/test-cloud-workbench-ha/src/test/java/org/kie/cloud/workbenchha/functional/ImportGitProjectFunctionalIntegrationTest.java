@@ -18,6 +18,7 @@ package org.kie.cloud.workbenchha.functional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -30,10 +31,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
+import org.kie.cloud.runners.ImportRunner;
+import org.kie.cloud.runners.provider.ImportRunnerProvider;
 import org.kie.cloud.tests.common.provider.git.Git;
-import org.kie.cloud.util.Users;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
-import org.kie.cloud.workbenchha.runners.ImportRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,14 +63,12 @@ public class ImportGitProjectFunctionalIntegrationTest extends AbstractWorkbench
     @Test
     public void testImportProjects() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
-        List<ImportRunner> runners = new ArrayList<>();
-        runners.add(new ImportRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
-        //... TODO
+        List<ImportRunner> runners = ImportRunnerProvider.getAllRunners(deploymentScenario.getWorkbenchDeployment());
 
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.importProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),"RANDOM GENERATE NAME", 1, 5)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.importProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         List<String> expectedList = new ArrayList<>();

@@ -33,9 +33,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.util.Users;
+import org.kie.cloud.runners.CompileRunner;
+import org.kie.cloud.runners.provider.CompileRunnerProvider;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
-import org.kie.cloud.workbenchha.runners.CompileRunner;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,9 +68,7 @@ public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHa
     @Test
     public void testImportProjects() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
-        List<CompileRunner> runners = new ArrayList<>();
-        runners.add(new CompileRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
-        //... TODO
+        List<CompileRunner> runners = CompileRunnerProvider.getAllRunners(deploymentScenario.getWorkbenchDeployment());
 
         // TODO need to be updated - not finished !!!
 

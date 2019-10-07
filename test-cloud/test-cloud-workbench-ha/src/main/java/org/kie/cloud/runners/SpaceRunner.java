@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.runners;
+package org.kie.cloud.runners;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,8 +26,11 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 // Runner class witch can run command in series repeatedly as a new thread
 public class SpaceRunner extends AbstractRunner {
 
+    private List<String> allCreatedSpaces;
+
     public SpaceRunner(WorkbenchDeployment workbenchDeployment, String user, String password) {
         super(workbenchDeployment, user, password);
+        allCreatedSpaces = new ArrayList<>();
         // TODO Auto-generated constructor stub
     }
 
@@ -40,6 +43,7 @@ public class SpaceRunner extends AbstractRunner {
                     workbenchClient.createSpace(spaceName + "-" + i, wbUser);
                     createdSpaces.add(spaceName + "-" + i);
                 }
+                allCreatedSpaces.addAll(createdSpaces);
                 return createdSpaces;
             }
         };
@@ -52,6 +56,10 @@ public class SpaceRunner extends AbstractRunner {
                 return workbenchClient.getSpaces();
             }
         };
+    }
+
+    public Callable<Void> deleteSpaces() {
+        return deleteSpaces(allCreatedSpaces);
     }
 
     public Callable<Void> deleteSpaces(Collection<String> spaceNames) {
@@ -79,9 +87,14 @@ public class SpaceRunner extends AbstractRunner {
                         e.printStackTrace();
                     } // random value in (0,5 s - 3 s)
                 }
+                allCreatedSpaces.addAll(createdSpaces);
                 return createdSpaces;
             }
         };
+    }
+
+    public Callable<Void> deleteSpacesWithDelays() {
+        return deleteSpacesWithDelays(allCreatedSpaces);
     }
 
     public Callable<Void> deleteSpacesWithDelays(Collection<String> spaceNames) {

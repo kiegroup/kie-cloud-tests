@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.runners;
+package org.kie.cloud.runners;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,9 +25,11 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 public class ProjectRunner extends AbstractRunner {
 
+    private Collection<String> allCreatedProjects;
+
     public ProjectRunner(WorkbenchDeployment workbenchDeployment, String user, String password) {
         super(workbenchDeployment, user, password);
-        // TODO Auto-generated constructor stub
+        allCreatedProjects = new ArrayList<>();
     }
 
     private static final String GROUP_ID = "org.kie.cloud.testing";
@@ -42,6 +44,7 @@ public class ProjectRunner extends AbstractRunner {
                     workbenchClient.createProject(spaceName,projectName + "-" + i, GROUP_ID, VERSION);
                     createdProjects.add(projectName + "-" + i);
                 }
+                allCreatedProjects.addAll(createdProjects);
                 return createdProjects;
             }
         };
@@ -54,6 +57,10 @@ public class ProjectRunner extends AbstractRunner {
                 return workbenchClient.getProjects(spaceName);
             }
         };
+    }
+
+    public Callable<Void> deleteProjects(String spaceName) {
+        return deleteProjects(spaceName, allCreatedProjects);
     }
 
     public Callable<Void> deleteProjects(String spaceName, Collection<String> projectNames) {
@@ -83,9 +90,14 @@ public class ProjectRunner extends AbstractRunner {
                         e.printStackTrace();
                     } // random value in (0,5 s - 3 s)
                 }
+                allCreatedProjects.addAll(createdProjects);
                 return createdProjects;
             }
         };
+    }
+
+    public Callable<Void> deleteProjectsWithDelays(String spaceName) {
+        return deleteProjectsWithDelays(spaceName, allCreatedProjects);
     }
 
     public Callable<Void> deleteProjectsWithDelays(String spaceName, Collection<String> projectNames) {
