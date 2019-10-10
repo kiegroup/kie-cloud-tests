@@ -19,20 +19,14 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 
-import javax.net.ssl.SSLHandshakeException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import cz.xtf.core.http.Https;
+import cz.xtf.core.http.HttpsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RouterUtil {
 
-    private static final int ROUTER_CODE = 503;
-    private static final String ROUTER_MESSAGE = "The application is currently not serving requests at this endpoint. It may not have been started or is still starting.";
+    private static final int ROUTER_SERVICE_UNAVAILABLE_CODE = 503;
     private static final long ROUTER_WAIT_ITERATION_TIME = 250;
     private static final Duration ROUTER_WAIT_TIME = Duration.ofMinutes(5);
 
@@ -41,32 +35,24 @@ public class RouterUtil {
     public static void waitForRouter(URL url) {
         Instant endTime = Instant.now().plus(ROUTER_WAIT_TIME);
 
-        logger.info("Waiting for router to expose url: {}", url.toString());
+        String urlString = url.toString();
+        logger.info("Waiting for router to expose url: {}", urlString);
 
         while (Instant.now().isBefore(endTime)) {
             try {
-                HttpGet request = new HttpGet(url.toString());
-                HttpClient client = HttpClientBuilder.create().build();
-                HttpResponse response = client.execute(request);
-
-                if (response.getStatusLine().getStatusCode() != ROUTER_CODE) {
-                    return;
-                }
-
-                String responseContent = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
-                if (!responseContent.contains(ROUTER_MESSAGE)) {
+                if (Https.getCode(urlString) != ROUTER_SERVICE_UNAVAILABLE_CODE) {
                     return;
                 }
 
                 Thread.sleep(ROUTER_WAIT_ITERATION_TIME);
-            } catch (SSLHandshakeException e) {
+            } catch (HttpsException e) {
                 logger.debug("SSLHandshakeException: " + e.getMessage());
                 logger.debug("Wait for a while and try to execute request again.");
                 try {
                     Thread.sleep(Duration.ofSeconds(1).toMillis());
                 } catch (InterruptedException e1) {
                     Thread.currentThread().interrupt();
-                    throw new RuntimeException("Interrupted while waiting for server template creation.", e1);
+                    throw new RuntimeException("Interrupted while waiting for route to become available.", e1);
                 }
                 continue;
             } catch (Exception e) {
@@ -75,6 +61,6 @@ public class RouterUtil {
             }
         }
 
-        logger.warn("Timeout while waiting for router to expose url: {}. The URL is unreachable.", url.toString());
+        logger.warn("Timeout while waiting for router to expose url: {}. The URL is unreachable.", urlString);
     }
 }
