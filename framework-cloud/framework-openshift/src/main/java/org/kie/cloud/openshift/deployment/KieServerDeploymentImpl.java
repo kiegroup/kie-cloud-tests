@@ -93,8 +93,9 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
 
     @Override public void waitForScale() {
         super.waitForScale();
-        if (getInstances().size() > 0) {
-            RouterUtil.waitForRouter(getUrl());
+        if (!getInstances().isEmpty()) {
+            getInsecureUrl().ifPresent(RouterUtil::waitForRouter);
+            getSecureUrl().ifPresent(RouterUtil::waitForRouter);
         }
     }
 
