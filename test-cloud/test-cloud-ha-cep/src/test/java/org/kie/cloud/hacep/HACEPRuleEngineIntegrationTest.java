@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.kie.api.runtime.rule.FactHandle;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
@@ -30,9 +29,7 @@ import org.kie.hacep.sample.kjar.StockTickEvent;
 import org.kie.remote.CommonConfig;
 import org.kie.remote.RemoteFactHandle;
 import org.kie.remote.RemoteKieSession;
-import org.kie.remote.RemoteStreamingKieSession;
 import org.kie.remote.TopicsConfig;
-import org.kie.remote.impl.RemoteFactHandleImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
