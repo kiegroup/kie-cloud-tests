@@ -70,6 +70,10 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     private static final String KAFKA_BOOTSTRAP_ROUTE = "my-cluster-kafka-bootstrap";
 
+    private static final String SOURCES_FILE_ROLE = "springboot/kubernetes/role.yaml";
+    private static final String SOURCES_FILE_ROLE_BINDING = "springboot/kubernetes/role-binding.yaml";
+    private static final String SOURCES_FILE_SERVICE_ACCOUNT = "springboot/kubernetes/service-account.yaml";
+
     private StrimziOperator strimziOperator;
     private HACepDeployment haCepDeployment;
 
@@ -103,8 +107,24 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
         createTopics();
 
-        project.runOcCommandAsAdmin("create", "clusterrolebinding", "permissive-binding",
-                                               "--clusterrole=cluster-admin", "--group=system:serviceaccounts");
+        final File haCepSourcesDir = new File(OpenShiftConstants.getHaCepSources());
+        final File roleYamlFile = new File(haCepSourcesDir, SOURCES_FILE_ROLE);
+        if (!roleYamlFile.isFile()) {
+            throw new RuntimeException("File with HACEP role can not be found: " + roleYamlFile.getAbsolutePath());
+        }
+        final File serviceAccountYamlFile = new File(haCepSourcesDir, SOURCES_FILE_SERVICE_ACCOUNT);
+        if (!serviceAccountYamlFile.isFile()) {
+            throw new RuntimeException("File with HACEP service account can not be found: " +
+                                               serviceAccountYamlFile.getAbsolutePath());
+        }
+        final File roleBindingYamlFile = new File(haCepSourcesDir, SOURCES_FILE_ROLE_BINDING);
+        if (!serviceAccountYamlFile.isFile()) {
+            throw new RuntimeException("File with HACEP role binding can not be found: " +
+                                               roleBindingYamlFile.getAbsolutePath());
+        }
+        project.createResourcesFromYamlAsAdmin(roleYamlFile.getAbsolutePath());
+        project.createResourcesFromYamlAsAdmin(serviceAccountYamlFile.getAbsolutePath());
+        project.createResourcesFromYamlAsAdmin(roleBindingYamlFile.getAbsolutePath());
 
         project.createResourcesFromYamlAsAdmin(OpenShiftConstants.getHaCepResourcesList());
         haCepDeployment = new HACepDeploymentImpl(project);
@@ -120,7 +140,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     @Override
     public void undeploy() {
-        project.runOcCommandAsAdmin("delete", "clusterrolebinding", "permissive-binding");
         super.undeploy();
     }
 
