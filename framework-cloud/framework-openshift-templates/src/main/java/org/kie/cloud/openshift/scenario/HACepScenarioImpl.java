@@ -17,23 +17,14 @@ package org.kie.cloud.openshift.scenario;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.KeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -59,7 +50,6 @@ import org.kie.cloud.strimzi.resources.KafkaCluster;
 import org.kie.cloud.strimzi.resources.KafkaClusterBuilder;
 import org.kie.cloud.strimzi.resources.KafkaTopic;
 import org.kie.cloud.strimzi.resources.KafkaTopicBuilder;
-import sun.security.pkcs.PKCS8Key;
 
 public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implements HACepScenario {
 
