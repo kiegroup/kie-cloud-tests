@@ -16,7 +16,6 @@
 package org.kie.cloud.strimzi.deployment;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import cz.xtf.core.waiting.SupplierWaiter;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
