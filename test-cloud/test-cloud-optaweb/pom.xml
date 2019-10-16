@@ -61,16 +61,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.optaweb.employeerostering</groupId>
-      <artifactId>employee-rostering-shared</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.optaweb.employeerostering</groupId>
-      <artifactId>employee-rostering-restclient</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

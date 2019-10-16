@@ -18,30 +18,23 @@ package org.kie.cloud.optaweb;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.EmployeeRosteringScenario;
-import org.kie.cloud.optaweb.testprovider.OptawebEmployeeRosteringTestProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 
 public class OptawebEmployeeRosteringIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<EmployeeRosteringScenario> {
-
-    private OptawebEmployeeRosteringTestProvider testProvider;
 
     @Override
     protected EmployeeRosteringScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getEmployeeRosteringScenarioBuilder().build();
     }
 
-    @Before
-    public void setup() {
-        testProvider = new OptawebEmployeeRosteringTestProvider(getSanitizedUrl());
-    }
-
     @Test
+    @Ignore("Requires a complete rewrite after Employee Rostering has been re-implemented in React and Spring Boot")
     public void fromSkillToRoster() {
-        testProvider.fromSkillToRoster();
+        throw new UnsupportedOperationException();
     }
 
     private URL getSanitizedUrl() {
