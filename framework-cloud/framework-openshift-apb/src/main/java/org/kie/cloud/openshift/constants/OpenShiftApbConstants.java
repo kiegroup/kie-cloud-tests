@@ -146,4 +146,14 @@ public class OpenShiftApbConstants {
     public static final String KIE_SERVER_IMAGE_STREAM_NAME = "apb_kieserver_image_stream_name";
 
     public static final String PROMETHEUS_SERVER_EXT_DISABLED = "apb_kieserver_prometheus_ext_disabled";
+
+    // AMQ
+    public static final String AMQ_INTEGRATION_ENABLE = "apb_enable_kieserver_jms_integration";
+    public static final String AMQ_USERNAME = "apb_kieserver_jms_username";
+    public static final String AMQ_PASSWORD = "apb_kieserver_jms_password";
+    public static final String AMQ_SECRET = "apb_amq_secret_name";
+    public static final String AMQ_TRUSTSTORE = "apb_amq_truststore_name";
+    public static final String AMQ_TRUSTSTORE_PASSWORD = "apb_amq_truststore_pwd";
+    public static final String AMQ_KEYSTORE = "apb_amq_keystore_name";
+    public static final String AMQ_KEYSTORE_PASSWORD = "apb_amq_keystore_pwd";
 }
