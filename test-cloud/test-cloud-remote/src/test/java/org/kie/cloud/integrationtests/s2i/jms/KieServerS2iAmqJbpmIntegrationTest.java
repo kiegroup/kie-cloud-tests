@@ -45,7 +45,7 @@ import org.kie.server.client.UserTaskServicesClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({ApbNotSupported.class, JBPMOnly.class})
+@Category({JBPMOnly.class})
 public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario deploymentScenario;
@@ -124,6 +124,7 @@ public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegration
     }
 
     @Test
+    @Category({ApbNotSupported.class})
     public void testWorkbenchHttps() {
         HttpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
     }

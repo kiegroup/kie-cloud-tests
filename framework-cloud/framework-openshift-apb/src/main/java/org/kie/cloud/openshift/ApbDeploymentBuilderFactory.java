@@ -37,6 +37,7 @@ import org.kie.cloud.openshift.scenario.builder.ClusteredWorkbenchRuntimeSmartRo
 import org.kie.cloud.openshift.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderApb;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderApb;
 import org.kie.cloud.openshift.scenario.builder.WorkbenchKieServerScenarioBuilderApb;
+import org.kie.cloud.openshift.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderApb;
 import org.kie.cloud.openshift.settings.builder.LdapSettingsBuilderImpl;
 
 public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFactory {
@@ -98,7 +99,7 @@ public class ApbDeploymentBuilderFactory implements DeploymentScenarioBuilderFac
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder getWorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderApb();
     }
 
     @Override
