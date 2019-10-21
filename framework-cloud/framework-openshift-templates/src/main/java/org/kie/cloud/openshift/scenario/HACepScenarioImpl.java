@@ -74,6 +74,9 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static final String SOURCES_FILE_ROLE_BINDING = "springboot/kubernetes/role-binding.yaml";
     private static final String SOURCES_FILE_SERVICE_ACCOUNT = "springboot/kubernetes/service-account.yaml";
 
+    private static final String STRIMZI_LABEL_KEY = "app";
+    private static final String STRIMZI_LABEL_VALUE = "strimzi";
+
     private StrimziOperator strimziOperator;
     private HACepDeployment haCepDeployment;
 
@@ -141,6 +144,8 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     @Override
     public void undeploy() {
         super.undeploy();
+
+        deleteStrimziCustomResourceDefinitions();
     }
 
     private File downloadAndUnzipAMQStreams() {
@@ -198,6 +203,15 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
                 .addConfigItem("delete.retention.ms", "100")
                 .build();
         strimziOperator.createTopic(snapshotsTopic);
+    }
+
+    private void deleteStrimziCustomResourceDefinitions() {
+        project.getOpenShiftAdmin().customResourceDefinitions().list().getItems()
+                .stream()
+                .filter(d -> d.getMetadata().getLabels() != null)
+                .filter(d -> d.getMetadata().getLabels().containsKey(STRIMZI_LABEL_KEY))
+                .filter(d -> d.getMetadata().getLabels().get(STRIMZI_LABEL_KEY).equals(STRIMZI_LABEL_VALUE))
+                .forEach(d -> project.getOpenShiftAdmin().customResourceDefinitions().delete(d));
     }
 
     private static void filterNamespaceInInstallationFiles(final File amqStreamsInstallDirectory,
