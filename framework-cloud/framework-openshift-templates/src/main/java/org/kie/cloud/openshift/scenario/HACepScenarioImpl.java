@@ -48,8 +48,6 @@ import org.kie.cloud.strimzi.deployment.StrimziOperatorDeployment;
 import org.kie.cloud.strimzi.deployment.ZookeeperDeployment;
 import org.kie.cloud.strimzi.resources.KafkaCluster;
 import org.kie.cloud.strimzi.resources.KafkaClusterBuilder;
-import org.kie.cloud.strimzi.resources.KafkaTopic;
-import org.kie.cloud.strimzi.resources.KafkaTopicBuilder;
 
 public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implements HACepScenario {
 
@@ -57,10 +55,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static final String AMQ_STREAMS_TEMPLATES_SUBDIRECTORY = "examples/templates/cluster-operator";
 
     private static final String KAFKA_CLUSTER_NAME = "my-cluster";
-    private static final String MASTER_EVENTS_TOPIC = "control";
-    private static final String USER_INPUT_TOPIC = "events";
-    private static final String SESSION_INFOS_TOPIC = "kiesessioninfos";
-    private static final String SNAPSHOTS_TOPIC = "snapshot";
 
     private static final String KAFKA_CLUSTER_CA_SECRET_SUFFIX = "-cluster-ca-cert";
     private static final String KAFKA_CLUSTER_CA_KEY = "ca.crt";
@@ -73,6 +67,12 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static final String SOURCES_FILE_ROLE = "springboot/kubernetes/role.yaml";
     private static final String SOURCES_FILE_ROLE_BINDING = "springboot/kubernetes/role-binding.yaml";
     private static final String SOURCES_FILE_SERVICE_ACCOUNT = "springboot/kubernetes/service-account.yaml";
+
+    private static final String SOURCES_KAFKA_TOPICS_FOLDER = "kafka-topics";
+    /* List of topics which needs to be created for HACEP. Topics are located in kafka-topics folder in HACEP
+     distribution */
+    private static final String[] SOURCE_KAFKA_TOPIC_FILES =
+            new String[] {"control.yaml", "events.yaml", "kiesessioninfos.yaml", "snapshot.yaml"};
 
     private static final String STRIMZI_LABEL_KEY = "app";
     private static final String STRIMZI_LABEL_VALUE = "strimzi";
@@ -110,7 +110,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
         createTopics();
 
-        final File haCepSourcesDir = new File(OpenShiftConstants.getHaCepSources());
+        final File haCepSourcesDir = new File(OpenShiftConstants.getHaCepSourcesDir());
         final File roleYamlFile = new File(haCepSourcesDir, SOURCES_FILE_ROLE);
         if (!roleYamlFile.isFile()) {
             throw new RuntimeException("File with HACEP role can not be found: " + roleYamlFile.getAbsolutePath());
@@ -168,50 +168,16 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     }
 
     private void createTopics() {
-        final KafkaTopic masterEventsTopic = new KafkaTopicBuilder(MASTER_EVENTS_TOPIC, KAFKA_CLUSTER_NAME)
-                .withPartitions(1)
-                .withReplicas(3)
-                .addConfigItem("retention.ms", "7200000")
-                .addConfigItem("segment.bytes", "1073741824")
-                .build();
-        strimziOperator.createTopic(masterEventsTopic);
-
-        final KafkaTopic userInputTopic = new KafkaTopicBuilder(USER_INPUT_TOPIC, KAFKA_CLUSTER_NAME)
-                .withPartitions(1)
-                .withReplicas(3)
-                .addConfigItem("retention.ms", "7200000")
-                .addConfigItem("segment.bytes", "1073741824")
-                .build();
-        strimziOperator.createTopic(userInputTopic);
-
-        final KafkaTopic sessionInfosTopic = new KafkaTopicBuilder(SESSION_INFOS_TOPIC, KAFKA_CLUSTER_NAME)
-                .withPartitions(1)
-                .withReplicas(3)
-                .addConfigItem("retention.ms", "7200000")
-                .addConfigItem("segment.bytes", "1073741824")
-                .build();
-        strimziOperator.createTopic(sessionInfosTopic);
-
-        final KafkaTopic snapshotsTopic = new KafkaTopicBuilder(SNAPSHOTS_TOPIC, KAFKA_CLUSTER_NAME)
-                .withPartitions(1)
-                .withReplicas(3)
-                .addConfigItem("retention.ms", "7200000")
-                .addConfigItem("segment.bytes", "1073741824")
-                .addConfigItem("cleanup.policy", "compact")
-                .addConfigItem("segment.ms", "100")
-                .addConfigItem("min.cleanable.dirty.ratio", "0.01")
-                .addConfigItem("delete.retention.ms", "100")
-                .build();
-        strimziOperator.createTopic(snapshotsTopic);
+        final File kafkaTopicsFolder = new File(OpenShiftConstants.getHaCepSourcesDir(), SOURCES_KAFKA_TOPICS_FOLDER);
+        for (final String topicFileName : SOURCE_KAFKA_TOPIC_FILES) {
+            final File kafkaTopicFile = new File(kafkaTopicsFolder, topicFileName);
+            project.createResourcesFromYamlAsAdmin(kafkaTopicFile.getAbsolutePath());
+        }
     }
 
     private void deleteStrimziCustomResourceDefinitions() {
-        project.getOpenShiftAdmin().customResourceDefinitions().list().getItems()
-                .stream()
-                .filter(d -> d.getMetadata().getLabels() != null)
-                .filter(d -> d.getMetadata().getLabels().containsKey(STRIMZI_LABEL_KEY))
-                .filter(d -> d.getMetadata().getLabels().get(STRIMZI_LABEL_KEY).equals(STRIMZI_LABEL_VALUE))
-                .forEach(d -> project.getOpenShiftAdmin().customResourceDefinitions().delete(d));
+        project.runOcCommandAsAdmin("delete", "customresourcedefinition", "-l", STRIMZI_LABEL_KEY
+                                            + "=" + STRIMZI_LABEL_VALUE);
     }
 
     private static void filterNamespaceInInstallationFiles(final File amqStreamsInstallDirectory,

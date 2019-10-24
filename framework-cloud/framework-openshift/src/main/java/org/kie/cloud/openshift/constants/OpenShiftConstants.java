@@ -164,7 +164,7 @@ public class OpenShiftConstants implements Constants {
     public static final String AMQ_STREAMS_ZIP = "amq.streams.zip";
     public static final String AMQ_STREAMS_DIR = "amqStreamsDirectory";
     public static final String HA_CEP_RESOURCES_LIST = "ha.cep.resources";
-    public static final String HA_CEP_SOURCES = "ha.cep.sources";
+    public static final String HA_CEP_SOURCES_DIR = "ha.cep.sources.dir";
     public static final String PROJECT_BUILD_DIRECTORY = "project.build.directory";
 
     /**
@@ -266,8 +266,8 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(HA_CEP_RESOURCES_LIST);
     }
 
-    public static String getHaCepSources() {
-        return System.getProperty(HA_CEP_SOURCES);
+    public static String getHaCepSourcesDir() {
+        return System.getProperty(HA_CEP_SOURCES_DIR);
     }
 
     public static File getKieJdbcDriverScriptsFolder() {
