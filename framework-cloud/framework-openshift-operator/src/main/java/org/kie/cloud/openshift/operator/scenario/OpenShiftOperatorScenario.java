@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.operator.scenario;
 
+import java.util.Objects;
+
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.Secret;
@@ -25,6 +27,7 @@ import io.fabric8.kubernetes.api.model.rbac.KubernetesRole;
 import io.fabric8.kubernetes.api.model.rbac.KubernetesRoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
@@ -104,7 +107,15 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     private void createOperatorInProject(Project project) {
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
         Deployment deployment = project.getOpenShift().apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
-        deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(OpenShiftOperatorConstants.getKieOperatorImageTag());
+
+        String operatorImageTag = OpenShiftOperatorConstants.getKieOperatorImageTag();
+        String[] split = operatorImageTag.split(":");
+        ImageStream operatorImageStream = project.getOpenShift().getImageStream(split[0]);
+        if (Objects.nonNull(operatorImageStream)) {
+            final String streamTag = split.length > 0 ? split[1] : "latest";
+            operatorImageTag = operatorImageStream.getStatus().getDockerImageRepository() + ":" + streamTag;
+        }
+        deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(operatorImageTag);
         project.getOpenShift().apps().deployments().create(deployment);
 
         // wait until operator is ready
