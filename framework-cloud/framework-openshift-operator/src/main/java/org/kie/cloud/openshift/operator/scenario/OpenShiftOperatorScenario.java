@@ -78,12 +78,12 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void createCustomResourceDefinitionsInOpenShift(OpenShiftBinary adminBinary) {
         // TODO: Commented out due to UnrecognizedPropertyException, uncomment with raised Fabric8 version to check if it is fixed already.
-//        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
-//        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
-//        if(!operatorCrdExists) {
-            logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
-            adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
-//        }
+        //        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
+        //        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
+        //        if(!operatorCrdExists) {
+        logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
+        adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
+        //        }
     }
 
     private void createServiceAccountInProject(Project project) {
@@ -108,6 +108,10 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
         Deployment deployment = project.getOpenShift().apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
 
+        // Get the operator image tag (composed of name + tag). 
+        // Retrieve the image name and see if it fits an image stream.
+        // If yes, then use the image stream image's name and same tag as defined (use latest if no tag).
+        // If not, use as it is as image name.
         String operatorImageTag = OpenShiftOperatorConstants.getKieOperatorImageTag();
         String[] split = operatorImageTag.split(":");
         ImageStream operatorImageStream = project.getOpenShift().getImageStream(split[0]);
