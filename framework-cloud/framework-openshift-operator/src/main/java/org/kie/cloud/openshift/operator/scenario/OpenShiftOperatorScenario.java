@@ -15,6 +15,8 @@
 
 package org.kie.cloud.openshift.operator.scenario;
 
+import java.util.Objects;
+
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.Secret;
@@ -25,6 +27,7 @@ import io.fabric8.kubernetes.api.model.rbac.KubernetesRole;
 import io.fabric8.kubernetes.api.model.rbac.KubernetesRoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
@@ -75,12 +78,12 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void createCustomResourceDefinitionsInOpenShift(OpenShiftBinary adminBinary) {
         // TODO: Commented out due to UnrecognizedPropertyException, uncomment with raised Fabric8 version to check if it is fixed already.
-//        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
-//        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
-//        if(!operatorCrdExists) {
-            logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
-            adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
-//        }
+        //        List<CustomResourceDefinition> customResourceDefinitions = OpenShifts.master().customResourceDefinitions().list().getItems();
+        //        boolean operatorCrdExists = customResourceDefinitions.stream().anyMatch(i -> i.getMetadata().getName().equals("kieapps.app.kiegroup.org"));
+        //        if(!operatorCrdExists) {
+        logger.info("Creating custom resource definitions from " + OpenShiftResource.CRD.getResourceUrl().toString());
+        adminBinary.execute("create", "-n", getNamespace(), "-f", OpenShiftResource.CRD.getResourceUrl().toString());
+        //        }
     }
 
     private void createServiceAccountInProject(Project project) {
@@ -104,7 +107,19 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     private void createOperatorInProject(Project project) {
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
         Deployment deployment = project.getOpenShift().apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
-        deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(OpenShiftOperatorConstants.getKieOperatorImageTag());
+
+        // Get the operator image tag (composed of name + tag). 
+        // Retrieve the image name and see if it fits an image stream.
+        // If yes, then use the image stream image's name and same tag as defined (use latest if no tag).
+        // If not, use as it is as image name.
+        String operatorImageTag = OpenShiftOperatorConstants.getKieOperatorImageTag();
+        String[] split = operatorImageTag.split(":");
+        ImageStream operatorImageStream = project.getOpenShift().getImageStream(split[0]);
+        if (Objects.nonNull(operatorImageStream)) {
+            final String streamTag = split.length > 1 ? split[1] : "latest";
+            operatorImageTag = operatorImageStream.getStatus().getDockerImageRepository() + ":" + streamTag;
+        }
+        deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(operatorImageTag);
         project.getOpenShift().apps().deployments().create(deployment);
 
         // wait until operator is ready
