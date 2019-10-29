@@ -116,7 +116,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         String[] split = operatorImageTag.split(":");
         ImageStream operatorImageStream = project.getOpenShift().getImageStream(split[0]);
         if (Objects.nonNull(operatorImageStream)) {
-            final String streamTag = split.length > 0 ? split[1] : "latest";
+            final String streamTag = split.length > 1 ? split[1] : "latest";
             operatorImageTag = operatorImageStream.getStatus().getDockerImageRepository() + ":" + streamTag;
         }
         deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(operatorImageTag);
