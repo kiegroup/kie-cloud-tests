@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
@@ -72,6 +73,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
     }
 
     @Test
+    @Category({OperatorNotSupported.class}) // Skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2267
     public void testProcessUsingSmartRouter() {
         ProcessTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
         ProcessTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ALIAS_ID);
