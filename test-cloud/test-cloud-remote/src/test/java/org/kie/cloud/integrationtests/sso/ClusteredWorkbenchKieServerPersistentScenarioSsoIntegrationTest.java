@@ -29,6 +29,7 @@ import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
+import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
@@ -49,7 +50,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
             try {
                 deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                       .deploySso()
-                      .withInternalMavenRepo()
+                      // Using external Maven repo due to test instabilities, should be enabled once BAQE-1017 is fully implemented
+                      // .withInternalMavenRepo()
+                      .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                       .build();
             } catch (UnsupportedOperationException ex) {
                 Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -58,7 +61,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
             try {
                 deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                           .deploySso()
-                          .withInternalMavenRepo()
+                          // Using external Maven repo due to test instabilities, should be enabled once BAQE-1017 is fully implemented
+                          // .withInternalMavenRepo()
+                          .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(), MavenConstants.getMavenRepoPassword())
                           .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                           .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                           .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
