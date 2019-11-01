@@ -29,16 +29,16 @@ import org.guvnor.rest.client.ProjectResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 import org.kie.cloud.runners.ProjectRunner;
 import org.kie.cloud.runners.provider.ProjectRunnerProvider;
+import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static final String SPACE_NAME = "test-space";
-    private static final int PROJECT_PER_USER = 5;
+    //private static final int PROJECT_PER_USER = 5;
 
     @Before
     public void createTestingSpace() {
@@ -51,7 +51,7 @@ public class ProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegra
     }
 
     @Test
-    public void testCreateAndDeleteProjects() throws InterruptedException,ExecutionException {
+    public void testCreateAndDeleteProject() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
         List<ProjectRunner> runners = ProjectRunnerProvider.getAllRunners(deploymentScenario.getWorkbenchDeployment());
 
@@ -59,13 +59,14 @@ public class ProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIntegra
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
 
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjects(SPACE_NAME, UUID.randomUUID().toString().substring(0, 6), 1, PROJECT_PER_USER)).collect(Collectors.toList());
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProject(SPACE_NAME, UUID.randomUUID().toString().substring(0, 6))).collect(Collectors.toList());
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         List<String> expectedList = getAllStringFromFutures(futures);
 
         //Check that all projects where created
-        checkProjectsWereCreated(SPACE_NAME, expectedList, runners.size(), PROJECT_PER_USER);
+        assertThat(expectedList).isNotEmpty().hasSize(runners.size());
+        checkProjectsWereCreated(SPACE_NAME, expectedList);
 
         //GET ALL
 

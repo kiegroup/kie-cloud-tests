@@ -72,7 +72,8 @@ public class ProjectFailoverIntegrationTest extends AbstractWorkbenchHaIntegrati
         List<String> expectedList = getAllStringFromFutures(futures);
 
         //Check that all projects where created
-        checkProjectsWereCreated(SPACE_NAME, expectedList, runners.size(), 5);
+        assertThat(expectedList).isNotEmpty().hasSize(runners.size()*5);
+        checkProjectsWereCreated(SPACE_NAME, expectedList);
         
         //DELETE ALL
 
@@ -119,6 +120,7 @@ public class ProjectFailoverIntegrationTest extends AbstractWorkbenchHaIntegrati
 
 
         //Check that all projects where created
-        checkProjectsWereCreated(SPACE_NAME, expectedList, runners.size(), oldPods.size()*5);
+        assertThat(expectedList).isNotEmpty().hasSize(runners.size()*oldPods.size()*5);
+        checkProjectsWereCreated(SPACE_NAME, expectedList);
     }
 }

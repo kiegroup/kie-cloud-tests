@@ -13,9 +13,8 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.workbenchha.scaling;
+package org.kie.cloud.workbenchha.functional;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -24,33 +23,32 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import cz.xtf.core.waiting.SimpleWaiter;
+import org.guvnor.rest.client.ProjectResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.runners.ProjectRunner;
 import org.kie.cloud.runners.provider.ProjectRunnerProvider;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore("Scaling scenarios are not supported yet.")
-public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
-
-    private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
+public class ProjectAsyncFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
     private static final String SPACE_NAME = "test-space";
+    private static final int PROJECT_PER_USER = 5;
 
     @Before
-    public void setUp() {
+    public void createTestingSpace() {
         defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
     }
 
     @After
-    public void cleanUp(){
+    public void deleteTestingSpace(){
         defaultWorkbenchClient.deleteSpace(SPACE_NAME);
     }
 
@@ -61,46 +59,51 @@ public class ProjectScaleIntegrationTest extends AbstractWorkbenchHaIntegrationT
 
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
-        //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
-        List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
-        int originalWorkbenchPods = deploymentScenario.getWorkbenchDeployment().getInstances().size();
-        deploymentScenario.getWorkbenchDeployment().scale(originalWorkbenchPods/2);
+        //Create task to create projects for all users
+        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.asyncCreateProjects(SPACE_NAME, UUID.randomUUID().toString().substring(0, 6),0,PROJECT_PER_USER)).collect(Collectors.toList());
+        List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         List<String> expectedList = getAllStringFromFutures(futures);
 
-        //Check that all projects where created
-        assertThat(expectedList).isNotEmpty().hasSize(runners.size()*5);
-        checkProjectsWereCreated(SPACE_NAME, expectedList);
-
-        //Another run with scale up of WB
-        createTasks = runners.stream().map(runner -> runner.createProjectsWithDelays(SPACE_NAME,UUID.randomUUID().toString().substring(0, 6), 6, 5)).collect(Collectors.toList());
-        futures = executorService.invokeAll(createTasks);
-
-        deploymentScenario.getWorkbenchDeployment().scale(originalWorkbenchPods);
+        // TODO add here waiter for project creation
+        //new SimpleWaiter(()->{return defaultWorkbenchClient.getProjects(SPACE_NAME).size()==runners.size()*PROJECT_PER_USER;}).timeout(TimeUnit.MINUTES, 5).interval(TimeUnit.SECONDS, 5).;
         
 
-        List<String> secondExpectedList = new ArrayList<>(expectedList);
-        secondExpectedList.addAll(getAllStringFromFutures(futures));        
+        //Check that all projects where created
+        //assertThat(expectedList).isNotEmpty().hasSize(runners.size()*PROJECT_PER_USER);
+        
+        new SimpleWaiter(()->wereProjectsCreated(SPACE_NAME, expectedList)).reason("Waiting for projects to be created.").timeout(TimeUnit.MINUTES, 5).interval(TimeUnit.SECONDS, 5).waitFor();
+        checkProjectsWereCreated(SPACE_NAME, expectedList);
 
-        //Check that all spaces where created
-        checkSpacesWereCreated(secondExpectedList, runners.size(), 10);
+        
+
+        //GET ALL
+
+        List<Callable<Collection<ProjectResponse>>> getAllProjects = runners.stream().map(pr -> pr.getProjects(SPACE_NAME)).collect(Collectors.toList());
+        List<Future<Collection<ProjectResponse>>> futuresProjects = executorService.invokeAll(getAllProjects);
+        futuresProjects.forEach(futureProjects -> {
+            try {
+                assertThat(futureProjects.get().stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()))).isNotNull().isNotEmpty().containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
+            } catch (InterruptedException | ExecutionException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
         
         //DELETE ALL
 
-        
         //Create tasks to delete projects
         List<Callable<Void>> deleteTasks = runners.stream().map(pr -> pr.deleteProjects(SPACE_NAME)).collect(Collectors.toList());
-
         //Execute task and wait for all threads to finished
         List<Future<Void>> deleteFutures = executorService.invokeAll(deleteTasks);
-        
-        deploymentScenario.getWorkbenchDeployment().scale(originalWorkbenchPods/2);
-
         getAllDeleteDone(deleteFutures);
 
-        // Check all projects was deleted
+        //Check all projects was deleted
         assertThat(defaultWorkbenchClient.getProjects(SPACE_NAME)).isNotNull().isEmpty();
     }
+
+    // TODO add scenario when user tries to get one space (each user have it's own space) from that space get all projects.
+    // Mainly check that all spaces and projects are correctly returned.
+
 }

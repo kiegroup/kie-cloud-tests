@@ -85,12 +85,15 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
         assertThat(resultSpaceNameList).containsExactlyInAnyOrder(expectedSpaceNames.stream().toArray(String[]::new));
     }
 
-    protected void checkProjectsWereCreated(String spaceName, Collection<String> expectedProjectNames, int runnersSize, int retries) {
-        assertThat(expectedProjectNames).isNotEmpty().hasSize(runnersSize * retries);        
+    protected void checkProjectsWereCreated(String spaceName, Collection<String> expectedProjectNames) {
         Collection<ProjectResponse> projects = defaultWorkbenchClient.getProjects(spaceName);
         assertThat(projects).isNotNull();
         List<String> resultList = projects.stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()));
         assertThat(resultList).containsExactlyInAnyOrder(expectedProjectNames.stream().toArray(String[]::new));
+    }
+
+    protected boolean wereProjectsCreated(String spaceName, Collection<String> expectedProjectNames) {
+        return defaultWorkbenchClient.getProjects(spaceName).stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList())).containsAll(expectedProjectNames);
     }
 
     protected List<String> getAllStringFromFutures(List<Future<Collection<String>>> futures) {

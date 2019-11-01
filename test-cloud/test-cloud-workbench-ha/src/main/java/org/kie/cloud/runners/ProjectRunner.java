@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.guvnor.rest.client.ProjectResponse;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class ProjectRunner extends AbstractRunner {
 
@@ -35,19 +36,36 @@ public class ProjectRunner extends AbstractRunner {
     private static final String GROUP_ID = "org.kie.cloud.testing";
     private static final String VERSION = "1.0.0";
     
+    public Callable<Collection<String>> createProject(String spaceName, String projectName) {
+        return createProjects(spaceName, projectName, 0, 1);
+    }
+
     public Callable<Collection<String>> createProjects(String spaceName, String projectName, int startSuffix, int retries) {
         return new Callable<Collection<String>>() {
             @Override
             public Collection<String> call() {
-                List<String> createdProjects = new ArrayList<>(retries);
-                for (int i = startSuffix; i < startSuffix + retries; i++) {
-                    workbenchClient.createProject(spaceName,projectName + "-" + i, GROUP_ID, VERSION);
-                    createdProjects.add(projectName + "-" + i);
-                }
-                allCreatedProjects.addAll(createdProjects);
-                return createdProjects;
+                return createProjects(workbenchClient, spaceName, projectName, startSuffix, retries);
             }
         };
+    }
+
+    public Callable<Collection<String>> asyncCreateProjects(String spaceName, String projectName, int startSuffix, int retries) {
+        return new Callable<Collection<String>>() {
+            @Override
+            public Collection<String> call() {
+                return createProjects(asyncWorkbenchClient, spaceName, projectName, startSuffix, retries);
+            }
+        };
+    }
+
+    private List<String> createProjects(WorkbenchClient client, String spaceName, String projectName, int startSuffix, int retries) {
+        List<String> createdProjects = new ArrayList<>(retries);
+        for (int i = startSuffix; i < startSuffix + retries; i++) {
+            client.createProject(spaceName, projectName + "-" + i, GROUP_ID, VERSION);
+            createdProjects.add(projectName + "-" + i);
+        }
+        allCreatedProjects.addAll(createdProjects);
+        return createdProjects;
     }
 
     public Callable<Collection<ProjectResponse>> getProjects(String spaceName) {
