@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.CertificateFactory;
@@ -48,6 +49,8 @@ import org.kie.cloud.strimzi.deployment.StrimziOperatorDeployment;
 import org.kie.cloud.strimzi.deployment.ZookeeperDeployment;
 import org.kie.cloud.strimzi.resources.KafkaCluster;
 import org.kie.cloud.strimzi.resources.KafkaClusterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implements HACepScenario {
 
@@ -67,6 +70,8 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static final String SOURCES_FILE_ROLE = "springboot/kubernetes/role.yaml";
     private static final String SOURCES_FILE_ROLE_BINDING = "springboot/kubernetes/role-binding.yaml";
     private static final String SOURCES_FILE_SERVICE_ACCOUNT = "springboot/kubernetes/service-account.yaml";
+    private static final String SOURCES_FILE_HACEP_DEPLOYMENT = "springboot/kubernetes/deployment.yaml";
+    private static final String SOURCES_FILE_HACEP_SERVICE = "springboot/kubernetes/service.yaml";
 
     private static final String SOURCES_KAFKA_TOPICS_FOLDER = "kafka-topics";
     /* List of topics which needs to be created for HACEP. Topics are located in kafka-topics folder in HACEP
@@ -79,6 +84,8 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     private StrimziOperator strimziOperator;
     private HACepDeployment haCepDeployment;
+
+    private static final Logger logger = LoggerFactory.getLogger(HACepScenarioImpl.class);
 
     @Override
     protected void deployKieDeployments() {
@@ -102,6 +109,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
                 .addKafkaConfigItem("log.message.format.version", "2.1")
                 .addKafkaConfigItem("auto.create.topics.enable", "true");
         final KafkaCluster kafkaCluster = kafkaClusterBuilder.build();
+        logger.info("Deploying Kafka cluster");
         strimziOperator.createCluster(kafkaCluster);
         final ZookeeperDeployment zookeeperDeployment = new ZookeeperDeployment(kafkaCluster.getMetadata().getName(), project);
         zookeeperDeployment.waitForScale();
@@ -113,10 +121,13 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         final File haCepSourcesDir = new File(OpenShiftConstants.getHaCepSourcesDir());
         final File roleYamlFile = new File(haCepSourcesDir, SOURCES_FILE_ROLE);
         if (!roleYamlFile.isFile()) {
+            logger.error("File with HACEP role can not be found: {}", roleYamlFile.getAbsolutePath());
             throw new RuntimeException("File with HACEP role can not be found: " + roleYamlFile.getAbsolutePath());
         }
         final File serviceAccountYamlFile = new File(haCepSourcesDir, SOURCES_FILE_SERVICE_ACCOUNT);
         if (!serviceAccountYamlFile.isFile()) {
+            logger.error("File with HACEP service account can not be found: {}",
+                         serviceAccountYamlFile.getAbsolutePath());
             throw new RuntimeException("File with HACEP service account can not be found: " +
                                                serviceAccountYamlFile.getAbsolutePath());
         }
@@ -125,20 +136,29 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
             throw new RuntimeException("File with HACEP role binding can not be found: " +
                                                roleBindingYamlFile.getAbsolutePath());
         }
+        logger.info("Creating role for HACEP from file: {}", roleYamlFile.getAbsolutePath());
         project.createResourcesFromYamlAsAdmin(roleYamlFile.getAbsolutePath());
+        logger.info("Creating service account for HACEP from file: {}", serviceAccountYamlFile.getAbsolutePath());
         project.createResourcesFromYamlAsAdmin(serviceAccountYamlFile.getAbsolutePath());
+        logger.info("Creating role binding for HACEP from file: {}", roleBindingYamlFile.getAbsolutePath());
         project.createResourcesFromYamlAsAdmin(roleBindingYamlFile.getAbsolutePath());
 
-        project.createResourcesFromYamlAsAdmin(OpenShiftConstants.getHaCepResourcesList());
+        final String dockerImageRepository = buildHACEPImage();
+        final File haCepDeploymentYamlFile = new File(haCepSourcesDir, SOURCES_FILE_HACEP_DEPLOYMENT);
+        final String haCepDeploymentYaml = patchHACEPDeploymentFile(haCepDeploymentYamlFile, dockerImageRepository);
+        logger.info("Creating HACEP deployment");
+        project.createResourcesFromYamlStringAsAdmin(haCepDeploymentYaml);
+
+        final File haCepService = new File(haCepSourcesDir, SOURCES_FILE_HACEP_SERVICE);
+        logger.info("Creating HACEP service from file: {}", haCepService.getAbsolutePath());
+        project.createResourcesFromYamlAsAdmin(haCepService.getAbsolutePath());
+
         haCepDeployment = new HACepDeploymentImpl(project);
+
+        logger.info("Exposing HACEP service as route");
         project.runOcCommandAsAdmin("expose", "service",
                                     ((HACepDeploymentImpl) haCepDeployment).getServiceName());
         haCepDeployment.waitForScale();
-        try {
-            Thread.sleep(30000); // RHPAM-2380
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
     }
 
     @Override
@@ -152,6 +172,8 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         File amqStreamsZipFile;
         try {
             amqStreamsZipFile = File.createTempFile("amq-streams", ".zip");
+            logger.info("Downloading zip with AMQ Streams from {} to {}", OpenShiftConstants.getAMQStreamsZip(),
+                        amqStreamsZipFile.getAbsolutePath());
             FileUtils.copyURLToFile(new URL(OpenShiftConstants.getAMQStreamsZip()), amqStreamsZipFile);
         } catch (IOException e) {
             throw new RuntimeException("Unable to download AMQ streams zip", e);
@@ -162,20 +184,52 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         final Unzip unzip = new Unzip();
         unzip.setSrc(amqStreamsZipFile);
         unzip.setDest(amqStreamsDirectory);
+        logger.info("Unpacking AMQ streams zip from {} to {}", amqStreamsZipFile.getAbsolutePath(),
+                    amqStreamsDirectory.getAbsolutePath());
         unzip.execute();
 
         return amqStreamsDirectory;
+    }
+
+    private String buildHACEPImage() {
+        project.runOcCommandAsAdmin("new-build", "--binary", "--strategy=docker",
+                                    "--name", "openshift-kie-springboot");
+        final File springModuleDir = new File(OpenShiftConstants.getHaCepSourcesDir(), "springboot");
+        logger.info("Building HA-CEP Spring boot image");
+        final String buildOutput = project.runOcCommandAsAdmin("start-build", "openshift-kie-springboot",
+                                    "--from-dir=" + springModuleDir.getAbsolutePath(), "--follow");
+        logger.info(buildOutput);
+        final String dockerImageRepository = project.getOpenShiftAdmin().getImageStream("openshift-kie-springboot").getStatus().getDockerImageRepository();
+
+        return dockerImageRepository;
+    }
+
+    private String patchHACEPDeploymentFile(final File deploymentYamlFile, final String dockerImageRepository) {
+        String deploymentYaml;
+        try {
+            deploymentYaml = FileUtils.readFileToString(deploymentYamlFile, "UTF-8");
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading yaml file with HACEP deployment" +
+                                               deploymentYamlFile.getAbsolutePath(), e);
+        }
+
+        logger.info("Changing image name in HACEP deployment from file: {}", deploymentYamlFile.getAbsolutePath());
+        deploymentYaml = deploymentYaml.replaceAll("image:.*", "image: " + dockerImageRepository);
+
+        return deploymentYaml;
     }
 
     private void createTopics() {
         final File kafkaTopicsFolder = new File(OpenShiftConstants.getHaCepSourcesDir(), SOURCES_KAFKA_TOPICS_FOLDER);
         for (final String topicFileName : SOURCE_KAFKA_TOPIC_FILES) {
             final File kafkaTopicFile = new File(kafkaTopicsFolder, topicFileName);
+            logger.info("Creating topic from file: {}", kafkaTopicFile.getAbsolutePath());
             project.createResourcesFromYamlAsAdmin(kafkaTopicFile.getAbsolutePath());
         }
     }
 
     private void deleteStrimziCustomResourceDefinitions() {
+        logger.info("Deleting AMQ streams custom resource definitions");
         project.runOcCommandAsAdmin("delete", "customresourcedefinition", "-l", STRIMZI_LABEL_KEY
                                             + "=" + STRIMZI_LABEL_VALUE);
     }
@@ -186,6 +240,7 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         for (File file : installationFiles) {
             if (file.isFile() && file.getName().contains("RoleBinding")) {
                 try {
+                    logger.info("Changing namespace name in file: {}", file.getAbsolutePath());
                     String fileContent = FileUtils.readFileToString(file, "UTF-8");
                     fileContent = fileContent.replaceAll("namespace: .*",
                                                          "namespace: " + projectName);
