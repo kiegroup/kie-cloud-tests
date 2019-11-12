@@ -31,7 +31,7 @@ public class ImportRunnerProvider {
         return runners;
     }
 
-    public static List<ImportRunner> getOneRunners(WorkbenchDeployment workbenchDeployment) {
+    public static List<ImportRunner> getOneRunner(WorkbenchDeployment workbenchDeployment) {
         List<ImportRunner> runners = new ArrayList<>();
         runners.add(new ImportRunner(workbenchDeployment, Users.JOHN.getName(), Users.JOHN.getPassword()));
         return runners;

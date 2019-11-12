@@ -32,7 +32,7 @@ public class ProjectRunnerProvider {
         return runners;
     }
 
-    public static List<ProjectRunner> getOneRunners(WorkbenchDeployment workbenchDeployment) {
+    public static List<ProjectRunner> getOneRunner(WorkbenchDeployment workbenchDeployment) {
         List<ProjectRunner> runners = new ArrayList<>();
         runners.add(new ProjectRunner(workbenchDeployment, Users.JOHN.getName(), Users.JOHN.getPassword()));
         return runners;

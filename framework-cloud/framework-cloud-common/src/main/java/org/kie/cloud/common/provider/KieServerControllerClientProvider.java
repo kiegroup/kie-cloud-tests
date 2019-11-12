@@ -30,7 +30,7 @@ public class KieServerControllerClientProvider {
     }
 
     public static KieServerControllerClient getKieServerControllerClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
-        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
+        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient("http://insecure-myapp-rhpamcentr-ha-test.project.openshiftdomain/"/*workbenchDeployment.getUrl().toString()*/ + "/rest/controller",  //TODO revert
                 username, password);
         return kieServerControllerClient;
     }

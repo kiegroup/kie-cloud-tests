@@ -34,7 +34,7 @@ public class SpaceRunnerProvider {
         
     }
 
-    public static List<SpaceRunner> getOneRunners(WorkbenchDeployment workbenchDeployment) {
+    public static List<SpaceRunner> getOneRunner(WorkbenchDeployment workbenchDeployment) {
         List<SpaceRunner> runners = new ArrayList<>();
         runners.add(new SpaceRunner(workbenchDeployment, Users.JOHN.getName(), Users.JOHN.getPassword()));
         return runners;

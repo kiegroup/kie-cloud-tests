@@ -29,7 +29,8 @@ import org.guvnor.rest.client.Space;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
-import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
+//import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.maven.constants.MavenConstants;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -42,8 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegrationTest {
 
-    protected WorkbenchKieServerPersistentScenario deploymentScenario;
-    //protected ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
+    //protected WorkbenchKieServerPersistentScenario deploymentScenario;
+    protected ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 
     protected WorkbenchClient defaultWorkbenchClient;
 
@@ -52,8 +53,8 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
     @Before
     public void initializeDeployment() {
         try {
-            deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-            //deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
+            //deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
                     .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
                             MavenConstants.getMavenRepoPassword())
                     .deploySso()
@@ -74,7 +75,7 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
 
     @After
     public void cleanEnvironment() {
-        ScenarioDeployer.undeployScenario(deploymentScenario);
+        //ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     protected void checkSpacesWereCreated(Collection<String> expectedSpaceNames, int runnersSize, int retries) {

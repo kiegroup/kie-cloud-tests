@@ -33,7 +33,7 @@ public class CompileRunnerProvider {
         return runners;
     }
 
-    public static List<CompileRunner> getOneRunners(WorkbenchDeployment workbenchDeployment) {
+    public static List<CompileRunner> getOneRunner(WorkbenchDeployment workbenchDeployment) {
         List<CompileRunner> runners = new ArrayList<>();
         runners.add(new CompileRunner(workbenchDeployment, Users.JOHN.getName(), Users.JOHN.getPassword()));
         return runners;
