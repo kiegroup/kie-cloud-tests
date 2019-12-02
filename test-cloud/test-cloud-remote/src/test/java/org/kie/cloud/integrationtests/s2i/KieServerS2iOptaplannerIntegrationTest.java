@@ -122,7 +122,7 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndInstallMavenProject(
-                KieServerS2iOptaplannerIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile(), new HashMap<>());
+                KieServerS2iOptaplannerIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
     }
 
     @Before

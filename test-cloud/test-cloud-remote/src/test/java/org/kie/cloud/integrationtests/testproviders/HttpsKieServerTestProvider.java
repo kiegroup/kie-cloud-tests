@@ -31,6 +31,7 @@ import org.apache.http.entity.ContentType;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
@@ -74,16 +75,16 @@ public class HttpsKieServerTestProvider {
      * 
      * @return provider instance
      */
-    public static HttpsKieServerTestProvider create(Map<String, String> environment) {
+    public static HttpsKieServerTestProvider create(DeploymentScenario<?> deploymentScenario) {
         HttpsKieServerTestProvider provider = new HttpsKieServerTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {
-        KjarDeployer.create(Kjar.HELLO_RULES_SNAPSHOT).deploy(environment);
+    private void init(DeploymentScenario<?> deploymentScenario) {
+        KjarDeployer.create(Kjar.HELLO_RULES_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
     }
 
     public void testKieServerInfo(KieServerDeployment kieServerDeployment, boolean ssoScenario) {

@@ -93,4 +93,9 @@ public class MavenUtil {
         this.maven.setEnvironmentVariable(key, value);
         return this;
     }
+
+    public MavenUtil setSystemProperty(String key, String value) {
+        maven.setSystemProperty(key, value);
+        return this;
+    }
 }

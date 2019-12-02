@@ -183,8 +183,4 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<W
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
     }
-
-    public Map<String, String> getScenarioEnvironment() {
-        return new HashMap<>(extraVars);
-    }
 }

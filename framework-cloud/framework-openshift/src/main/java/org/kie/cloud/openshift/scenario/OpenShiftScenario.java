@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,12 +27,14 @@ import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.log.EventsRecorder;
 import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
@@ -52,6 +55,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     private InstancesLogCollectorRunnable instancesLogCollectorRunnable;
 
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
+    private List<ExternalDeployment<?, ?>> externalDeployments = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
 
@@ -193,6 +197,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      * @param externalDeployment External deployment to add to the scenario
      */
     public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
+        externalDeployments.add(externalDeployment);
         addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
 
             @Override
@@ -220,6 +225,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      * @param externalDeployment External deployment to add to the scenario
      */
     public void addExtraDeploymentSynchronized(ExternalDeployment<?, ?> externalDeployment) {
+        externalDeployments.add(externalDeployment);
         addDeploymentScenarioListener(new DeploymentScenarioListener<T>() {
 
             @Override
@@ -235,5 +241,14 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
             }
 
         });
+    }
+
+    @Override
+    public MavenRepositoryDeployment getMavenRepositoryDeployment() {
+        return externalDeployments.stream().filter(deployment -> ExternalDeploymentID.MAVEN_REPOSITORY.equals(deployment.getKey()))
+                                           .map(ExternalDeployment::getDeploymentInformation)
+                                           .map(deployment -> (MavenRepositoryDeployment) deployment)
+                                           .findAny()
+                                           .orElseThrow(() -> new RuntimeException("Maven repository deployment not found."));
     }
 }

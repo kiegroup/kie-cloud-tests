@@ -218,9 +218,4 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
 
         return deployment;
     }
-
-    @Override
-    public Map<String, String> getScenarioEnvironment() {
-        return new HashMap<>(extraVars);
-    }
 }

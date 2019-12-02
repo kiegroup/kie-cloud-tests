@@ -96,7 +96,7 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
 
     @Before
     public void setUp() {
-        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getScenarioEnvironment());
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
 
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());

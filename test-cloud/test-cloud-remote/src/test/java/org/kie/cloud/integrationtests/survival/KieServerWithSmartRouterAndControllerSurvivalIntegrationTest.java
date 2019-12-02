@@ -82,7 +82,7 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
         deploymentScenario.setLogFolderName(KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
 
-        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getScenarioEnvironment());
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
     }
 
     @Before

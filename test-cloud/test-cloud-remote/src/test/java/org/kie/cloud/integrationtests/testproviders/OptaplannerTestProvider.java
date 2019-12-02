@@ -18,7 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,6 +26,7 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -69,16 +69,16 @@ public class OptaplannerTestProvider {
      * 
      * @return provider instance
      */
-    public static OptaplannerTestProvider create(Map<String, String> environment) {
+    public static OptaplannerTestProvider create(DeploymentScenario<?> deploymentScenario) {
         OptaplannerTestProvider provider = new OptaplannerTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {
-        KjarDeployer.create(Kjar.CLOUD_BALANCE_SNAPSHOT).deploy(environment);
+    private void init(DeploymentScenario<?> deploymentScenario) {
+        KjarDeployer.create(Kjar.CLOUD_BALANCE_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
     }
 
     public void testDeployFromKieServerAndExecuteSolver(KieServerDeployment kieServerDeployment) {

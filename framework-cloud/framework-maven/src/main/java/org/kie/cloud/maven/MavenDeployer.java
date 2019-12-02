@@ -18,11 +18,11 @@ package org.kie.cloud.maven;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.it.VerificationException;
 import org.kie.cloud.api.constants.ConfigurationInitializer;
+import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.maven.util.MavenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +33,6 @@ public class MavenDeployer {
 
     private static final String SETTINGS_XML_PATH_KEY = "kjars.build.settings.xml";
 
-    // Environment variables that can be configured for this deployer
-    public static final String MAVEN_DEPLOYER_REPO_URL_KEY = "MAVEN_DEPLOYER_REPO_URL";
-    public static final String MAVEN_DEPLOYER_REPO_USERNAME_KEY = "MAVEN_DEPLOYER_REPO_USERNAME";
-    public static final String MAVEN_DEPLOYER_REPO_PASSWORD_KEY = "MAVEN_DEPLOYER_REPO_PASSWORD";
     // Keep those for Backward Compatibility with system properties
     public static final String MAVEN_REPO_URL_KEY = "maven.repo.url";
     public static final String MAVEN_REPO_USERNAME_KEY = "maven.repo.username";
@@ -52,8 +48,8 @@ public class MavenDeployer {
      * @param basedir Directory to build a project from.
      * @param environment Map of key / value environment variables that could be used
      */
-    public static void buildAndInstallMavenProject(String basedir, Map<String, String> environment) {
-        buildMavenProject(basedir, "install", environment);
+    public static void buildAndInstallMavenProject(String basedir) {
+        buildMavenProject(basedir, "install", null);
     }
 
     /**
@@ -62,8 +58,8 @@ public class MavenDeployer {
      * @param basedir Directory to build a project from.
      * @param environment Map of key / value environment variables that could be used
      */
-    public static void buildAndDeployMavenProject(String basedir, Map<String, String> environment) {
-        buildMavenProject(basedir, "deploy", environment);
+    public static void buildAndDeployMavenProject(String basedir, MavenRepositoryDeployment repositoryDeployment) {
+        buildMavenProject(basedir, "deploy", repositoryDeployment);
     }
 
     /**
@@ -72,12 +68,15 @@ public class MavenDeployer {
      * @param basedir Directory to build a project from.
      * @param buildCommand Build command, for example "install" or "deploy".
      */
-    private static void buildMavenProject(String basedir, String buildCommand, Map<String, String> environment) {
+    private static void buildMavenProject(String basedir, String buildCommand, MavenRepositoryDeployment repositoryDeployment) {
         try {
             MavenUtil mavenUtil = MavenUtil.forProject(Paths.get(basedir)).forkJvm();
-            addSettingsXmlPathIfExists(mavenUtil, environment);
-            addDistributionRepository(mavenUtil, environment);
-            environment.entrySet().forEach(e -> mavenUtil.setEnvironmentVariable(e.getKey(), e.getValue()));
+            addSettingsXmlPathIfExists(mavenUtil);
+
+            if (repositoryDeployment != null) {
+                addDistributionRepository(mavenUtil, repositoryDeployment);
+            }
+
             mavenUtil.executeGoals(buildCommand);
 
             logger.debug("Maven project successfully built and deployed!");
@@ -91,8 +90,8 @@ public class MavenDeployer {
      *
      * @param mavenUtil
      */
-    private static void addSettingsXmlPathIfExists(MavenUtil mavenUtil, Map<String, String> environment) {
-        getSettingsXmlPath(environment).map(Paths::get).ifPresent(settingsXmlPath -> {
+    private static void addSettingsXmlPathIfExists(MavenUtil mavenUtil) {
+        getSettingsXmlPath().map(Paths::get).ifPresent(settingsXmlPath -> {
             if (settingsXmlPath.toFile().exists()) {
                 mavenUtil.useSettingsXml(settingsXmlPath);
             } else {
@@ -106,17 +105,12 @@ public class MavenDeployer {
      *
      * @param mavenUtil
      */
-    private static void addDistributionRepository(MavenUtil mavenUtil, Map<String, String> environment) {
-        List<String> cliOptions = new ArrayList<String>();
-        getEnvVar(environment, MAVEN_DEPLOYER_REPO_URL_KEY, MAVEN_REPO_URL_KEY)
-                .map(url -> constructMavenEnvCliOption(MAVEN_REPO_URL_KEY, url.replaceAll("\\/\\/", "\\/\\/\\/")))
-                .ifPresent(cliOptions::add);
-        getEnvVar(environment, MAVEN_DEPLOYER_REPO_USERNAME_KEY, MAVEN_REPO_USERNAME_KEY)
-                .map(username -> constructMavenEnvCliOption(MAVEN_REPO_USERNAME_KEY, username))
-                .ifPresent(cliOptions::add);
-        getEnvVar(environment, MAVEN_DEPLOYER_REPO_PASSWORD_KEY, MAVEN_REPO_PASSWORD_KEY)
-                .map(password -> constructMavenEnvCliOption(MAVEN_REPO_PASSWORD_KEY, password))
-                .ifPresent(cliOptions::add);
+    private static void addDistributionRepository(MavenUtil mavenUtil, MavenRepositoryDeployment repositoryDeployment) {
+        mavenUtil.setSystemProperty("altDeploymentRepository", String.format("remote-testing-repo::default::%s", repositoryDeployment.getSnapshotsRepositoryUrl()));
+
+        List<String> cliOptions = new ArrayList<>();
+        cliOptions.add(constructMavenEnvCliOption(MAVEN_REPO_USERNAME_KEY, repositoryDeployment.getUsername()));
+        cliOptions.add(constructMavenEnvCliOption(MAVEN_REPO_PASSWORD_KEY, repositoryDeployment.getPassword()));
         mavenUtil.addCliOptions(cliOptions);
     }
 
@@ -124,19 +118,11 @@ public class MavenDeployer {
         return "-D" + key + "=" + value;
     }
 
-    private static Optional<String> getSettingsXmlPath(Map<String, String> environment) {
-        return getEnvVar(environment, SETTINGS_XML_PATH_KEY);
+    private static Optional<String> getSettingsXmlPath() {
+        return getSystemProperty(SETTINGS_XML_PATH_KEY);
     }
 
-    private static Optional<String> getEnvVar(Map<String, String> environment, String envKey) {
-        return getEnvVar(environment, envKey, envKey);
-    }
-
-    private static Optional<String> getEnvVar(Map<String, String> environment, String envKey, String systemKey) {
-        if (environment.containsKey(envKey)) {
-            return Optional.of(environment.get(envKey));
-        } else {
-            return Optional.ofNullable(System.getProperty(systemKey));
-        }
+    private static Optional<String> getSystemProperty(String systemKey) {
+        return Optional.ofNullable(System.getProperty(systemKey));
     }
 }
