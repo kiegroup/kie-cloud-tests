@@ -174,8 +174,4 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
     public Optional<PrometheusDeployment> getPrometheusDeployment() {
         return Optional.ofNullable(prometheusDeployment);
     }
-
-    public Map<String, String> getScenarioEnvironment() {
-        return new HashMap<>(extraVars);
-    }
 }

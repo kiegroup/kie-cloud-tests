@@ -249,8 +249,4 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     public SsoDeployment getSsoDeployment() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    public Map<String, String> getScenarioEnvironment() {
-        return new HashMap<>(extraVars);
-    }
 }

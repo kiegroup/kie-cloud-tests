@@ -60,9 +60,9 @@ public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudInte
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
-        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
+        processTestProvider = ProcessTestProvider.create(deploymentScenario);
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
 
         // Workaround to speed test execution.
         // Create all containers while Kie servers are turned off to avoid expensive respins.

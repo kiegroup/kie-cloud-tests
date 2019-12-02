@@ -18,7 +18,6 @@ package org.kie.cloud.integrationtests.testproviders;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.kie.api.KieServices;
@@ -29,6 +28,7 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.git.GitProvider;
@@ -75,16 +75,16 @@ public class FireRulesTestProvider {
      * 
      * @return provider instance
      */
-    public static FireRulesTestProvider create(Map<String, String> environment) {
+    public static FireRulesTestProvider create(DeploymentScenario<?> deploymentScenario) {
         FireRulesTestProvider provider = new FireRulesTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {
-        KjarDeployer.create(Kjar.HELLO_RULES_SNAPSHOT).deploy(environment);
+    private void init(DeploymentScenario<?> deploymentScenario) {
+        KjarDeployer.create(Kjar.HELLO_RULES_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
     }
 
     public void testDeployFromKieServerAndFireRules(KieServerDeployment kieServerDeployment) {

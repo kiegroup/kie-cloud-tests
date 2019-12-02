@@ -124,7 +124,7 @@ public class KieServerS2iAmqOptaplannerIntegrationTest extends AbstractMethodIso
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndInstallMavenProject(
-            KieServerS2iAmqOptaplannerIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile(), new HashMap<>());
+            KieServerS2iAmqOptaplannerIntegrationTest.class.getResource("/kjars-sources/cloudbalance-snapshot").getFile());
     }
 
     @Before

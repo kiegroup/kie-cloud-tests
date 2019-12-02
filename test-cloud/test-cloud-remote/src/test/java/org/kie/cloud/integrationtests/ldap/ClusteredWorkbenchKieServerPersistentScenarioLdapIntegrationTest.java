@@ -70,10 +70,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
-        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
+        processTestProvider = ProcessTestProvider.create(deploymentScenario);
         projectBuilderTestProvider = ProjectBuilderTestProvider.create();
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
     }
 
     @AfterClass

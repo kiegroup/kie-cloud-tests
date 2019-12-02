@@ -40,7 +40,8 @@ public abstract class AbstractExternalDeployment<T extends Deployment, U> implem
 
     protected abstract T deployToProject(Project project);
 
-    protected T getDeploymentInformation() {
+    @Override
+    public T getDeploymentInformation() {
         if (Objects.isNull(this.deployment)) {
             throw new RuntimeException("Trying to access deployment informaiton whereas the deployment has not been done ...");
         }

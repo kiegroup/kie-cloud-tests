@@ -69,12 +69,12 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
-        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
+        processTestProvider = ProcessTestProvider.create(deploymentScenario);
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
         httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
-        smartRouterTestProvider = SmartRouterTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        smartRouterTestProvider = SmartRouterTestProvider.create(deploymentScenario);
 
         // Workaround to speed test execution.
         // Create all containers while Kie servers are turned off to avoid expensive respins.

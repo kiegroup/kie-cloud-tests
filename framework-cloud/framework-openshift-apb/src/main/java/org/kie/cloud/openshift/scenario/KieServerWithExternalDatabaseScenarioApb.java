@@ -164,8 +164,4 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
                 DeploymentConstants.getCustomTrustedKeystoreAlias());
         extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
     }
-
-    public Map<String, String> getScenarioEnvironment() {
-        return new HashMap<>(extraVars);
-    }
 }

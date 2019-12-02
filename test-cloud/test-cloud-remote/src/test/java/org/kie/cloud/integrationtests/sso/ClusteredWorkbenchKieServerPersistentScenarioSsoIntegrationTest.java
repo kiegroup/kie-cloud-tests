@@ -78,9 +78,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
-        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        processTestProvider = ProcessTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
+        processTestProvider = ProcessTestProvider.create(deploymentScenario);
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
         projectBuilderTestProvider = ProjectBuilderTestProvider.create();
     }
 
