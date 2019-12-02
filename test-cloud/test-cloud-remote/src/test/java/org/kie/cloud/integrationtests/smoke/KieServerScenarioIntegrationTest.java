@@ -50,9 +50,9 @@ public class KieServerScenarioIntegrationTest extends AbstractCloudIntegrationTe
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
-        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario.getScenarioEnvironment());
-        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario.getScenarioEnvironment());
+        fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
+        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
+        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
     }
 
     @AfterClass

@@ -36,7 +36,7 @@ public class KjarDeploymentScenarioListener<T extends DeploymentScenario<T>> imp
 
     @Override
     public void beforeDeploymentStarted(T deploymentScenario) {
-        this.kjars.forEach(kjar -> KjarDeployer.create(kjar).deploy(deploymentScenario.getScenarioEnvironment()));
+        this.kjars.forEach(kjar -> KjarDeployer.create(kjar).deploy(deploymentScenario.getMavenRepositoryDeployment()));
     }
 
     @Override

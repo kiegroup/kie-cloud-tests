@@ -15,12 +15,12 @@
 package org.kie.cloud.integrationtests.testproviders;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.Constants;
@@ -59,16 +59,16 @@ public class ProcessTestProvider {
      * 
      * @return provider instance
      */
-    public static ProcessTestProvider create(Map<String, String> environment) {
+    public static ProcessTestProvider create(DeploymentScenario<?> deploymentScenario) {
         ProcessTestProvider provider = new ProcessTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {
-        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(environment);
+    private void init(DeploymentScenario<?> deploymentScenario) {
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
     }
 
     public void testDeployFromKieServerAndExecuteProcesses(KieServerDeployment kieServerDeployment) {

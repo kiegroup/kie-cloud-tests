@@ -40,6 +40,11 @@ public interface ExternalDeployment<T extends Deployment, U> {
     T deploy(Project project);
 
     /**
+     * @return Deployment entity of this external deployment
+     */
+    T getDeploymentInformation();
+
+    /**
      * Configure the given object with this external deployment information
      * 
      * @param object This object should be specific for deployment process (templates, operator, apb ...)

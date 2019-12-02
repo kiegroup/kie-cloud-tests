@@ -79,7 +79,7 @@ public class DroolsSessionFailoverIntegrationTest extends AbstractMethodIsolated
 
     @Before
     public void setUp() {
-        KjarDeployer.create(Kjar.RULE_SNAPSHOT).deploy(deploymentScenario.getScenarioEnvironment());
+        KjarDeployer.create(Kjar.RULE_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
 
         kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
         smartRouterServicesClient = KieServerClientProvider.getSmartRouterClient(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment().getUsername(), deploymentScenario

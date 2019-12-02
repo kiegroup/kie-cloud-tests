@@ -128,7 +128,7 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
 
     @BeforeClass
     public static void buildKjar() {
-        MavenDeployer.buildAndInstallMavenProject(KieServerS2iDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile(), new HashMap<>());
+        MavenDeployer.buildAndInstallMavenProject(KieServerS2iDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile());
     }
 
     @Before

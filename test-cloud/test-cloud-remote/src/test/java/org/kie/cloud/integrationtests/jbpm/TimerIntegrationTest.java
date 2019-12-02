@@ -66,7 +66,7 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
 
     @Before
     public void setUp() {
-        KjarDeployer.create(DEPLOYED_KJAR).deploy(deploymentScenario.getScenarioEnvironment());
+        KjarDeployer.create(DEPLOYED_KJAR).deploy(deploymentScenario.getMavenRepositoryDeployment());
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
     }
