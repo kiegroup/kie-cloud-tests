@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.SupplierWaiter;
 import cz.xtf.core.waiting.WaiterException;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
@@ -35,6 +36,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
@@ -87,6 +89,8 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
 
         // deploy application
         getKieAppClient().create(kieApp);
+        // Wait until the operator reconciliate the KieApp and add there missing informations
+        new SupplierWaiter<KieApp>(() -> getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get(), kieApp -> kieApp.getStatus() != null).reason("Waiting for reconciliation to initialize all fields.").timeout(TimeUnit.MINUTES,1).waitFor();
 
         workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
