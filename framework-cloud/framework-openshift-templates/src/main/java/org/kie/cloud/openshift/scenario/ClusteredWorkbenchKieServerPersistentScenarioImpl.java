@@ -34,8 +34,9 @@ import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
-import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
 
     @Override
     protected void deployKieDeployments() {
-        /* TODO revert
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploy(project);
 
@@ -85,15 +85,12 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
         }
-        */
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
         envVariables.put(OpenShiftTemplateConstants.AMQ_IMAGE_STREAM_NAMESPACE, project.getName());
         envVariables.put("AMQ_REPLICAS","1");
-        //project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl(), envVariables); TODO revert
-
-        project = new ProjectImpl("ha-test");
+        project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
@@ -103,17 +100,15 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
         kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
-        //kieServerDeployment.scale(0); TODO revert
+        kieServerDeployment.scale(1);
 
-        //logger.info("Waiting for Workbench deployment to become ready."); TODO revert
-        //workbenchDeployment.waitForScale(); TODO revert
+        logger.info("Waiting for Workbench deployment to become ready.");
+        workbenchDeployment.waitForScale();
 
-        //logger.info("Waiting for Kie server deployment to become ready."); TODO revert
-        //kieServerDeployment.waitForScale(); TODO revert
+        logger.info("Waiting for Kie server deployment to become ready.");
+        kieServerDeployment.waitForScale();
 
-        logger.warn("SKIPING DEPLYMENT WAITING - skip as we are using WB from diferrent project.");
-
-        //logNodeNameOfAllInstances(); TODO revert
+        logNodeNameOfAllInstances();
     }
 
     @Override public List<Deployment> getDeployments() {

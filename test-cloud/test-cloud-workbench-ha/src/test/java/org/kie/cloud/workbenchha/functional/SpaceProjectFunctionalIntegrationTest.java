@@ -32,8 +32,8 @@ import org.guvnor.rest.client.Space;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.cloud.runners.ProjectRunner;
-import org.kie.cloud.runners.provider.ProjectRunnerProvider;
+import org.kie.cloud.runners.SpaceProjectRunner;
+import org.kie.cloud.runners.provider.SpaceProjectRunnerProvider;
 import org.kie.cloud.util.SpaceProjects;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 
@@ -58,7 +58,7 @@ public class SpaceProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIn
     @Test
     public void testCreateAndDeleteSpaceAndProject() throws InterruptedException,ExecutionException {
         //Create Runners with different users.
-        List<ProjectRunner> runners = ProjectRunnerProvider.getAllRunners(deploymentScenario.getWorkbenchDeployment());
+        List<SpaceProjectRunner> runners = SpaceProjectRunnerProvider.getAllRunners(deploymentScenario.getWorkbenchDeployment());
 
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
@@ -78,38 +78,24 @@ public class SpaceProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIn
         assertThat(expectedList).isNotEmpty().hasSize(runners.size());
 
         assertThat(defaultWorkbenchClient.getSpaces().stream().map(Space::getName)).as("Check all spaces were created").containsAll(expectedList.stream().map(SpaceProjects::getSpaceName).collect(Collectors.toList()));
-        expectedList.forEach(sp -> {
-            System.out.println("** "+sp.getSpaceName()+"  "+defaultWorkbenchClient.getProjects(sp.getSpaceName()).stream().map(ProjectResponse::getName).collect(Collectors.toList()));
-            assertThat(defaultWorkbenchClient.getProjects(sp.getSpaceName()).stream().map(ProjectResponse::getName)).as("Check Project in space %s",sp.getSpaceName()).containsAll(sp.getProjectNames());
-        });
-        //checkProjectsWereCreated(SPACE_NAME, expectedList);
-
-        /*
-        //GET ALL
-
-        List<Callable<Collection<ProjectResponse>>> getAllProjects = runners.stream().map(pr -> pr.getProjects(SPACE_NAME)).collect(Collectors.toList());
-        List<Future<Collection<ProjectResponse>>> futuresProjects = executorService.invokeAll(getAllProjects);
-        futuresProjects.forEach(futureProjects -> {
-            try {
-                assertThat(futureProjects.get().stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()))).isNotNull().isNotEmpty().containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
-            } catch (InterruptedException | ExecutionException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+        expectedList.forEach(spaceProjects -> {
+            System.out.println("** "+spaceProjects.getSpaceName()+"  "+defaultWorkbenchClient.getProjects(spaceProjects.getSpaceName()).stream().map(ProjectResponse::getName).collect(Collectors.toList()));
+            assertThat(defaultWorkbenchClient.getProjects(spaceProjects.getSpaceName()).stream().map(ProjectResponse::getName)).as("Check Project in space %s",spaceProjects.getSpaceName()).containsAll(spaceProjects.getProjectNames());
         });
         
         //DELETE ALL
 
         //Create tasks to delete projects
-        List<Callable<Void>> deleteTasks = runners.stream().map(pr -> pr.deleteProjects(SPACE_NAME)).collect(Collectors.toList());
+        List<Callable<Void>> deleteTasks = runners.stream().map(SpaceProjectRunner::deleteProjects).collect(Collectors.toList());
         //Execute task and wait for all threads to finished
         List<Future<Void>> deleteFutures = executorService.invokeAll(deleteTasks);
         getAllDeleteDone(deleteFutures);
 
         //Check all projects was deleted
-        assertThat(defaultWorkbenchClient.getProjects(SPACE_NAME)).isNotNull().isEmpty();
-
-        */
+        expectedList.forEach(spaceProjects-> {
+            assertThat(defaultWorkbenchClient.getProjects(spaceProjects.getSpaceName())).isNotNull().isEmpty();
+        });
+        
     }
 
     // TODO add scenario when user tries to get one space (each user have it's own space) from that space get all projects.
@@ -132,8 +118,6 @@ public class SpaceProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIn
     }
 
     protected void checkProjectsWereCreated(String spaceName, Collection<String> expectedProjectNames) {
-
-
         Collection<ProjectResponse> projects = defaultWorkbenchClient.getProjects(spaceName);
         assertThat(projects).isNotNull();
         List<String> resultList = projects.stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()));

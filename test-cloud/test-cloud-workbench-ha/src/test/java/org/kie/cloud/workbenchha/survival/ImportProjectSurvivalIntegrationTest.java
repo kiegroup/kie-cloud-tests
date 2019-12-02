@@ -36,6 +36,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.runners.ImportRunner;
 import org.kie.cloud.tests.common.provider.git.Git;
+import org.kie.cloud.util.SpaceProjects;
 import org.kie.cloud.util.Users;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 
@@ -74,8 +75,8 @@ public class ImportProjectSurvivalIntegrationTest extends AbstractWorkbenchHaInt
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.asyncImportProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
-        List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
+        List<Callable<SpaceProjects>> createTasks = runners.stream().map(runner -> runner.asyncImportProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6))).collect(Collectors.toList());
+        List<Future<SpaceProjects>> futures = executorService.invokeAll(createTasks);
 
         // Delete all pods
         List<Instance> allPods = deploymentScenario.getWorkbenchDeployment().getInstances();
@@ -83,7 +84,15 @@ public class ImportProjectSurvivalIntegrationTest extends AbstractWorkbenchHaInt
 
         deploymentScenario.getWorkbenchDeployments().stream().forEach(WorkbenchDeployment::waitForScale);
 
-        List<String> expectedList = getAllStringFromFutures(futures);
+        List<SpaceProjects> expectedList = new ArrayList<>();//getAllStringFromFutures(futures);
+        futures.forEach(future -> {
+            try {
+                expectedList.add(future.get());
+            } catch (InterruptedException | ExecutionException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
 
         //TODO add check that all process are created !!
 

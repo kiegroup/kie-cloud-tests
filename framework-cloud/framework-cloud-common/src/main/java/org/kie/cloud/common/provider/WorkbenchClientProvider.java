@@ -28,7 +28,7 @@ public class WorkbenchClientProvider {
     }
 
     public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
-        WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient("http://insecure-myapp-rhpamcentr-ha-test.project.openshiftdomain/"/*workbenchDeployment.getUrl().toString()*/,  //TODO revert
+        WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(),
                 username, password, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC);
 
         return workbenchClient;
@@ -39,7 +39,7 @@ public class WorkbenchClientProvider {
     }
 
     public static WorkbenchClient getAsyncWorkbenchClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
-        WorkbenchClient asyncWorkbenchClient = RestWorkbenchClient.createAsyncWorkbenchClient("http://insecure-myapp-rhpamcentr-ha-test.project.openshiftdomain/"/*workbenchDeployment.getUrl().toString()*/,  //TODO revert
+        WorkbenchClient asyncWorkbenchClient = RestWorkbenchClient.createAsyncWorkbenchClient(workbenchDeployment.getUrl().toString(),
                 username, password);
         return asyncWorkbenchClient;
     }

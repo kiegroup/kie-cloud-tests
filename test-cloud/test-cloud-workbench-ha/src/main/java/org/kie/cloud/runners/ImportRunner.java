@@ -16,48 +16,59 @@
 package org.kie.cloud.runners;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.util.SpaceProjects;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
+/**
+ * Runner for work with Project importing
+ */
 public class ImportRunner extends AbstractRunner {
+
+    private Collection<SpaceProjects> allCreatedSpaceProjects;
 
     public ImportRunner(WorkbenchDeployment workbenchDeployment, String user, String password) {
         super(workbenchDeployment, user, password);
-        // TODO Auto-generated constructor stub
+        allCreatedSpaceProjects = new ArrayList<>();
     }
 
-    public Callable<Collection<String>> asyncImportProjects(String spaceName, String gitURL, String projectName, int startSuffix, int retries) {
-        return new Callable<Collection<String>>() {
+    public Callable<SpaceProjects> asyncImportProjects(String spaceName, String gitURL, String... projectName) {
+        return new Callable<SpaceProjects>() {
             @Override
-            public Collection<String> call() {
-                List<String> importedProjects = new ArrayList<>(retries);
-                for (int i = startSuffix; i < startSuffix + retries; i++) {
-                    importProject(asyncWorkbenchClient, spaceName, gitURL, projectName + "-" + i);
-                    importedProjects.add(projectName + "-" + i);
-                }
-                return importedProjects;
+            public SpaceProjects call() {
+                return createSpaceAndImportProject(asyncWorkbenchClient, spaceName, gitURL, Arrays.asList(projectName));
             }
         };
     }
 
-    public Callable<Collection<String>> importProjects(String spaceName, String gitURL, String projectName, int startSuffix,
-            int retries) {
-        return new Callable<Collection<String>>() {
+    public Callable<SpaceProjects> importProjects(String spaceName, String gitURL, String... projectName) {
+        return new Callable<SpaceProjects>() {
             @Override
-            public Collection<String> call() {
-                List<String> importedProjects = new ArrayList<>(retries);
-                for (int i = startSuffix; i < startSuffix + retries; i++) {
-                    importProject(workbenchClient, spaceName, gitURL, projectName + "-" + i);
-                    importedProjects.add(projectName + "-" + i);
-                }
-                return importedProjects;
+            public SpaceProjects call() {
+                return createSpaceAndImportProject(workbenchClient, spaceName, gitURL, Arrays.asList(projectName));
             }
         };
+    }
+
+    private SpaceProjects createSpaceAndImportProject(WorkbenchClient client, String spaceName, String gitURL, List<String> projectNames) {
+        client.createSpace(spaceName, wbUser);
+        return new SpaceProjects(spaceName, importProjects(client, spaceName, gitURL, projectNames));
+    }
+
+    private List<String> importProjects(WorkbenchClient client, String spaceName, String gitURL, List<String> projectNames) {
+        List<String> importedProjects = new ArrayList<>(projectNames.size());
+        for(String projectName:projectNames) {
+            importProject(client, spaceName, gitURL, projectName);
+            importedProjects.add(projectName);
+        }
+        allCreatedSpaceProjects.add(new SpaceProjects(spaceName, importedProjects));
+        return importedProjects;
     }
 
     private void importProject(WorkbenchClient client, String spaceName, String gitURL, String name) {

@@ -151,9 +151,9 @@ public class SsoDeployer {
     }
 
     public static void createUsers(SsoDeployment ssoDeployment, Map<String, String> users) {
-        String authUrl = "http://sso-sso.project.openshiftdomain/auth";//ssoDeployment.getUrl().toString() + "/auth"; TODO revert
-        logger.info("Creating custom users in SSO at URL {} in Realm {}", authUrl, "demo-realm");// SSO_REALM); TODO revert
-        SsoApi ssoApi = SsoApiFactory.getRestApi(authUrl, "demo-realm");//SSO_REALM); TODO revert
+        String authUrl = ssoDeployment.getUrl().toString() + "/auth";
+        logger.info("Creating custom users in SSO at URL {} in Realm {}", authUrl, SSO_REALM);
+        SsoApi ssoApi = SsoApiFactory.getRestApi(authUrl, SSO_REALM);
 
         users.forEach((String name, String pwd) -> {
             ssoApi.createUser(name, pwd, Arrays.asList(ADMIN, KIE_SERVER, REST_ALL));

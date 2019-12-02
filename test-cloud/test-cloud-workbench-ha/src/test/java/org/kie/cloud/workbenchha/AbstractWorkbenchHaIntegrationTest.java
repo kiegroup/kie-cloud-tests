@@ -29,7 +29,7 @@ import org.guvnor.rest.client.Space;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 //import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.maven.constants.MavenConstants;
@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegrationTest {
 
     //protected WorkbenchKieServerPersistentScenario deploymentScenario;
-    protected ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
+    protected ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario; // TODO parametrized for jbpm and drools template
 
     protected WorkbenchClient defaultWorkbenchClient;
 
@@ -54,7 +54,7 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
     public void initializeDeployment() {
         try {
             //deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
+            deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                     .withExternalMavenRepo(MavenConstants.getMavenRepoUrl(), MavenConstants.getMavenRepoUser(),
                             MavenConstants.getMavenRepoPassword())
                     .deploySso()

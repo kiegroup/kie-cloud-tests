@@ -24,6 +24,9 @@ import org.guvnor.rest.client.Space;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 
 // Runner class witch can run command in series repeatedly as a new thread
+/**
+ * Runner for work with Spaces
+ */
 public class SpaceRunner extends AbstractRunner {
 
     private List<String> allCreatedSpaces;

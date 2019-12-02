@@ -22,9 +22,11 @@ import java.util.concurrent.Callable;
 
 import org.guvnor.rest.client.ProjectResponse;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.util.SpaceProjects;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
+/**
+ * Runner for work with Projects
+ */
 public class ProjectRunner extends AbstractRunner {
 
     private Collection<String> allCreatedProjects;
@@ -39,15 +41,6 @@ public class ProjectRunner extends AbstractRunner {
     
     public Callable<Collection<String>> createProject(String spaceName, String projectName) {
         return createProjects(spaceName, projectName, 0, 1);
-    }
-
-    public Callable<SpaceProjects> createSpaceAndProject(String newSpaceName, String newProjectName) {
-        return new Callable<SpaceProjects>() {
-            @Override
-            public SpaceProjects call() {
-                return createSpaceAndProjects(workbenchClient, newSpaceName, newProjectName, 0, 1);
-            }
-        };
     }
 
     public Callable<Collection<String>> createProjects(String spaceName, String projectName, int startSuffix, int retries) {
@@ -76,11 +69,6 @@ public class ProjectRunner extends AbstractRunner {
         }
         allCreatedProjects.addAll(createdProjects);
         return createdProjects;
-    }
-
-    private SpaceProjects createSpaceAndProjects(WorkbenchClient client, String spaceName, String projectName, int startSuffix, int retries) {
-        client.createSpace(spaceName, wbUser);
-        return new SpaceProjects(spaceName, createProjects(client, spaceName, projectName, startSuffix, retries));
     }
 
     public Callable<Collection<ProjectResponse>> getProjects(String spaceName) {

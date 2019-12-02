@@ -34,6 +34,7 @@ import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.runners.ImportRunner;
 import org.kie.cloud.runners.provider.ImportRunnerProvider;
 import org.kie.cloud.tests.common.provider.git.Git;
+import org.kie.cloud.util.SpaceProjects;
 import org.kie.cloud.workbenchha.AbstractWorkbenchHaIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,7 +48,6 @@ public class ImportGitProjectFunctionalIntegrationTest extends AbstractWorkbench
     @Before
     public void setUp() {
         repositoryName = Git.getProvider().createGitRepositoryWithPrefix("ImportGitProjectFunctionalIntegrationTest", ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-        // TODO add kjar sources for tests with projects
 
         defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
         defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
@@ -68,14 +68,14 @@ public class ImportGitProjectFunctionalIntegrationTest extends AbstractWorkbench
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-        List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.importProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
-        List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
+        List<Callable<SpaceProjects>> createTasks = runners.stream().map(runner -> runner.importProjects(SPACE_NAME,Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6))).collect(Collectors.toList());
+        List<Future<SpaceProjects>> futures = executorService.invokeAll(createTasks);
 
-        List<String> expectedList = new ArrayList<>();
+        List<SpaceProjects> expectedList = new ArrayList<>();
         //Wait to all threads finish and save all created projects names
         futures.forEach(future -> {
             try {
-                expectedList.addAll(future.get());
+                expectedList.add(future.get());
             } catch (InterruptedException | ExecutionException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -88,6 +88,5 @@ public class ImportGitProjectFunctionalIntegrationTest extends AbstractWorkbench
         assertThat(projects).isNotNull();
         List<String> resultList = projects.stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()));
         assertThat(resultList).containsExactlyInAnyOrder(resultList.stream().toArray(String[]::new));
-
     }
 }

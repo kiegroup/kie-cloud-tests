@@ -19,7 +19,11 @@ import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.util.SpaceProjects;
 
+/**
+ * Runner for work with Compiler
+ */
 public class CompileRunner extends AbstractRunner {
 
     public CompileRunner(WorkbenchDeployment workbenchDeployment, String user, String password) {
@@ -27,6 +31,10 @@ public class CompileRunner extends AbstractRunner {
         // TODO Auto-generated constructor stub
     }
 
+    public Callable<Void> compileProjects(SpaceProjects spaceProjects) {
+        return compileProjects(spaceProjects.getSpaceName(), spaceProjects.getProjectNames());
+    }
+    
     public Callable<Void> compileProjects(String spaceName, Collection<String> projectNames) {
         return new Callable<Void>() {
             @Override
@@ -37,6 +45,10 @@ public class CompileRunner extends AbstractRunner {
                 return null;
             }
         };
+    }
+
+    public Callable<Void> installProjects(SpaceProjects spaceProjects) {
+        return installProjects(spaceProjects.getSpaceName(), spaceProjects.getProjectNames());
     }
 
     public Callable<Void> installProjects(String spaceName, Collection<String> projectNames) {
@@ -51,6 +63,10 @@ public class CompileRunner extends AbstractRunner {
         };
     }
 
+    public Callable<Void> testProjects(SpaceProjects spaceProjects) {
+        return testProjects(spaceProjects.getSpaceName(), spaceProjects.getProjectNames());
+    }
+
     public Callable<Void> testProjects(String spaceName, Collection<String> projectNames) {
         return new Callable<Void>() {
             @Override
@@ -61,6 +77,10 @@ public class CompileRunner extends AbstractRunner {
                 return null;
             }
         };
+    }
+
+    public Callable<Void> deployProjects(SpaceProjects spaceProjects) {
+        return deployProjects(spaceProjects.getSpaceName(), spaceProjects.getProjectNames());
     }
 
     public Callable<Void> deployProjects(String spaceName, Collection<String> projectNames) {
