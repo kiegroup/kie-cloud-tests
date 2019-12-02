@@ -16,9 +16,11 @@ package org.kie.cloud.api.scenario;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
+import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 
 public interface DeploymentScenario<T extends DeploymentScenario<T>> {
     /**
@@ -71,9 +73,9 @@ public interface DeploymentScenario<T extends DeploymentScenario<T>> {
     void addDeploymentScenarioListener(DeploymentScenarioListener<T> deploymentScenarioListener);
 
     /**
-     * Return the environment for the scenario
-     * 
-     * @return Map of key/value
+     * Return external Maven repository deployment.
+     *
+     * @return External Maven repository deployment.
      */
-    Map<String, String> getScenarioEnvironment();
+    MavenRepositoryDeployment getMavenRepositoryDeployment();
 }

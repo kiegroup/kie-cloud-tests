@@ -14,11 +14,11 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import java.util.Map;
 import java.util.Objects;
 
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.server.api.model.KieContainerResource;
@@ -48,15 +48,15 @@ public class ProjectBuilderTestProvider {
      * 
      * @return provider instance
      */
-    public static ProjectBuilderTestProvider create(Map<String, String> environment) {
+    public static ProjectBuilderTestProvider create(DeploymentScenario<?> deploymentScenario) {
         ProjectBuilderTestProvider provider = new ProjectBuilderTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {}
+    private void init(DeploymentScenario<?> deploymentScenario) {}
 
     public void testCreateAndDeployProject(WorkbenchDeployment workbenchDeployment,
                                            KieServerDeployment kieServerDeployment) {

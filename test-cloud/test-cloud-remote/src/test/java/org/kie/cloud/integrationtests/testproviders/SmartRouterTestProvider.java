@@ -16,7 +16,6 @@
 package org.kie.cloud.integrationtests.testproviders;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +25,7 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -68,17 +68,17 @@ public class SmartRouterTestProvider {
      * 
      * @return provider instance
      */
-    public static SmartRouterTestProvider create(Map<String, String> environment) {
+    public static SmartRouterTestProvider create(DeploymentScenario<?> deploymentScenario) {
         SmartRouterTestProvider provider = new SmartRouterTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {
-        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(environment);
-        KjarDeployer.create(Kjar.DEFINITION_101_SNAPSHOT).deploy(environment);
+    private void init(DeploymentScenario<?> deploymentScenario) {
+        KjarDeployer.create(Kjar.DEFINITION_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
+        KjarDeployer.create(Kjar.DEFINITION_101_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
     }
 
     public void testRouterLoadBalancing(WorkbenchDeployment workbenchDeployment,

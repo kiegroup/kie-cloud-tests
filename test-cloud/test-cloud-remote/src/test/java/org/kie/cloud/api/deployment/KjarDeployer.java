@@ -34,10 +34,10 @@ public class KjarDeployer {
         return new KjarDeployer(kjar);
     }
 
-    public void deploy(Map<String, String> deploymentEnvironment) {
+    public void deploy(MavenRepositoryDeployment repositoryDeployment) {
         // Synchronize on kjar deployment to avoid conflicts
         synchronized (kjar) {
-            MavenDeployer.buildAndDeployMavenProject(KjarDeployer.class.getResource(KJAR_SOURCES_FOLDER + kjar.getProjectName()).getFile(), deploymentEnvironment);
+            MavenDeployer.buildAndDeployMavenProject(KjarDeployer.class.getResource(KJAR_SOURCES_FOLDER + kjar.getProjectName()).getFile(), repositoryDeployment);
         }
     }
 }

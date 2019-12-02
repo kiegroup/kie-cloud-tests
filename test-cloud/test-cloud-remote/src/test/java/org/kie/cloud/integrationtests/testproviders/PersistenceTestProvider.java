@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
@@ -53,15 +54,15 @@ public class PersistenceTestProvider {
      * 
      * @return provider instance
      */
-    public static PersistenceTestProvider create(Map<String, String> environment) {
+    public static PersistenceTestProvider create(DeploymentScenario<?> deploymentScenario) {
         PersistenceTestProvider provider = new PersistenceTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {}
+    private void init(DeploymentScenario<?> deploymentScenario) {}
 
     public void testControllerPersistence(WorkbenchKieServerScenario deploymentScenario) {
         String containerId = "testControllerPersistence";

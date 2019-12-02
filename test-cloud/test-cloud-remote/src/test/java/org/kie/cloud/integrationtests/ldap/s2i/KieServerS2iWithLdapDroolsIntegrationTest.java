@@ -145,7 +145,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
     @BeforeClass
     public static void buildKjar() {
         MavenDeployer.buildAndInstallMavenProject(
-                KieServerS2iWithLdapDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile(), new HashMap<>());
+                KieServerS2iWithLdapDroolsIntegrationTest.class.getResource("/kjars-sources/stateless-session").getFile());
     }
 
     @Before

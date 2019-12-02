@@ -33,6 +33,7 @@ import cz.xtf.client.HttpResponseParser;
 import org.apache.http.entity.ContentType;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,15 +70,15 @@ public class HttpsWorkbenchTestProvider {
      * 
      * @return provider instance
      */
-    public static HttpsWorkbenchTestProvider create(Map<String, String> environment) {
+    public static HttpsWorkbenchTestProvider create(DeploymentScenario<?> deploymentScenario) {
         HttpsWorkbenchTestProvider provider = new HttpsWorkbenchTestProvider();
-        if (Objects.nonNull(environment)) {
-            provider.init(environment);
+        if (Objects.nonNull(deploymentScenario)) {
+            provider.init(deploymentScenario);
         }
         return provider;
     }
 
-    private void init(Map<String, String> environment) {}
+    private void init(DeploymentScenario<?> deploymentScenario) {}
 
     public void testLoginScreen(WorkbenchDeployment workbenchDeployment, boolean ssoScenario) {
         final URL url = workbenchDeployment.getSecureUrl().get();
