@@ -32,7 +32,7 @@ public abstract class AbstractMethodIsolatedCloudIntegrationTest<T extends Deplo
     @Before
     public void initializeDeployment() {
         deploymentScenario = createDeploymentScenario(AbstractCloudIntegrationTest.deploymentScenarioFactory);
-        deploymentScenario.setLogFolderName(testName.getMethodName());
+        deploymentScenario.setLogFolderName(this.getClass().getSimpleName() + "-" + testName.getMethodName());
 
         ScenarioDeployer.deployScenario(deploymentScenario);
     }
