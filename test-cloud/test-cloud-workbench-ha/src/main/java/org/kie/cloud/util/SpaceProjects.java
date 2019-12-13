@@ -15,12 +15,23 @@
 
 package org.kie.cloud.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpaceProjects {
 
     private String spaceName;
     private List<String> projectNames;
+
+    public SpaceProjects(String spaceName) {
+        this.spaceName=spaceName;
+        this.projectNames=new ArrayList<>();
+    }
+
+    public SpaceProjects(String spaceName, String projectName) {
+        this(spaceName);
+        this.projectNames.add(projectName);
+    }
 
     public SpaceProjects(String spaceName, List<String> projectNames) {
         this.spaceName=spaceName;
@@ -43,10 +54,8 @@ public class SpaceProjects {
         this.spaceName = spaceName;
     }
 
-
-        //Create Runners with different users.
-        //List<CompileRunner> runners = new ArrayList<>();
-        //runners.add(new CompileRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
-        //... TODO
+    public void addProjectNames(List<String> names) {
+        this.projectNames.addAll(names);
+    }
 
 }

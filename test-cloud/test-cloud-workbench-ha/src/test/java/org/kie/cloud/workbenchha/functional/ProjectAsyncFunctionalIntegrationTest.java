@@ -85,9 +85,8 @@ public class ProjectAsyncFunctionalIntegrationTest extends AbstractWorkbenchHaIn
         futuresProjects.forEach(futureProjects -> {
             try {
                 assertThat(futureProjects.get().stream().collect(Collectors.mapping(ProjectResponse::getName, Collectors.toList()))).isNotNull().isNotEmpty().containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
-            } catch (InterruptedException | ExecutionException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException("Collecting of all task results failed.",e);
             }
         });
         

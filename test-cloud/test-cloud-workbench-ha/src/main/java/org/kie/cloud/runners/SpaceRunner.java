@@ -34,7 +34,6 @@ public class SpaceRunner extends AbstractRunner {
     public SpaceRunner(WorkbenchDeployment workbenchDeployment, String user, String password) {
         super(workbenchDeployment, user, password);
         allCreatedSpaces = new ArrayList<>();
-        // TODO Auto-generated constructor stub
     }
 
     public Callable<Collection<String>> createSpaces(String spaceName, int startSuffix, int retries) {

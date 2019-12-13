@@ -16,9 +16,8 @@
 package org.kie.cloud.runners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.guvnor.rest.client.CloneProjectRequest;
@@ -38,37 +37,56 @@ public class ImportRunner extends AbstractRunner {
         allCreatedSpaceProjects = new ArrayList<>();
     }
 
-    public Callable<SpaceProjects> asyncImportProjects(String spaceName, String gitURL, String... projectName) {
+    public Callable<SpaceProjects> asyncImportProjects(String spaceName, String gitURL, String projectName) {
         return new Callable<SpaceProjects>() {
             @Override
             public SpaceProjects call() {
-                return createSpaceAndImportProject(asyncWorkbenchClient, spaceName, gitURL, Arrays.asList(projectName));
+                return createSpaceAndImportProject(asyncWorkbenchClient, spaceName, gitURL, projectName);
             }
         };
     }
 
-    public Callable<SpaceProjects> importProjects(String spaceName, String gitURL, String... projectName) {
+    public Callable<SpaceProjects> asyncImportProjects(String spaceName, Map<String, String> projectNameAndGitURL) {
         return new Callable<SpaceProjects>() {
             @Override
             public SpaceProjects call() {
-                return createSpaceAndImportProject(workbenchClient, spaceName, gitURL, Arrays.asList(projectName));
+                SpaceProjects finalSpaceProjects = new SpaceProjects(spaceName);
+                projectNameAndGitURL.forEach((String projectName, String gitUrl) -> {
+                    finalSpaceProjects.addProjectNames(createSpaceAndImportProject(asyncWorkbenchClient, spaceName, gitUrl, projectName).getProjectNames());
+                });
+                return finalSpaceProjects;
             }
         };
     }
 
-    private SpaceProjects createSpaceAndImportProject(WorkbenchClient client, String spaceName, String gitURL, List<String> projectNames) {
+    public Callable<SpaceProjects> importProjects(String spaceName, Map<String, String> projectNameAndGitURL) {
+        return new Callable<SpaceProjects>() {
+            @Override
+            public SpaceProjects call() {
+                SpaceProjects finalSpaceProjects = new SpaceProjects(spaceName);
+                projectNameAndGitURL.forEach((String projectName, String gitUrl) -> {
+                    finalSpaceProjects.addProjectNames(createSpaceAndImportProject(workbenchClient, spaceName, gitUrl, projectName).getProjectNames());
+                });
+                return finalSpaceProjects;
+            }
+        };
+    }
+
+    public Callable<SpaceProjects> importProjects(String spaceName, String gitURL, String projectNames) {
+        return new Callable<SpaceProjects>() {
+            @Override
+            public SpaceProjects call() {
+                return createSpaceAndImportProject(workbenchClient, spaceName, gitURL, projectNames);
+            }
+        };
+    }
+
+    private SpaceProjects createSpaceAndImportProject(WorkbenchClient client, String spaceName, String gitURL, String projectName) {
         client.createSpace(spaceName, wbUser);
-        return new SpaceProjects(spaceName, importProjects(client, spaceName, gitURL, projectNames));
-    }
-
-    private List<String> importProjects(WorkbenchClient client, String spaceName, String gitURL, List<String> projectNames) {
-        List<String> importedProjects = new ArrayList<>(projectNames.size());
-        for(String projectName:projectNames) {
-            importProject(client, spaceName, gitURL, projectName);
-            importedProjects.add(projectName);
-        }
-        allCreatedSpaceProjects.add(new SpaceProjects(spaceName, importedProjects));
-        return importedProjects;
+        importProject(client, spaceName, gitURL, projectName);
+        SpaceProjects spaceProjects = new SpaceProjects(spaceName, projectName);
+        allCreatedSpaceProjects.add(spaceProjects);
+        return spaceProjects;
     }
 
     private void importProject(WorkbenchClient client, String spaceName, String gitURL, String name) {

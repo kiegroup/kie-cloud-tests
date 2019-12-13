@@ -28,7 +28,6 @@ public class CompileRunner extends AbstractRunner {
 
     public CompileRunner(WorkbenchDeployment workbenchDeployment, String user, String password) {
         super(workbenchDeployment, user, password);
-        // TODO Auto-generated constructor stub
     }
 
     public Callable<Void> compileProjects(SpaceProjects spaceProjects) {

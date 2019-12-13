@@ -75,7 +75,7 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
 
     @After
     public void cleanEnvironment() {
-        //ScenarioDeployer.undeployScenario(deploymentScenario);
+        ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     protected void checkSpacesWereCreated(Collection<String> expectedSpaceNames, int runnersSize, int retries) {
@@ -104,9 +104,8 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
         futures.forEach(future -> {
             try {
                 list.addAll(future.get());
-            } catch (InterruptedException | ExecutionException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException("Collecting of all task results failed.",e);
             }
         });
 
@@ -119,8 +118,7 @@ public class AbstractWorkbenchHaIntegrationTest extends AbstractCloudIntegration
             try {
                 t.get();
             } catch (InterruptedException | ExecutionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException("Collecting of all task results failed.",e);
             }
         });
     }

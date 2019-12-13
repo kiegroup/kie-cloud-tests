@@ -37,4 +37,7 @@ public abstract class AbstractRunner {
         wbUser = workbenchDeployment.getUsername();
     }
     
+    public String getRunnerUser() {
+        return wbUser;
+    }
 }

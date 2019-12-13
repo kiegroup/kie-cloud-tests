@@ -38,9 +38,5 @@ public class CompileRunnerProvider {
         runners.add(new CompileRunner(workbenchDeployment, Users.JOHN.getName(), Users.JOHN.getPassword()));
         return runners;
     }
-        //Create Runners with different users.
-        //List<CompileRunner> runners = new ArrayList<>();
-        //runners.add(new CompileRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
-        //... TODO
 
 }

@@ -107,9 +107,7 @@ public class ProjectFailoverIntegrationTest extends AbstractWorkbenchHaIntegrati
             try {
                 futures = executorService.invokeAll(createTasks);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                throw new RuntimeException(e); // TODO
+                throw new RuntimeException("Invoke of all task failed.",e);
             }
             
             deploymentScenario.getWorkbenchDeployment().deleteInstances(pod);

@@ -46,6 +46,9 @@ public class SpaceFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrati
 
         //Create task to create spaces for all users
         List<Callable<Collection<String>>> createTasks = runners.stream().map(runner -> runner.createSpaces(UUID.randomUUID().toString().substring(0, 6), 1, 5)).collect(Collectors.toList());
+
+        //createTasks = runners.stream().map((UUID.randomUUID().toString().substring(0, 6), 1, 5) -> SpaceRunner::createSpaces).collect(Collectors.toList());
+
         List<Future<Collection<String>>> futures = executorService.invokeAll(createTasks);
 
         List<String> expectedList = getAllStringFromFutures(futures);
@@ -60,9 +63,8 @@ public class SpaceFunctionalIntegrationTest extends AbstractWorkbenchHaIntegrati
         futuresSpaces.forEach(futureSpaces -> {
             try {
                 assertThat(futureSpaces.get().stream().collect(Collectors.mapping(Space::getName, Collectors.toList()))).containsExactlyInAnyOrder(expectedList.stream().toArray(String[]::new));
-            } catch (InterruptedException | ExecutionException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException("Collecting of all task results failed.",e);
             }
         });
         

@@ -98,9 +98,6 @@ public class SpaceProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIn
         
     }
 
-    // TODO add scenario when user tries to get one space (each user have it's own space) from that space get all projects.
-    // Mainly check that all spaces and projects are correctly returned.
-
     protected List<SpaceProjects> getAllSpaceProjectsFromFutures(List<Future<SpaceProjects>> futures) {
         List<SpaceProjects> list = new ArrayList<>();
 
@@ -108,9 +105,8 @@ public class SpaceProjectFunctionalIntegrationTest extends AbstractWorkbenchHaIn
         futures.forEach(future -> {
             try {
                 list.add(future.get());
-            } catch (InterruptedException | ExecutionException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException("Collecting of all task results failed.",e);
             }
         });
 

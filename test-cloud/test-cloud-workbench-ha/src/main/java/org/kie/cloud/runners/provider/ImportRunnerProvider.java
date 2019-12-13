@@ -37,8 +37,4 @@ public class ImportRunnerProvider {
         return runners;
     }
 
-       //Create Runners with different users.
-       //List<ImportRunner> runners = new ArrayList<>();
-       //runners.add(new ImportRunner(deploymentScenario.getWorkbenchDeployment(), Users.JOHN.getName(), Users.JOHN.getPassword()));
-       //... TODO
 }
