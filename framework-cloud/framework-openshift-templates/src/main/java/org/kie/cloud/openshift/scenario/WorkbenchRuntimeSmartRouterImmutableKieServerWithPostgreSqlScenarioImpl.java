@@ -110,6 +110,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
         databaseDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
+        kieServerDeployment.scale(1);
         kieServerDeployment.waitForScale();
 
         logger.info("Waiting for Smart router deployment to become ready.");
