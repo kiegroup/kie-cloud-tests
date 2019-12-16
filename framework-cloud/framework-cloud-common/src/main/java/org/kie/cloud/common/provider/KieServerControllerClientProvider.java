@@ -16,9 +16,12 @@
 package org.kie.cloud.common.provider;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.controller.client.KieServerControllerClientFactory;
@@ -56,7 +59,9 @@ public class KieServerControllerClientProvider {
                 throw new RuntimeException("Interrupted while waiting for server template creation.", e);
             }
         }
-        throw new RuntimeException("Timeout while waiting for 30 seconds for server template creation.");
+        ServerTemplateList serverTemplates = getKieServerControllerClient(workbenchDeployment).listServerTemplates();
+        String templates = Arrays.stream(serverTemplates.getServerTemplates()).map(ServerTemplateKey::getId).collect(Collectors.joining(", "));
+        throw new RuntimeException("Timeout while waiting for 30 seconds for server template creation. Expected " + numberOfServerTemplates + " templates, but got these templates: " + templates);
     }
 }
 
