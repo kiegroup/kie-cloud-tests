@@ -27,8 +27,8 @@ import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.rbac.KubernetesRole;
-import io.fabric8.kubernetes.api.model.rbac.KubernetesRoleBinding;
+import io.fabric8.kubernetes.api.model.rbac.Role;
+import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.openshift.api.model.ImageStream;
@@ -98,14 +98,14 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     private void createRoleInProject(Project project) {
         logger.info("Creating role in project '" + project.getName() + "' from " + OpenShiftResource.ROLE.getResourceUrl().toString());
-        KubernetesRole role = project.getOpenShiftAdmin().rbac().kubernetesRoles().load(OpenShiftResource.ROLE.getResourceUrl()).get();
-        project.getOpenShiftAdmin().rbac().kubernetesRoles().inNamespace(project.getName()).create(role);
+        Role role = project.getOpenShiftAdmin().rbac().roles().load(OpenShiftResource.ROLE.getResourceUrl()).get();
+        project.getOpenShiftAdmin().rbac().roles().inNamespace(project.getName()).create(role);
     }
 
     private void createRoleBindingsInProject(Project project) {
         logger.info("Creating role bindings in project '" + project.getName() + "' from " + OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
-        KubernetesRoleBinding roleBinding = project.getOpenShiftAdmin().rbac().kubernetesRoleBindings().load(OpenShiftResource.ROLE_BINDING.getResourceUrl()).get();
-        project.getOpenShiftAdmin().rbac().kubernetesRoleBindings().inNamespace(project.getName()).create(roleBinding);
+        RoleBinding roleBinding = project.getOpenShiftAdmin().rbac().roleBindings().load(OpenShiftResource.ROLE_BINDING.getResourceUrl()).get();
+        project.getOpenShiftAdmin().rbac().roleBindings().inNamespace(project.getName()).create(roleBinding);
     }
 
     private void createOperatorInProject(Project project) {
