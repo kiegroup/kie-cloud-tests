@@ -104,7 +104,7 @@ public class SsoDeployer {
             resourceList.getItems().forEach(item -> {
                 openShift.imageStreams().inNamespace("openshift").withName(item.getMetadata().getName()).delete();
             });
-            openShift.lists().inNamespace("openshift").create(resourceList);
+            project.runOcCommandAsAdmin("apply", "-f", OpenShiftConstants.getSsoImageStreams(), "-n", "openshift");
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed resource URL", e);
         } catch (KubernetesClientException e) {

@@ -38,9 +38,7 @@ public class AmqImageStreamDeployer {
                         .withName(item.getMetadata().getName())
                         .delete();
             });
-            openShift.lists()
-                    .inNamespace("openshift")
-                    .create(resourceList);
+            project.runOcCommandAsAdmin("apply", "-f", OpenShiftConstants.getAmqImageStreams(), "-n", "openshift");
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed resource URL", e);
         }
