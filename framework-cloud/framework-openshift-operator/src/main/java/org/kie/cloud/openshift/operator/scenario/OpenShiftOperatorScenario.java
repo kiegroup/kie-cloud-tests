@@ -118,7 +118,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         // If not, use as it is as image name.
         String operatorImageTag = OpenShiftOperatorConstants.getKieOperatorImageTag();
         String[] split = operatorImageTag.split(":");
-        ImageStream operatorImageStream = project.getOpenShift().getImageStream(split[0]);
+        ImageStream operatorImageStream = project.getOpenShiftAdmin().getImageStream(split[0]);
         if (Objects.nonNull(operatorImageStream)) {
             final String streamTag = split.length > 1 ? split[1] : "latest";
             operatorImageTag = operatorImageStream.getStatus().getDockerImageRepository() + ":" + streamTag;
@@ -165,8 +165,8 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
      * @return OpenShift client which is aware of KieApp custom resource.
      */
     protected NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> getKieAppClient() {
-        CustomResourceDefinition customResourceDefinition = OpenShifts.master().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
-        return OpenShifts.master().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
+        CustomResourceDefinition customResourceDefinition = OpenShifts.admin().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
+        return OpenShifts.admin().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
     }
 
     @Override
