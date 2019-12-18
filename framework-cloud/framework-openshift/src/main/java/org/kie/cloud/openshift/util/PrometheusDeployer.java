@@ -36,7 +36,7 @@ import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.rbac.KubernetesClusterRoleBinding;
+import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -145,11 +145,11 @@ public class PrometheusDeployer {
 
     private static void createPrometheusOperatorClusterRoleBinding(Project project, String clusterRoleBindingUrl) {
         try {
-            KubernetesClusterRoleBinding clusterRoleBinding = project.getOpenShift().rbac().kubernetesClusterRoleBindings().load(new URL(clusterRoleBindingUrl)).get();
+            ClusterRoleBinding clusterRoleBinding = project.getOpenShift().rbac().clusterRoleBindings().load(new URL(clusterRoleBindingUrl)).get();
             clusterRoleBinding.getSubjects().get(0).setNamespace(project.getName());
             clusterRoleBinding.getMetadata().setNamespace(project.getName());
             clusterRoleBinding.setApiVersion("rbac.authorization.k8s.io/v1"); // Workaround to make REST call work
-            OpenShifts.admin().inNamespace(project.getName()).rbac().kubernetesClusterRoleBindings().createOrReplace(clusterRoleBinding);
+            OpenShifts.admin().inNamespace(project.getName()).rbac().clusterRoleBindings().createOrReplace(clusterRoleBinding);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed cluster role binding URL: " + clusterRoleBindingUrl, e);
         }

@@ -62,7 +62,7 @@ public class ImageStreamProvider {
 
     private static void createImagesFromImageStreamFile(Project project, String kieImageStreams) {
         logger.info("Creating image streams from " + kieImageStreams);
-        project.createResources(kieImageStreams);
+        project.createResourcesFromYamlAsAdmin(kieImageStreams);
     }
 
     private static void replaceImagesFromImageStreamTags(Project project) {
