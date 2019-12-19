@@ -44,6 +44,7 @@ import org.kie.cloud.api.protocol.Protocol;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.util.OpenShiftCaller;
 import org.kie.cloud.openshift.util.OpenshiftInstanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,15 +132,14 @@ public abstract class OpenShiftDeployment implements Deployment {
         if (isReady()) {
             String deploymentConfigName = getDeploymentConfigName();
 
-            List<Instance> instances = openShift.getPods().stream()
-                                                .filter(pod -> {
-                                                    String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
-                                                    return deploymentConfigName.equals(podsDeploymentConfigName);
-                                                })
-                                                .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getNamespace(), pod))
-                                                .collect(toList());
-
-            return instances;
+            return OpenShiftCaller.repeatableCall(() -> openShift.getPods()
+                                                                 .stream()
+                                                                 .filter(pod -> {
+                                                                     String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
+                                                                     return deploymentConfigName.equals(podsDeploymentConfigName);
+                                                                 })
+                                                                 .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getNamespace(), pod))
+                                                                 .collect(toList()));
         }
 
         return Collections.emptyList();
@@ -164,11 +164,11 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     protected void waitUntilAllPodsAreReady(int expectedPods) {
         try {
-            openShift.waiters()
-                     .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
-                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                     .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become ready.")
-                     .waitFor();
+            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
+                                                          .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
+                                                          .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become ready.")
+                                                          .waitFor());
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
         }
@@ -176,11 +176,11 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     protected void waitUntilAllPodsAreRunning(int expectedPods) {
         try {
-            openShift.waiters()
-                     .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
-                     .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                     .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
-                     .waitFor();
+            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
+                                                          .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
+                                                          .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
+                                                          .waitFor());
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
         }
