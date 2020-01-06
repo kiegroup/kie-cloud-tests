@@ -15,8 +15,14 @@
 
 package org.kie.cloud.api.scenario.builder;
 
+import java.util.List;
+import java.util.Map;
+
 import org.kie.cloud.api.scenario.HACepScenario;
 
 public interface HACepScenarioBuilder extends DeploymentScenarioBuilder<HACepScenario> {
-
+    HACepScenarioBuilder setKjars(List<String> kjars);
+    HACepScenarioBuilder setSpringDeploymentEnvironmentVariables(
+            final Map<String, String> springDeploymentEnvironmentVariables);
+    HACepScenarioBuilder withInternalMavenRepo();
 }
