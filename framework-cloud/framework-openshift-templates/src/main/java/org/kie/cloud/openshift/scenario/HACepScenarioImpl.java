@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.CertificateFactory;
@@ -32,18 +31,28 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.openshift.api.model.Route;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.HACepDeployment;
+import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.api.scenario.HACepScenario;
+import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.HACepDeploymentImpl;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.strimzi.StrimziOperator;
 import org.kie.cloud.strimzi.deployment.KafkaDeployment;
 import org.kie.cloud.strimzi.deployment.StrimziOperatorDeployment;
@@ -83,8 +92,17 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private static final String STRIMZI_LABEL_KEY = "app";
     private static final String STRIMZI_LABEL_VALUE = "strimzi";
 
+    private static final String HACEP_CONTAINER_NAME = "openshift-kie-springboot";
+
+    private static final String IMAGE_BUILD_ARTIFACT_NAME = "openshift-kie-springboot";
+    private static final String USER_ID_DOCKERFILE_PLACEHOLDER = "<id_user>";
+    private static final String GROUP_ID_DOCKERFILE_PLACEHOLDER = "<id_group>";
+
+    private Map<String, String> springDeploymentEnvironmentVariables = new HashMap<>();
+
     private StrimziOperator strimziOperator;
     private HACepDeployment haCepDeployment;
+    private List<String> kjars = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(HACepScenarioImpl.class);
 
@@ -144,11 +162,16 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         logger.info("Creating role binding for HACEP from file: {}", roleBindingYamlFile.getAbsolutePath());
         project.createResourcesFromYamlAsAdmin(roleBindingYamlFile.getAbsolutePath());
 
-        final String dockerImageRepository = buildHACEPImage();
+        logger.info("Building and deploying kjars");
+        buildAndDeployKjars();
+
+        final String userUUID = project.getOpenShift().getProject(projectName)
+                .getMetadata().getAnnotations().get("openshift.io/sa.scc.uid-range").split("/")[0];
+
+        final String dockerImageRepository = buildHACEPImage(userUUID);
         final File haCepDeploymentYamlFile = new File(haCepSourcesDir, SOURCES_FILE_HACEP_DEPLOYMENT);
-        final String haCepDeploymentYaml = patchHACEPDeploymentFile(haCepDeploymentYamlFile, dockerImageRepository);
-        logger.info("Creating HACEP deployment");
-        project.createResourcesFromYamlStringAsAdmin(haCepDeploymentYaml);
+
+        deployHACEPDeployment(haCepDeploymentYamlFile, dockerImageRepository, userUUID, springDeploymentEnvironmentVariables);
 
         final File haCepService = new File(haCepSourcesDir, SOURCES_FILE_HACEP_SERVICE);
         logger.info("Creating HACEP service from file: {}", haCepService.getAbsolutePath());
@@ -192,32 +215,79 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         return amqStreamsDirectory;
     }
 
-    private String buildHACEPImage() {
-        project.runOcCommandAsAdmin("new-build", "--binary", "--strategy=docker",
-                                    "--name", "openshift-kie-springboot");
+    private String buildHACEPImage(final String userUUID) {
         final File springModuleDir = new File(OpenShiftConstants.getHaCepSourcesDir(), "springboot");
-        logger.info("Building HA-CEP Spring boot image");
-        final String buildOutput = project.runOcCommandAsAdmin("start-build", "openshift-kie-springboot",
-                                    "--from-dir=" + springModuleDir.getAbsolutePath(), "--follow");
-        logger.info(buildOutput);
-        final String dockerImageRepository = project.getOpenShiftAdmin().getImageStream("openshift-kie-springboot").getStatus().getDockerImageRepository();
+        final File dockerFile = new File(springModuleDir, "Dockerfile");
+        try {
+            final String originalDockerFileContent = FileUtils.readFileToString(dockerFile, "UTF-8");
+            String dockerFileContent = originalDockerFileContent.replace(USER_ID_DOCKERFILE_PLACEHOLDER, userUUID);
+            dockerFileContent = dockerFileContent.replace(GROUP_ID_DOCKERFILE_PLACEHOLDER, "1000");
+            FileUtils.writeStringToFile(dockerFile, dockerFileContent, "UTF-8");
+
+            project.runOcCommandAsAdmin("new-build", "--binary", "--strategy=docker",
+                                        "--name", IMAGE_BUILD_ARTIFACT_NAME);
+            logger.info("Building HA-CEP Spring boot image");
+            final String buildOutput = project.runOcCommandAsAdmin("start-build", IMAGE_BUILD_ARTIFACT_NAME,
+                                                                   "--from-dir=" + springModuleDir.getAbsolutePath(), "--follow");
+            logger.info(buildOutput);
+
+            FileUtils.writeStringToFile(dockerFile, originalDockerFileContent, "UTF-8");
+        } catch (IOException e) {
+            logger.error("Unable to read/write Dockerfile {}", dockerFile);
+            throw new RuntimeException("Unable to read/write Dockerfile", e);
+        }
+
+        final String dockerImageRepository = project.getOpenShiftAdmin().getImageStream(IMAGE_BUILD_ARTIFACT_NAME)
+                .getStatus().getDockerImageRepository();
 
         return dockerImageRepository;
     }
 
-    private String patchHACEPDeploymentFile(final File deploymentYamlFile, final String dockerImageRepository) {
-        String deploymentYaml;
+    private void deployHACEPDeployment(
+            final File deploymentYamlFile,
+            final String dockerImageRepository,
+            final String userUUID,
+            final Map<String, String> additionalEnvVars) {
         try {
-            deploymentYaml = FileUtils.readFileToString(deploymentYamlFile, "UTF-8");
-        } catch (IOException e) {
-            throw new RuntimeException("Error loading yaml file with HACEP deployment" +
-                                               deploymentYamlFile.getAbsolutePath(), e);
+            String deploymentYamlContent = FileUtils.readFileToString(deploymentYamlFile, "UTF-8");
+            deploymentYamlContent = deploymentYamlContent.replace(USER_ID_DOCKERFILE_PLACEHOLDER, "0");
+            FileUtils.writeStringToFile(deploymentYamlFile, deploymentYamlContent);
+
+            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+            io.fabric8.kubernetes.api.model.apps.Deployment deployment =
+                    objectMapper.readValue(deploymentYamlFile, io.fabric8.kubernetes.api.model.apps.Deployment.class);
+            final Optional<Container> container = deployment.getSpec().getTemplate().getSpec().getContainers()
+                    .stream()
+                    .filter(c -> c.getName().equals(HACEP_CONTAINER_NAME))
+                    .findFirst();
+            if (!container.isPresent()) {
+                logger.error("Can not find HA-CEP container in deployment");
+                throw new RuntimeException("Can not find HA-CEP container in deployment");
+            }
+            container.get().getSecurityContext().setRunAsUser(Long.valueOf(userUUID));
+            container.get().setImage(dockerImageRepository);
+            if (container.get().getEnv() == null) {
+                container.get().setEnv(new ArrayList<>());
+            }
+
+            if (externalDeployments.stream()
+                    .anyMatch(d -> ExternalDeployment.ExternalDeploymentID.MAVEN_REPOSITORY.equals(d.getKey()))) {
+                final MavenRepositoryDeployment mavenRepositoryDeployment = this.getMavenRepositoryDeployment();
+
+                container.get().getEnv().add(new EnvVar("MAVEN_LOCAL_REPO", "/app/.m2/repository", null));
+                container.get().getEnv().add(new EnvVar("MAVEN_MIRROR_URL", mavenRepositoryDeployment.getSnapshotsRepositoryUrl().toString(), null));
+                container.get().getEnv().add(new EnvVar("MAVEN_SETTINGS_XML", "/app/.m2/settings.xml", null));
+            }
+            for (final Map.Entry<String, String> envVariable : additionalEnvVars.entrySet()) {
+                final EnvVar envVar= new EnvVar(envVariable.getKey(), envVariable.getValue(), null);
+                container.get().getEnv().add(envVar);
+            }
+
+            project.getOpenShiftAdmin().apps().deployments().create(deployment);
+        } catch (Exception e) {
+            logger.error("Can not create Spring app deployment: {}", e);
+            throw new RuntimeException("Can not create Spring app deployment", e);
         }
-
-        logger.info("Changing image name in HACEP deployment from file: {}", deploymentYamlFile.getAbsolutePath());
-        deploymentYaml = deploymentYaml.replaceAll("image:.*", "image: " + dockerImageRepository);
-
-        return deploymentYaml;
     }
 
     private void createTopics() {
@@ -300,6 +370,28 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         }
 
         return kafkaKSFile;
+    }
+
+    @Override
+    public void setKjars(List<String> kjars) {
+        this.kjars = new ArrayList<>(kjars);
+    }
+
+    @Override
+    public void setSpringDeploymentEnvironmentVariables(Map<String, String> springDeploymentEnvironmentVariables) {
+        this.springDeploymentEnvironmentVariables = springDeploymentEnvironmentVariables;
+    }
+
+    private void buildAndDeployKjars() {
+        if (!kjars.isEmpty()) {
+            final MavenRepositoryDeployment mavenRepositoryDeployment = this.getMavenRepositoryDeployment();
+
+            for (String kjar : kjars) {
+                logger.info("Building and deploying kjar: {}", kjar);
+                MavenDeployer.buildAndDeployMavenProject(HACepScenarioImpl.class.getResource(kjar)
+                                                                 .getFile(), mavenRepositoryDeployment);
+            }
+        }
     }
 
     @Override

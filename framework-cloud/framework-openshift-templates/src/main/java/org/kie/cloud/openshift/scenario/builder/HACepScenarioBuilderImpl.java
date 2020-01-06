@@ -15,14 +15,47 @@
 
 package org.kie.cloud.openshift.scenario.builder;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
+import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.scenario.HACepScenarioImpl;
 
-public class HACepScenarioBuilderImpl implements HACepScenarioBuilder {
+public class HACepScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<HACepScenario> implements HACepScenarioBuilder {
+
+    private Map<String, String> springDeploymentEnvironmentVariables = new HashMap<>();
+    private List<String> kjars = new ArrayList<>();
 
     @Override
-    public HACepScenario build() {
-        return new HACepScenarioImpl();
+    protected HACepScenario getDeploymentScenarioInstance() {
+        final HACepScenarioImpl haCepScenario = new HACepScenarioImpl();
+        haCepScenario.setSpringDeploymentEnvironmentVariables(springDeploymentEnvironmentVariables);
+        haCepScenario.setKjars(kjars);
+
+        return haCepScenario;
+    }
+
+    @Override
+    public HACepScenarioBuilder setKjars(List<String> kjars) {
+        this.kjars = new ArrayList<>(kjars);
+
+        return this;
+    }
+
+    @Override
+    public HACepScenarioBuilder setSpringDeploymentEnvironmentVariables(Map<String, String> springDeploymentEnvironmentVariables) {
+        this.springDeploymentEnvironmentVariables = springDeploymentEnvironmentVariables;
+
+        return this;
+    }
+
+    @Override
+    public HACepScenarioBuilder withInternalMavenRepo() {
+        setAsyncExternalDeployment(ExternalDeployment.ExternalDeploymentID.MAVEN_REPOSITORY);
+        return this;
     }
 }
