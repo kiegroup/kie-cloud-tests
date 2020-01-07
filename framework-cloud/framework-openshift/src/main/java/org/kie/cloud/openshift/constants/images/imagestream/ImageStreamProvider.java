@@ -16,7 +16,6 @@
 
 package org.kie.cloud.openshift.constants.images.imagestream;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -101,9 +100,9 @@ public class ImageStreamProvider {
         logger.info("Creating image stream for " + image.toString() + " image.");
         ImageStream imageStream = new ImageStreamBuilder().withApiVersion("v1")
                                                           .withNewMetadata()
-                                                              .withName(image.getImageName())
+                                                              .withName(getImageStreamNaming(image.getImageName()))
                                                               .addToAnnotations("openshift.io/image.insecureRepository", "true")
-                                                              .addToAnnotations("openshift.io/display-name", image.getImageName())
+                                                              .addToAnnotations("openshift.io/display-name", getImageStreamNaming(image.getImageName()))
                                                               .addToAnnotations("openshift.io/provider-display-name", "Red Hat, Inc.")
                                                           .endMetadata()
                                                           .withNewSpec()
@@ -125,11 +124,17 @@ public class ImageStreamProvider {
                                                           .endSpec()
                                                           .build();
 
-        ImageStream existingImageStream = project.getOpenShift().getImageStream(image.getImageName());
+        ImageStream existingImageStream = project.getOpenShift().getImageStream(getImageStreamNaming(image.getImageName()));
         if(existingImageStream != null) {
-            logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", image.getImageName());
+            logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", getImageStreamNaming(image.getImageName()));
             project.getOpenShift().deleteImageStream(existingImageStream);
         }
         project.getOpenShift().createImageStream(imageStream);
+    }
+
+    private static String getImageStreamNaming(String imageName) {
+        // We need to adjust image name from the OSBS build full name to the new naming policy since 7.5.1
+        // rhpam-7-rhpam-businesscentral-rhel8 -> rhpam-businesscentral-rhel8
+        return imageName.replaceFirst("^rhpam-7-", "");
     }
 }
