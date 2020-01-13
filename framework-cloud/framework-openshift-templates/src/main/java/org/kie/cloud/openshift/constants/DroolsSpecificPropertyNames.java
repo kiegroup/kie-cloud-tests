@@ -56,4 +56,9 @@ public class DroolsSpecificPropertyNames implements ProjectSpecificPropertyNames
     public String workbenchSsoSecret() {
         return OpenShiftTemplateConstants.DECISION_CENTRAL_SSO_SECRET;
     }
+
+    @Override
+    public String workbenchMemoryLimit() {
+        return OpenShiftTemplateConstants.DECISION_CENTRAL_MEMORY_LIMIT;
+    }
 }

@@ -129,4 +129,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
                 throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
         }
     }
+
+    @Override
+    public ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
