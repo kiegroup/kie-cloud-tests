@@ -18,11 +18,13 @@ package org.kie.cloud.openshift.deployment;
 import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import cz.xtf.core.waiting.SimpleWaiter;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.util.OpenShiftCaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,9 +144,10 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
      */
     private void waitForRolloutFinish(String rolloutInProgressConfigMapName) {
         if (getOpenShift().getConfigMap(rolloutInProgressConfigMapName) != null) {
-            new SimpleWaiter(() -> getOpenShift().getConfigMap(rolloutInProgressConfigMapName) == null).timeout(TimeUnit.MINUTES, 5)
-                                                                                                       .reason("Temporary rollout config map found, waiting for rollout to finish.")
-                                                                                                       .waitFor();
+            Supplier<ConfigMap> getConfigMap = () -> getOpenShift().getConfigMap(rolloutInProgressConfigMapName);
+            new SimpleWaiter(() -> OpenShiftCaller.repeatableCall(getConfigMap) == null).timeout(TimeUnit.MINUTES, 5)
+                                                                                        .reason("Temporary rollout config map found, waiting for rollout to finish.")
+                                                                                        .waitFor();
         }
     }
 
