@@ -55,6 +55,9 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
     public static final String KIE_SERVER_MEMORY_LIMIT = "KIE_SERVER_MEMORY_LIMIT";
+
+    public static final String BUSINESS_CENTRAL_MEMORY_LIMIT = "BUSINESS_CENTRAL_MEMORY_LIMIT";
+    public static final String DECISION_CENTRAL_MEMORY_LIMIT = "DECISION_CENTRAL_MEMORY_LIMIT";
     
     // Intentionally not public. Use ProjectSpecificPropertyNames to get proper variant based on product profile
     static final String BUSINESS_CENTRAL_MAVEN_SERVICE = "BUSINESS_CENTRAL_MAVEN_SERVICE";
