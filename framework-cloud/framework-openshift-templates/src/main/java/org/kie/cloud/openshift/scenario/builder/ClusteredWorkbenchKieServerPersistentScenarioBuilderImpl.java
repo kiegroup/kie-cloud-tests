@@ -32,6 +32,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
     private final Map<String, String> envVariables = new HashMap<>();
     private boolean deploySso = false;
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     public ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
@@ -44,6 +45,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
         ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
         envVariables.put(propertyNames.workbenchHttpsSecret(), OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(propertyNames.workbenchMemoryLimit(), "4Gi"); //limit memory limit to use only 4Gi
     }
 
     @Override
@@ -68,6 +70,12 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
         deploySso = true;
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit) {
+        envVariables.put(propertyNames.workbenchMemoryLimit(), limit);
         return this;
     }
 }
