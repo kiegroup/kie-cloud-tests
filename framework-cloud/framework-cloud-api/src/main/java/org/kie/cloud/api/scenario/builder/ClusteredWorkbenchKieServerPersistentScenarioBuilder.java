@@ -41,4 +41,12 @@ public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends De
      * @return Builder
      */
     ClusteredWorkbenchKieServerPersistentScenarioBuilder deploySso();
+
+    /**
+     * Return setup builder with specified memory limit.
+     *
+     * @param limit memory limit (e.g.: 4Gi, etc).
+     * @return Builder with configured memory limit.
+     */
+    ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
 }

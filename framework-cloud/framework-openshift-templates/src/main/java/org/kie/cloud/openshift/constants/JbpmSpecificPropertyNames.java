@@ -56,4 +56,9 @@ public class JbpmSpecificPropertyNames implements ProjectSpecificPropertyNames {
     public String workbenchSsoSecret() {
         return OpenShiftTemplateConstants.BUSINESS_CENTRAL_SSO_SECRET;
     }
+
+    @Override
+    public String workbenchMemoryLimit() {
+        return OpenShiftTemplateConstants.BUSINESS_CENTRAL_MEMORY_LIMIT;
+    }
 }
