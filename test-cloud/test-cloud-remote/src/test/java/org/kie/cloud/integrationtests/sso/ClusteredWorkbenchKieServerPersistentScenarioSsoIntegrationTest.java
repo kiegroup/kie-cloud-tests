@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -95,6 +96,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
     }
 
     @Test
+    @Ignore("Ignored as the tests are affected by RHPAM-1544. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1544")
     public void testCreateAndDeployProject() {
         projectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
                                                               deploymentScenario.getKieServerDeployment());
