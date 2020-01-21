@@ -48,6 +48,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
         ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
         envVariables.put(propertyNames.workbenchHttpsSecret(), OpenShiftConstants.getKieApplicationSecretName());
+        envVariables.put(propertyNames.workbenchMemoryLimit(), "4Gi"); // limit memory limit to use only 4Gi
     }
 
     @Override
@@ -102,6 +103,12 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
         envVariables.putAll(ldapSettings.getEnvVariables());
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withWorkbenchMemoryLimit(String limit) {
+        envVariables.put(propertyNames.workbenchMemoryLimit(), limit);
         return this;
     }
 }
