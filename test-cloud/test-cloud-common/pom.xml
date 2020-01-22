@@ -14,21 +14,15 @@
 
   <name>KIE :: Cloud :: Common Test</name>
   <description>Module providing test utilities and parent test classes.</description>
-  
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-rest-client</artifactId>
-        <version>${version.org.uberfire}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
       
   <dependencies>
     <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-git</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -86,11 +80,6 @@
     <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-common</artifactId>
-    </dependency>
-    <!-- UberFire rest client -->
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-rest-client</artifactId>
     </dependency>
   </dependencies>
 </project>

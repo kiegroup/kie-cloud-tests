@@ -21,11 +21,26 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchClientProvider {
 
-    private static final Integer DEFAULT_TIMEOUT_IN_SEC = 120;
+    private static final Integer DEFAULT_TIMEOUT_IN_SEC = 240;
 
     public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment) {
+        return getWorkbenchClient(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
+    }
+
+    public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
         WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(),
-                workbenchDeployment.getUsername(), workbenchDeployment.getPassword(), DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC);
+                username, password, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC);
+
         return workbenchClient;
+    }
+
+    public static WorkbenchClient getAsyncWorkbenchClient(WorkbenchDeployment workbenchDeployment) {
+        return getAsyncWorkbenchClient(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
+    }
+
+    public static WorkbenchClient getAsyncWorkbenchClient(WorkbenchDeployment workbenchDeployment, String username, String password) {
+        WorkbenchClient asyncWorkbenchClient = RestWorkbenchClient.createAsyncWorkbenchClient(workbenchDeployment.getUrl().toString(),
+                username, password);
+        return asyncWorkbenchClient;
     }
 }

@@ -88,7 +88,8 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
         return serviceName;
     }
 
-    @Override public void waitForScale() {
+    @Override
+    public void waitForScale() {
         super.waitForScale();
         if (!getInstances().isEmpty()) {
             getInsecureUrl().ifPresent(RouterUtil::waitForRouter);

@@ -114,6 +114,7 @@
     <module>test-cloud-optaweb</module>
     <module>test-cloud-performance</module>
     <module>test-cloud-ha-cep</module>
+    <module>test-cloud-workbench-ha</module>
   </modules>
 
   <build>
