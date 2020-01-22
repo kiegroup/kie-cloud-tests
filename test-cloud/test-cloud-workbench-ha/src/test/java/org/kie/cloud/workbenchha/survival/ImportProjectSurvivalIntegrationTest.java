@@ -49,21 +49,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Ignore("Survival scenarios are not supported yet.")
 public class ImportProjectSurvivalIntegrationTest extends AbstractWorkbenchHaIntegrationTest {
 
-    private String repositoryName;
-
     private Map<String,String> projectNameRepository;
-
 
     @Before
     public void setUp() {
-        //repositoryName = Git.getProvider().createGitRepositoryWithPrefix("ImportGitProjectFunctionalIntegrationTest", ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(this.getClass().getName(), ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + Kjar.HELLO_RULES.getName());
-
         projectNameRepository = new HashMap<>();
         projectNameRepository.put(Kjar.DEFINITION.getName(), Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(UUID.randomUUID().toString().substring(0, 4), ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + Kjar.DEFINITION.getName())));
         projectNameRepository.put(Kjar.HELLO_RULES.getName(), Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(UUID.randomUUID().toString().substring(0, 4), ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + Kjar.HELLO_RULES.getName())));
         projectNameRepository.put(Kjar.STATELESS_SESSION.getName(), Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(UUID.randomUUID().toString().substring(0, 4), ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + Kjar.STATELESS_SESSION.getName())));
-        projectNameRepository.put(Kjar.USERTASK.getName(), Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(UUID.randomUUID().toString().substring(0, 4), ImportGitProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + Kjar.USERTASK.getName())));
 
         defaultWorkbenchClient = WorkbenchClientProvider.getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
         //defaultWorkbenchClient.createSpace(SPACE_NAME, deploymentScenario.getWorkbenchDeployment().getUsername());
@@ -73,7 +66,7 @@ public class ImportProjectSurvivalIntegrationTest extends AbstractWorkbenchHaInt
     public void cleanUp(){
         //defaultWorkbenchClient.deleteSpace(SPACE_NAME);
 
-        Git.getProvider().deleteGitRepository(repositoryName);
+        projectNameRepository.values().forEach(Git.getProvider()::deleteGitRepository);
     }
 
     @Test
@@ -84,9 +77,6 @@ public class ImportProjectSurvivalIntegrationTest extends AbstractWorkbenchHaInt
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-
-        // TODO test with one first
-        //List<Callable<SpaceProjects>> createTasks = runners.stream().map(runner -> runner.importProjects(UUID.randomUUID().toString().substring(0, 4),Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6))).collect(Collectors.toList());
         
         // TODO use in tests more repos
         List<Callable<SpaceProjects>> createTasks = runners.stream().map(runner -> runner.asyncImportProjects(UUID.randomUUID().toString().substring(0, 4),projectNameRepository)).collect(Collectors.toList());

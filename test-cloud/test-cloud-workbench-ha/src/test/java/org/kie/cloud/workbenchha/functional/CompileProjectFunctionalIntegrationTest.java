@@ -50,7 +50,6 @@ public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHa
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 
-    private String repositoryName;
     private Map<String, String> projectNameRepository;
     private List<SpaceProjects> spaceProjects;
 
@@ -58,12 +57,6 @@ public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHa
 
     @Before
     public void setUp() {
-        // repositoryName =
-        // Git.getProvider().createGitRepositoryWithPrefix("CompileProjectFunctionalIntegrationTest",
-        // CompileProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(this.getClass().getName(),
-                CompileProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/"
-                        + Kjar.HELLO_RULES.getName());
 
         projectNameRepository = new HashMap<>();
         projectNameRepository.put(Kjar.DEFINITION.getName(),
@@ -81,11 +74,6 @@ public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHa
                         UUID.randomUUID().toString().substring(0, 4),
                         CompileProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile()
                                 + "/" + Kjar.STATELESS_SESSION.getName())));
-        projectNameRepository.put(Kjar.USERTASK.getName(),
-                Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(
-                        UUID.randomUUID().toString().substring(0, 4),
-                        CompileProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile()
-                                + "/" + Kjar.USERTASK.getName())));
 
         defaultWorkbenchClient = WorkbenchClientProvider
                 .getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());
@@ -103,7 +91,7 @@ public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHa
     public void cleanUp(){
         //defaultWorkbenchClient.deleteSpace(SPACE_NAME);
 
-        Git.getProvider().deleteGitRepository(repositoryName);
+        projectNameRepository.values().forEach(Git.getProvider()::deleteGitRepository);
     }
 
     @Test
@@ -204,11 +192,8 @@ public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHa
         //Create executor service to run every tasks in own thread
         ExecutorService executorService = Executors.newFixedThreadPool(runners.size());
         //Create task to create projects for all users
-
-        // TODO test with one first
-        //List<Callable<SpaceProjects>> createTasks = runners.stream().map(runner -> runner.importProjects(UUID.randomUUID().toString().substring(0, 4),Git.getProvider().getRepositoryUrl(repositoryName),UUID.randomUUID().toString().substring(0, 6))).collect(Collectors.toList());
         
-        // TODO use in tests more repos
+        // use in tests more repos
         List<Callable<SpaceProjects>> createTasks = runners.stream().map(runner -> runner.importProjects(UUID.randomUUID().toString().substring(0, 4),projectNameRepository)).collect(Collectors.toList());
 
         List<Future<SpaceProjects>> futures = executorService.invokeAll(createTasks);
