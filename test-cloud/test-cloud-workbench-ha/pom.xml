@@ -27,7 +27,6 @@
     <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>test-cloud-common</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
