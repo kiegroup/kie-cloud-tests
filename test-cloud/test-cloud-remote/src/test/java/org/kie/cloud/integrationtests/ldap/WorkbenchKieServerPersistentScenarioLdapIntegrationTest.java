@@ -19,7 +19,7 @@ import java.time.Duration;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -43,7 +43,6 @@ import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
-import org.kie.cloud.utils.TestRunnerFeature;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
@@ -65,9 +64,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
     private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
-
-    @ClassRule
-    public static final TestRunnerFeature runner = new TestRunnerFeature("runners/jbpm.properties");
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -118,15 +114,13 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         });
     }
     
-
-
     @AfterClass
     public static void cleanEnvironment() {
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     @Test
-    // @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
+    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
         persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
