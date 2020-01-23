@@ -20,6 +20,7 @@ import java.time.Duration;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
@@ -37,6 +38,7 @@ import org.kie.cloud.tests.common.AutoScalerDeployment;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.tests.common.runner.TestRunnerFeature;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
@@ -56,6 +58,9 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
     private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
+
+    @ClassRule
+    public static final TestRunnerFeature runner = new TestRunnerFeature("runners/jbpm.properties");
 
     @BeforeClass
     public static void initializeDeployment() {

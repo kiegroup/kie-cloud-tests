@@ -55,7 +55,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     private InstancesLogCollectorRunnable instancesLogCollectorRunnable;
 
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
-    private List<ExternalDeployment<?, ?>> externalDeployments = new ArrayList<>();
+    protected List<ExternalDeployment<?, ?>> externalDeployments = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
 
