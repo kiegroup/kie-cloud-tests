@@ -21,7 +21,7 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchClientProvider {
 
-    private static final Integer DEFAULT_TIMEOUT_IN_SEC = 240;
+    private static final Integer DEFAULT_TIMEOUT_IN_SEC = 600;
 
     public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment) {
         return getWorkbenchClient(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
