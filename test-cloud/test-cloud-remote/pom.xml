@@ -28,6 +28,10 @@
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-openshift</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
       <artifactId>test-cloud-common</artifactId>
     </dependency>
     <dependency>
