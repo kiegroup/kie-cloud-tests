@@ -36,6 +36,7 @@ import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.SmartRouterTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.AutoScalerDeployment;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -85,19 +86,15 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
             KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
             kieServerDeployment.setRouterTimeout(Duration.ofMinutes(3));
-            kieServerDeployment.scale(0);
-            kieServerDeployment.waitForScale();
-
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
+            AutoScalerDeployment.on(kieServerDeployment, () -> {
+                WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
+                WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
+                                                 KieContainerStatus.STARTED);
+                WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT,
+                                                 KieContainerStatus.STARTED);
+            });
         }
 
-        // Scaling to one is kept independently from for loop above and done in parallel, to speed up the test execution time
-        deploymentScenario.getKieServerOneDeployment().scale(1);
-        deploymentScenario.getKieServerTwoDeployment().scale(1);
-        deploymentScenario.getKieServerOneDeployment().waitForScale();
-        deploymentScenario.getKieServerTwoDeployment().waitForScale();
     }
 
     @AfterClass

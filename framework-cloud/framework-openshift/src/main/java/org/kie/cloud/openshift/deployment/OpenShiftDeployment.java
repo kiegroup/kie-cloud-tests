@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.openshift.deployment;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,13 +31,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import cz.xtf.core.openshift.OpenShift;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.Route;
-import io.fabric8.openshift.api.model.RouteList;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
@@ -49,7 +44,13 @@ import org.kie.cloud.openshift.util.OpenshiftInstanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.stream.Collectors.toList;
+import cz.xtf.core.openshift.OpenShift;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.RouteList;
 
 public abstract class OpenShiftDeployment implements Deployment {
 
@@ -147,14 +148,17 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void waitForScale() {
-        int expectedPods = openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
-        waitUntilAllPodsAreReadyAndRunning(expectedPods);
+        waitUntilAllPodsAreReadyAndRunning(getReplicas());
     }
 
     @Override
     public void waitForScheduled() {
-        int expectedPods = openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
-        waitUntilAllPodsAreReady(expectedPods);
+        waitUntilAllPodsAreReady(getReplicas());
+    }
+
+    @Override
+    public int getReplicas() {
+        return openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
     }
 
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {

@@ -18,7 +18,6 @@ package org.kie.cloud.openshift.scenario;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -114,7 +113,6 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
         databaseDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
-        kieServerDeployment.scale(1);
         kieServerDeployment.waitForScale();
 
         logNodeNameOfAllInstances();

@@ -93,10 +93,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl(), envVariables);
 
         workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
-        workbenchRuntimeDeployment.scale(1);
 
         smartRouterDeployment = createSmartRouterDeployment(project);
-        smartRouterDeployment.scale(1);
 
         kieServerOneDeployment = createKieServerDeployment(project, "1");
         kieServerTwoDeployment = createKieServerDeployment(project, "2");

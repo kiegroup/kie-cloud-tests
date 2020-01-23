@@ -103,7 +103,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
         workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
-        workbenchDeployment.scale(1);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
@@ -116,7 +115,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
 
         // TODO: Workaround for KIECLOUD-48, respin Kie server when database is ready
         kieServerDeployment.deleteInstances(kieServerDeployment.getInstances());
-        kieServerDeployment.scale(1);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
