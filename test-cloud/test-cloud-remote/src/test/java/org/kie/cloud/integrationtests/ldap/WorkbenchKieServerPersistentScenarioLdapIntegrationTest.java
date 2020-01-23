@@ -19,7 +19,7 @@ import java.time.Duration;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -38,10 +38,12 @@ import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.AutoScalerDeployment;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.utils.TestRunnerFeature;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
@@ -63,6 +65,9 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
     private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
+
+    @ClassRule
+    public static final TestRunnerFeature runner = new TestRunnerFeature("runners/jbpm.properties");
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -104,16 +109,16 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
         deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
-        deploymentScenario.getKieServerDeployment().scale(0);
-        deploymentScenario.getKieServerDeployment().waitForScale();
 
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
-
-        deploymentScenario.getKieServerDeployment().scale(1);
-        deploymentScenario.getKieServerDeployment().waitForScale();
+        AutoScalerDeployment.on(deploymentScenario.getKieServerDeployment(), () -> {
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
+                                             KieContainerStatus.STARTED);
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
+        });
     }
+    
+
 
     @AfterClass
     public static void cleanEnvironment() {
@@ -121,7 +126,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
+    // @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
         persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
