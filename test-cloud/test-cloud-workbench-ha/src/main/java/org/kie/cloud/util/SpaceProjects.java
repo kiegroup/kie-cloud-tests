@@ -16,6 +16,7 @@
 package org.kie.cloud.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class SpaceProjects {
@@ -33,9 +34,9 @@ public class SpaceProjects {
         this.projectNames.add(projectName);
     }
 
-    public SpaceProjects(String spaceName, List<String> projectNames) {
-        this.spaceName=spaceName;
-        this.projectNames=projectNames;
+    public SpaceProjects(String spaceName, Collection<String> projectNames) {
+        this(spaceName);
+        projectNames.addAll(projectNames);
     }
 
     public String getSpaceName() {

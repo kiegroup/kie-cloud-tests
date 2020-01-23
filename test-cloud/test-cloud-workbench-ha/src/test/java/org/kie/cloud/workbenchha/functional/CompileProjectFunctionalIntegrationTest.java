@@ -60,20 +60,20 @@ public class CompileProjectFunctionalIntegrationTest extends AbstractWorkbenchHa
 
         projectNameRepository = new HashMap<>();
         projectNameRepository.put(Kjar.DEFINITION.getName(),
-                Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(
+                Git.getProvider().createGitRepositoryWithPrefix(
                         UUID.randomUUID().toString().substring(0, 4),
                         CompileProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile()
-                                + "/" + Kjar.DEFINITION.getName())));
+                                + "/" + Kjar.DEFINITION.getName()));
         projectNameRepository.put(Kjar.HELLO_RULES.getName(),
-                Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(
+                Git.getProvider().createGitRepositoryWithPrefix(
                         UUID.randomUUID().toString().substring(0, 4),
                         CompileProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile()
-                                + "/" + Kjar.HELLO_RULES.getName())));
+                                + "/" + Kjar.HELLO_RULES.getName()));
         projectNameRepository.put(Kjar.STATELESS_SESSION.getName(),
-                Git.getProvider().getRepositoryUrl(Git.getProvider().createGitRepositoryWithPrefix(
+                Git.getProvider().createGitRepositoryWithPrefix(
                         UUID.randomUUID().toString().substring(0, 4),
                         CompileProjectFunctionalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile()
-                                + "/" + Kjar.STATELESS_SESSION.getName())));
+                                + "/" + Kjar.STATELESS_SESSION.getName()));
 
         defaultWorkbenchClient = WorkbenchClientProvider
                 .getWorkbenchClient(deploymentScenario.getWorkbenchDeployment());

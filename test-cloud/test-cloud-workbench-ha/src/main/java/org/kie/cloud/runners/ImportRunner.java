@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.tests.common.provider.git.Git;
 import org.kie.cloud.util.SpaceProjects;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 
@@ -46,32 +47,25 @@ public class ImportRunner extends AbstractRunner {
         };
     }
 
-    public Callable<SpaceProjects> asyncImportProjects(String spaceName, Map<String, String> projectNameAndGitURL) {
+    public Callable<SpaceProjects> asyncImportProjects(String spaceName, Map<String, String> projectNameAndGitRepoName) {
         return new Callable<SpaceProjects>() {
             @Override
             public SpaceProjects call() {
-                SpaceProjects finalSpaceProjects = new SpaceProjects(spaceName);
-                projectNameAndGitURL.forEach((String projectName, String gitUrl) -> {
-                    finalSpaceProjects.addProjectNames(createSpaceAndImportProject(asyncWorkbenchClient, spaceName, gitUrl, projectName).getProjectNames());
-                });
-                return finalSpaceProjects;
+                return createSpaceAndImportProject(asyncWorkbenchClient,spaceName,projectNameAndGitRepoName);
             }
         };
     }
 
-    public Callable<SpaceProjects> importProjects(String spaceName, Map<String, String> projectNameAndGitURL) {
+    public Callable<SpaceProjects> importProjects(String spaceName, Map<String, String> projectNameAndGitRepoName) {
         return new Callable<SpaceProjects>() {
             @Override
             public SpaceProjects call() {
-                SpaceProjects finalSpaceProjects = new SpaceProjects(spaceName);
-                projectNameAndGitURL.forEach((String projectName, String gitUrl) -> {
-                    finalSpaceProjects.addProjectNames(createSpaceAndImportProject(workbenchClient, spaceName, gitUrl, projectName).getProjectNames());
-                });
-                return finalSpaceProjects;
+                return createSpaceAndImportProject(workbenchClient,spaceName,projectNameAndGitRepoName);
             }
         };
     }
 
+    // TODO can I delete this?
     public Callable<SpaceProjects> importProjects(String spaceName, String gitURL, String projectNames) {
         return new Callable<SpaceProjects>() {
             @Override
@@ -79,6 +73,16 @@ public class ImportRunner extends AbstractRunner {
                 return createSpaceAndImportProject(workbenchClient, spaceName, gitURL, projectNames);
             }
         };
+    }
+
+    private SpaceProjects createSpaceAndImportProject(WorkbenchClient client, String spaceName, Map<String, String> projectNameAndGitRepoName) {
+        client.createSpace(spaceName, wbUser);
+        projectNameAndGitRepoName.forEach((String projectName, String gitRepoName) -> {
+            importProject(client, spaceName, Git.getProvider().getRepositoryUrl(gitRepoName), projectName);
+        });
+        SpaceProjects spaceProjects = new SpaceProjects(spaceName, projectNameAndGitRepoName.keySet());
+        allCreatedSpaceProjects.add(spaceProjects);
+        return spaceProjects;
     }
 
     private SpaceProjects createSpaceAndImportProject(WorkbenchClient client, String spaceName, String gitURL, String projectName) {
