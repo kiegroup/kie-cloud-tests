@@ -23,9 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import cz.xtf.core.waiting.SimpleWaiter;
-import cz.xtf.core.waiting.SupplierWaiter;
-import cz.xtf.core.waiting.WaiterException;
 import org.kie.cloud.api.deployment.AmqDeployment;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
@@ -53,6 +50,10 @@ import org.kie.cloud.openshift.util.AmqSecretDeployer;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.SupplierWaiter;
+import cz.xtf.core.waiting.WaiterException;
 
 public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioImpl extends OpenShiftOperatorScenario<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> implements WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario {
 
@@ -144,7 +145,6 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
         smartRouterDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
-        kieServerDeployment.scale(1);
         kieServerDeployment.waitForScale();
 
         logger.info("Waiting for Database deployment to become ready.");
