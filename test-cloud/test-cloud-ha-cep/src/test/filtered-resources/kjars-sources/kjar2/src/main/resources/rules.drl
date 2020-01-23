@@ -1,0 +1,9 @@
+package org.drools.cep
+
+import java.util.Map
+
+rule Multiply when
+    $m : Map()
+then
+    $m.put("result", "value2");
+end
