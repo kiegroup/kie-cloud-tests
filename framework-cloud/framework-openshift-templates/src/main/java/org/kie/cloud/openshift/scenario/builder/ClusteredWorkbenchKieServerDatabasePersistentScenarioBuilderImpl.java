@@ -48,7 +48,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
         ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
         envVariables.put(propertyNames.workbenchHttpsSecret(), OpenShiftConstants.getKieApplicationSecretName());
-        envVariables.put(propertyNames.workbenchMemoryLimit(), "4Gi"); // limit memory limit to use only 4Gi
+        envVariables.put(propertyNames.workbenchMemoryLimit(), "2Gi"); // limit memory limit to use only 4Gi
     }
 
     @Override
