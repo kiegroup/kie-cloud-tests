@@ -18,16 +18,6 @@ package org.kie.cloud.openshift.constants;
 public class JbpmSpecificPropertyNames implements ProjectSpecificPropertyNames {
 
     @Override
-    public String workbenchMavenUserName() {
-        return OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_USERNAME;
-    }
-
-    @Override
-    public String workbenchMavenPassword() {
-        return OpenShiftTemplateConstants.BUSINESS_CENTRAL_MAVEN_PASSWORD;
-    }
-
-    @Override
     public String workbenchHttpsSecret() {
         return OpenShiftTemplateConstants.BUSINESS_CENTRAL_HTTPS_SECRET;
     }

@@ -16,10 +16,10 @@
 package org.kie.cloud.openshift.scenario;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.openshift.OpenShiftController;
@@ -87,6 +88,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
     @Override
     public final void deploy() {
+
         // OpenShift restriction: Hostname must be shorter than 63 characters
         projectName = UUID.randomUUID().toString().substring(0, 4);
         OpenShiftConstants.getNamespacePrefix().ifPresent(p -> projectName = p + "-" + projectName);
@@ -101,7 +103,12 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         initLogCollectors();
 
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
+        Map<String, String> secretConfig = new HashMap<>();
+        secretConfig.put(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
+        secretConfig.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
+
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), secretConfig);
+        deploySecretUsers(project);
 
         if (createImageStreams) {
             logger.info("Creating image streams.");
@@ -113,6 +120,13 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         }
 
         deployKieDeployments();
+    }
+
+    private void deploySecretUsers(Project project) {
+        Map<String, String> data = new HashMap<>();
+        data.put(OpenShiftConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
+        data.put(OpenShiftConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
+        project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
     }
 
     /**
