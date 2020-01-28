@@ -58,9 +58,6 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
 
     private KieServerControllerClient kieControllerClient;
 
-    @ClassRule
-    public static final TestRunnerFeature runner = new TestRunnerFeature("runners/jbpm.properties");
-
     @Override
     protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
         return deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()

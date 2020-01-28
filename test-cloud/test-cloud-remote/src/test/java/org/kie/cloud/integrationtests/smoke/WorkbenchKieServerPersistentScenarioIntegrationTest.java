@@ -19,6 +19,7 @@ import java.time.Duration;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
@@ -35,6 +36,7 @@ import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.utils.TestRunnerFeature;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
@@ -92,7 +94,7 @@ public class WorkbenchKieServerPersistentScenarioIntegrationTest extends Abstrac
     public static void cleanEnvironment() {
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
-
+ 
     @Test
     public void testRulesFromMavenRepo() {
         fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
