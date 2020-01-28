@@ -90,7 +90,6 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         envVariables.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, projectName);
-        envVariables.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl(), envVariables);
 
         workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
@@ -110,13 +109,6 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
         logger.info("Waiting for Database two deployment to become ready.");
         databaseTwoDeployment.waitForScale();
-
-        // TODO: Workaround for KIECLOUD-48, respin Kie server when database is ready
-        kieServerOneDeployment.deleteInstances(kieServerOneDeployment.getInstances());
-        kieServerTwoDeployment.deleteInstances(kieServerTwoDeployment.getInstances());
-        // Scale after recreating instances to prevent race condition
-        kieServerOneDeployment.scale(1);
-        kieServerTwoDeployment.scale(1);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchRuntimeDeployment.waitForScale();
