@@ -90,6 +90,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, projectName);
         envVariables.put(OpenShiftTemplateConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, projectName);
+        envVariables.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl(), envVariables);
 
         workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
@@ -180,8 +181,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
         WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl(project);
-        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
-        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
+        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getAppUser());
+        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getAppPassword());
 
         return workbenchRuntimeDeployment;
     }
@@ -195,8 +196,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project, String kieServerSuffix) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
         kieServerDeployment.setServiceSuffix("-" + kieServerSuffix);
 
         return kieServerDeployment;

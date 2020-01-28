@@ -21,13 +21,10 @@ public class OpenShiftTemplateConstants {
     // Used as a generic password for all passwords in the template (Workbench user, Kie server user, Controller user, Workbench maven user)
     public static final String DEFAULT_PASSWORD = "DEFAULT_PASSWORD";
 
-    public static final String KIE_ADMIN_USER = "KIE_ADMIN_USER";
-    public static final String KIE_ADMIN_PWD = "KIE_ADMIN_PWD";
+    public static final String CREDENTIALS_SECRET = "CREDENTIALS_SECRET";
 
     public static final String GIT_HOOKS_DIR = "GIT_HOOKS_DIR";
 
-    public static final String KIE_SERVER_USER = "KIE_SERVER_USER";
-    public static final String KIE_SERVER_PWD = "KIE_SERVER_PWD";
     public static final String KIE_SERVER_HOST = "KIE_SERVER_HOST";
     public static final String KIE_SERVER_PORT = "KIE_SERVER_PORT";
     public static final String KIE_SERVER_ID = "KIE_SERVER_ID";
@@ -40,8 +37,6 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_CONTROLLER_PROTOCOL = "KIE_SERVER_CONTROLLER_PROTOCOL";
     public static final String KIE_SERVER_CONTROLLER_HOST = "KIE_SERVER_CONTROLLER_HOST";
     public static final String KIE_SERVER_CONTROLLER_PORT = "KIE_SERVER_CONTROLLER_PORT";
-    public static final String KIE_SERVER_CONTROLLER_USER = "KIE_SERVER_CONTROLLER_USER";
-    public static final String KIE_SERVER_CONTROLLER_PWD = "KIE_SERVER_CONTROLLER_PWD";
     public static final String KIE_SERVER_CONTROLLER_SERVICE = "KIE_SERVER_CONTROLLER_SERVICE";
 
     public static final String KIE_SERVER_ROUTER_ID = "KIE_SERVER_ROUTER_ID";
@@ -61,11 +56,7 @@ public class OpenShiftTemplateConstants {
     
     // Intentionally not public. Use ProjectSpecificPropertyNames to get proper variant based on product profile
     static final String BUSINESS_CENTRAL_MAVEN_SERVICE = "BUSINESS_CENTRAL_MAVEN_SERVICE";
-    static final String BUSINESS_CENTRAL_MAVEN_USERNAME = "BUSINESS_CENTRAL_MAVEN_USERNAME";
-    static final String BUSINESS_CENTRAL_MAVEN_PASSWORD = "BUSINESS_CENTRAL_MAVEN_PASSWORD";
     static final String DECISION_CENTRAL_MAVEN_SERVICE = "DECISION_CENTRAL_MAVEN_SERVICE";
-    static final String DECISION_CENTRAL_MAVEN_USERNAME = "DECISION_CENTRAL_MAVEN_USERNAME";
-    static final String DECISION_CENTRAL_MAVEN_PASSWORD = "DECISION_CENTRAL_MAVEN_PASSWORD";
 
     public static final String MAVEN_REPO_URL = "MAVEN_REPO_URL";
     public static final String MAVEN_REPO_USERNAME = "MAVEN_REPO_USERNAME";

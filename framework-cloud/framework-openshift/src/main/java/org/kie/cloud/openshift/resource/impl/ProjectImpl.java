@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,9 +36,12 @@ import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.common.util.Base64Utils;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
@@ -118,6 +122,21 @@ public class ProjectImpl implements Project {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while waiting for scenario to be initialized.", e);
         }
+    }
+
+    @Override
+    public void createSecret(String secretName, Map<String, String> secrets) {
+        Secret secret = new Secret();
+        secret.setMetadata(new ObjectMeta());
+        secret.getMetadata().setName(secretName);
+
+        Map<String, String> data = new HashMap<>();
+        for (Entry<String, String> entry : secrets.entrySet()) {
+            data.put(entry.getKey(), Base64Utils.decode(entry.getValue()));
+        }
+
+        secret.setData(data);
+        openShift.createSecret(secret);
     }
 
     static Semaphore semaphore = new Semaphore(1);

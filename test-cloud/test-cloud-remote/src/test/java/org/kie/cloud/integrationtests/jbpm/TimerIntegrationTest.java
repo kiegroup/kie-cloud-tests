@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -37,6 +38,7 @@ import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.cloud.tests.common.time.Constants;
 import org.kie.cloud.tests.common.time.TimeUtils;
+import org.kie.cloud.utils.TestRunnerFeature;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -55,6 +57,9 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
     private static final String NODE_INSTANCE_NAME = "PrintingNode";
 
     private KieServerControllerClient kieControllerClient;
+
+    @ClassRule
+    public static final TestRunnerFeature runner = new TestRunnerFeature("runners/jbpm.properties");
 
     @Override
     protected ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {

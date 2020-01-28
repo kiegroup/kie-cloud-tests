@@ -101,13 +101,13 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
         project.processTemplateAndCreateResources(OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
-        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
-        workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
+        workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
+        workbenchDeployment.setPassword(DeploymentConstants.getAppPassword());
         workbenchDeployment.scale(1);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
 
         databaseDeployment = new DatabaseDeploymentImpl(project);
 
