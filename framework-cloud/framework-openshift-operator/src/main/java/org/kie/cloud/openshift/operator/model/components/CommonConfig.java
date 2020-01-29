@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.operator.model.components;
 
@@ -28,9 +28,12 @@ public class CommonConfig {
     private String amqClusterPassword;
     private String amqPassword;
     private String applicationName;
+    private String controllerPassword;
     private String dbPassword;
     private String imageTag;
     private String keyStorePassword;
+    private String mavenPassword;
+    private String serverPassword;
     private String version;
 
     public String getAdminUser() {
@@ -53,6 +56,10 @@ public class CommonConfig {
         return applicationName;
     }
 
+    public String getControllerPassword() {
+        return controllerPassword;
+    }
+
     public String getDbPassword() {
         return dbPassword;
     }
@@ -63,6 +70,14 @@ public class CommonConfig {
 
     public String getKeyStorePassword() {
         return keyStorePassword;
+    }
+
+    public String getMavenPassword() {
+        return mavenPassword;
+    }
+
+    public String getServerPassword() {
+        return serverPassword;
     }
 
     public String getVersion() {
@@ -89,6 +104,10 @@ public class CommonConfig {
         this.applicationName = applicationName;
     }
 
+    public void setControllerPassword(String controllerPassword) {
+        this.controllerPassword = controllerPassword;
+    }
+
     public void setDbPassword(String dbPassword) {
         this.dbPassword = dbPassword;
     }
@@ -99,6 +118,14 @@ public class CommonConfig {
 
     public void setKeyStorePassword(String keyStorePassword) {
         this.keyStorePassword = keyStorePassword;
+    }
+
+    public void setMavenPassword(String mavenPassword) {
+        this.mavenPassword = mavenPassword;
+    }
+
+    public void setServerPassword(String serverPassword) {
+        this.serverPassword = serverPassword;
     }
 
     public void setVersion(String version) {
