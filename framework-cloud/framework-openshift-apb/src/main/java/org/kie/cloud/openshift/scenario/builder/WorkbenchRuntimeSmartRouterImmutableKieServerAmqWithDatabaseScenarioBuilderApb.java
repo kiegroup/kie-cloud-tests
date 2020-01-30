@@ -51,12 +51,12 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
         extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_VOLUME_SIZE, "64Mi");
 
         // Users
-        extraVars.put(OpenShiftApbConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
-        extraVars.put(OpenShiftApbConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
-        extraVars.put(OpenShiftApbConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
-        extraVars.put(OpenShiftApbConstants.KIE_ADMIN_PWD, DeploymentConstants.getWorkbenchPassword());
-        extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_USER, DeploymentConstants.getControllerUser());
-        extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_PWD, DeploymentConstants.getControllerPassword());
+        extraVars.put(OpenShiftApbConstants.KIE_SERVER_USER, DeploymentConstants.getAppUser());
+        extraVars.put(OpenShiftApbConstants.KIE_SERVER_PWD, DeploymentConstants.getAppPassword());
+        extraVars.put(OpenShiftApbConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
+        extraVars.put(OpenShiftApbConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
+        extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_USER, DeploymentConstants.getAppUser());
+        extraVars.put(OpenShiftApbConstants.KIE_CONTROLLER_PWD, DeploymentConstants.getAppPassword());
 
         // AMQ
         extraVars.put(OpenShiftApbConstants.AMQ_INTEGRATION_ENABLE, "true");
