@@ -18,7 +18,6 @@ package org.kie.cloud.openshift.scenario;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -101,8 +100,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
 
         kieServerDeployment = createKieServerDeployment(project);
         kieServerDeployment.setServiceSuffix("-0");
-        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
         databaseDeployment = new DatabaseDeploymentImpl(project);
         databaseDeployment.setServiceSuffix("-0");
         amqDeployment = createAmqDeployment(project);
@@ -205,8 +204,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project) {
         KieServerDeploymentImpl deployment = new KieServerDeploymentImpl(project);
-        deployment.setUsername(DeploymentConstants.getKieServerUser());
-        deployment.setPassword(DeploymentConstants.getKieServerPassword());
+        deployment.setUsername(DeploymentConstants.getAppUser());
+        deployment.setPassword(DeploymentConstants.getAppPassword());
 
         return deployment;
     }
