@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.scenario;
 
@@ -102,13 +102,8 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         logger.info("Launch instances log collector on project {}", projectName);
         initLogCollectors();
 
-        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
-        Map<String, String> secretConfig = new HashMap<>();
-        secretConfig.put(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
-        secretConfig.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
-
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), secretConfig);
-        deploySecretUsers(project);
+        deploySecretConfig();
+        deploySecretAppUser();
 
         if (createImageStreams) {
             logger.info("Creating image streams.");
@@ -122,12 +117,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         deployKieDeployments();
     }
 
-    private void deploySecretUsers(Project project) {
-        Map<String, String> data = new HashMap<>();
-        data.put(OpenShiftConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
-        data.put(OpenShiftConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
-        project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
-    }
+
 
     /**
      * Deploy Kie deployments for this scenario and wait until deployments are ready
@@ -203,11 +193,11 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     /**
      * Add an external deployment to be executed before the specific scenario deployments are done
      * and undeployed when scenario is over.
-     * 
+     *
      * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
-     * 
+     *
      * <b>Note that the deployment does NOT wait for the deployment to be ready.</b>
-     * 
+     *
      * @param externalDeployment External deployment to add to the scenario
      */
     public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
@@ -233,9 +223,9 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      * Add an external deployment to be executed before the specific scenario deployments are done
      * and undeployed when scenario is over, in a synchronized manner, meaning that it is waiting
      * that the deployment is ready to going further.
-     * 
+     *
      * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
-     * 
+     *
      * @param externalDeployment External deployment to add to the scenario
      */
     public void addExtraDeploymentSynchronized(ExternalDeployment<?, ?> externalDeployment) {
@@ -260,9 +250,27 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     @Override
     public MavenRepositoryDeployment getMavenRepositoryDeployment() {
         return externalDeployments.stream().filter(deployment -> ExternalDeploymentID.MAVEN_REPOSITORY.equals(deployment.getKey()))
-                                           .map(ExternalDeployment::getDeploymentInformation)
-                                           .map(deployment -> (MavenRepositoryDeployment) deployment)
-                                           .findAny()
-                                           .orElseThrow(() -> new RuntimeException("Maven repository deployment not found."));
+                .map(ExternalDeployment::getDeploymentInformation)
+                .map(deployment -> (MavenRepositoryDeployment) deployment)
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("Maven repository deployment not found."));
+    }
+
+    private void deploySecretConfig() {
+        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+        Map<String, String> secretConfig = new HashMap<>();
+        secretConfig.put(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
+        secretConfig.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
+
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), secretConfig);
+    }
+
+    private void deploySecretAppUser() {
+        logger.info("Creating user secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
+        Map<String, String> data = new HashMap<>();
+        data.put(OpenShiftConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
+        data.put(OpenShiftConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
+
+        project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
     }
 }
