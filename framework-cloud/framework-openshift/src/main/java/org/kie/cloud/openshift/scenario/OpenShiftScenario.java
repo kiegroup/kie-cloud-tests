@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.scenario;
 
@@ -102,13 +102,8 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         logger.info("Launch instances log collector on project {}", projectName);
         initLogCollectors();
 
-        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
-        Map<String, String> secretConfig = new HashMap<>();
-        secretConfig.put(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
-        secretConfig.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
-
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), secretConfig);
-        deploySecretUsers(project);
+        deploySecretConfig();
+        deploySecretAppUser();
 
         if (createImageStreams) {
             logger.info("Creating image streams.");
@@ -120,13 +115,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         }
 
         deployKieDeployments();
-    }
-
-    private void deploySecretUsers(Project project) {
-        Map<String, String> data = new HashMap<>();
-        data.put(OpenShiftConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
-        data.put(OpenShiftConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
-        project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
     }
 
     /**
@@ -264,5 +252,23 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
                                            .map(deployment -> (MavenRepositoryDeployment) deployment)
                                            .findAny()
                                            .orElseThrow(() -> new RuntimeException("Maven repository deployment not found."));
+    }
+
+    private void deploySecretConfig() {
+        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+        Map<String, String> secretConfig = new HashMap<>();
+        secretConfig.put(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
+        secretConfig.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
+
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), secretConfig);
+    }
+
+    private void deploySecretAppUser() {
+        logger.info("Creating user secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
+        Map<String, String> data = new HashMap<>();
+        data.put(OpenShiftConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
+        data.put(OpenShiftConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
+
+        project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
     }
 }
