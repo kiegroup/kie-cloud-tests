@@ -11,14 +11,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 package org.kie.cloud.common.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * Collection of utils to decode string into Base64.
+ * Collection of utils to encode string into Base64.
  */
 public final class Base64Utils {
 
@@ -27,11 +27,11 @@ public final class Base64Utils {
     }
 
     /**
-     * Decode the content into a base64 codec using UTF-8.
+     * Encode the content into a base64 codec using UTF-8.
      * @param content to decode.
      * @return a base64 string.
      */
-    public static final String decode(String content) {
+    public static final String encode(String content) {
         return Base64.getEncoder().encodeToString(content.getBytes(StandardCharsets.UTF_8));
     }
 

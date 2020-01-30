@@ -132,7 +132,7 @@ public class ProjectImpl implements Project {
 
         Map<String, String> data = new HashMap<>();
         for (Entry<String, String> entry : secrets.entrySet()) {
-            data.put(entry.getKey(), Base64Utils.decode(entry.getValue()));
+            data.put(entry.getKey(), Base64Utils.encode(entry.getValue()));
         }
 
         secret.setData(data);
