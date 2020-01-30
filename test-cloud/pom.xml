@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.kie.cloud</groupId>
     <artifactId>kie-cloud-tests</artifactId>
-    <version>7.32.0-SNAPSHOT</version>
+    <version>7.33.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-cloud</artifactId>
@@ -409,11 +409,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
       <dependencies>
         <dependency>
           <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
           <artifactId>framework-openshift-templates</artifactId>
           <scope>test</scope>
         </dependency>
@@ -433,11 +428,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
         <xtf.openshift.master.token/>
       </properties>
       <dependencies>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift</artifactId>
-          <scope>test</scope>
-        </dependency>
         <dependency>
           <groupId>org.kie.cloud</groupId>
           <artifactId>framework-openshift-operator</artifactId>
@@ -512,11 +502,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
         <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.ApbNotSupported</failsafe.excluded.groups>
       </properties>
       <dependencies>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift</artifactId>
-          <scope>test</scope>
-        </dependency>
         <dependency>
           <groupId>org.kie.cloud</groupId>
           <artifactId>framework-openshift-apb</artifactId>

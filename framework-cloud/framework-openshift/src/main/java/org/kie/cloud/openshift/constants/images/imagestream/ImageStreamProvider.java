@@ -16,9 +16,12 @@
 
 package org.kie.cloud.openshift.constants.images.imagestream;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import cz.xtf.core.waiting.SimpleWaiter;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.ImageStreamBuilder;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -128,6 +131,11 @@ public class ImageStreamProvider {
         if(existingImageStream != null) {
             logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", getImageStreamNaming(image.getImageName()));
             project.getOpenShift().deleteImageStream(existingImageStream);
+
+            new SimpleWaiter(() -> Objects.isNull(project.getOpenShift().getImageStream(getImageStreamNaming(image.getImageName()))))
+                            .timeout(TimeUnit.SECONDS, 30)
+                            .reason("Old ImageStream not deleted yet, waiting for ImageStream deletion.")
+                            .waitFor();
         }
         project.getOpenShift().createImageStream(imageStream);
     }

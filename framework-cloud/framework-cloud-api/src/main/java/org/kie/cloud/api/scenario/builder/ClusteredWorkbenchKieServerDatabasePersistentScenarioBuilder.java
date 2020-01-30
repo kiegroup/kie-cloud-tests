@@ -84,4 +84,11 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withHttpsKieServerHostname(String hostname);
 
+    /**
+     * Return setup builder with specified memory limit.
+     *
+     * @param limit memory limit (e.g.: 4Gi, etc).
+     * @return Builder with configured memory limit.
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
 }

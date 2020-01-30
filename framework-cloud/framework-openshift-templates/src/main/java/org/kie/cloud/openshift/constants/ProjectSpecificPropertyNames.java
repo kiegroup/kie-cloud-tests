@@ -44,6 +44,8 @@ public interface ProjectSpecificPropertyNames {
 
     String workbenchSsoSecret();
 
+    String workbenchMemoryLimit();
+
     /**
      * @return create ProjectSpecificPropertyNames instance grouping names of properties
      * based on value of system property "template.project"
