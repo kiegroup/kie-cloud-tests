@@ -277,8 +277,8 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
               <maven.repo.username>${maven.repo.username}</maven.repo.username>
               <maven.repo.password>${maven.repo.password}</maven.repo.password>
               <kie.app.user>${kie.app.user}</kie.app.user>
-			  <kie.app.password>${kie.app.password}</kie.app.password>
-			  <kie.app.credentials-secret-name>${kie.app.credentials-secret-name}</kie.app.credentials-secret-name>
+              <kie.app.password>${kie.app.password}</kie.app.password>
+              <kie.app.credentials-secret-name>${kie.app.credentials-secret-name}</kie.app.credentials-secret-name>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
               <amq.image.streams>${amq.image.streams}</amq.image.streams>
               <amq.username>${amq.username}</amq.username>

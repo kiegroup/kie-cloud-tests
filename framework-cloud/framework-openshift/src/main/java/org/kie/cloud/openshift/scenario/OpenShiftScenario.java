@@ -117,8 +117,6 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         deployKieDeployments();
     }
 
-
-
     /**
      * Deploy Kie deployments for this scenario and wait until deployments are ready
      * for use.
