@@ -114,7 +114,7 @@ public class KieServerClientProvider {
         return KieServicesFactory.newKieServicesClient(kieServicesConfiguration);
     }
 
-    private static ActiveMQSslConnectionFactory getJmsConnectionFactory(URL amqHost) throws Exception {
+    public static ActiveMQSslConnectionFactory getJmsConnectionFactory(URL amqHost) throws Exception {
         ActiveMQSslConnectionFactory connectionFactory = new ActiveMQSslConnectionFactory(
                 "failover://(ssl://"+amqHost.getHost()+":443)?initialReconnectDelay=2000&maxReconnectAttempts=5");
         connectionFactory.setUserName(DeploymentConstants.getAmqUsername());
