@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.scenario;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -256,11 +257,8 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
     private void deploySecretConfig() {
         logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
-        Map<String, String> secretConfig = new HashMap<>();
-        secretConfig.put(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
-        secretConfig.put(OpenShiftConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
 
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), secretConfig);
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
     }
 
     private void deploySecretAppUser() {
