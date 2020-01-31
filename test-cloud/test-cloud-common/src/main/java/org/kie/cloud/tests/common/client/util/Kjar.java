@@ -28,7 +28,8 @@ public enum Kjar {
     HELLO_RULES("org.kie.server.testing", "hello-rules", "1.0.0.Final"),
     HELLO_RULES_SNAPSHOT("org.kie.server.testing", "hello-rules-snapshot", "1.0.0-SNAPSHOT"),
     USERTASK("org.kie.server.testing", "usertask-project", "1.0.0.Final"),
-    STATELESS_SESSION("org.kie.server.testing", "stateless-session", "1.0.0.Final");
+    STATELESS_SESSION("org.kie.server.testing", "stateless-session", "1.0.0.Final"),
+    EXTERNAL_SIGNAL("org.kie.server.testing", "external-signal", "1.0.0.Final");
 
     private String groupId;
     private String artifactName;

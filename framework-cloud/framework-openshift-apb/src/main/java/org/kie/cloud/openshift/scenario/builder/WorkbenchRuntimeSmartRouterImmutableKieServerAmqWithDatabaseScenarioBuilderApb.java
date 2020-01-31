@@ -146,4 +146,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
         return this;
     }
 
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueName) {
+        throw new UnsupportedOperationException("Not supported for APB.");
+    }
 }

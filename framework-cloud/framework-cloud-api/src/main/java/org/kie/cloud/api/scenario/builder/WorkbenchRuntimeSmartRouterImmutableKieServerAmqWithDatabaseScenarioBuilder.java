@@ -105,4 +105,13 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseSce
      * @return Builder
      */
     WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+
+    /**
+    *
+    * Return setup builder with enabled external JMS signal queue.
+    * @param queueJndiName Name of the external JMS signal queue.
+    *
+    * @return Builder
+    */
+   WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueJndiName);
 }
