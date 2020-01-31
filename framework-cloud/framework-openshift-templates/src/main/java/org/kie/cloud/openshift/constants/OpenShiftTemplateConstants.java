@@ -190,4 +190,7 @@ public class OpenShiftTemplateConstants {
     public static final String KIE_SERVER_ACCESS_CONTROL_MAX_AGE = "KIE_SERVER_ACCESS_CONTROL_MAX_AGE";
 
     public static final String PROMETHEUS_SERVER_EXT_DISABLED = "PROMETHEUS_SERVER_EXT_DISABLED";
+
+    public static final String KIE_SERVER_JMS_ENABLE_SIGNAL = "KIE_SERVER_JMS_ENABLE_SIGNAL";
+    public static final String KIE_SERVER_JMS_QUEUE_SIGNAL = "KIE_SERVER_JMS_QUEUE_SIGNAL";
 }
