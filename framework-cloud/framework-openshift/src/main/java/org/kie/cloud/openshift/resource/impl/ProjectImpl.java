@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.resource.impl;
 
@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,16 +31,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cz.xtf.builder.builders.ImageStreamBuilder;
+import cz.xtf.builder.builders.SecretBuilder;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.KubernetesList;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.common.util.Base64Utils;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
@@ -126,17 +123,12 @@ public class ProjectImpl implements Project {
 
     @Override
     public void createSecret(String secretName, Map<String, String> secrets) {
-        Secret secret = new Secret();
-        secret.setMetadata(new ObjectMeta());
-        secret.getMetadata().setName(secretName);
-
-        Map<String, String> data = new HashMap<>();
+        SecretBuilder builder = new SecretBuilder(secretName);
         for (Entry<String, String> entry : secrets.entrySet()) {
-            data.put(entry.getKey(), Base64Utils.encode(entry.getValue()));
+            builder.addRawData(entry.getKey(), entry.getValue());
         }
 
-        secret.setData(data);
-        openShift.createSecret(secret);
+        openShift.createSecret(builder.build());
     }
 
     static Semaphore semaphore = new Semaphore(1);
@@ -184,9 +176,9 @@ public class ProjectImpl implements Project {
 
     private String formatExtraVars(Map<String, String> extraVars) {
         return extraVars.entrySet()
-                        .stream()
-                        .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
-                        .collect(Collectors.joining(", ", "{", "}"));
+                .stream()
+                .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
+                .collect(Collectors.joining(", ", "{", "}"));
     }
 
     @Override
@@ -199,11 +191,13 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourcesFromYaml(String yamlUrl) {
         final String output = openShiftBinaryClient().execute("create", "-f", yamlUrl);
         logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
     }
 
+    @Override
     public void createResourcesFromYaml(List<String> yamlUrls) {
         final OpenShiftBinary oc = openShiftBinaryClient();
         for (String url : yamlUrls) {
@@ -212,6 +206,7 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourceFromYamlString(String yamlString) {
         try {
             final File tmpYamlFile = File.createTempFile("openshift-resource-",".yaml");
@@ -223,11 +218,13 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourcesFromYamlAsAdmin(String yamlUrl) {
         final String output = openShiftBinaryClientAsAdmin().execute("create", "-f", yamlUrl);
         logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
     }
 
+    @Override
     public void createResourcesFromYamlAsAdmin(List<String> yamlUrls) {
         final OpenShiftBinary oc = openShiftBinaryClientAsAdmin();
         for (String url : yamlUrls) {
@@ -236,6 +233,7 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourcesFromYamlStringAsAdmin(String yamlString) {
         try {
             final File tmpYamlFile = File.createTempFile("openshift-resource-",".yaml");
@@ -289,6 +287,7 @@ public class ProjectImpl implements Project {
         return output;
     }
 
+    @Override
     public void close() {
         try {
             openShift.close();
@@ -305,13 +304,14 @@ public class ProjectImpl implements Project {
         return OpenShifts.getBinaryPath();
     }
 
+    @Override
     public List<Instance> getAllInstances() {
         return openShift
-                        .getPods()
-                        .stream()
-                        .filter(this::isScheduledPod)
-                        .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getName(), pod))
-                        .collect(toList());
+                .getPods()
+                .stream()
+                .filter(this::isScheduledPod)
+                .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getName(), pod))
+                .collect(toList());
     }
 
     private boolean isScheduledPod(Pod pod) {
