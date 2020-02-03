@@ -127,4 +127,11 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
     }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueJndiName) {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_JMS_ENABLE_SIGNAL, "true");
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_JMS_QUEUE_SIGNAL, queueJndiName);
+        return this;
+    }
 }
