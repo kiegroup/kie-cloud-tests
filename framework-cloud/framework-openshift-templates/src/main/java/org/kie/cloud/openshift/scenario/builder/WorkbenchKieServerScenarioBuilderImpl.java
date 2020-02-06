@@ -35,6 +35,7 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     public WorkbenchKieServerScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
         envVariables.put(OpenShiftTemplateConstants.DEFAULT_PASSWORD, DeploymentConstants.getAppPassword());
     }
 
