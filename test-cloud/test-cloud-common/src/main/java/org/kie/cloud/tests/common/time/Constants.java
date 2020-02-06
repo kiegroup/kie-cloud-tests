@@ -33,6 +33,7 @@ public class Constants {
     }
 
     public class User {
-        public static final String YODA = "yoda";
+
+        public static final String YODA = "adminUser";
     }
 }
