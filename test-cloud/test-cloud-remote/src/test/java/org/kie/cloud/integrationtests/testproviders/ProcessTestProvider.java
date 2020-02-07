@@ -20,6 +20,7 @@ import java.util.Objects;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -114,15 +115,15 @@ public class ProcessTestProvider {
     }
 
     private void testExecuteProcessWithUserTask(ProcessServicesClient processClient, UserTaskServicesClient taskClient, String containerId) {
-        int tasksCount = taskClient.findTasks(Constants.User.YODA, 0, TASKS_PAGE_SIZE).size();
+        int tasksCount = taskClient.findTasks(DeploymentConstants.getAppUser(), 0, TASKS_PAGE_SIZE).size();
 
         Long userTaskPid = processClient.startProcess(containerId, Constants.ProcessId.USERTASK);
         assertThat(userTaskPid).isNotNull();
 
-        List<TaskSummary> tasks = taskClient.findTasks(Constants.User.YODA, 0, TASKS_PAGE_SIZE);
+        List<TaskSummary> tasks = taskClient.findTasks(DeploymentConstants.getAppUser(), 0, TASKS_PAGE_SIZE);
         assertThat(tasks).hasSize(tasksCount + 1);
 
-        taskClient.completeAutoProgress(containerId, tasks.get(0).getId(), Constants.User.YODA, null);
+        taskClient.completeAutoProgress(containerId, tasks.get(0).getId(), DeploymentConstants.getAppUser(), null);
 
         ProcessInstance userTaskPi = processClient.getProcessInstance(containerId, userTaskPid);
         assertThat(userTaskPi).isNotNull();

@@ -31,8 +31,4 @@ public class Constants {
         public static final String SIGNAL_NAME = "signal1";
         public static final String SIGNAL_2_NAME = "signal2";
     }
-
-    public class User {
-        public static final String YODA = "yoda";
-    }
 }

@@ -30,6 +30,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
@@ -143,10 +144,10 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
         Long processId = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.USERTASK);
         assertThat(processId).isNotNull();
 
-        List<TaskSummary> tasks = taskServicesClient.findTasks(Constants.User.YODA, 0, 10);
+        List<TaskSummary> tasks = taskServicesClient.findTasks(DeploymentConstants.getAppUser(), 0, 10);
         assertThat(tasks).hasSize(1);
 
-        taskServicesClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), Constants.User.YODA, null);
+        taskServicesClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), DeploymentConstants.getAppUser(), null);
 
         ProcessInstance userTaskPi = processServicesClient.getProcessInstance(CONTAINER_ID, processId);
         assertThat(userTaskPi).isNotNull();

@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.ApbNotSupported;
@@ -115,10 +116,10 @@ public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegration
         Long processId = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.USERTASK);
         assertThat(processId).isNotNull();
 
-        List<TaskSummary> tasks = taskServicesClient.findTasks(Constants.User.YODA, 0, 10);
+        List<TaskSummary> tasks = taskServicesClient.findTasks(DeploymentConstants.getAppUser(), 0, 10);
         assertThat(tasks).isNotNull().hasSize(1);
 
-        taskServicesClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), Constants.User.YODA, null);
+        taskServicesClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), DeploymentConstants.getAppUser(), null);
 
         ProcessInstance userTaskPi = processServicesClient.getProcessInstance(CONTAINER_ID, processId);
         assertThat(userTaskPi).isNotNull();
