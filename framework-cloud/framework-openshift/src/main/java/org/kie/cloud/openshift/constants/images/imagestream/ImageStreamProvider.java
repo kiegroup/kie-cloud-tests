@@ -127,17 +127,17 @@ public class ImageStreamProvider {
                                                           .endSpec()
                                                           .build();
 
-        ImageStream existingImageStream = project.getOpenShift().getImageStream(getImageStreamNaming(image.getImageName()));
+        ImageStream existingImageStream = project.getOpenShiftAdmin().getImageStream(getImageStreamNaming(image.getImageName()));
         if(existingImageStream != null) {
             logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", getImageStreamNaming(image.getImageName()));
-            project.getOpenShift().deleteImageStream(existingImageStream);
+            project.getOpenShiftAdmin().deleteImageStream(existingImageStream);
 
-            new SimpleWaiter(() -> Objects.isNull(project.getOpenShift().getImageStream(getImageStreamNaming(image.getImageName()))))
+            new SimpleWaiter(() -> Objects.isNull(project.getOpenShiftAdmin().getImageStream(getImageStreamNaming(image.getImageName()))))
                             .timeout(TimeUnit.SECONDS, 30)
                             .reason("Old ImageStream not deleted yet, waiting for ImageStream deletion.")
                             .waitFor();
         }
-        project.getOpenShift().createImageStream(imageStream);
+        project.getOpenShiftAdmin().createImageStream(imageStream);
     }
 
     private static String getImageStreamNaming(String imageName) {
