@@ -100,44 +100,80 @@ public class ImageStreamProvider {
             throw new RuntimeException("System property for image tag '" + image.getSystemPropertyForImageTag() + "' is not defined.");
         }
 
-        logger.info("Creating image stream for " + image.toString() + " image.");
-        ImageStream imageStream = new ImageStreamBuilder().withApiVersion("v1")
-                                                          .withNewMetadata()
-                                                              .withName(getImageStreamNaming(image.getImageName()))
-                                                              .addToAnnotations("openshift.io/image.insecureRepository", "true")
-                                                              .addToAnnotations("openshift.io/display-name", getImageStreamNaming(image.getImageName()))
-                                                              .addToAnnotations("openshift.io/provider-display-name", "Red Hat, Inc.")
-                                                          .endMetadata()
-                                                          .withNewSpec()
-                                                              .addNewTag()
-                                                                  .withName(image.getImageVersion())
-                                                                  .addToAnnotations("description", image.getImageName() + " image")
-                                                                  .addToAnnotations("iconClass", "icon-jboss")
-                                                                  .addToAnnotations("tags", "rhpam,xpaas")
-                                                                  .addToAnnotations("supports", "xpaas:1.4")
-                                                                  .addToAnnotations("version", image.getImageVersion())
-                                                                  .withNewFrom()
-                                                                      .withKind("DockerImage")
-                                                                      .withName(image.getTag().get())
-                                                                  .endFrom()
-                                                                  .withNewImportPolicy()
-                                                                      .withInsecure(Boolean.TRUE)
-                                                                  .endImportPolicy()
-                                                              .endTag()
-                                                          .endSpec()
-                                                          .build();
+        logger.info("Creating image stream for {} image from DockerImage {}", image.toString(), image.getTag().get());
 
+        ImageStream imageStream;
         ImageStream existingImageStream = project.getOpenShiftAdmin().getImageStream(getImageStreamNaming(image.getImageName()));
-        if(existingImageStream != null) {
+        if (existingImageStream != null) {
             logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", getImageStreamNaming(image.getImageName()));
+            imageStream = replaceExistingImageStream(existingImageStream, image);
+
+            logger.debug("Deleting old image stream.");
             project.getOpenShiftAdmin().deleteImageStream(existingImageStream);
 
             new SimpleWaiter(() -> Objects.isNull(project.getOpenShiftAdmin().getImageStream(getImageStreamNaming(image.getImageName()))))
                             .timeout(TimeUnit.SECONDS, 30)
                             .reason("Old ImageStream not deleted yet, waiting for ImageStream deletion.")
                             .waitFor();
+        } else {
+            logger.debug("ImageStream for {} do not exists. Creating new image stream.", image.getImageName());
+            imageStream = createNewImageStream(image);
         }
         project.getOpenShiftAdmin().createImageStream(imageStream);
+    }
+
+    private static ImageStream replaceExistingImageStream(ImageStream imageStream, Image image) {
+        return new ImageStreamBuilder().withApiVersion(imageStream.getApiVersion())
+                                       .withNewMetadata()
+                                       .withName(imageStream.getMetadata().getName())
+                                       .addToAnnotations("openshift.io/image.insecureRepository", "true")
+                                       .addToAnnotations("openshift.io/display-name", getImageStreamNaming(image.getImageName()))
+                                       .addToAnnotations("openshift.io/provider-display-name", "Red Hat, Inc.")
+                                       .endMetadata()
+                                       .withNewSpec()
+                                       .addNewTag()
+                                       .withName(image.getImageVersion())
+                                       .addToAnnotations("description", image.getImageName() + " image")
+                                       .addToAnnotations("iconClass", "icon-jboss")
+                                       .addToAnnotations("tags", "rhpam")
+                                       .addToAnnotations("version", image.getImageVersion())
+                                       .withNewFrom()
+                                       .withKind("DockerImage")
+                                       .withName(image.getTag().get())
+                                       .endFrom()
+                                       .withNewImportPolicy()
+                                       .withInsecure(Boolean.TRUE)
+                                       .endImportPolicy()
+                                       .endTag()
+                                       .endSpec()
+                                       .build();
+    }
+
+    private static ImageStream createNewImageStream(Image image) {
+        return new ImageStreamBuilder().withApiVersion("v1")
+                                       .withNewMetadata()
+                                       .withName(getImageStreamNaming(image.getImageName()))
+                                       .addToAnnotations("openshift.io/image.insecureRepository", "true")
+                                       .addToAnnotations("openshift.io/display-name", getImageStreamNaming(image.getImageName()))
+                                       .addToAnnotations("openshift.io/provider-display-name", "Red Hat, Inc.")
+                                       .endMetadata()
+                                       .withNewSpec()
+                                       .addNewTag()
+                                       .withName(image.getImageVersion())
+                                       .addToAnnotations("description", image.getImageName() + " image")
+                                       .addToAnnotations("iconClass", "icon-jboss")
+                                       .addToAnnotations("tags", "rhpam")
+                                       .addToAnnotations("version", image.getImageVersion())
+                                       .withNewFrom()
+                                       .withKind("DockerImage")
+                                       .withName(image.getTag().get())
+                                       .endFrom()
+                                       .withNewImportPolicy()
+                                       .withInsecure(Boolean.TRUE)
+                                       .endImportPolicy()
+                                       .endTag()
+                                       .endSpec()
+                                       .build();
     }
 
     private static String getImageStreamNaming(String imageName) {
