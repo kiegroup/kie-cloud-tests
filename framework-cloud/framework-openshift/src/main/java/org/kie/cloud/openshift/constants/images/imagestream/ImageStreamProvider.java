@@ -16,14 +16,15 @@
 
 package org.kie.cloud.openshift.constants.images.imagestream;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import cz.xtf.core.waiting.SimpleWaiter;
+import io.fabric8.kubernetes.api.model.ObjectReference;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.ImageStreamBuilder;
+import io.fabric8.openshift.api.model.TagReference;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.Image;
 import org.kie.cloud.openshift.resource.Project;
@@ -102,55 +103,35 @@ public class ImageStreamProvider {
 
         logger.info("Creating image stream for {} image from DockerImage {}", image.toString(), image.getTag().get());
 
-        ImageStream imageStream;
         ImageStream existingImageStream = project.getOpenShiftAdmin().getImageStream(getImageStreamNaming(image.getImageName()));
+
         if (existingImageStream != null) {
-            logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", getImageStreamNaming(image.getImageName()));
-            imageStream = replaceExistingImageStream(existingImageStream, image);
+            logger.debug("Found already existing image stream for {}. Replacing it with custom tag.", getImageStreamNaming(image.getImageName()));
+            project.runOcCommandAsAdmin("tag", "--source=docker", "--insecure=true", image.getTag().get(), existingImageStream.getMetadata().getName()+":"+existingImageStream.getSpec().getTags().get(0).getName());
 
-            logger.debug("Deleting old image stream.");
-            project.getOpenShiftAdmin().deleteImageStream(existingImageStream);
-
-            new SimpleWaiter(() -> Objects.isNull(project.getOpenShiftAdmin().getImageStream(getImageStreamNaming(image.getImageName()))))
+            new SimpleWaiter(() -> isImageStreamTagChange(project, image))
                             .timeout(TimeUnit.SECONDS, 30)
-                            .reason("Old ImageStream not deleted yet, waiting for ImageStream deletion.")
+                            .reason("Old ImageStream not replaced yet, waiting for new ImageStream tag.")
                             .waitFor();
         } else {
             logger.debug("ImageStream for {} do not exists. Creating new image stream.", image.getImageName());
-            imageStream = createNewImageStream(image);
+            project.getOpenShiftAdmin().createImageStream(createNewImageStream(image));
         }
-        project.getOpenShiftAdmin().createImageStream(imageStream);
     }
 
-    private static ImageStream replaceExistingImageStream(ImageStream imageStream, Image image) {
-        return new ImageStreamBuilder().withApiVersion(imageStream.getApiVersion())
-                                       .withNewMetadata()
-                                       .withName(imageStream.getMetadata().getName())
-                                       .addToAnnotations("openshift.io/image.insecureRepository", "true")
-                                       .addToAnnotations("openshift.io/display-name", getImageStreamNaming(image.getImageName()))
-                                       .addToAnnotations("openshift.io/provider-display-name", "Red Hat, Inc.")
-                                       .endMetadata()
-                                       .withNewSpec()
-                                       .addNewTag()
-                                       .withName(image.getImageVersion())
-                                       .addToAnnotations("description", image.getImageName() + " image")
-                                       .addToAnnotations("iconClass", "icon-jboss")
-                                       .addToAnnotations("tags", "rhpam")
-                                       .addToAnnotations("version", image.getImageVersion())
-                                       .withNewFrom()
-                                       .withKind("DockerImage")
-                                       .withName(image.getTag().get())
-                                       .endFrom()
-                                       .withNewImportPolicy()
-                                       .withInsecure(Boolean.TRUE)
-                                       .endImportPolicy()
-                                       .endTag()
-                                       .endSpec()
-                                       .build();
+    private static boolean isImageStreamTagChange(Project project, Image image) {
+        return project.getOpenShiftAdmin()
+                      .getImageStream(getImageStreamNaming(image.getImageName()))
+                      .getSpec()
+                      .getTags()
+                      .stream()
+                      .map(TagReference::getFrom)
+                      .map(ObjectReference::getName)
+                      .anyMatch(image.getTag().get()::equals);
     }
 
     private static ImageStream createNewImageStream(Image image) {
-        return new ImageStreamBuilder().withApiVersion("v1")
+        return new ImageStreamBuilder().withApiVersion("image.openshift.io/v1")
                                        .withNewMetadata()
                                        .withName(getImageStreamNaming(image.getImageName()))
                                        .addToAnnotations("openshift.io/image.insecureRepository", "true")
