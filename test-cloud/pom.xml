@@ -57,8 +57,8 @@
     <maven.repo.username/>
     <maven.repo.password/>
 
-    <kie.app.user>adminUser</kie.app.user>
-    <kie.app.password>adminUser1!</kie.app.password>
+    <kie.app.user>yoda</kie.app.user>
+    <kie.app.password>usetheforce123@</kie.app.password>
     <kie.app.credentials-secret-name>rhpam-credentials</kie.app.credentials-secret-name>
 
     <default.domain.suffix/>
