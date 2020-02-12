@@ -43,7 +43,7 @@
       </bpmn2:dataInputAssociation>
       <bpmn2:potentialOwner id="_-yU_PFJrEeeXz9aypS7zpg">
         <bpmn2:resourceAssignmentExpression id="_-yU_PVJrEeeXz9aypS7zpg">
-          <bpmn2:formalExpression id="_-yU_PlJrEeeXz9aypS7zpg">adminUser</bpmn2:formalExpression>
+          <bpmn2:formalExpression id="_-yU_PlJrEeeXz9aypS7zpg">yoda</bpmn2:formalExpression>
         </bpmn2:resourceAssignmentExpression>
       </bpmn2:potentialOwner>
     </bpmn2:userTask>
