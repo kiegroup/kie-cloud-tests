@@ -225,4 +225,13 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withDeploymentScenarioListener(DeploymentScenarioListener<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> deploymentScenarioListener) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueJndiName) {
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.getJms().setEnableSignal(true);
+            server.getJms().setQueueSignal(queueJndiName);
+        }
+        return this;
+    }
 }
