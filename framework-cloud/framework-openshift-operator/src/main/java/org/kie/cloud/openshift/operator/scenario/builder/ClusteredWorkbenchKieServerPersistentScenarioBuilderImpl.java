@@ -51,6 +51,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING_HA);
+        kieApp.getSpec().setUseImageTags(true);
 
         OpenShiftOperatorConstants.getKieImageRegistryCustom().ifPresent(registry -> {
             ImageRegistry imageRegistry = new ImageRegistry();

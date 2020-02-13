@@ -51,6 +51,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING);
+        kieApp.getSpec().setUseImageTags(true);
 
         OpenShiftOperatorConstants.getKieImageRegistryCustom().ifPresent(registry -> {
             ImageRegistry imageRegistry = new ImageRegistry();
