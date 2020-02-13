@@ -57,6 +57,7 @@ public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.PRODUCTION_IMMUTABLE);
+        kieApp.getSpec().setUseImageTags(true);
 
         OpenShiftOperatorConstants.getKieImageRegistryCustom().ifPresent(registry -> {
             ImageRegistry imageRegistry = new ImageRegistry();

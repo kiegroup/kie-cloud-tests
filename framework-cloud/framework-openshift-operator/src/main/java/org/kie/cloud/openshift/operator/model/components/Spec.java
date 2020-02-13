@@ -30,6 +30,7 @@ public class Spec {
     private ImageRegistry imageRegistry;
     private Upgrades upgrades;
     private String version;
+    private Boolean useImageTags;
 
     public CommonConfig getCommonConfig() {
         return commonConfig;
@@ -85,5 +86,13 @@ public class Spec {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public Boolean getUseImageTags() {
+        return useImageTags;
+    }
+
+    public void setUseImageTags(Boolean useImageTags) {
+        this.useImageTags = useImageTags;
     }
 }
