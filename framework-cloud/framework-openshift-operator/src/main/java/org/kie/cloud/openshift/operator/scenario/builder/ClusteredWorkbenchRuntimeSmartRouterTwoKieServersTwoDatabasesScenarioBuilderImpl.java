@@ -56,6 +56,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword()));
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.PRODUCTION);
+        kieApp.getSpec().setUseImageTags(true);
 
         CommonConfig commonConfig = new CommonConfig();
         commonConfig.setAdminUser(DeploymentConstants.getAppUser());
