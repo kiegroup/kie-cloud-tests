@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.resource.impl;
 
@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cz.xtf.builder.builders.ImageStreamBuilder;
+import cz.xtf.builder.builders.SecretBuilder;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
@@ -120,6 +121,16 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
+    public void createSecret(String secretName, Map<String, String> secrets) {
+        SecretBuilder builder = new SecretBuilder(secretName);
+        for (Entry<String, String> entry : secrets.entrySet()) {
+            builder.addRawData(entry.getKey(), entry.getValue());
+        }
+
+        openShift.createSecret(builder.build());
+    }
+
     static Semaphore semaphore = new Semaphore(1);
 
     @Override
@@ -165,9 +176,9 @@ public class ProjectImpl implements Project {
 
     private String formatExtraVars(Map<String, String> extraVars) {
         return extraVars.entrySet()
-                        .stream()
-                        .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
-                        .collect(Collectors.joining(", ", "{", "}"));
+                .stream()
+                .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
+                .collect(Collectors.joining(", ", "{", "}"));
     }
 
     @Override
@@ -180,11 +191,13 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourcesFromYaml(String yamlUrl) {
         final String output = openShiftBinaryClient().execute("create", "-f", yamlUrl);
         logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
     }
 
+    @Override
     public void createResourcesFromYaml(List<String> yamlUrls) {
         final OpenShiftBinary oc = openShiftBinaryClient();
         for (String url : yamlUrls) {
@@ -193,6 +206,7 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourceFromYamlString(String yamlString) {
         try {
             final File tmpYamlFile = File.createTempFile("openshift-resource-",".yaml");
@@ -204,11 +218,13 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourcesFromYamlAsAdmin(String yamlUrl) {
         final String output = openShiftBinaryClientAsAdmin().execute("create", "-f", yamlUrl);
         logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
     }
 
+    @Override
     public void createResourcesFromYamlAsAdmin(List<String> yamlUrls) {
         final OpenShiftBinary oc = openShiftBinaryClientAsAdmin();
         for (String url : yamlUrls) {
@@ -217,6 +233,7 @@ public class ProjectImpl implements Project {
         }
     }
 
+    @Override
     public void createResourcesFromYamlStringAsAdmin(String yamlString) {
         try {
             final File tmpYamlFile = File.createTempFile("openshift-resource-",".yaml");
@@ -270,6 +287,7 @@ public class ProjectImpl implements Project {
         return output;
     }
 
+    @Override
     public void close() {
         try {
             openShift.close();
@@ -286,13 +304,14 @@ public class ProjectImpl implements Project {
         return OpenShifts.getBinaryPath();
     }
 
+    @Override
     public List<Instance> getAllInstances() {
         return openShift
-                        .getPods()
-                        .stream()
-                        .filter(this::isScheduledPod)
-                        .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getName(), pod))
-                        .collect(toList());
+                .getPods()
+                .stream()
+                .filter(this::isScheduledPod)
+                .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getName(), pod))
+                .collect(toList());
     }
 
     private boolean isScheduledPod(Pod pod) {
