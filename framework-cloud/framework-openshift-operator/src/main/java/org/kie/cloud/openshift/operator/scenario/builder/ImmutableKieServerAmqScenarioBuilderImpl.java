@@ -52,9 +52,8 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
         isScenarioAllowed();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_MAVEN_USER, DeploymentConstants.getWorkbenchUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.PRODUCTION_IMMUTABLE);
@@ -68,11 +67,8 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
         });
 
         CommonConfig commonConfig = new CommonConfig();
-        commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());
-        commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
-        commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
-        commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());
-        commonConfig.setMavenPassword(DeploymentConstants.getWorkbenchPassword());
+        commonConfig.setAdminUser(DeploymentConstants.getAppUser());
+        commonConfig.setAdminPassword(DeploymentConstants.getAppPassword());
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         // These values are defined in pom.xml where keystore and truststore are generated

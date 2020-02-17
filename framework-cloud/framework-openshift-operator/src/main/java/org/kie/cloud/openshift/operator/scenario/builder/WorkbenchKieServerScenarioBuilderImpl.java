@@ -42,7 +42,7 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     public WorkbenchKieServerScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.TRIAL);
@@ -56,9 +56,8 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
         });
 
         CommonConfig commonConfig = new CommonConfig();
-        commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());
-        commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
-        commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
+        commonConfig.setAdminUser(DeploymentConstants.getAppUser());
+        commonConfig.setAdminPassword(DeploymentConstants.getAppPassword());
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();

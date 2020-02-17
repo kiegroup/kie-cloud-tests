@@ -11,15 +11,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.cloud.openshift.scenario;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.openshift.OpenShiftController;
@@ -87,6 +89,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
     @Override
     public final void deploy() {
+
         // OpenShift restriction: Hostname must be shorter than 63 characters
         projectName = UUID.randomUUID().toString().substring(0, 4);
         OpenShiftConstants.getNamespacePrefix().ifPresent(p -> projectName = p + "-" + projectName);
@@ -100,8 +103,8 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         logger.info("Launch instances log collector on project {}", projectName);
         initLogCollectors();
 
-        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
+        deploySecretConfig();
+        deploySecretAppUser();
 
         if (createImageStreams) {
             logger.info("Creating image streams.");
@@ -189,11 +192,11 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     /**
      * Add an external deployment to be executed before the specific scenario deployments are done
      * and undeployed when scenario is over.
-     * 
+     *
      * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
-     * 
+     *
      * <b>Note that the deployment does NOT wait for the deployment to be ready.</b>
-     * 
+     *
      * @param externalDeployment External deployment to add to the scenario
      */
     public void addExtraDeployment(ExternalDeployment<?, ?> externalDeployment) {
@@ -219,9 +222,9 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
      * Add an external deployment to be executed before the specific scenario deployments are done
      * and undeployed when scenario is over, in a synchronized manner, meaning that it is waiting
      * that the deployment is ready to going further.
-     * 
+     *
      * This implements and add a deployment scenario listener to the scenario to be launched accordingly.
-     * 
+     *
      * @param externalDeployment External deployment to add to the scenario
      */
     public void addExtraDeploymentSynchronized(ExternalDeployment<?, ?> externalDeployment) {
@@ -246,9 +249,24 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     @Override
     public MavenRepositoryDeployment getMavenRepositoryDeployment() {
         return externalDeployments.stream().filter(deployment -> ExternalDeploymentID.MAVEN_REPOSITORY.equals(deployment.getKey()))
-                                           .map(ExternalDeployment::getDeploymentInformation)
-                                           .map(deployment -> (MavenRepositoryDeployment) deployment)
-                                           .findAny()
-                                           .orElseThrow(() -> new RuntimeException("Maven repository deployment not found."));
+                .map(ExternalDeployment::getDeploymentInformation)
+                .map(deployment -> (MavenRepositoryDeployment) deployment)
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("Maven repository deployment not found."));
+    }
+
+    private void deploySecretConfig() {
+        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+
+        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
+    }
+
+    private void deploySecretAppUser() {
+        logger.info("Creating user secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
+        Map<String, String> data = new HashMap<>();
+        data.put(OpenShiftConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
+        data.put(OpenShiftConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
+
+        project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
     }
 }
