@@ -67,15 +67,6 @@ public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesSc
     ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
 
     /**
-     * Return setup builder with Business Central user for the maven repository.
-     *
-     * @param user Business Central Maven repo user name.
-     * @param password Business Central Maven repo user password.
-     * @return Builder with configured Business Central Maven repo user.
-     */
-    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password);
-
-    /**
      * Return setup builder with configure Workbench http hostname.
      *
      * @param hostname HTTP hostname for Workbench
