@@ -61,11 +61,11 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
         project.processTemplateAndCreateResources(OpenShiftTemplate.WORKBENCH_KIE_SERVER.getTemplateUrl(), envVariables);
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
-        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
         workbenchDeployment.setPassword(envVariables.get(OpenShiftTemplateConstants.DEFAULT_PASSWORD));
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
         kieServerDeployment.setPassword(envVariables.get(OpenShiftTemplateConstants.DEFAULT_PASSWORD));
 
         if (deployPrometheus) {

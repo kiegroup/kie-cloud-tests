@@ -81,8 +81,8 @@ public class KieServerWithPostgreSqlScenarioImpl extends KieCommonScenario<KieSe
         project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_POSTGRESQL.getTemplateUrl(), envVariables);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
 
         databaseDeployment = new DatabaseDeploymentImpl(project);
 
