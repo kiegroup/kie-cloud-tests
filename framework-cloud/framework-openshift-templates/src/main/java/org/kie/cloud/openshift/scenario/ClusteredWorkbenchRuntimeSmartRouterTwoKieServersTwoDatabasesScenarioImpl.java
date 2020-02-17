@@ -180,8 +180,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
         WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl(project);
-        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         return workbenchRuntimeDeployment;
     }
@@ -195,8 +195,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project, String kieServerSuffix) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setServiceSuffix("-" + kieServerSuffix);
 
         return kieServerDeployment;

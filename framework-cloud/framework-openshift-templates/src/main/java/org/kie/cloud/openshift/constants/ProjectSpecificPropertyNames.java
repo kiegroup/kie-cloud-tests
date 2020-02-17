@@ -28,6 +28,10 @@ import org.kie.cloud.openshift.template.ProjectProfile;
  */
 public interface ProjectSpecificPropertyNames {
 
+    String workbenchMavenUserName();
+
+    String workbenchMavenPassword();
+
     String workbenchHttpsSecret();
 
     String workbenchMavenService();

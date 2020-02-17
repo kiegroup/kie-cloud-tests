@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,13 +86,13 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<W
         project.processApbRun(ApbImageGetter.fromImageStream(), extraVars);
 
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
-        workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setServiceSuffix("-0");
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();

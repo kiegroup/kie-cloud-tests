@@ -24,11 +24,18 @@ public class DeploymentConstants implements Constants {
         TestInfoPrinter.printTestConstants();
     }
 
+    public static final String KIE_SERVER_USER = "org.kie.server.user";
+    public static final String KIE_SERVER_PASSWORD = "org.kie.server.pwd";
     public static final String HIBERNATE_PERSISTENCE_DIALECT = "hibernate.dialect";
 
-    public static final String APP_USER = "kie.app.user";
-    public static final String APP_PASSWORD = "kie.app.password";
-    public static final String APP_CREDENTIALS_SECRET_NAME = "kie.app.credentials-secret-name";
+    public static final String WORKBENCH_USER = "org.kie.workbench.user";
+    public static final String WORKBENCH_PASSWORD = "org.kie.workbench.pwd";
+
+    public static final String WORKBENCH_MAVEN_USER = "org.kie.workbench.maven.user";
+    public static final String WORKBENCH_MAVEN_PASSWORD = "org.kie.workbench.maven.pwd";
+
+    public static final String CONTROLLER_USER = "org.kie.server.controller.user";
+    public static final String CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
 
     public static final String AMQ_USERNAME = "amq.username";
     public static final String AMQ_PASSWORD = "amq.password";
@@ -59,16 +66,36 @@ public class DeploymentConstants implements Constants {
 
     public static final String CERTIFICATE_DIR = "certificate.dir";
 
-    public static String getAppUser() {
-        return System.getProperty(APP_USER);
+    public static String getKieServerUser() {
+        return System.getProperty(KIE_SERVER_USER);
     }
 
-    public static String getAppPassword() {
-        return System.getProperty(APP_PASSWORD);
+    public static String getKieServerPassword() {
+        return System.getProperty(KIE_SERVER_PASSWORD);
     }
 
-    public static String getAppCredentialsSecretName() {
-        return System.getProperty(APP_CREDENTIALS_SECRET_NAME);
+    public static String getWorkbenchUser() {
+        return System.getProperty(WORKBENCH_USER);
+    }
+
+    public static String getWorkbenchPassword() {
+        return System.getProperty(WORKBENCH_PASSWORD);
+    }
+
+    public static String getWorkbenchMavenUser() {
+        return System.getProperty(WORKBENCH_MAVEN_USER);
+    }
+
+    public static String getWorkbenchMavenPassword() {
+        return System.getProperty(WORKBENCH_MAVEN_PASSWORD);
+    }
+
+    public static String getControllerUser() {
+        return System.getProperty(CONTROLLER_USER);
+    }
+
+    public static String getControllerPassword() {
+        return System.getProperty(CONTROLLER_PASSWORD);
     }
 
     public static String getAmqUsername() {

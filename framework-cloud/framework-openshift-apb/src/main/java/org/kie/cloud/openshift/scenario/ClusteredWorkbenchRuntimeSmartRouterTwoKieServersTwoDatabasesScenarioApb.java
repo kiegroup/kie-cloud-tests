@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.scenario;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -197,8 +198,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
         WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl(project);
-        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         return workbenchRuntimeDeployment;
     }
@@ -211,8 +212,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project, String kieServerIndex) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setServiceSuffix("-" + kieServerIndex);
 
         return kieServerDeployment;

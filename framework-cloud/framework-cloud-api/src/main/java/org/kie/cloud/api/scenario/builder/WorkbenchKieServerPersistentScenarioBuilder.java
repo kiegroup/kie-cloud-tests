@@ -36,6 +36,15 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
     WorkbenchKieServerPersistentScenarioBuilder deploySso();
 
     /**
+     * Return setup builder with Business Central user for the maven repository.
+     *
+     * @param user Business Central Maven repo user name.
+     * @param password Business Central Maven repo user password.
+     * @return Builder with configured Business Central Maven repo user.
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withBusinessCentralMavenUser(String user, String password);
+
+    /**
      * @param kieServerId kie-server id
      * @return Builder with kie-server id set
      */

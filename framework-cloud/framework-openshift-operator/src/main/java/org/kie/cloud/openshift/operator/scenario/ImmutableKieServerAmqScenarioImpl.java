@@ -97,8 +97,8 @@ public class ImmutableKieServerAmqScenarioImpl extends OpenShiftOperatorScenario
         new SupplierWaiter<KieApp>(() -> getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get(), kieApp -> kieApp.getStatus() != null).reason("Waiting for reconciliation to initialize all fields.").timeout(TimeUnit.MINUTES,1).waitFor();
 
         kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         amqDeployment = new AmqDeploymentImpl(project);
         amqDeployment.setUsername(DeploymentConstants.getAmqUsername());

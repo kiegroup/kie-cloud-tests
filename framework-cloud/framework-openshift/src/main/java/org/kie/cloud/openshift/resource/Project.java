@@ -57,15 +57,6 @@ public interface Project extends AutoCloseable {
     public void processTemplateAndCreateResources(URL templateUrl, Map<String, String> envVariables);
 
     /**
-     * Create a secret in the project. The value secrets will be automatically decoded into a base64 string.
-     * Example credentials yam can be found here:
-     * https://github.com/ruromero/rhpam-7-openshift-image/blob/master/example-credentials.yaml
-     * @param secretName metadata name of the secret
-     * @param secrets of the secret
-     */
-    void createSecret(String secretName, Map<String, String> secrets);
-
-    /**
      * Process APB and create all resources defined there.
      * @param image APB Image to be provision
      * @param extraVars Map of extra vars to override default values from the APB image

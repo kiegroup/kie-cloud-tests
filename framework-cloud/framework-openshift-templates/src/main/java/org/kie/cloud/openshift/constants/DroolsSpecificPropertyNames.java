@@ -18,6 +18,16 @@ package org.kie.cloud.openshift.constants;
 public class DroolsSpecificPropertyNames implements ProjectSpecificPropertyNames {
 
     @Override
+    public String workbenchMavenUserName() {
+        return OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_USERNAME;
+    }
+
+    @Override
+    public String workbenchMavenPassword() {
+        return OpenShiftTemplateConstants.DECISION_CENTRAL_MAVEN_PASSWORD;
+    }
+
+    @Override
     public String workbenchHttpsSecret() {
         return OpenShiftTemplateConstants.DECISION_CENTRAL_HTTPS_SECRET;
     }

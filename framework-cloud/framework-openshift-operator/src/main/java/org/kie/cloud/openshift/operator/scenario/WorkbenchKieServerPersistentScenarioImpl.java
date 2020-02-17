@@ -93,12 +93,12 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
         new SupplierWaiter<KieApp>(() -> getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get(), kieApp -> kieApp.getStatus() != null).reason("Waiting for reconciliation to initialize all fields.").timeout(TimeUnit.MINUTES,1).waitFor();
 
         workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
-        workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         logger.info("Waiting until all services are created.");
         try {

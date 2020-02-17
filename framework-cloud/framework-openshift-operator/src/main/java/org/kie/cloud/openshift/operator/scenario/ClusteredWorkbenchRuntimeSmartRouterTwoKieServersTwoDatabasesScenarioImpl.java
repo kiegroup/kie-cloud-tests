@@ -188,8 +188,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
         WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeOperatorDeployment(project, getKieAppClient());
-        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
         return workbenchRuntimeDeployment;
     }
 
@@ -200,15 +200,15 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         return kieServerDeployment;
     }
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project, String serviceSuffix) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
         kieServerDeployment.setServiceSuffix(serviceSuffix);
         return kieServerDeployment;
     }

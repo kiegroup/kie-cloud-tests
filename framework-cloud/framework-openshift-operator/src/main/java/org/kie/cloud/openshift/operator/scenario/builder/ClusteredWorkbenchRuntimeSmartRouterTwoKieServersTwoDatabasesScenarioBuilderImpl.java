@@ -28,6 +28,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
+import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
@@ -46,20 +47,24 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
                                                                                               implements ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySSO = false;
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl() {
         isScenarioAllowed();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
+
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.PRODUCTION);
 
         CommonConfig commonConfig = new CommonConfig();
-        commonConfig.setAdminUser(DeploymentConstants.getAppUser());
-        commonConfig.setAdminPassword(DeploymentConstants.getAppPassword());
+        commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());
+        commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
+        commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
+        commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         OpenShiftOperatorConstants.getKieImageRegistryCustom().ifPresent(registry -> {
@@ -135,6 +140,17 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
             ssoClient.setName("kie-server-" + i + "-client");
             ssoClient.setSecret("kie-server-" + i + "-secret");
             servers[i].setSsoClient(ssoClient);
+        }
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withBusinessCentralMavenUser(String user, String password) {
+        kieApp.getSpec().getCommonConfig().setMavenPassword(password);
+        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.KIE_MAVEN_USER, user));
+
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(propertyNames.workbenchMavenUserName(), user));
         }
         return this;
     }

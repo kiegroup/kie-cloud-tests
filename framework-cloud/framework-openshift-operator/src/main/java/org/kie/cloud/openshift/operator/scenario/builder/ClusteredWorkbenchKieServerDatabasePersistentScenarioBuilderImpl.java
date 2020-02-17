@@ -27,6 +27,7 @@ import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
+import org.kie.cloud.openshift.operator.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
@@ -44,14 +45,17 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
                                                                               ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private boolean deploySSO = false;
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
         isScenarioAllowed();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_USER, DeploymentConstants.getKieServerUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_USER, DeploymentConstants.getControllerUser()));
+        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_MAVEN_USER, DeploymentConstants.getWorkbenchUser()));
+        authenticationEnvVars.add(new Env(propertyNames.workbenchMavenUserName(), DeploymentConstants.getWorkbenchUser()));
 
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING_HA);
@@ -64,8 +68,11 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
         });
 
         CommonConfig commonConfig = new CommonConfig();
-        commonConfig.setAdminUser(DeploymentConstants.getAppUser());
-        commonConfig.setAdminPassword(DeploymentConstants.getAppPassword());
+        commonConfig.setAdminUser(DeploymentConstants.getWorkbenchUser());
+        commonConfig.setAdminPassword(DeploymentConstants.getWorkbenchPassword());
+        commonConfig.setServerPassword(DeploymentConstants.getKieServerPassword());
+        commonConfig.setControllerPassword(DeploymentConstants.getControllerPassword());
+        commonConfig.setMavenPassword(DeploymentConstants.getWorkbenchPassword());
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();

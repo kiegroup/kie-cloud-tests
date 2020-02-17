@@ -102,16 +102,16 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl ext
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
         WorkbenchRuntimeDeploymentImpl workbenchRuntimeDeployment = new WorkbenchRuntimeDeploymentImpl(project);
-        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         return workbenchRuntimeDeployment;
     }
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project) {
         KieServerDeploymentImpl kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         return kieServerDeployment;
     }

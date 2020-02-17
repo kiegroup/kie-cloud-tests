@@ -176,8 +176,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
         WorkbenchRuntimeDeploymentImpl deployment = new WorkbenchRuntimeDeploymentImpl(project);
-        deployment.setUsername(DeploymentConstants.getAppUser());
-        deployment.setPassword(DeploymentConstants.getAppPassword());
+        deployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        deployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         return deployment;
     }
@@ -191,8 +191,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project) {
         KieServerDeploymentImpl deployment = new KieServerDeploymentImpl(project);
-        deployment.setUsername(DeploymentConstants.getAppUser());
-        deployment.setPassword(DeploymentConstants.getAppPassword());
+        deployment.setUsername(DeploymentConstants.getKieServerUser());
+        deployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         return deployment;
     }

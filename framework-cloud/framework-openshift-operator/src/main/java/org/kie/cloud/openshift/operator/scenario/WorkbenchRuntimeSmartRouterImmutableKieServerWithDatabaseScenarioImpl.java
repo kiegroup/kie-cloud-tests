@@ -96,14 +96,14 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioIm
         new SupplierWaiter<KieApp>(() -> getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get(), kieApp -> kieApp.getStatus() != null).reason("Waiting for reconciliation to initialize all fields.").timeout(TimeUnit.MINUTES,1).waitFor();
 
         workbenchRuntimeDeployment = new WorkbenchRuntimeOperatorDeployment(project, getKieAppClient());
-        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchRuntimeDeployment.setUsername(DeploymentConstants.getWorkbenchUser());
+        workbenchRuntimeDeployment.setPassword(DeploymentConstants.getWorkbenchPassword());
 
         smartRouterDeployment = new SmartRouterOperatorDeployment(project, getKieAppClient());
 
         kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         databaseDeployment = new DatabaseDeploymentImpl(project);
 

@@ -21,10 +21,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import cz.xtf.core.openshift.OpenShift;
-import cz.xtf.core.openshift.OpenShifts;
-import io.fabric8.kubernetes.api.model.KubernetesList;
-import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -36,6 +32,10 @@ import org.kie.cloud.openshift.util.sso.SsoApi;
 import org.kie.cloud.openshift.util.sso.SsoApiFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.openshift.OpenShifts;
+import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 
 public class SsoDeployer {
 
@@ -137,8 +137,16 @@ public class SsoDeployer {
         ssoApi.createRole(ADMIN);
         ssoApi.createRole(KIE_SERVER);
         ssoApi.createRole(REST_ALL);
-        ssoApi.createUser(DeploymentConstants.getAppUser(),
-                          DeploymentConstants.getAppPassword(),
+        ssoApi.createUser(DeploymentConstants.getWorkbenchUser(),
+                DeploymentConstants.getWorkbenchPassword(),
                 Arrays.asList(ADMIN, KIE_SERVER, REST_ALL));
+        ssoApi.createUser(DeploymentConstants.getControllerUser(),
+                DeploymentConstants.getControllerPassword(),
+                Arrays.asList(KIE_SERVER, REST_ALL));
+        ssoApi.createUser(DeploymentConstants.getKieServerUser(),
+                DeploymentConstants.getKieServerPassword(),
+                Arrays.asList(KIE_SERVER));
+        ssoApi.createUser(DeploymentConstants.getWorkbenchMavenUser(),
+                DeploymentConstants.getWorkbenchMavenPassword());
     }
 }

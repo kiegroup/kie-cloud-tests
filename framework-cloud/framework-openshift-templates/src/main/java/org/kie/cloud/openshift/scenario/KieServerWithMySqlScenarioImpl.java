@@ -81,8 +81,8 @@ public class KieServerWithMySqlScenarioImpl extends KieCommonScenario<KieServerW
         project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_MYSQL.getTemplateUrl(), envVariables);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
 
         databaseDeployment = new DatabaseDeploymentImpl(project);
 
