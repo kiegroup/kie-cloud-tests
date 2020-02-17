@@ -57,14 +57,9 @@
     <maven.repo.username/>
     <maven.repo.password/>
 
-    <org.kie.server.user>yoda</org.kie.server.user>
-    <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
-    <org.kie.workbench.user>adminUser</org.kie.workbench.user>
-    <org.kie.workbench.pwd>adminUser1!</org.kie.workbench.pwd>
-    <org.kie.server.controller.user>controllerUser</org.kie.server.controller.user>
-    <org.kie.server.controller.pwd>controllerUser1!</org.kie.server.controller.pwd>
-    <org.kie.workbench.maven.user>mavenUser</org.kie.workbench.maven.user>
-    <org.kie.workbench.maven.pwd>mavenUser1!</org.kie.workbench.maven.pwd>
+    <kie.app.user>adminUser</kie.app.user>
+    <kie.app.password>adminUser1!</kie.app.password>
+    <kie.app.credentials-secret-name>rhpam-credentials</kie.app.credentials-secret-name>
 
     <default.domain.suffix/>
 
@@ -281,14 +276,9 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
               <maven.repo.url>${maven.repo.url}</maven.repo.url>
               <maven.repo.username>${maven.repo.username}</maven.repo.username>
               <maven.repo.password>${maven.repo.password}</maven.repo.password>
-              <org.kie.server.user>${org.kie.server.user}</org.kie.server.user>
-              <org.kie.server.pwd>${org.kie.server.pwd}</org.kie.server.pwd>
-              <org.kie.workbench.user>${org.kie.workbench.user}</org.kie.workbench.user>
-              <org.kie.workbench.pwd>${org.kie.workbench.pwd}</org.kie.workbench.pwd>
-              <org.kie.workbench.maven.user>${org.kie.workbench.maven.user}</org.kie.workbench.maven.user>
-              <org.kie.workbench.maven.pwd>${org.kie.workbench.maven.pwd}</org.kie.workbench.maven.pwd>
-              <org.kie.server.controller.user>${org.kie.server.controller.user}</org.kie.server.controller.user>
-              <org.kie.server.controller.pwd>${org.kie.server.controller.pwd}</org.kie.server.controller.pwd>
+              <kie.app.user>${kie.app.user}</kie.app.user>
+              <kie.app.password>${kie.app.password}</kie.app.password>
+              <kie.app.credentials-secret-name>${kie.app.credentials-secret-name}</kie.app.credentials-secret-name>
               <default.domain.suffix>${default.domain.suffix}</default.domain.suffix>
               <amq.image.streams>${amq.image.streams}</amq.image.streams>
               <amq.username>${amq.username}</amq.username>

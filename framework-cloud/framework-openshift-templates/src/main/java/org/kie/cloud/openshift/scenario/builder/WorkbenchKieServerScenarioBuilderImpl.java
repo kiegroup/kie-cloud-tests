@@ -34,10 +34,9 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
     private boolean deployPrometheus = false;
 
     public WorkbenchKieServerScenarioBuilderImpl() {
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
-        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getWorkbenchUser());
-
-        envVariables.put(OpenShiftTemplateConstants.DEFAULT_PASSWORD, DeploymentConstants.getWorkbenchPassword());
+        envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
+        envVariables.put(OpenShiftTemplateConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
+        envVariables.put(OpenShiftTemplateConstants.DEFAULT_PASSWORD, DeploymentConstants.getAppPassword());
     }
 
     @Override

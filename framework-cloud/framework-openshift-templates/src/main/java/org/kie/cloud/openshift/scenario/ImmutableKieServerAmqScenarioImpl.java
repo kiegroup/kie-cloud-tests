@@ -84,8 +84,8 @@ public class ImmutableKieServerAmqScenarioImpl extends KieCommonScenario<Immutab
         project.processTemplateAndCreateResources(OpenShiftTemplate.KIE_SERVER_S2I_AMQ.getTemplateUrl(), envVariables);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
-        kieServerDeployment.setUsername(DeploymentConstants.getKieServerUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getKieServerPassword());
+        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
+        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
 
         amqDeployment = new AmqDeploymentImpl(project);
         amqDeployment.setUsername(DeploymentConstants.getAmqUsername());

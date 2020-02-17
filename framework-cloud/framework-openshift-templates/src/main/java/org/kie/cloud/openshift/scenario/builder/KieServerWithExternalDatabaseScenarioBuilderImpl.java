@@ -31,8 +31,7 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl extends AbstractOp
     private final Map<String, String> envVariables = new HashMap<>();
 
     public KieServerWithExternalDatabaseScenarioBuilderImpl() {
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_USER, DeploymentConstants.getKieServerUser());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_PWD, DeploymentConstants.getKieServerPassword());
+        envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
 
         // TODO: Workaround until Maven repo with released artifacts is implemented
