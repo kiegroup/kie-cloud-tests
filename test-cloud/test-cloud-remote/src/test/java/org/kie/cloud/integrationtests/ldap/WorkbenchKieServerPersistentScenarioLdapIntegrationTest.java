@@ -19,6 +19,7 @@ import java.time.Duration;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -112,7 +113,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
         });
     }
-    
+
 
 
     @AfterClass
@@ -121,7 +122,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     }
 
     @Test
-    // @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
+    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
         persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
