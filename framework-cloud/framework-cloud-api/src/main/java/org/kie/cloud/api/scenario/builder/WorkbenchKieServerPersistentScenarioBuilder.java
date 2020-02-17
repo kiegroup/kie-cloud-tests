@@ -21,9 +21,9 @@ import org.kie.cloud.api.settings.LdapSettings;
 public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchKieServerPersistentScenario> {
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     WorkbenchKieServerPersistentScenarioBuilder withInternalMavenRepo();
@@ -89,5 +89,15 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
      * @return Builder
      */
     WorkbenchKieServerPersistentScenarioBuilder withGitHooksDir(String dir);
+
+    /**
+     * KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE: If OpenShift integration of Business Central is turned on, setting this parameter to true  enables
+     * connection to KIE Server via an OpenShift internal Service endpoint.
+     * (Sets the org.kie.server.controller.openshift.prefer.kieserver.service system property)
+     *
+     * @param flag if true, it will use the internal service route.
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress();
 
 }
