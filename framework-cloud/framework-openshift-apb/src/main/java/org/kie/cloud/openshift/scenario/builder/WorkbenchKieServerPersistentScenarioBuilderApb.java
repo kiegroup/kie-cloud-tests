@@ -116,4 +116,10 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb extends AbstractOpen
         return this;
     }
 
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress() {
+        logger.warn("Use public IP cannot configure in this scenario. Configuration skipped.");
+        return this;
+    }
+
 }
