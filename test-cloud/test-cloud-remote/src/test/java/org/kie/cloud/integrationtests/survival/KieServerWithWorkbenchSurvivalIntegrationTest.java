@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -53,8 +55,6 @@ import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Category({JBPMOnly.class, Baseline.class})
 public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {

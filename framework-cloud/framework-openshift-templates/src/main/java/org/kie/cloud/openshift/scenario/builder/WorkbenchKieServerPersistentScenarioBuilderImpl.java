@@ -52,6 +52,12 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
     }
 
     @Override
+    public WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress() {
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE, Boolean.FALSE.toString());
+        return this;
+    }
+
+    @Override
     public WorkbenchKieServerPersistentScenarioBuilder deploySso() {
         deploySSO = true;
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
