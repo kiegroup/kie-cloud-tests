@@ -16,14 +16,15 @@
 
 package org.kie.cloud.openshift.constants.images.imagestream;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import cz.xtf.core.waiting.SimpleWaiter;
+import io.fabric8.kubernetes.api.model.ObjectReference;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.ImageStreamBuilder;
+import io.fabric8.openshift.api.model.TagReference;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.Image;
 import org.kie.cloud.openshift.resource.Project;
@@ -100,44 +101,60 @@ public class ImageStreamProvider {
             throw new RuntimeException("System property for image tag '" + image.getSystemPropertyForImageTag() + "' is not defined.");
         }
 
-        logger.info("Creating image stream for " + image.toString() + " image.");
-        ImageStream imageStream = new ImageStreamBuilder().withApiVersion("v1")
-                                                          .withNewMetadata()
-                                                              .withName(getImageStreamNaming(image.getImageName()))
-                                                              .addToAnnotations("openshift.io/image.insecureRepository", "true")
-                                                              .addToAnnotations("openshift.io/display-name", getImageStreamNaming(image.getImageName()))
-                                                              .addToAnnotations("openshift.io/provider-display-name", "Red Hat, Inc.")
-                                                          .endMetadata()
-                                                          .withNewSpec()
-                                                              .addNewTag()
-                                                                  .withName(image.getImageVersion())
-                                                                  .addToAnnotations("description", image.getImageName() + " image")
-                                                                  .addToAnnotations("iconClass", "icon-jboss")
-                                                                  .addToAnnotations("tags", "rhpam,xpaas")
-                                                                  .addToAnnotations("supports", "xpaas:1.4")
-                                                                  .addToAnnotations("version", image.getImageVersion())
-                                                                  .withNewFrom()
-                                                                      .withKind("DockerImage")
-                                                                      .withName(image.getTag().get())
-                                                                  .endFrom()
-                                                                  .withNewImportPolicy()
-                                                                      .withInsecure(Boolean.TRUE)
-                                                                  .endImportPolicy()
-                                                              .endTag()
-                                                          .endSpec()
-                                                          .build();
+        logger.info("Creating image stream for {} image from DockerImage {}", image.toString(), image.getTag().get());
 
-        ImageStream existingImageStream = project.getOpenShift().getImageStream(getImageStreamNaming(image.getImageName()));
-        if(existingImageStream != null) {
-            logger.debug("Found already existing image stream for {}. Replacing it with custom set tag.", getImageStreamNaming(image.getImageName()));
-            project.getOpenShift().deleteImageStream(existingImageStream);
+        ImageStream existingImageStream = project.getOpenShiftAdmin().getImageStream(getImageStreamNaming(image.getImageName()));
 
-            new SimpleWaiter(() -> Objects.isNull(project.getOpenShift().getImageStream(getImageStreamNaming(image.getImageName()))))
+        if (existingImageStream != null) {
+            logger.debug("Found already existing image stream for {}. Replacing it with custom tag.", getImageStreamNaming(image.getImageName()));
+            project.runOcCommandAsAdmin("tag", "--source=docker", "--insecure=true", image.getTag().get(), existingImageStream.getMetadata().getName()+":"+existingImageStream.getSpec().getTags().get(0).getName());
+
+            new SimpleWaiter(() -> isImageStreamTagChange(project, image))
                             .timeout(TimeUnit.SECONDS, 30)
-                            .reason("Old ImageStream not deleted yet, waiting for ImageStream deletion.")
+                            .reason("Old ImageStream not replaced yet, waiting for new ImageStream tag.")
                             .waitFor();
+        } else {
+            logger.debug("ImageStream for {} do not exists. Creating new image stream.", image.getImageName());
+            project.getOpenShiftAdmin().createImageStream(createNewImageStream(image));
         }
-        project.getOpenShift().createImageStream(imageStream);
+    }
+
+    private static boolean isImageStreamTagChange(Project project, Image image) {
+        return project.getOpenShiftAdmin()
+                      .getImageStream(getImageStreamNaming(image.getImageName()))
+                      .getSpec()
+                      .getTags()
+                      .stream()
+                      .map(TagReference::getFrom)
+                      .map(ObjectReference::getName)
+                      .anyMatch(image.getTag().get()::equals);
+    }
+
+    private static ImageStream createNewImageStream(Image image) {
+        return new ImageStreamBuilder().withApiVersion("image.openshift.io/v1")
+                                       .withNewMetadata()
+                                       .withName(getImageStreamNaming(image.getImageName()))
+                                       .addToAnnotations("openshift.io/image.insecureRepository", "true")
+                                       .addToAnnotations("openshift.io/display-name", getImageStreamNaming(image.getImageName()))
+                                       .addToAnnotations("openshift.io/provider-display-name", "Red Hat, Inc.")
+                                       .endMetadata()
+                                       .withNewSpec()
+                                       .addNewTag()
+                                       .withName(image.getImageVersion())
+                                       .addToAnnotations("description", image.getImageName() + " image")
+                                       .addToAnnotations("iconClass", "icon-jboss")
+                                       .addToAnnotations("tags", "rhpam")
+                                       .addToAnnotations("version", image.getImageVersion())
+                                       .withNewFrom()
+                                       .withKind("DockerImage")
+                                       .withName(image.getTag().get())
+                                       .endFrom()
+                                       .withNewImportPolicy()
+                                       .withInsecure(Boolean.TRUE)
+                                       .endImportPolicy()
+                                       .endTag()
+                                       .endSpec()
+                                       .build();
     }
 
     private static String getImageStreamNaming(String imageName) {
