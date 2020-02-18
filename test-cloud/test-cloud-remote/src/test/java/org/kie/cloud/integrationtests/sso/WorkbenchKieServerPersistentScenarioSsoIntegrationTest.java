@@ -17,7 +17,6 @@ package org.kie.cloud.integrationtests.sso;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -50,17 +49,12 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
 
     @BeforeClass
     public static void initializeDeployment() {
-        if (deploymentScenarioFactory.getCloudAPIImplementationName().equals("openshift-operator")) {
-            deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                    .deploySso()
-                    .withInternalMavenRepo()
-                    .build();
-        } else {
-            deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                    .deploySso()
-                    .withInternalMavenRepo()
-                    .build();
-        }
+        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+                                                      .deploySso()
+                                                      .withInternalMavenRepo()
+                                                      .usePublicIpAddress()
+                                                      .build();
+
         deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
 
@@ -80,7 +74,6 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
         persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }

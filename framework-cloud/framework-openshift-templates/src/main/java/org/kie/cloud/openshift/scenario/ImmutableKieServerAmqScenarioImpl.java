@@ -95,7 +95,6 @@ public class ImmutableKieServerAmqScenarioImpl extends KieCommonScenario<Immutab
         amqDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
-        kieServerDeployment.scale(1);
         kieServerDeployment.waitForScale();
 
         logNodeNameOfAllInstances();

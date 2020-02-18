@@ -94,12 +94,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
         workbenchDeployment.setPassword(DeploymentConstants.getAppPassword());
-        workbenchDeployment.scale(1);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
         kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
-        kieServerDeployment.scale(1);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();

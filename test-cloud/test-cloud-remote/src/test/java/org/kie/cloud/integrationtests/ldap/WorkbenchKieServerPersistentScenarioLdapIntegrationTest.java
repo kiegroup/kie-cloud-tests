@@ -19,7 +19,6 @@ import java.time.Duration;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -38,6 +37,7 @@ import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.AutoScalerDeployment;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
@@ -83,6 +83,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                   .withLdapSettings(ldapSettings)
                   .withInternalMavenRepo()
+                  .usePublicIpAddress()
                   .build();
         deploymentScenario
                   .setLogFolderName(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
@@ -104,16 +105,16 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
         deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
-        deploymentScenario.getKieServerDeployment().scale(0);
-        deploymentScenario.getKieServerDeployment().waitForScale();
 
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT, KieContainerStatus.STARTED);
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
-
-        deploymentScenario.getKieServerDeployment().scale(1);
-        deploymentScenario.getKieServerDeployment().waitForScale();
+        AutoScalerDeployment.on(deploymentScenario.getKieServerDeployment(), () -> {
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
+                                             KieContainerStatus.STARTED);
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
+        });
     }
+
+
 
     @AfterClass
     public static void cleanEnvironment() {
@@ -121,7 +122,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     }
 
     @Test
-    @Ignore("Ignored as the tests are affected by RHPAM-1354. Unignore when the JIRA will be fixed. https://issues.jboss.org/browse/RHPAM-1354")
     public void testWorkbenchControllerPersistence() {
         persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }

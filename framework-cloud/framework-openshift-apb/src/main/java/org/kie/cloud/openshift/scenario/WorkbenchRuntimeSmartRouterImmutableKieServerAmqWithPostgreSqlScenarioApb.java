@@ -113,7 +113,6 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
         databaseDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
-        kieServerDeployment.scale(1);
         kieServerDeployment.waitForScale();
 
         logNodeNameOfAllInstances();
