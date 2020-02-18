@@ -1,0 +1,102 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: ldap
+  annotations:
+    name: ldap
+    description: Application template for ldap server
+message: A new ldap server was created
+
+parameters:
+- name: APPLICATION_NAME
+  displayName: Application Name
+  description: The name for the application.
+  required: true
+
+objects:
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "rhba-qe-ldap"
+    annotations:
+      openshift.io/image.insecureRepository: 'true'
+  spec:
+    tags:
+    - name: 'latest'
+      from:
+        kind: DockerImage
+        name: bxms-binaries.usersys.redhat.com:5000/openldap:latest
+      importPolicy:
+        insecure: true
+      referencePolicy:
+        type: Local
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "ldap"
+    labels:
+      application: "ldap"
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - "ldap"
+        from:
+          kind: ImageStreamTag
+          name: "rhba-qe-ldap:latest"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      deploymentConfig: "ldap"
+    template:
+      metadata:
+        name: "ldap"
+        labels:
+          application: "ldap"
+          deploymentConfig: "ldap"
+      spec:
+        containers:
+        - name: "ldap"
+          image: "rhba-qe-ldap:latest"
+          imagePullPolicy: Always
+          ports:
+          - name: "ldap"
+            containerPort: 389
+            protocol: TCP
+          - name: "ldap-tls"
+            containerPort: 636
+            protocol: TCP
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "ldap"
+    labels:
+      application: "ldap"
+  spec:
+    ports:
+    - name: ldap
+      port: 389
+      targetPort: 30389
+    - name: ldap-tls
+      port: 636
+      targetPort: 30636
+    selector:
+      deploymentConfig: "ldap"
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "ldap-route"
+    labels:
+      application: "ldap"
+      service: "ldap"
+  spec:
+      host: "ldap-${APPLICATION_NAME}.project.openshiftdomain"
+      to:
+        name: "ldap"
+      port:
+        targetPort: ldap

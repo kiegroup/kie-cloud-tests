@@ -57,7 +57,7 @@ public class KieServerWithPostgreSqlLdapIntegrationTest extends AbstractCloudInt
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
         try {
             deploymentScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
-                    .withLdapSettings(ldapSettings)
+                    .withInternalLdap(ldapSettings)
                     .withInternalMavenRepo(false)
                     .build();
         } catch (UnsupportedOperationException ex) {

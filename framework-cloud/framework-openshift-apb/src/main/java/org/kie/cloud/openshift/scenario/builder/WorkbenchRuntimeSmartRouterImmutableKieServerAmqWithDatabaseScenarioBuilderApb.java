@@ -141,7 +141,14 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
+        extraVars.putAll(ldapSettings.getEnvVariables());
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         extraVars.putAll(ldapSettings.getEnvVariables());
         return this;
     }

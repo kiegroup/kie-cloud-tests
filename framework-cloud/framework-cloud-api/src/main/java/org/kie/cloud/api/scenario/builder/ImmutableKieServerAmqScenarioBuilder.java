@@ -22,9 +22,9 @@ public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScena
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     ImmutableKieServerAmqScenarioBuilder withInternalMavenRepo();
@@ -98,11 +98,21 @@ public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScena
     ImmutableKieServerAmqScenarioBuilder withDroolsServerFilterClasses(boolean droolsFilter);
 
     /**
-     *
-     * Return setup builder with configured LDAP.
-     *
-     * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
-     */
-    ImmutableKieServerAmqScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    *
+    * Return setup builder with an external LDAP.
+    *
+    * @param ldapSettings configuration of LDAP represented by a class.
+    * @return Builder
+    */
+    ImmutableKieServerAmqScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
+
+    /**
+    * Return setup builder with additional configuration of internal ldap.
+    *
+    * Parameters will be used automatically
+    *
+    * @param ldapSettings configuration of LDAP represented by a class.
+    * @return Builder with configured internal ldap.
+    */
+    ImmutableKieServerAmqScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
 }

@@ -57,7 +57,7 @@ public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrat
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
         try {
             deploymentScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
-                    .withLdapSettings(ldapSettings)
+                    .withInternalLdap(ldapSettings)
                     .withInternalMavenRepo(false)
                     .build();
         } catch (UnsupportedOperationException ex) {

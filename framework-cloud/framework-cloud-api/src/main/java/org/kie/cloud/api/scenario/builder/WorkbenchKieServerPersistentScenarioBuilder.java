@@ -74,13 +74,23 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
     WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String hostname);
 
     /**
-     *
-     * Return setup builder with configured LDAP.
-     *
-     * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
-     */
-    WorkbenchKieServerPersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    *
+    * Return setup builder with an external LDAP.
+    *
+    * @param ldapSettings configuration of LDAP represented by a class.
+    * @return Builder
+    */
+    WorkbenchKieServerPersistentScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
+
+    /**
+    * Return setup builder with additional configuration of internal ldap.
+    *
+    * Parameters will be used automatically
+    *
+    * @param ldapSettings configuration of LDAP represented by a class.
+    * @return Builder with configured internal ldap.
+    */
+    WorkbenchKieServerPersistentScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with configured Git hooks dir.

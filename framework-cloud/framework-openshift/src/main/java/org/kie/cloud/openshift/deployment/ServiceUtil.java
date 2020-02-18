@@ -37,6 +37,7 @@ public class ServiceUtil {
     private static final Pattern AMQ_TCP_SSL_REGEXP = Pattern.compile("(?!secure-).*amq-tcp-ssl");
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
     private static final Pattern MAVEN_NEXUS_REPOSITORY_REGEXP = Pattern.compile("nexus");
+    private static final Pattern LDAP_REGEXP = Pattern.compile(".*ldap.*");
     private static final Pattern PROMETHEUS_REGEXP = Pattern.compile("prometheus-operated");
 
     public static String getControllerServiceName(OpenShift openShift) {
@@ -85,6 +86,10 @@ public class ServiceUtil {
 
     public static String getMavenNexusServiceName(OpenShift openShift) {
         return getServiceName(openShift, MAVEN_NEXUS_REPOSITORY_REGEXP);
+    }
+
+    public static String getLdapServiceName(OpenShift openShift) {
+        return getServiceName(openShift, LDAP_REGEXP);
     }
 
     public static String getPrometheusServiceName(OpenShift openShift) {

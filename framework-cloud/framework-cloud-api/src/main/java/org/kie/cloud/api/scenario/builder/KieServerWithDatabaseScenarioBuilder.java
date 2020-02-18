@@ -22,11 +22,11 @@ public interface KieServerWithDatabaseScenarioBuilder extends KieDeploymentScena
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @param waitForRunning If true, wait for maven repository to be fully running
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     KieServerWithDatabaseScenarioBuilder withInternalMavenRepo(boolean waitForRunning);
@@ -70,10 +70,20 @@ public interface KieServerWithDatabaseScenarioBuilder extends KieDeploymentScena
 
     /**
      *
-     * Return setup builder with configured LDAP.
+     * Return setup builder with an external LDAP.
      *
      * @param ldapSettings configuration of LDAP represented by a class.
      * @return Builder
      */
-    KieServerWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    KieServerWithDatabaseScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
+
+    /**
+     * Return setup builder with additional configuration of internal ldap.
+     *
+     * Parameters will be used automatically
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder with configured internal ldap.
+     */
+    KieServerWithDatabaseScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
 }
