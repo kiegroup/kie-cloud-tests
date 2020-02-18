@@ -32,6 +32,7 @@ public enum Image {
     CONTROLLER(OpenShiftConstants.KIE_IMAGE_TAG_CONTROLLER),
     KIE_SERVER(OpenShiftConstants.KIE_IMAGE_TAG_KIE_SERVER),
     MYSQL(OpenShiftConstants.KIE_IMAGE_TAG_MYSQL),
+    OPERATOR(OpenShiftConstants.KIE_IMAGE_TAG_OPERATOR),
     POSTGRESQL(OpenShiftConstants.KIE_IMAGE_TAG_POSTGRESQL),
     SMARTROUTER(OpenShiftConstants.KIE_IMAGE_TAG_SMARTROUTER),
     WORKBENCH(OpenShiftConstants.KIE_IMAGE_TAG_WORKBENCH),
