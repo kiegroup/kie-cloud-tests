@@ -27,6 +27,7 @@
     <openshift.admin.password>admin</openshift.admin.password>
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
+    <cloud.properties.location/> <!-- Needs to be defined for proper test run. -->
 
     <!-- Values of these properties are used to select property file with template urls from framework-openshift resources -->
     <template.project/> <!-- valid values: jbpm, drools-->
@@ -255,6 +256,7 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
               <openshift.admin.username>${openshift.admin.username}</openshift.admin.username>
               <openshift.admin.password>${openshift.admin.password}</openshift.admin.password>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
+              <cloud.properties.location>${cloud.properties.location}</cloud.properties.location>
               <template.project>${template.project}</template.project>
               <db.hostname>${db.hostname}</db.hostname>
               <db.port>${db.port}</db.port>

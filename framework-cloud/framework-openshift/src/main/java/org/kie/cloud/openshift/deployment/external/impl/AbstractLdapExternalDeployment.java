@@ -14,13 +14,15 @@
  */
 package org.kie.cloud.openshift.deployment.external.impl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
-import cz.xtf.core.openshift.OpenShiftBinary;
-import cz.xtf.core.openshift.OpenShifts;
 import org.kie.cloud.api.deployment.LdapDeployment;
 import org.kie.cloud.openshift.deployment.LdapDeploymentImpl;
 import org.kie.cloud.openshift.deployment.external.AbstractExternalDeployment;
+import org.kie.cloud.openshift.resource.CloudProperties;
 import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,14 +44,25 @@ public abstract class AbstractLdapExternalDeployment<U> extends AbstractExternal
     @Override
     protected LdapDeployment deployToProject(Project project) {
         logger.info("Creating internal LDAP instance.");
-
-
-        // Login is part of binary retrieval
-        OpenShiftBinary masterBinary = OpenShifts.masterBinary(project.getName());
-        masterBinary.execute("new-app", "-p", "APPLICATION_NAME=" + project.getName(), "-f", getClass().getResource(LDAP_TEMPLATE).getFile());
+        project.processTemplateAndCreateResources(getLdapTemplate(), getLdapProperties(project));
 
         logger.info("Waiting for LDAP deployment to become ready.");
         return new LdapDeploymentImpl(project);
+    }
+
+    private URL getLdapTemplate() {
+        try {
+            return new URL("file://" + getClass().getResource(LDAP_TEMPLATE).getFile());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Wrong LDAP template location", e);
+        }
+    }
+
+    private Map<String, String> getLdapProperties(Project project) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("APPLICATION_NAME", project.getName());
+        properties.put("LDAP_DOCKER_IMAGE", CloudProperties.getInstance().getLdapDockerImage());
+        return properties;
     }
 
     @Override
