@@ -16,7 +16,7 @@
 package org.kie.cloud.api.deployment;
 
 /**
- * Maven repository deployment representation in cloud.
+ * LDAP deployment representation in cloud.
  */
 public interface LdapDeployment extends Deployment {
 
