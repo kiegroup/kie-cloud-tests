@@ -109,7 +109,9 @@
     <module>test-cloud-remote</module>
     <module>test-cloud-optaweb</module>
     <module>test-cloud-performance</module>
+    <!-- Temporarily disable ha-cep module due to ongoing massive refactoring DROOLS-5083
     <module>test-cloud-ha-cep</module>
+    -->
   </modules>
 
   <build>
