@@ -20,5 +20,7 @@ package org.kie.cloud.api.protocol;
  * TCP communication protocol.
  */
 public enum Protocol {
-    http, https, ws, ldap;
+    http,
+    https,
+    ws;
 }

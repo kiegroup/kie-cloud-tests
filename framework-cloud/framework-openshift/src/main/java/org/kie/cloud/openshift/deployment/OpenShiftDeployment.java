@@ -256,10 +256,6 @@ public abstract class OpenShiftDeployment implements Deployment {
                  .done();
     }
 
-    protected Optional<String> getLdapRoute(String serviceName) {
-        return getRoute(Protocol.ldap, serviceName);
-    }
-
     protected Optional<URL> getHttpRouteUrl(String serviceName) {
         return getRoute(Protocol.http, serviceName).map(toURL());
     }
@@ -280,7 +276,6 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     private Optional<String> getRoute(Protocol protocol, String serviceName) {
-        URI uri;
         Service service = openShift.getService(serviceName);
         Predicate<Route> httpsPredicate = n -> n.getSpec().getTls() != null;
         Predicate<Route> httpPredicate = n -> n.getSpec().getTls() == null;
@@ -318,8 +313,6 @@ public abstract class OpenShiftDeployment implements Deployment {
                 return "80";
             case https:
                 return "443";
-            case ldap:
-                return "30389";
             default:
                 throw new IllegalArgumentException("Unrecognized protocol '" + protocol + "'");
         }

@@ -19,6 +19,9 @@ import org.kie.cloud.openshift.resource.Project;
 
 public class LdapDeploymentImpl extends OpenShiftDeployment implements LdapDeployment {
 
+    private static final String HOST_TEMPLATE = "ldap://%s:30389";
+    private static final String DEPLOYMENT_CONFIG_NAME = "ldap";
+
     private String serviceName;
     private String host;
 
@@ -35,10 +38,16 @@ public class LdapDeploymentImpl extends OpenShiftDeployment implements LdapDeplo
     }
 
     @Override
+    public String getDeploymentConfigName() {
+        return DEPLOYMENT_CONFIG_NAME;
+    }
+
+    @Override
     public String getHost() {
         if (host == null) {
-            host = getLdapRoute(getServiceName()).orElseThrow(() -> new RuntimeException("No LDAP URL is available."));
+            host = String.format(HOST_TEMPLATE, getServiceName());
         }
+
         return host;
     }
 

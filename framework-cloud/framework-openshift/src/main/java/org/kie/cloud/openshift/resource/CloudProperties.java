@@ -16,6 +16,7 @@ package org.kie.cloud.openshift.resource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -33,7 +34,7 @@ public final class CloudProperties {
         try (InputStream is = new FileInputStream(new File(fileLocation))) {
             prop = new Properties();
             prop.load(is);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("Error loarding cloud properties", e);
         }
     }
@@ -46,7 +47,7 @@ public final class CloudProperties {
         return prop.getProperty(key);
     }
 
-    public synchronized static final CloudProperties getInstance() {
+    public static synchronized final CloudProperties getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new CloudProperties();
         }

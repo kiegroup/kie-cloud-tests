@@ -46,7 +46,6 @@ public abstract class AbstractLdapExternalDeployment<U> extends AbstractExternal
         logger.info("Creating internal LDAP instance.");
         project.processTemplateAndCreateResources(getLdapTemplate(), getLdapProperties(project));
 
-        logger.info("Waiting for LDAP deployment to become ready.");
         return new LdapDeploymentImpl(project);
     }
 

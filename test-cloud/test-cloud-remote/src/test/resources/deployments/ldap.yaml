@@ -74,29 +74,13 @@ objects:
 - kind: Service
   apiVersion: v1
   metadata:
-    name: "ldap"
+    name: "ldap-${APPLICATION_NAME}"
     labels:
       application: "ldap"
   spec:
     ports:
     - name: ldap
-      port: 389
-      targetPort: 30389
-    - name: ldap-tls
-      port: 636
-      targetPort: 30636
+      port: 30389
+      targetPort: 389 
     selector:
       deploymentConfig: "ldap"
-- kind: Route
-  apiVersion: v1
-  metadata:
-    name: "ldap-route"
-    labels:
-      application: "ldap"
-      service: "ldap"
-  spec:
-      host: "ldap-${APPLICATION_NAME}.project.openshiftdomain"
-      to:
-        name: "ldap"
-      port:
-        targetPort: ldap
