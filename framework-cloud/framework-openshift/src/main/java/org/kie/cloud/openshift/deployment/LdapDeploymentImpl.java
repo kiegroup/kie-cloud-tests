@@ -14,41 +14,46 @@
  */
 package org.kie.cloud.openshift.deployment;
 
+import io.fabric8.kubernetes.api.model.Service;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.LdapDeployment;
 import org.kie.cloud.openshift.resource.Project;
 
 public class LdapDeploymentImpl extends OpenShiftDeployment implements LdapDeployment {
 
-    private static final String HOST_TEMPLATE = "ldap://%s:30389";
-    private static final String DEPLOYMENT_CONFIG_NAME = "ldap";
+    private static final String LDAP = "ldap";
 
-    private String serviceName;
-    private String host;
+    private final String serviceName;
+    private final String host;
 
     public LdapDeploymentImpl(Project project) {
         super(project);
+        Service ldapService = ServiceUtil.getLdapService(getOpenShift());
+        this.serviceName = ldapService.getMetadata().getName();
+        this.host = getHostByService(ldapService);
     }
 
     @Override
     public String getServiceName() {
-        if (serviceName == null) {
-            serviceName = ServiceUtil.getLdapServiceName(getOpenShift());
-        }
         return serviceName;
     }
 
     @Override
     public String getDeploymentConfigName() {
-        return DEPLOYMENT_CONFIG_NAME;
+        return LDAP;
     }
 
     @Override
     public String getHost() {
-        if (host == null) {
-            host = String.format(HOST_TEMPLATE, getServiceName());
-        }
-
         return host;
+    }
+
+    private static final String getHostByService(Service ldapService) {
+        return ldapService.getSpec().getPorts().stream()
+                          .filter(route -> StringUtils.equals(LDAP, route.getName()))
+                          .map(route -> String.format("%s://%s:%s", LDAP, ldapService.getMetadata().getName(), route.getPort()))
+                          .findFirst()
+                          .orElseThrow(() -> new RuntimeException("Host LDAP not found"));
     }
 
 }

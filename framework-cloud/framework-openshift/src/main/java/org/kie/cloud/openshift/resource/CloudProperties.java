@@ -47,7 +47,7 @@ public final class CloudProperties {
         return prop.getProperty(key);
     }
 
-    public static synchronized final CloudProperties getInstance() {
+    public static final synchronized CloudProperties getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new CloudProperties();
         }

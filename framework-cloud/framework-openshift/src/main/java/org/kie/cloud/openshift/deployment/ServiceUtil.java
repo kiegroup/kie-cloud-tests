@@ -88,8 +88,8 @@ public class ServiceUtil {
         return getServiceName(openShift, MAVEN_NEXUS_REPOSITORY_REGEXP);
     }
 
-    public static String getLdapServiceName(OpenShift openShift) {
-        return getServiceName(openShift, LDAP_REGEXP);
+    public static Service getLdapService(OpenShift openShift) {
+        return getService(openShift, LDAP_REGEXP);
     }
 
     public static String getPrometheusServiceName(OpenShift openShift) {
@@ -97,11 +97,15 @@ public class ServiceUtil {
     }
 
     public static String getServiceName(OpenShift openShift, Pattern regexp) {
-        // Try to find service name from all available services
+        return getService(openShift, regexp).getMetadata().getName();
+    }
+
+    public static Service getService(OpenShift openShift, Pattern regexp) {
+        // Try to find service from all available services
         List<Service> services = openShift.getServices();
         for (Service service : services) {
             if (regexp.matcher(service.getMetadata().getName()).matches()) {
-                return service.getMetadata().getName();
+                return service;
             }
         }
         String serviceNames = services.stream().map(s -> s.getMetadata().getName()).collect(Collectors.joining(", "));

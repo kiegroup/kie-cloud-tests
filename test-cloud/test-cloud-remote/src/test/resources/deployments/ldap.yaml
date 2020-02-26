@@ -13,7 +13,11 @@ parameters:
   displayName: Application Name
   description: The name for the application.
   required: true
-
+- name: LDAP_DOCKER_IMAGE
+  displayName: LDAP Docker Image
+  description: The LDAP Docker Image URL
+  required: true
+  
 objects:
 - kind: ImageStream
   apiVersion: v1
@@ -26,7 +30,7 @@ objects:
     - name: 'latest'
       from:
         kind: DockerImage
-        name: bxms-binaries.usersys.redhat.com:5000/openldap:latest
+        name: ${LDAP_DOCKER_IMAGE}
       importPolicy:
         insecure: true
       referencePolicy:
