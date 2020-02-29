@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.LdapDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.deployment.LdapDeploymentImpl;
 import org.kie.cloud.openshift.deployment.external.AbstractExternalDeployment;
 import org.kie.cloud.openshift.resource.CloudProperties;
@@ -61,6 +62,8 @@ public abstract class AbstractLdapExternalDeployment<U> extends AbstractExternal
         Map<String, String> properties = new HashMap<>();
         properties.put("APPLICATION_NAME", project.getName());
         properties.put("LDAP_DOCKER_IMAGE", CloudProperties.getInstance().getLdapDockerImage());
+        properties.put("LDAP_USER_NAME", DeploymentConstants.getAppUser());
+        properties.put("LDAP_USER_PWD", DeploymentConstants.getAppPassword());
         return properties;
     }
 

@@ -17,7 +17,12 @@ parameters:
   displayName: LDAP Docker Image
   description: The LDAP Docker Image URL
   required: true
-  
+- name: LDAP_USER_NAME
+  displayName: LDAP User Name
+  required: true
+- name: LDAP_USER_PWD
+  displayName: LDAP User Password
+  required: true
 objects:
 - kind: ImageStream
   apiVersion: v1
@@ -35,6 +40,23 @@ objects:
         insecure: true
       referencePolicy:
         type: Local
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: add-user-script
+  data: 
+    addUser.sh: |- 
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      objectClass: top
+      objectClass: uidObject
+      objectClass: person
+      objectClass: inetOrgPerson
+      uid: ${LDAP_USER_NAME}
+      cn: ${LDAP_USER_NAME}
+      sn: ${LDAP_USER_NAME}
+      userPassword: ${LDAP_USER_PWD}
+      EOF
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
@@ -44,6 +66,14 @@ objects:
   spec:
     strategy:
       type: Recreate
+      recreateParams:  
+        post: 
+          failurePolicy: Abort
+          execNewPod:
+            containerName: ldap 
+            command: [ "/bin/sh", "/opt/user/addUser.sh" ] 
+            volumes:
+              - add-user-script
     triggers:
     - type: ImageChange
       imageChangeParams:
@@ -68,6 +98,9 @@ objects:
         - name: "ldap"
           image: "rhba-qe-ldap:latest"
           imagePullPolicy: Always
+          volumeMounts:
+          - name: add-user-script
+            mountPath: /opt/user
           ports:
           - name: "ldap"
             containerPort: 389
@@ -75,6 +108,10 @@ objects:
           - name: "ldap-tls"
             containerPort: 636
             protocol: TCP
+        volumes:
+        - name: add-user-script
+          configMap:
+            name: add-user-script
 - kind: Service
   apiVersion: v1
   metadata:
@@ -85,6 +122,6 @@ objects:
     ports:
     - name: ldap
       port: 30389
-      targetPort: 389 
+      targetPort: 389
     selector:
       deploymentConfig: "ldap"
