@@ -43,7 +43,7 @@ objects:
 - kind: ConfigMap
   apiVersion: v1
   metadata:
-    name: add-user-script
+    name: ldap-user-scripts
   data: 
     addUser.sh: |- 
       ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
@@ -56,6 +56,49 @@ objects:
       cn: ${LDAP_USER_NAME}
       sn: ${LDAP_USER_NAME}
       userPassword: ${LDAP_USER_PWD}
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: ou=roles,dc=example,dc=com
+      objectClass: top
+      objectclass: organizationalunit
+      ou: roles
+      description: roles
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: cn=guest,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: guest
+      description: guest group
+      ou: guest@example.com
+      member: uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: cn=admin,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: admin
+      description: Admin group
+      ou: admins@example.com
+      member: uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: cn=kie-server,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: kie-server
+      description: Kie server group
+      ou: kie-server@example.com
+      member: uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: cn=rest-all,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: rest-all
+      description: rest-all group
+      ou: rest-all@example.com
+      member: uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
       EOF
 - kind: DeploymentConfig
   apiVersion: v1
@@ -71,9 +114,9 @@ objects:
           failurePolicy: Abort
           execNewPod:
             containerName: ldap 
-            command: [ "/bin/sh", "/opt/user/addUser.sh" ] 
+            command: [ "/bin/sh", "/opt/scripts/addUser.sh" ] 
             volumes:
-              - add-user-script
+              - ldap-user-scripts
     triggers:
     - type: ImageChange
       imageChangeParams:
@@ -99,8 +142,8 @@ objects:
           image: "rhba-qe-ldap:latest"
           imagePullPolicy: Always
           volumeMounts:
-          - name: add-user-script
-            mountPath: /opt/user
+          - name: ldap-user-scripts
+            mountPath: /opt/scripts
           ports:
           - name: "ldap"
             containerPort: 389
@@ -109,9 +152,9 @@ objects:
             containerPort: 636
             protocol: TCP
         volumes:
-        - name: add-user-script
+        - name: ldap-user-scripts
           configMap:
-            name: add-user-script
+            name: ldap-user-scripts
 - kind: Service
   apiVersion: v1
   metadata:
