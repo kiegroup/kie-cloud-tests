@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.s2i.KieServerS2iJbpmIntegrationTest;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
@@ -131,7 +130,6 @@ public class KieServerS2iAmqJbpmIntegrationTest extends AbstractCloudIntegration
     }
 
     @Test
-    @Category({ApbNotSupported.class})
     public void testWorkbenchHttps() {
         httpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchRuntimeDeployment(), false);
     }

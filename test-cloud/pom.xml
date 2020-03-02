@@ -84,10 +84,6 @@
     <custom.trusted.keystore.pwd/>
     <certificate.dir>${project.build.testOutputDirectory}/certificate</certificate.dir>
 
-    <!-- APB -->
-    <apb.image.stream.name/>
-    <apb.kie.image.stream.tag/> <!-- Tag version of the Kie ImageStream to use. -->
-    <apb.image.docker.repo.tag/>
 
     <!-- Image tag properties for Image Stream Provider -->
     <kie.image.tag.amq/>
@@ -300,9 +296,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
               <custom.trusted.secret.name>${custom.trusted.secret.name}</custom.trusted.secret.name>
               <custom.trusted.keystore.alias>${custom.trusted.keystore.alias}</custom.trusted.keystore.alias>
               <custom.trusted.keystore.pwd>${custom.trusted.keystore.pwd}</custom.trusted.keystore.pwd>
-              <apb.image.stream.name>${apb.image.stream.name}</apb.image.stream.name>
-              <apb.kie.image.stream.tag>${apb.kie.image.stream.tag}</apb.kie.image.stream.tag>
-              <apb.image.docker.repo.tag>${apb.image.docker.repo.tag}</apb.image.docker.repo.tag>
               <kie.image.tag.amq>${kie.image.tag.amq}</kie.image.tag.amq>
               <kie.image.tag.console>${kie.image.tag.console}</kie.image.tag.console>
               <kie.image.tag.controller>${kie.image.tag.controller}</kie.image.tag.controller>
@@ -477,76 +470,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
 
                   <xtf.openshift.admin.token>${xtf.openshift.admin.token}</xtf.openshift.admin.token>
                   <xtf.openshift.master.token>${xtf.openshift.master.token}</xtf.openshift.master.token>
-                </systemProperties>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>openshift-apb</id>
-      <properties>
-        <custom.trusted.app.secret>file://${project.build.testOutputDirectory}/secret/rhpam-certs.secret.yaml</custom.trusted.app.secret>
-        <custom.trusted.secret.name>rhpam-certs</custom.trusted.secret.name>
-        <custom.trusted.keystore.alias>jboss</custom.trusted.keystore.alias>
-        <custom.trusted.keystore.pwd>test</custom.trusted.keystore.pwd>
-        <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.ApbNotSupported</failsafe.excluded.groups>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift-apb</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>keytool-maven-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>importCustomCertificate</id>
-                  <goals>
-                    <goal>importCertificate</goal>
-                  </goals>
-                  <phase>package</phase>
-                  <configuration>
-                    <!-- certificate.dir set in project test-cloud-remote-->
-                    <storepass>changeit</storepass>
-                    <keystore>${certificate.dir}/test-keystore</keystore>
-                    <keypass>changeit</keypass>
-                    <alias>jboss</alias>
-                    <file>${certificate.dir}/rhpam-test-ca.crt</file>
-                    <trustcacerts>true</trustcacerts>
-                    <noprompt>true</noprompt>
-                  </configuration>
-                </execution>
-                <execution>
-                  <id>importJavaKeystore</id>
-                  <goals>
-                    <goal>importKeystore</goal>
-                  </goals>
-                  <phase>package</phase>
-                  <configuration>
-                    <srckeystore>${java.home}/lib/security/cacerts</srckeystore>
-                    <srcstorepass>changeit</srcstorepass>
-                    <destkeystore>${certificate.dir}/test-keystore</destkeystore>
-                    <deststorepass>changeit</deststorepass>
-                    <noprompt>true</noprompt>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-              <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <systemProperties>
-                  <javax.net.ssl.trustStore>${certificate.dir}/test-keystore</javax.net.ssl.trustStore>
-                  <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
                 </systemProperties>
               </configuration>
             </plugin>

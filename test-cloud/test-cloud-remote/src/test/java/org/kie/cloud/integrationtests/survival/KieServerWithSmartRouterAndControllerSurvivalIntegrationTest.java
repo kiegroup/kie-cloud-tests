@@ -29,7 +29,6 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServ
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
@@ -55,7 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({JBPMOnly.class, ApbNotSupported.class, OperatorNotSupported.class})
+@Category({JBPMOnly.class, OperatorNotSupported.class})
 public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithSmartRouterAndControllerSurvivalIntegrationTest.class);
