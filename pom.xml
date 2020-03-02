@@ -134,11 +134,6 @@
       </dependency>
       <dependency>
         <groupId>org.kie.cloud</groupId>
-        <artifactId>framework-openshift-apb</artifactId>
-        <version>${version.org.kie}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.cloud</groupId>
         <artifactId>framework-openshift-templates</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
