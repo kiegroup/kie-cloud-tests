@@ -22,16 +22,18 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerScenarioApb;
 
 public class WorkbenchKieServerScenarioBuilderApb extends AbstractOpenshiftScenarioBuilderApb<WorkbenchKieServerScenario> implements WorkbenchKieServerScenarioBuilder {
 
     private final Map<String, String> extraVars = new HashMap<>();
-    private boolean deployPrometheus = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchKieServerScenarioBuilderApb() {
         extraVars.put(OpenShiftApbConstants.APB_PLAN_ID, ApbConstants.Plans.TRIAL);
@@ -43,7 +45,7 @@ public class WorkbenchKieServerScenarioBuilderApb extends AbstractOpenshiftScena
 
     @Override
     public WorkbenchKieServerScenario getDeploymentScenarioInstance() {
-        return new WorkbenchKieServerScenarioApb(extraVars, deployPrometheus);
+        return new WorkbenchKieServerScenarioApb(extraVars, request);
 
     }
 
@@ -85,8 +87,14 @@ public class WorkbenchKieServerScenarioBuilderApb extends AbstractOpenshiftScena
 
     @Override
     public WorkbenchKieServerScenarioBuilder withPrometheusMonitoring() {
-        deployPrometheus = true;
+        request.enableDeployPrometheus();
         extraVars.put(OpenShiftApbConstants.PROMETHEUS_SERVER_EXT_DISABLED, "false");
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 }

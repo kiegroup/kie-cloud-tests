@@ -64,8 +64,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
         }
-        deploymentScenario.setLogFolderName(
-                                            ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
+
+        deploymentScenario.setLogFolderName(ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
@@ -105,6 +105,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
     @Test
     public void testDeployContainerFromWorkbench() {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
-                                                                  deploymentScenario.getKieServerDeployment());
+                                                                  deploymentScenario.getKieServerDeployment(),
+                                                                  deploymentScenario.getGitProvider());
     }
 }

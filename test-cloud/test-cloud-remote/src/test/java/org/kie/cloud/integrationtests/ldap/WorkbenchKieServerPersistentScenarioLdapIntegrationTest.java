@@ -151,7 +151,8 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     @Test
     public void testDeployContainerFromWorkbench() {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
-                                                                  deploymentScenario.getKieServerDeployment());
+                                                                  deploymentScenario.getKieServerDeployment(),
+                                                                  deploymentScenario.getGitProvider());
     }
 
     @Test

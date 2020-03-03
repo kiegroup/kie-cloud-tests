@@ -19,6 +19,8 @@ package org.kie.cloud.integrationtests.testproviders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
@@ -28,10 +30,10 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.git.GitProvider;
 import org.kie.cloud.git.GitProviderService;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -61,7 +63,7 @@ public class FireRulesTestProvider {
 
     /**
      * Create provider instance
-     * 
+     *
      * @return provider instance
      */
     public static FireRulesTestProvider create() {
@@ -70,9 +72,9 @@ public class FireRulesTestProvider {
 
     /**
      * Create provider instance and init it with given environment
-     * 
+     *
      * @param environment if not null, initialize this provider with the environment
-     * 
+     *
      * @return provider instance
      */
     public static FireRulesTestProvider create(DeploymentScenario<?> deploymentScenario) {
@@ -105,15 +107,20 @@ public class FireRulesTestProvider {
         }
     }
 
-    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment) {
+    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, Optional<GitProvider> gitProvider) {
+        testDeployFromWorkbenchAndFireRules(workbenchDeployment, kieServerDeployment, gitProvider.orElseGet(() -> new GitProviderService().createGitProvider()));
+    }
+
+    private void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, GitProvider gitProvider) {
         String containerId = "testDeployFromWorkbenchAndFireRules";
         String containerAlias = "alias-testDeployFromWorkbenchAndFireRules";
-        GitProvider gitProvider = new GitProviderService().createGitProvider();
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), FireRulesTestProvider.class.getResource("/kjars-sources/hello-rules").getFile());
+        String repositoryName = generateNameWithPrefix(workbenchDeployment.getNamespace());
+
+        gitProvider.createGitRepository(repositoryName, FireRulesTestProvider.class.getResource("/kjars-sources/hello-rules").getFile());
         try {
             WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, Kjar.HELLO_RULES.getArtifactName());
 
@@ -148,5 +155,9 @@ public class FireRulesTestProvider {
         assertThat(outcome).hasSize(2);
         assertThat(outcome.get(0)).startsWith(HELLO_RULE);
         assertThat(outcome.get(1)).startsWith(WORLD_RULE);
+    }
+
+    private static String generateNameWithPrefix(String prefix) {
+        return prefix + "-" + UUID.randomUUID().toString().substring(0, 4);
     }
 }

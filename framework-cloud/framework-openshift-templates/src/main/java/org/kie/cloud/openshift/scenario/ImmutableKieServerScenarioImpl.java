@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
@@ -28,11 +29,13 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +44,15 @@ public class ImmutableKieServerScenarioImpl extends KieCommonScenario<ImmutableK
 
     private KieServerDeploymentImpl kieServerDeployment;
     private SsoDeployment ssoDeployment;
+    private GitProvider gitProvider;
 
-    private boolean deploySso;
+    private final ScenarioRequest request;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public ImmutableKieServerScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
+    public ImmutableKieServerScenarioImpl(Map<String, String> envVariables, ScenarioRequest request) {
         super(envVariables);
-        this.deploySso = deploySso;
+        this.request = request;
     }
 
     @Override public KieServerDeployment getKieServerDeployment() {
@@ -57,7 +61,7 @@ public class ImmutableKieServerScenarioImpl extends KieCommonScenario<ImmutableK
 
     @Override
     protected void deployKieDeployments() {
-        if (deploySso) {
+        if (request.isDeploySso()) {
             ssoDeployment = SsoDeployer.deploy(project);
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
@@ -65,6 +69,10 @@ public class ImmutableKieServerScenarioImpl extends KieCommonScenario<ImmutableK
 
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
+        }
+
+        if (request.getGitSettings() != null) {
+            gitProvider = Git.getProvider(project, request.getGitSettings());
         }
 
         logger.info("Processing template and creating resources from {}", OpenShiftTemplate.KIE_SERVER_HTTPS_S2I.getTemplateUrl());
@@ -111,4 +119,9 @@ public class ImmutableKieServerScenarioImpl extends KieCommonScenario<ImmutableK
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
 	}
+
+    @Override
+    public Optional<GitProvider> getGitProvider() {
+        return Optional.ofNullable(gitProvider);
+    }
 }

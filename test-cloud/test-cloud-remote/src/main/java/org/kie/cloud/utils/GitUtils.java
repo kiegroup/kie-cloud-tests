@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2020 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,16 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kie.cloud.utils;
 
-package org.kie.cloud.provider.git;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 
-import org.kie.cloud.api.git.GitProvider;
-import org.kie.cloud.git.GitProviderService;
+public final class GitUtils {
 
-public class Git {
-    private static final GitProvider gitProvider = new GitProviderService().createGitProvider();
+    private GitUtils() {
 
-    public static GitProvider getProvider() {
-        return gitProvider;
+    }
+
+    public static final void deleteGitRepository(String repositoryName, KieDeploymentScenario<?> deploymentScenario) {
+        deploymentScenario.getGitProvider().ifPresent(gitProvider -> gitProvider.deleteGitRepository(repositoryName));
     }
 }

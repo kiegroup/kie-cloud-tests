@@ -32,6 +32,7 @@ public final class CloudProperties {
 
     private static final String CLOUD_PROPERTIES_LOCATION = "cloud.properties.location";
     private static final String LDAP_DOCKER_IMAGE_PROPERTY = "ldap.docker.image";
+    private static final String GOGS_DOCKER_IMAGE_PROPERTY = "gogs.docker.image";
 
     private static CloudProperties INSTANCE;
 
@@ -49,6 +50,10 @@ public final class CloudProperties {
 
     public String getLdapDockerImage() {
         return getProperty(LDAP_DOCKER_IMAGE_PROPERTY);
+    }
+
+    public String getGogsDockerImage() {
+        return getProperty(GOGS_DOCKER_IMAGE_PROPERTY);
     }
 
     private String getProperty(String key) {

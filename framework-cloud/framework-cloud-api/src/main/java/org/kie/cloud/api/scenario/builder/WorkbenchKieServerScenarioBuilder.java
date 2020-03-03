@@ -18,6 +18,7 @@ package org.kie.cloud.api.scenario.builder;
 import java.time.Duration;
 
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.GitSettings;
 
 /**
  * Cloud builder for Workbench and Kie Server in project. Built setup
@@ -28,9 +29,9 @@ public interface WorkbenchKieServerScenarioBuilder extends DeploymentScenarioBui
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     WorkbenchKieServerScenarioBuilder withInternalMavenRepo();
@@ -75,4 +76,12 @@ public interface WorkbenchKieServerScenarioBuilder extends DeploymentScenarioBui
      * @return Builder with Prometheus monitoring configured monitoring deployed Kie servers.
      */
     WorkbenchKieServerScenarioBuilder withPrometheusMonitoring();
+
+    /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param git settings
+     * @return Builder
+     */
+    WorkbenchKieServerScenarioBuilder withGitSettings(GitSettings gitSettings);
 }

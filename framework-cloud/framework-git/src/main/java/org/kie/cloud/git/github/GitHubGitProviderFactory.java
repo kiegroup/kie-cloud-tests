@@ -15,17 +15,19 @@
 
 package org.kie.cloud.git.github;
 
-import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.git.GitProviderFactory;
 import org.kie.cloud.git.constants.GitConstants;
 
 public class GitHubGitProviderFactory implements GitProviderFactory {
 
-    @Override public String providerType() {
+    @Override
+    public String providerType() {
         return "GitHub";
     }
 
-    @Override public GitProvider createGitProvider() {
+    @Override
+    public GitProvider createGitProvider() {
         final String user = GitConstants.readMandatoryParameter(GitConstants.GITHUB_USER);
         final String password = GitConstants.readMandatoryParameter(GitConstants.GITHUB_PASSWORD);
 

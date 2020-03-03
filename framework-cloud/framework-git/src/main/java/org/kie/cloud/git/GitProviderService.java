@@ -12,38 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
 package org.kie.cloud.git;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.kie.cloud.api.constants.ConfigurationInitializer;
+import org.kie.cloud.api.git.GitProvider;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProviderFactory;
+import org.kie.cloud.git.gogs.ExternalGogsGitProviderFactory;
 import org.kie.cloud.git.gogs.GogsGitProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GitProviderService {
-    private final Map<String, GitProviderFactory> providerFactories;
+
+    private final List<GitProviderFactory> providerFactories;
 
     private static final Logger logger = LoggerFactory.getLogger(GitProviderService.class);
 
     private boolean isConfigurationInitialized = false;
 
     public GitProviderService() {
-        final Map<String, GitProviderFactory> providerFactories = new HashMap<>();
-        GitProviderFactory factory;
-
-        factory = new GitHubGitProviderFactory();
-        providerFactories.put(factory.providerType(), factory);
-
-        factory = new GogsGitProviderFactory();
-        providerFactories.put(factory.providerType(), factory);
-
-        this.providerFactories = Collections.unmodifiableMap(providerFactories);
+        this.providerFactories = Collections.unmodifiableList(Arrays.asList(new GitHubGitProviderFactory(),
+                                                                            new GogsGitProviderFactory(),
+                                                                            new ExternalGogsGitProviderFactory()));
     }
 
     public GitProvider createGitProvider() {
@@ -59,13 +55,10 @@ public class GitProviderService {
     }
 
     private GitProviderFactory getGitProviderFactory() {
-        final String gitProviderName = GitConstants.readMandatoryParameter(GitConstants.GIT_PROVIDER);
+        final String gitProviderName = GitConstants.readMandatoryParameter(GitSettings.GIT_PROVIDER);
         logger.debug("Initializing Git provider {}", gitProviderName);
-        if (!providerFactories.containsKey(gitProviderName)) {
-            logger.error("Unknown type of Git provider {}", gitProviderName);
-            throw new RuntimeException("Unknown type of Git provider " + gitProviderName);
-        }
-
-        return providerFactories.get(gitProviderName);
+        return this.providerFactories.stream().filter(factory -> factory.providerType().equalsIgnoreCase(gitProviderName))
+                                     .findFirst()
+                                     .orElseThrow(() -> new RuntimeException("Unknown type of Git provider " + gitProviderName));
     }
 }

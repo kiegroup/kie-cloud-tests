@@ -114,7 +114,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest extend
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment(), deploymentScenario.getGitProvider());
     }
 
     @Test

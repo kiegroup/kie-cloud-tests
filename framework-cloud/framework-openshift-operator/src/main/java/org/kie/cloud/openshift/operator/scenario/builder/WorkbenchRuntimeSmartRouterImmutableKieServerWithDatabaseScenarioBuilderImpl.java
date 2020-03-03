@@ -23,6 +23,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -43,13 +44,14 @@ import org.kie.cloud.openshift.operator.model.components.SmartRouter;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.template.ProjectProfile;
 
 public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> implements
                                                                                           WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilderImpl() {
         isScenarioAllowed();
@@ -89,7 +91,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBu
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario getDeploymentScenarioInstance() {
-        return new WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioImpl(kieApp, deploySSO);
+        return new WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -100,7 +102,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBu
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         SsoClient ssoClient = new SsoClient();
         ssoClient.setName("workbench-client");
         ssoClient.setSecret("workbench-secret");
@@ -113,6 +115,12 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBu
             ssoClient.setSecret("kie-server-" + i + "-secret");
             servers[i].setSsoClient(ssoClient);
         }
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 
@@ -168,11 +176,16 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBu
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir) {
+        if (request.getGitSettings() == null) {
+            throw new RuntimeException("Need to configure the git settings first");
+        }
+
         GitSource gitSource = new GitSource();
         gitSource.setContextDir(gitContextDir);
         gitSource.setReference(gitReference);
-        gitSource.setUri(gitRepoUrl);
+
+        request.getGitSettings().addOnRepositoryLoaded(gitSource::setUri);
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             if (server.getBuild() == null) {
@@ -185,8 +198,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBu
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
-        withSourceLocation(gitRepoUrl, gitReference, gitContextDir);
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs) {
+        withSourceLocation(gitReference, gitContextDir);
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             server.getBuild().setArtifactDir(artifactDirs);

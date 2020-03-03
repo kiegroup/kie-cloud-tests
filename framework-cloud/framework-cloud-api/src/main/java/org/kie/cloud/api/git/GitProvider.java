@@ -13,11 +13,11 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.git;
+package org.kie.cloud.api.git;
 
 public interface GitProvider {
 
-    String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath);
+    String createGitRepository(String repositoryName, String repositoryPath);
 
     void deleteGitRepository(String repositoryName);
 

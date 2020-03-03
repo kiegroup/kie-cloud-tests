@@ -16,6 +16,7 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.ImmutableKieServerAmqScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScenarioBuilder<ImmutableKieServerAmqScenarioBuilder, ImmutableKieServerAmqScenario> {
@@ -46,24 +47,22 @@ public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScena
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @return Builder
      */
-    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir);
+    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitReference, String gitContextDir);
 
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @param artifactDirs Directories containing built kjars, separated by
      * commas. For example "usertask-project/target,signaltask-project/target".
      * @return Builder
      */
-    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs);
+    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs);
 
     /**
      * Return setup builder with additional configuration for SSO deployment.
@@ -114,4 +113,12 @@ public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScena
      * @return Builder with configured internal ldap.
      */
     ImmutableKieServerAmqScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
+
+    /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param git settings
+     * @return Builder
+     */
+    ImmutableKieServerAmqScenarioBuilder withGitSettings(GitSettings gitSettings);
 }
