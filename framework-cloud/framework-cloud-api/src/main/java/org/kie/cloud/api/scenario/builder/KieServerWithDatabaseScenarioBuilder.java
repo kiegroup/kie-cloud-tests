@@ -69,7 +69,6 @@ public interface KieServerWithDatabaseScenarioBuilder extends KieDeploymentScena
     KieServerWithDatabaseScenarioBuilder withHttpsKieServerHostname(String hostname);
 
     /**
-     *
      * Return setup builder with an external LDAP.
      *
      * @param ldapSettings configuration of LDAP represented by a class.

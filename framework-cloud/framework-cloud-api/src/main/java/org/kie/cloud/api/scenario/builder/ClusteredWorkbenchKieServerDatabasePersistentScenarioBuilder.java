@@ -44,22 +44,21 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso();
 
     /**
-    *
-    * Return setup builder with an external LDAP.
-    *
-    * @param ldapSettings configuration of LDAP represented by a class.
-    * @return Builder
-    */
+     * Return setup builder with an external LDAP.
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder
+     */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
 
     /**
-    * Return setup builder with additional configuration of internal ldap.
-    *
-    * Parameters will be used automatically
-    *
-    * @param ldapSettings configuration of LDAP represented by a class.
-    * @return Builder with configured internal ldap.
-    */
+     * Return setup builder with additional configuration of internal ldap.
+     *
+     * Parameters will be used automatically
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder with configured internal ldap.
+     */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
 
     /**
