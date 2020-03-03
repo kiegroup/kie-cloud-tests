@@ -20,6 +20,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * Cloud properties to configure some private settings. The property "cloud.properties.location" must point out to a file with
+ * the constants defined in here. For example:
+ *
+ * ldap.docker.image=mydockerimage:latest
+ */
 public final class CloudProperties {
 
     private static final String CLOUD_PROPERTIES_LOCATION = "cloud.properties.location";
@@ -30,7 +38,7 @@ public final class CloudProperties {
     private final Properties prop;
 
     private CloudProperties() {
-        String fileLocation = System.getProperty(CLOUD_PROPERTIES_LOCATION);
+        String fileLocation = getFileLocation();
         try (InputStream is = new FileInputStream(new File(fileLocation))) {
             prop = new Properties();
             prop.load(is);
@@ -43,8 +51,17 @@ public final class CloudProperties {
         return getProperty(LDAP_DOCKER_IMAGE_PROPERTY);
     }
 
-    public String getProperty(String key) {
-        return prop.getProperty(key);
+    private String getProperty(String key) {
+        String value = prop.getProperty(key);
+        if (StringUtils.isBlank(value)) {
+            throw new RuntimeException("Property '" + key + "' not found in " + getFileLocation());
+        }
+
+        return value;
+    }
+
+    private String getFileLocation() {
+        return System.getProperty(CLOUD_PROPERTIES_LOCATION);
     }
 
     public static final synchronized CloudProperties getInstance() {
