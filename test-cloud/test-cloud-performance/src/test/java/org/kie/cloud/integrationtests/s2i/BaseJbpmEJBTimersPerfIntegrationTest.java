@@ -60,8 +60,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.jbpm.process.instance.ProcessInstance.STATE_ACTIVE;
-import static org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
 
 @RunWith(Parameterized.class)
 public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> {

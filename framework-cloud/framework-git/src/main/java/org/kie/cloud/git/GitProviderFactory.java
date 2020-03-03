@@ -20,6 +20,8 @@ import org.kie.cloud.api.git.GitProvider;
 public interface GitProviderFactory {
 
     String providerType();
+
     GitProvider createGitProvider();
+
     void initGitConfigurationProperties();
 }

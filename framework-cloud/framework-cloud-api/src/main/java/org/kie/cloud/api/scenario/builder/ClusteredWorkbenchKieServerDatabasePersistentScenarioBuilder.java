@@ -53,12 +53,12 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings);
 
     /**
-     *
-     * Return setup builder with an external LDAP.
-     *
-     * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
-     */
+    *
+    * Return setup builder with an external LDAP.
+    *
+    * @param ldapSettings configuration of LDAP represented by a class.
+    * @return Builder
+    */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
 
     /**
@@ -110,4 +110,5 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @return Builder with configured memory limit.
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
+
 }

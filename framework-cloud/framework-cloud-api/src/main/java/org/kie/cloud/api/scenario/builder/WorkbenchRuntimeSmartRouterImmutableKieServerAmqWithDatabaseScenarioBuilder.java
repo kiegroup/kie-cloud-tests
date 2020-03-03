@@ -19,7 +19,8 @@ import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerA
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
-public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder extends KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> {
+public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder extends
+                                                                                             KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> {
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
