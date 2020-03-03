@@ -36,7 +36,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     private static final Logger logger = LoggerFactory.getLogger(ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderApb.class);
     private final Map<String, String> extraVars = new HashMap<>();
-    
+
     private boolean deploySSO = false;
 
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderApb() {
@@ -90,7 +90,14 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Override
-    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
+        extraVars.putAll(ldapSettings.getEnvVariables());
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         extraVars.putAll(ldapSettings.getEnvVariables());
         return this;
     }

@@ -24,9 +24,9 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenar
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withInternalMavenRepo();
@@ -100,13 +100,22 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenar
     WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withDroolsServerFilterClasses(boolean droolsFilter);
 
     /**
-     *
-     * Return setup builder with configured LDAP.
+     * Return setup builder with an external LDAP.
      *
      * @param ldapSettings configuration of LDAP represented by a class.
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
+
+    /**
+     * Return setup builder with additional configuration of internal ldap.
+     *
+     * Parameters will be used automatically
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder with configured internal ldap.
+     */
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with specified timer service data store refresh interval.

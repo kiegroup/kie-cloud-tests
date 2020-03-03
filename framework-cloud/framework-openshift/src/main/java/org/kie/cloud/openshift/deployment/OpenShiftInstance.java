@@ -129,14 +129,14 @@ public class OpenShiftInstance implements Instance {
     }
 
     private List<Container> getContainers() {
-        return Optional.ofNullable(openshift.getPod(name).getSpec())
+        return Optional.ofNullable(openshift.getPod(name))
+                       .map(Pod::getSpec)
                        .map(PodSpec::getContainers)
                        .orElse(new ArrayList<>());
     }
 
     public Map<String, Observable<String>> observeAllContainersLogs() {
-        return getContainers()
-                              .stream()
+        return getContainers().stream()
                               .map(Container::getName)
                               .collect(Collectors.toMap(Function.identity(), this::observeContainerLogs));
     }

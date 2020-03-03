@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -256,33 +257,15 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     protected Optional<URL> getHttpRouteUrl(String serviceName) {
-        Optional<URI> uri = getRouteUri(Protocol.http, serviceName);
-        if (uri.isPresent()) {
-            try {
-                return Optional.ofNullable(uri.get().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return Optional.empty();
-        }
+        return getRoute(Protocol.http, serviceName).map(toURL());
     }
 
     protected Optional<URL> getHttpsRouteUrl(String serviceName) {
-        Optional<URI> uri = getRouteUri(Protocol.https, serviceName);
-        if (uri.isPresent()) {
-            try {
-                return Optional.ofNullable(uri.get().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return Optional.empty();
-        }
+        return getRoute(Protocol.https, serviceName).map(toURL());
     }
 
     protected Optional<URI> getWebSocketRouteUri(String serviceName) {
-        return getRouteUri(Protocol.ws, serviceName);
+        return getRoute(Protocol.ws, serviceName).map(toURI());
     }
 
     protected RouteList getRoutes() {
@@ -292,8 +275,7 @@ public abstract class OpenShiftDeployment implements Deployment {
                         .list();
     }
 
-    private Optional<URI> getRouteUri(Protocol protocol, String serviceName) {
-        URI uri;
+    private Optional<String> getRoute(Protocol protocol, String serviceName) {
         Service service = openShift.getService(serviceName);
         Predicate<Route> httpsPredicate = n -> n.getSpec().getTls() != null;
         Predicate<Route> httpPredicate = n -> n.getSpec().getTls() == null;
@@ -320,15 +302,8 @@ public abstract class OpenShiftDeployment implements Deployment {
                 //throw new RuntimeException(protocol + " route leading to service " + serviceName + " not found. Available routes " + routeNames);
             }
         }
-        String uriValue = protocol.name() + "://" + routeHost + ":" + retrievePort(protocol);
 
-        try {
-            uri = new URI(uriValue.toString());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-
-        return Optional.of(uri);
+        return Optional.ofNullable(protocol.name() + "://" + routeHost + ":" + retrievePort(protocol));
     }
 
     private String retrievePort(Protocol protocol) {
@@ -348,6 +323,26 @@ public abstract class OpenShiftDeployment implements Deployment {
                 .collect(Collectors.toMap(
                                           e -> e.getKey(),
                                           e -> new Quantity(e.getValue())));
+    }
+
+    private static Function<String, URI> toURI() {
+        return route -> {
+            try {
+                return new URI(route);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    private static Function<String, URL> toURL() {
+        return route -> {
+            try {
+                return new URL(route);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
 }

@@ -58,7 +58,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
 
         try {
             deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                    .withLdapSettings(ldapSettings)
+                    .withInternalLdap(ldapSettings)
                     .withInternalMavenRepo()
                     .build();
         } catch (UnsupportedOperationException ex) {

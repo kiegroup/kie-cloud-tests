@@ -24,8 +24,11 @@ import org.kie.cloud.openshift.deployment.external.ExternalDeploymentFactory;
 
 public class ExternalDeploymentFactoryOperator implements ExternalDeploymentFactory {
 
+    @Override
     public ExternalDeployment<? extends Deployment, ?> get(ExternalDeploymentID id, Map<String, String> extraDeploymentConfig) {
         switch (id) {
+            case LDAP:
+                return new LdapExternalDeploymentOperator(extraDeploymentConfig);
             case MAVEN_REPOSITORY:
                 return new MavenRepositoryExternalDeploymentOperator(extraDeploymentConfig);
             default:

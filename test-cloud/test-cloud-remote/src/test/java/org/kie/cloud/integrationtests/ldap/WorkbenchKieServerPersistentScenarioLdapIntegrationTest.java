@@ -81,7 +81,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
 
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                  .withLdapSettings(ldapSettings)
+                  .withInternalLdap(ldapSettings)
                   .withInternalMavenRepo()
                   .usePublicIpAddress()
                   .build();

@@ -18,7 +18,6 @@ package org.kie.cloud.integrationtests.ldap.s2i;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -92,7 +91,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
                                                                                                        .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                                                                                                        .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                                        .withDroolsServerFilterClasses(false)
-                                                                                                       .withLdapSettings(ldapSettings)
+                                                                                                       .withInternalLdap(ldapSettings)
                                                                                                        .build();
             scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
         } catch (UnsupportedOperationException ex) {
@@ -104,7 +103,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
                                                                                            .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
                                                                                            .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                            .withDroolsServerFilterClasses(false)
-                                                                                           .withLdapSettings(ldapSettings)
+                                                                                           .withInternalLdap(ldapSettings)
                                                                                            .build();
             scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenario });
         } catch (UnsupportedOperationException ex) {

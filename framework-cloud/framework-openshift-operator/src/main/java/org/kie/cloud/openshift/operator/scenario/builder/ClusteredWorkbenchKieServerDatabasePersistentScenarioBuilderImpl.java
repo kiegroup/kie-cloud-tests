@@ -145,12 +145,18 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
     }
 
     @Override
-    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
         Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
         Auth auth = new Auth();
         auth.setLdap(ldap);
         kieApp.getSpec().setAuth(auth);
         return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
+        return withExternalLdap(ldapSettings);
     }
 
     private static void isScenarioAllowed() {
