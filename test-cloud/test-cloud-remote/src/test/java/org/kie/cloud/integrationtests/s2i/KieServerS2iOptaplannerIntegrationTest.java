@@ -19,12 +19,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,11 +36,12 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
+import org.kie.cloud.utils.GitUtils;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.client.KieServicesClient;
@@ -53,6 +53,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
+
+    private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iOptaplannerRepository");
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iOptaplannerIntegrationTest.class);
 
@@ -81,8 +83,6 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
     private static final String REPO_BRANCH = "master";
     private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
-    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iOptaplannerRepository", KieServerS2iOptaplannerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
     private KieContainer kieContainer;
     private SolverServicesClient solverClient;
 
@@ -91,10 +91,15 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             KieServerS2iOptaplannerIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+
         try {
             KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
                                                                                                        .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
+                                                                                                       .withGitSettings(gitSettings)
+                                                                                                       .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                                        .build();
             scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
         } catch (UnsupportedOperationException ex) {
@@ -104,7 +109,8 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
         try {
             KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder()
                                                                                            .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
+                                                                                           .withGitSettings(gitSettings)
+                                                                                           .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                            .build();
             scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenario });
         } catch (UnsupportedOperationException ex) {
@@ -135,9 +141,9 @@ public class KieServerS2iOptaplannerIntegrationTest extends AbstractMethodIsolat
         solverClient = kieServerClient.getServicesClient(SolverServicesClient.class);
     }
 
-    @AfterClass
-    public static void deleteRepo() {
-        Git.getProvider().deleteGitRepository(gitRepositoryName);
+    @After
+    public void deleteRepo() {
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test

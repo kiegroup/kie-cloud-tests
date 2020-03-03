@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2020 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,17 +11,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+package org.kie.cloud.git.gogs;
 
-package org.kie.cloud.provider.git;
+public class ExternalGogsGitProviderFactory extends GogsGitProviderFactory {
 
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderService;
-
-public class Git {
-    private static final GitProvider gitProvider = new GitProviderService().createGitProvider();
-
-    public static GitProvider getProvider() {
-        return gitProvider;
+    @Override
+    public String providerType() {
+        return "ExternalGogs";
     }
 }

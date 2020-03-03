@@ -37,8 +37,7 @@ public class GitHubGitProvider extends AbstractGitProvider {
     }
 
     @Override
-    public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
-        String repositoryName = generateRepositoryName(repositoryPrefixName);
+    public String createGitRepository(String repositoryName, String repositoryPath) {
 
         try {
             RepositoryService service = new RepositoryService(client);

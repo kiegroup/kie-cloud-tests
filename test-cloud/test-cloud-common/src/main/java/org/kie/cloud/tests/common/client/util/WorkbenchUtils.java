@@ -22,6 +22,8 @@ import java.util.Map;
 
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.git.GitProvider;
+import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.api.model.KieContainerStatus;
@@ -39,6 +41,13 @@ public class WorkbenchUtils {
 
     private static final Duration WAIT_STEP = Duration.ofSeconds(1);
     private static final Duration MAX_WAIT_DURATION = Duration.ofSeconds(15);
+
+    public static void deployProjectToWorkbench(String repositoryName, KieDeploymentScenario<?> deploymentScenario, String projectName) {
+        GitProvider gitProvider = deploymentScenario.getGitProvider().orElseThrow(() -> new RuntimeException("No GIT provider in scenario"));
+        WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployments().get(0);
+
+        deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, projectName);
+    }
 
     public static void deployProjectToWorkbench(String repositoryUrl, WorkbenchDeployment workbenchDeployment, String projectName) {
         CloneProjectRequest cloneProjectRequest = createCloneProjectRequest(repositoryUrl, projectName);

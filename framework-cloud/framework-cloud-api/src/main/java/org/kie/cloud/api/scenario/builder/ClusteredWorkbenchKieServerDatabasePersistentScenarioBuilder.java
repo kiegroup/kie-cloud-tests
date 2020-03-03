@@ -16,6 +16,7 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerDatabasePersistentScenario> {
@@ -44,6 +45,15 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso();
 
     /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param git settings
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings);
+
+    /**
+     *
      * Return setup builder with an external LDAP.
      *
      * @param ldapSettings configuration of LDAP represented by a class.

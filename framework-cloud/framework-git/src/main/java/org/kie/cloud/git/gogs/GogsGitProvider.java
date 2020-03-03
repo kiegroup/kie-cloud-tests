@@ -19,12 +19,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.kie.cloud.git.AbstractGitProvider;
-import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +48,8 @@ public class GogsGitProvider extends AbstractGitProvider {
         this.password = password;
     }
 
-    @Override public String createGitRepositoryWithPrefix(String repositoryPrefixName, String repositoryPath) {
-        final String repositoryName = generateRepositoryName(repositoryPrefixName);
+    @Override
+    public String createGitRepository(String repositoryName, String repositoryPath) {
         createRepository(repositoryName);
         pushToGitRepository(getRepositoryUrl(repositoryName), repositoryPath,
                 user, password);

@@ -15,6 +15,8 @@
 
 package org.kie.cloud.git;
 
+import org.kie.cloud.api.git.GitProvider;
+
 public interface GitProviderFactory {
 
     String providerType();

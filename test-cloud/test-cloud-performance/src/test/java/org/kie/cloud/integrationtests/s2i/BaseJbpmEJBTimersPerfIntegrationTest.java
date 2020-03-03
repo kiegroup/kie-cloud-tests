@@ -66,33 +66,32 @@ import static org.jbpm.process.instance.ProcessInstance.STATE_COMPLETED;
 @RunWith(Parameterized.class)
 public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iJbpmRepository");
+
     protected static final String MEMORY = "memory";
     protected static final String CPU = "cpu";
     protected static final List<Integer> ACTIVE_STATUS = Collections.singletonList(STATE_ACTIVE);
     protected static final List<Integer> COMPLETED_STATUS = Collections.singletonList(STATE_COMPLETED);
-    
+
     protected static final Logger logger = LoggerFactory.getLogger(BaseJbpmEJBTimersPerfIntegrationTest.class);
 
     protected static final int PROCESSES_COUNT = Integer.parseInt(System.getProperty("processesCount", "5000"));
-    
-    
     protected static final double PERF_INDEX = Double.parseDouble(System.getProperty("perfIndex", "3.0"));
-    
     protected static final String HEAP = System.getProperty("heap","4Gi");
     protected static final int SCALE_COUNT = Integer.parseInt(System.getProperty("scale", "1"));
     protected static final int REPETITIONS = Integer.parseInt(System.getProperty("repetitions", "1"));
-    protected static final int REFRESH_INTERVAL = Integer.parseInt(System.getProperty("refreshInterval", "30"));   
-    protected static final int ROUTER_TIMEOUT = Integer.parseInt(System.getProperty("routerTimeout", "60"));   
-    protected static final String ROUTER_BALANCE = System.getProperty("routerBalance", "roundrobin");   
-    
+    protected static final int REFRESH_INTERVAL = Integer.parseInt(System.getProperty("refreshInterval", "30"));
+    protected static final int ROUTER_TIMEOUT = Integer.parseInt(System.getProperty("routerTimeout", "60"));
+    protected static final String ROUTER_BALANCE = System.getProperty("routerBalance", "roundrobin");
+
     protected static final String ONE_TIMER_DURATION_PROCESS_ID = "timers-testing.OneTimerDate";
-    
+
     protected static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "=" + Kjar.DEFINITION.toString();
 
     protected static final String REPO_BRANCH = "master";
     protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
     protected static final int MINIMUM_OFFSET = 45;
-    
+
     @Parameter(value = 0)
     public String testScenarioName;
 
@@ -120,17 +119,17 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
 
         return scenarios;
     }
-    
+
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected UserTaskServicesClient taskServicesClient;
-    
+
     protected QueryServicesClient queryServicesClient;
 
-    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", BaseJbpmEJBTimersPerfIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-    
+    private static String gitRepositoryName = Git.getProvider().createGitRepository(REPOSITORY_NAME, BaseJbpmEJBTimersPerfIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+
     protected List<String> pods = new ArrayList<String>();
-        
+
     protected Map<String, Integer> completedHostNameDistribution;
 
     @Override
@@ -159,14 +158,14 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
         } else {
             throw new RuntimeException("wrong scale parameter, should be equal or greater than 1");
         }
-        
+
         deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(ROUTER_TIMEOUT));
         deploymentScenario.getKieServerDeployment().setRouterBalance(ROUTER_BALANCE);
-        
+
         kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment(), Duration.ofMinutes(60).toMillis());
-        
+
         logger.info("Setting timeout for kieServerClient to {}", Duration.ofMinutes(60).toMillis());
-        
+
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
     }
@@ -200,17 +199,17 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
         logger.info("============================= STARTING SCENARIO =============================");
         runSingleScenario();
         logger.info("============================= SCENARIO COMPLETE =============================");
-    
+
         logger.info("============================= GATHERING STATISTICS =============================");
         gatherAndAssertStatistics();
         writeCSV();
-        logger.info("============================= STATISTICS GATHERED =============================");       
+        logger.info("============================= STATISTICS GATHERED =============================");
     }
 
     protected abstract void writeCSV() throws IOException;
 
     protected abstract void runSingleScenario();
-       
+
     protected void startAndWaitForStartingThreads(int numberOfThreads, Duration duration, Integer iterations, Runnable runnable) {
        List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
@@ -226,9 +225,9 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
                 throw new RuntimeException(e);
             }
         });
-        
+
     }
-    
+
     protected Runnable getStartingRunnable(String containerId, String processId, Map<String, Object> parameters) {
         return () -> {
             try {
@@ -240,12 +239,12 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
             }
         };
     }
-    
+
     protected void waitForAllProcessesToComplete(Duration waitForCompletionDuration) {
         BooleanSupplier completionCondition = () -> queryServicesClient.findProcessInstancesByStatus(ACTIVE_STATUS, 0, 1).isEmpty();
         TimeUtils.wait(waitForCompletionDuration, Duration.of(1, ChronoUnit.SECONDS), completionCondition);
     }
-    
+
     private void gatherAndAssertStatistics() {
         int numberOfPages = 1 + (PROCESSES_COUNT / 5000);// including one additional page to check there are no more processes
 
@@ -257,36 +256,36 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
         }
 
         logger.info("Completed processes count: {}", completedProcesses.size());
-        
+
         List<ProcessInstance> activeProcesses = queryServicesClient.findProcessInstancesByStatus(Collections.singletonList(org.jbpm.process.instance.ProcessInstance.STATE_ACTIVE), 0, 100);
         logger.info("Active processes count: {}", activeProcesses.size());
-        
+
         assertThat(activeProcesses).isEmpty();
-        
+
         assertThat(completedProcesses).hasSize(PROCESSES_COUNT);
-       
+
         Map<String, Integer> startedHostNameDistribution = new HashMap<>();
         completedHostNameDistribution = new HashMap<>();
-       
+
         for (String pod : pods) {
             completedHostNameDistribution.put(pod, 0);
             startedHostNameDistribution.put(pod, 0);
         }
-        
+
         for (int i = 0; i < numberOfPages; i++) {
           for (String pod : pods) {
            int sizeCompleted = queryServicesClient.findProcessInstancesByVariableAndValue("hostName", pod, COMPLETED_STATUS, i, 5000).size();
            completedHostNameDistribution.put(pod, completedHostNameDistribution.get(pod) + sizeCompleted);
-           
+
            int sizeStarted = queryOldValue(i, pod);
            startedHostNameDistribution.put(pod, startedHostNameDistribution.get(pod) + sizeStarted);
           }
         }
-        
+
         logger.info("Processes were completed with this distribution: {}", completedHostNameDistribution);
-        logger.info("Processes were started with this distribution: {}", startedHostNameDistribution);       
+        logger.info("Processes were started with this distribution: {}", startedHostNameDistribution);
     }
-    
+
     private void scaleKieServerTo(int count) {
         deploymentScenario.getKieServerDeployment().scale(count);
         deploymentScenario.getKieServerDeployment().waitForScale();
@@ -295,13 +294,13 @@ public abstract class BaseJbpmEJBTimersPerfIntegrationTest extends AbstractMetho
             pods.add(i.getName());
         }
     }
-    
-    private int queryOldValue(int page, String oldValue) {  
+
+    private int queryOldValue(int page, String oldValue) {
         QueryFilterSpec spec = new QueryFilterSpecBuilder()
                 .equalsTo("variableId", "hostName")
                 .equalsTo("oldValue", oldValue)
                 .get();
-          
+
         return queryServicesClient.query("jbpmOldValueVarSearch", QueryServicesClient.QUERY_MAP_PI_WITH_VARS, spec, page, 5000, ProcessInstance.class).size();
     }
 

@@ -21,16 +21,18 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.ImmutableKieServerScenarioImpl;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
 public class ImmutableKieServerScenarioBuilderImpl extends KieScenarioBuilderImpl<ImmutableKieServerScenarioBuilder, ImmutableKieServerScenario> implements ImmutableKieServerScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
-    private boolean deploySso = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public ImmutableKieServerScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
@@ -42,7 +44,7 @@ public class ImmutableKieServerScenarioBuilderImpl extends KieScenarioBuilderImp
 
     @Override
     protected ImmutableKieServerScenario getDeploymentScenarioInstance() {
-        return new ImmutableKieServerScenarioImpl(envVariables, deploySso);
+        return new ImmutableKieServerScenarioImpl(envVariables, request);
     }
 
     @Override
@@ -64,27 +66,33 @@ public class ImmutableKieServerScenarioBuilderImpl extends KieScenarioBuilderImp
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
-        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
-        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
-        envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
+    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitReference, String gitContextDir) {
+        if (request.getGitSettings() == null) {
+            throw new RuntimeException("Need to configure the git settings first");
+        }
+
+        request.getGitSettings().addOnRepositoryLoaded(gitRepoUrl -> envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl));
         return this;
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
-        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
-        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
-        envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
+    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs) {
+        withSourceLocation(gitReference, gitContextDir);
         envVariables.put(OpenShiftTemplateConstants.ARTIFACT_DIR, artifactDirs);
         return this;
     }
 
     @Override
     public ImmutableKieServerScenarioBuilder deploySso() {
-        deploySso = true;
+        request.enableDeploySso();
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public ImmutableKieServerScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 

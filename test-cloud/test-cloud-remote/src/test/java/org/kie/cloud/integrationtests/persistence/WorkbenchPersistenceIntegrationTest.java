@@ -14,8 +14,6 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,14 +35,15 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.utils.GitUtils;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
@@ -58,10 +57,13 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @RunWith(Parameterized.class)
 @Category({OperatorNotSupported.class}) // Operator doesn't support scaling Workbench to 0 for this scenario
 public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(WorkbenchPersistenceIntegrationTest.class.getSimpleName());
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchPersistenceIntegrationTest.class);
 
     @Parameter(value = 0)
@@ -69,8 +71,6 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
 
     @Parameter(value = 1)
     public KieDeploymentScenario<?> workbenchKieServerScenario;
-
-    private String repositoryName;
 
     private WorkbenchClient workbenchClient;
     private KieServerControllerClient kieControllerClient;
@@ -83,9 +83,15 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             WorkbenchPersistenceIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+
         try {
             WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                .build();
+                    .withGitSettings(gitSettings)
+                    .build();
+
             scenarios.add(new Object[] { "Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario });
         } catch (UnsupportedOperationException ex) {
             logger.info("Workbench + KIE Server - Persistent is skipped.", ex);
@@ -93,7 +99,8 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
 
         try {
             ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                .build();
+                    .withGitSettings(gitSettings)
+                    .build();
                 scenarios.add(new Object[]{"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Clustered Workbench + KIE Server + Database is skipped.", ex);
@@ -117,17 +124,12 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
 
     @After
     public void tearDown() {
-        if (repositoryName != null) {
-            Git.getProvider().deleteGitRepository(repositoryName);
-            repositoryName = null;
-        }
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), WorkbenchPersistenceIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
-
-        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), workbenchDeployment, DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(REPOSITORY_NAME, deploymentScenario, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION, KieContainerStatus.STARTED);

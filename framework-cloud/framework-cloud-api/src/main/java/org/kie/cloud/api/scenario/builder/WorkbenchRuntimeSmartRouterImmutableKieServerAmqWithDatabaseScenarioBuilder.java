@@ -16,6 +16,7 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder extends KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> {
@@ -46,24 +47,22 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseSce
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir);
 
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @param artifactDirs Directories containing built kjars, separated by
      * commas. For example "usertask-project/target,signaltask-project/target".
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs);
 
     /**
      * Return setup builder with additional configuration for SSO deployment.
@@ -122,5 +121,13 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseSce
     *
     * @return Builder
     */
-   WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueJndiName);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueJndiName);
+
+    /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param git settings
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withGitSettings(GitSettings gitSettings);
 }

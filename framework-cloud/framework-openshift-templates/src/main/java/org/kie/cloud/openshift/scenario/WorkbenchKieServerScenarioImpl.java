@@ -30,12 +30,14 @@ import org.kie.cloud.api.deployment.PrometheusDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.PrometheusDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,14 +46,15 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
-    private boolean deployPrometheus;
+    private final ScenarioRequest request;
     private PrometheusDeployment prometheusDeployment;
+    private GitProvider gitProvider;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
-    public WorkbenchKieServerScenarioImpl(Map<String, String> envVariables, boolean deployPrometheus) {
+    public WorkbenchKieServerScenarioImpl(Map<String, String> envVariables, ScenarioRequest request) {
         super(envVariables);
-        this.deployPrometheus = deployPrometheus;
+        this.request = request;
     }
 
     @Override
@@ -68,8 +71,12 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
         kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
         kieServerDeployment.setPassword(envVariables.get(OpenShiftTemplateConstants.DEFAULT_PASSWORD));
 
-        if (deployPrometheus) {
+        if (request.isDeployPrometheus()) {
             prometheusDeployment = PrometheusDeployer.deploy(project, kieServerDeployment);
+        }
+
+        if (request.getGitSettings() != null) {
+            gitProvider = Git.getProvider(project, request.getGitSettings());
         }
 
         logger.info("Waiting for Workbench deployment to become ready.");
@@ -132,5 +139,10 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
     @Override
     public Optional<PrometheusDeployment> getPrometheusDeployment() {
         return Optional.ofNullable(prometheusDeployment);
+    }
+
+    @Override
+    public Optional<GitProvider> getGitProvider() {
+        return Optional.ofNullable(gitProvider);
     }
 }

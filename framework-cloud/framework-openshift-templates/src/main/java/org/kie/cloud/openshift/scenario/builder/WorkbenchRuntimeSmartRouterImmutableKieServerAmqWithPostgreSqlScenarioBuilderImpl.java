@@ -21,18 +21,20 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioImpl;
 
 public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilderImpl extends KieScenarioBuilderImpl<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> implements WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
-    private boolean deploySso = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
@@ -55,7 +57,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
 
     @Override
     protected WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario getDeploymentScenarioInstance() {
-        return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioImpl(envVariables, deploySso);
+        return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioImpl(envVariables, request);
     }
 
     @Override
@@ -77,27 +79,35 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
-        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir) {
+        if (request.getGitSettings() == null) {
+            throw new RuntimeException("Need to configure the git settings first");
+        }
+
+        request.getGitSettings().addOnRepositoryLoaded(gitRepoUrl -> envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl));
         envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
         envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
         return this;
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
-        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
-        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
-        envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs) {
+        withSourceLocation(gitReference, gitContextDir);
         envVariables.put(OpenShiftTemplateConstants.ARTIFACT_DIR, artifactDirs);
         return this;
     }
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder deploySso() {
-        deploySso = true;
+        request.enableDeploySso();
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 

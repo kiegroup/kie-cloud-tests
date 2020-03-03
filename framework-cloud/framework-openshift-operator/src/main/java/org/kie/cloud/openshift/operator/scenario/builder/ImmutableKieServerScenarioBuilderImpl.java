@@ -22,6 +22,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.api.scenario.ImmutableKieServerScenario;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -40,12 +41,13 @@ import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ImmutableKieServerScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.template.ProjectProfile;
 
 public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ImmutableKieServerScenario> implements ImmutableKieServerScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public ImmutableKieServerScenarioBuilderImpl() {
         isScenarioAllowed();
@@ -77,7 +79,7 @@ public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     @Override
     public ImmutableKieServerScenario getDeploymentScenarioInstance() {
-        return new ImmutableKieServerScenarioImpl(kieApp, deploySSO);
+        return new ImmutableKieServerScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -88,7 +90,7 @@ public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     @Override
     public ImmutableKieServerScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         Server[] servers = kieApp.getSpec().getObjects().getServers();
         for (int i = 0; i < servers.length; i++) {
             SsoClient ssoClient = new SsoClient();
@@ -96,6 +98,12 @@ public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
             ssoClient.setSecret("kie-server-" + i + "-secret");
             servers[i].setSsoClient(ssoClient);
         }
+        return this;
+    }
+
+    @Override
+    public ImmutableKieServerScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 
@@ -156,11 +164,15 @@ public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
+    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitReference, String gitContextDir) {
+        if (request.getGitSettings() == null) {
+            throw new RuntimeException("Need to configure the git settings first");
+        }
+
         GitSource gitSource = new GitSource();
         gitSource.setContextDir(gitContextDir);
         gitSource.setReference(gitReference);
-        gitSource.setUri(gitRepoUrl);
+        request.getGitSettings().addOnRepositoryLoaded(gitSource::setUri);
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             if (server.getBuild() == null) {
@@ -173,8 +185,8 @@ public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
-        withSourceLocation(gitRepoUrl, gitReference, gitContextDir);
+    public ImmutableKieServerScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs) {
+        withSourceLocation(gitReference, gitContextDir);
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             server.getBuild().setArtifactDir(artifactDirs);
