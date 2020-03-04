@@ -52,7 +52,6 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                                                       .deploySso()
                                                       .withInternalMavenRepo()
-                                                      .usePublicIpAddress()
                                                       .build();
 
         deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());

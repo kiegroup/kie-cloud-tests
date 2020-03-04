@@ -162,9 +162,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress() {
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE, Boolean.FALSE.toString()));
-        }
-        return this;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
