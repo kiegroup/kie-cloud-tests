@@ -153,4 +153,12 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.GIT_HOOKS_DIR, dir));
         return this;
     }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress() {
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE, Boolean.FALSE.toString()));
+        }
+        return this;
+    }
 }

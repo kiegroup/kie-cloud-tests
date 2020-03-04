@@ -76,7 +76,6 @@ public class ImmutableKieServerScenarioImpl extends KieCommonScenario<ImmutableK
         kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
 
         logger.info("Waiting for Kie server deployment to become ready.");
-        kieServerDeployment.scale(1);
         kieServerDeployment.waitForScale();
 
         logNodeNameOfAllInstances();

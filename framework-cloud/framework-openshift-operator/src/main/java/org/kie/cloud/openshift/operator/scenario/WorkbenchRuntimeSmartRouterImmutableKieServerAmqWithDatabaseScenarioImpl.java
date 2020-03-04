@@ -144,7 +144,6 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
         smartRouterDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
-        kieServerDeployment.scale(1);
         kieServerDeployment.waitForScale();
 
         logger.info("Waiting for Database deployment to become ready.");

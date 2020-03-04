@@ -40,6 +40,13 @@ public interface Deployment {
     void scale(int instances);
 
     /**
+     * Return deployment replicas count. Replicas count is change as deployment is scale up or down.
+     *
+     * @return number of replicas
+     */
+    int getReplicas();
+
+    /**
      * Wait until Deployment is ready to use. This method waits until all
      * instances of deployment are initialized and ready and for router to
      * expose url.

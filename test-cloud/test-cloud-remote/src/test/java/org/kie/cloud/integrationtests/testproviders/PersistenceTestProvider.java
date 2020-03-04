@@ -15,7 +15,6 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import java.util.Map;
 import java.util.Objects;
 
 import org.kie.cloud.api.deployment.Deployment;
@@ -40,7 +39,7 @@ public class PersistenceTestProvider {
 
     /**
      * Create provider instance
-     * 
+     *
      * @return provider instance
      */
     public static PersistenceTestProvider create() {
@@ -49,9 +48,9 @@ public class PersistenceTestProvider {
 
     /**
      * Create provider instance and init it with given environment
-     * 
+     *
      * @param environment if not null, initialize this provider with the environment
-     * 
+     *
      * @return provider instance
      */
     public static PersistenceTestProvider create(DeploymentScenario<?> deploymentScenario) {
@@ -74,6 +73,7 @@ public class PersistenceTestProvider {
         String kieServerLocation = serverInfo.getLocation();
         try {
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerId, Kjar.DEFINITION, KieContainerStatus.STARTED);
+            KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), containerId);
 
             verifyOneServerTemplateWithContainer(kieControllerClient, kieServerLocation, containerId);
 
@@ -99,7 +99,6 @@ public class PersistenceTestProvider {
         ServerTemplate serverTemplate = serverTemplates.getServerTemplates()[0];
         assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
         assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
-        assertThat(serverTemplate.getContainersSpec()).hasSize(1);
-        assertThat(serverTemplate.getContainersSpec().iterator().next().getId()).isEqualTo(containerId);
+        assertThat(serverTemplate.getContainersSpec()).anyMatch(containerSpec -> containerSpec.getId().equals(containerId));
     }
 }

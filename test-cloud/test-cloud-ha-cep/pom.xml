@@ -5,7 +5,11 @@
   <parent>
     <artifactId>test-cloud</artifactId>
     <groupId>org.kie.cloud</groupId>
+<<<<<<< HEAD
     <version>7.33.1-SNAPSHOT</version>
+=======
+    <version>7.34.0-SNAPSHOT</version>
+>>>>>>> master
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

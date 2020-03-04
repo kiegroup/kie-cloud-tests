@@ -40,7 +40,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
+
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.provider.git.Git;
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
-@Category({Baseline.class, ApbNotSupported.class}) // Because DroolsServerFilterClasses not supported yet
+@Category({Baseline.class}) // Because DroolsServerFilterClasses not supported yet
 public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iDroolsIntegrationTest.class);

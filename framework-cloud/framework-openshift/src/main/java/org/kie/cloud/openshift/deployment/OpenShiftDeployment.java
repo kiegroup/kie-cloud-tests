@@ -147,14 +147,17 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void waitForScale() {
-        int expectedPods = openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
-        waitUntilAllPodsAreReadyAndRunning(expectedPods);
+        waitUntilAllPodsAreReadyAndRunning(getReplicas());
     }
 
     @Override
     public void waitForScheduled() {
-        int expectedPods = openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
-        waitUntilAllPodsAreReady(expectedPods);
+        waitUntilAllPodsAreReady(getReplicas());
+    }
+
+    @Override
+    public int getReplicas() {
+        return openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
     }
 
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {

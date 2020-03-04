@@ -116,7 +116,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
 
         // TODO: Workaround for KIECLOUD-48, respin Kie server when database is ready
         kieServerDeployment.deleteInstances(kieServerDeployment.getInstances());
-        kieServerDeployment.scale(1);
 
         logger.info("Waiting for Workbench deployment to become ready.");
         workbenchDeployment.waitForScale();
