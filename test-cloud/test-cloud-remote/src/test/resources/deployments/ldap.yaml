@@ -64,6 +64,15 @@ objects:
       member:uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
       EOF
       ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: cn=rest-all,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: rest-all
+      description: Rest All group
+      ou: restall@example.com
+      member:uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
       dn: cn=admin,ou=roles,dc=example,dc=com
       objectclass: groupOfNames
       objectClass: top

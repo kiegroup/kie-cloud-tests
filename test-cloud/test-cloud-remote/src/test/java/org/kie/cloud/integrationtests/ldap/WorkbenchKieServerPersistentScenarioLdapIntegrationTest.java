@@ -83,7 +83,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                   .withInternalLdap(ldapSettings)
                   .withInternalMavenRepo()
-                  .usePublicIpAddress()
                   .build();
         deploymentScenario
                   .setLogFolderName(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
