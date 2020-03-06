@@ -163,7 +163,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     }
 
     @Override
-    public Optional<GitProvider> getGitProvider() {
-        return Optional.ofNullable(gitProvider);
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 }

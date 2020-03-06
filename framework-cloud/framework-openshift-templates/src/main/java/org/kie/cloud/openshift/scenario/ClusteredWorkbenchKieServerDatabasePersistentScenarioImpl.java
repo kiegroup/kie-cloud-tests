@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
@@ -162,7 +161,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
 	}
 
     @Override
-    public Optional<GitProvider> getGitProvider() {
-        return Optional.ofNullable(gitProvider);
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 }

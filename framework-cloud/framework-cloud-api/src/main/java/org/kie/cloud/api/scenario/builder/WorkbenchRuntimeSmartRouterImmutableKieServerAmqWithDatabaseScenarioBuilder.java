@@ -127,7 +127,7 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseSce
     /**
      * Return setup builder with additional GIT settings.
      *
-     * @param git settings
+     * @param gitSettings settings configuration of GIT
      * @return Builder
      */
     WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withGitSettings(GitSettings gitSettings);

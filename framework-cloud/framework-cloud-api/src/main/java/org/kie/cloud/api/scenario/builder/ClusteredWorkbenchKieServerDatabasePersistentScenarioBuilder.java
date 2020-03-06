@@ -47,7 +47,7 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
     /**
      * Return setup builder with additional GIT settings.
      *
-     * @param git settings
+     * @param gitSettings settings configuration of GIT
      * @return Builder
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings);

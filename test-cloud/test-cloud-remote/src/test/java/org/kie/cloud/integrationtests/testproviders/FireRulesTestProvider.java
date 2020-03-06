@@ -19,7 +19,6 @@ package org.kie.cloud.integrationtests.testproviders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.kie.api.KieServices;
@@ -34,7 +33,6 @@ import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.git.GitProviderService;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResource;
@@ -107,11 +105,7 @@ public class FireRulesTestProvider {
         }
     }
 
-    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, Optional<GitProvider> gitProvider) {
-        testDeployFromWorkbenchAndFireRules(workbenchDeployment, kieServerDeployment, gitProvider.orElseGet(() -> new GitProviderService().createGitProvider()));
-    }
-
-    private void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, GitProvider gitProvider) {
+    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, GitProvider gitProvider) {
         String containerId = "testDeployFromWorkbenchAndFireRules";
         String containerAlias = "alias-testDeployFromWorkbenchAndFireRules";
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);

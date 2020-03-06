@@ -32,6 +32,6 @@ public final class GitUtils {
      * @param deploymentScenario git provider to use
      */
     public static final void deleteGitRepository(String repositoryName, KieDeploymentScenario<?> deploymentScenario) {
-        deploymentScenario.getGitProvider().ifPresent(gitProvider -> gitProvider.deleteGitRepository(repositoryName));
+        deploymentScenario.getGitProvider().deleteGitRepository(repositoryName);
     }
 }

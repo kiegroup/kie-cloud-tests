@@ -43,6 +43,7 @@ import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.cloud.tests.common.time.Constants;
+import org.kie.cloud.utils.GitUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -92,7 +93,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMetho
 
     @After
     public void tearDown() {
-        deploymentScenario.getGitProvider().ifPresent(gitProvider -> gitProvider.deleteGitRepository(REPOSITORY_NAME));
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test

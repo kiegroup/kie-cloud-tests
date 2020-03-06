@@ -43,7 +43,7 @@ public class WorkbenchUtils {
     private static final Duration MAX_WAIT_DURATION = Duration.ofSeconds(15);
 
     public static void deployProjectToWorkbench(String repositoryName, KieDeploymentScenario<?> deploymentScenario, String projectName) {
-        GitProvider gitProvider = deploymentScenario.getGitProvider().orElseThrow(() -> new RuntimeException("No GIT provider in scenario"));
+        GitProvider gitProvider = deploymentScenario.getGitProvider();
         WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployments().get(0);
 
         deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, projectName);

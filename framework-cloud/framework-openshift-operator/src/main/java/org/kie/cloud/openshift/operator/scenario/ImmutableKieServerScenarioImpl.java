@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import cz.xtf.core.waiting.SimpleWaiter;
@@ -148,7 +147,7 @@ public class ImmutableKieServerScenarioImpl extends OpenShiftOperatorScenario<Im
     }
 
     @Override
-    public Optional<GitProvider> getGitProvider() {
-        return Optional.ofNullable(gitProvider);
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 }

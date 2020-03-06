@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.AmqDeployment;
 import org.kie.cloud.api.deployment.ControllerDeployment;
@@ -182,8 +181,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
     }
 
     @Override
-    public Optional<GitProvider> getGitProvider() {
-        return Optional.ofNullable(gitProvider);
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {

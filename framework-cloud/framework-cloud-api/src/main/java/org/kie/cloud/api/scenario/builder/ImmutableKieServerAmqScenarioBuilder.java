@@ -117,7 +117,7 @@ public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScena
     /**
      * Return setup builder with additional GIT settings.
      *
-     * @param git settings
+     * @param gitSettings settings configuration of GIT
      * @return Builder
      */
     ImmutableKieServerAmqScenarioBuilder withGitSettings(GitSettings gitSettings);

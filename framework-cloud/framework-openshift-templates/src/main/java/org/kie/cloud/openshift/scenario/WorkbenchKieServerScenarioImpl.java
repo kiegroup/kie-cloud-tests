@@ -142,7 +142,7 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
     }
 
     @Override
-    public Optional<GitProvider> getGitProvider() {
-        return Optional.ofNullable(gitProvider);
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 }

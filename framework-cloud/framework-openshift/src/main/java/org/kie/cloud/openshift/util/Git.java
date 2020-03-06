@@ -23,7 +23,6 @@ import org.kie.cloud.api.deployment.GogsDeployment;
 import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.git.GitProviderService;
-import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.gogs.GogsGitProvider;
 import org.kie.cloud.openshift.resource.Project;
 
@@ -39,25 +38,21 @@ public class Git {
     private static final String GOGS = "Gogs";
     private static final Map<String, Function<Project, GitProvider>> SCENARIO_PROVIDERS = Collections.singletonMap(GOGS, deployGogs());
 
-    private static GitProvider PROVIDER;
-
     public static synchronized GitProvider getProvider(Project project, GitSettings settings) {
-        if (PROVIDER == null) {
-            PROVIDER = Optional.ofNullable(SCENARIO_PROVIDERS.get(GitConstants.getGitProvider()))
-                               .map(f -> f.apply(project))
-                               .orElseGet(() -> new GitProviderService().createGitProvider());
+        GitProvider provider = Optional.ofNullable(SCENARIO_PROVIDERS.get(settings.getProvider()))
+                                       .map(f -> f.apply(project))
+                                       .orElseGet(() -> new GitProviderService().createGitProvider());
 
-            PROVIDER.createGitRepository(settings.getRepositoryName(), settings.getRepositoryPath());
+        provider.createGitRepository(settings.getRepositoryName(), settings.getRepositoryPath());
 
-            onRepositoryLoaded(settings);
-        }
+        onRepositoryLoaded(provider, settings);
 
-        return PROVIDER;
+        return provider;
     }
 
-    private static void onRepositoryLoaded(GitSettings settings) {
+    private static void onRepositoryLoaded(GitProvider provider, GitSettings settings) {
         if (settings.getRepositoryLoadedActions() != null) {
-            String repoUrl = PROVIDER.getRepositoryUrl(settings.getRepositoryName());
+            String repoUrl = provider.getRepositoryUrl(settings.getRepositoryName());
             settings.getRepositoryLoadedActions().forEach(action -> action.accept(repoUrl));
         }
     }

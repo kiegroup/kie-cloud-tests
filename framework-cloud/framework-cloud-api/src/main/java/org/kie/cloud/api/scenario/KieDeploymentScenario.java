@@ -16,7 +16,6 @@
 package org.kie.cloud.api.scenario;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -70,7 +69,7 @@ public interface KieDeploymentScenario<T extends DeploymentScenario<T>> extends 
      *
      * @return GIT provider.
      */
-    default Optional<GitProvider> getGitProvider() {
-        return Optional.empty();
-    };
+    default GitProvider getGitProvider() {
+        throw new RuntimeException("No GIT provider configured for this scenario");
+    }
 }
