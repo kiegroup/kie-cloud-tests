@@ -117,7 +117,7 @@ public class Server {
     public void setJms(Jms jms) {
         this.jms = jms;
     }
-
+    
     public Database getDatabase() {
         return database;
     }

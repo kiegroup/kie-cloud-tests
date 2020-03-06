@@ -52,6 +52,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
 
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
+
     private SsoDeployment ssoDeployment;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithDatabaseScenarioImpl.class);
