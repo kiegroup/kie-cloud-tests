@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class TestRunnerFeature extends TestWatcher {
 	private static final Logger LOG = LoggerFactory.getLogger(TestRunnerFeature.class);
+    private static final String CUSTOM_RUNNER_PATH = "runners/%s.properties";
 	private static final String COMMON_PROPERTIES = "test.properties";
     private static final String TEMPLATE_SOURCES_FILE = "templates-%s.properties";
 
@@ -22,11 +23,12 @@ public class TestRunnerFeature extends TestWatcher {
 		this.testPropertiesFile = testPropertiesFile;
 	}
 
-	@Override
+    @Override
 	protected void starting(Description description) {
 		previousPropsBag.set(System.getProperties());
-		fromResources(testPropertiesFile);
+        fromResources(String.format(CUSTOM_RUNNER_PATH, testPropertiesFile));
         fromSourcesRecursively(ProjectProfile.class, defaultTemplateFile());
+        configureSSL();
 	}
 
     private String defaultTemplateFile() {
@@ -41,12 +43,17 @@ public class TestRunnerFeature extends TestWatcher {
 		}
 	}
 
+    private void configureSSL() {
+        System.setProperty("javax.net.ssl.trustStore", System.getProperty("certificate.dir") + "/" + System.getProperty("default.domain.suffix") + "_client.ts");
+        System.setProperty("javax.net.ssl.trustStorePassword", System.getProperty("trusted.keystore.pwd"));
+    }
+
     private static final void fromSourcesRecursively(Class<?> sources, String file) {
         injectProperties(PropertyLoader.loadProperties(sources, file));
     }
 
     private static final void fromResources(String file) {
-        
+
         Properties prop = new Properties();
         try {
             prop.load(TestRunnerFeature.class.getClassLoader().getResourceAsStream(file));

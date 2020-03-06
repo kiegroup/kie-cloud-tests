@@ -15,15 +15,13 @@
 
 package org.kie.cloud.openshift.operator.scenario;
 
-import java.util.Objects;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
-import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -34,6 +32,7 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.deployment.external.ExternalDeploymentOperator;
@@ -47,7 +46,6 @@ import org.kie.cloud.openshift.operator.model.components.SmartRouter;
 import org.kie.cloud.openshift.operator.resources.OpenShiftResource;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.scenario.OpenShiftScenario;
-import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +63,6 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     @Override
     protected void deployKieDeployments() {
         deployOperator();
-        deployCustomTrustedSecret();
         deployCustomResource();
     }
 
@@ -112,7 +109,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         logger.info("Creating operator in project '" + project.getName() + "' from " + OpenShiftResource.OPERATOR.getResourceUrl().toString());
         Deployment deployment = project.getOpenShift().apps().deployments().load(OpenShiftResource.OPERATOR.getResourceUrl()).get();
 
-        // Get the operator image tag (composed of name + tag). 
+        // Get the operator image tag (composed of name + tag).
         // Retrieve the image name and see if it fits an image stream.
         // If yes, then use the image stream image's name and same tag as defined (use latest if no tag).
         // If not, use as it is as image name.
@@ -137,28 +134,22 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
 
     protected abstract void deployCustomResource();
 
-    private void deployCustomTrustedSecret() {
-        logger.info("Creating custom trusted secret from {}.", OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl());
-        Secret secret = project.getOpenShift().secrets().load(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl()).get();
-        project.getOpenShift().secrets().create(secret);
+    protected void registerTrustedSecret(Console console) {
+        console.addEnv(new Env("HTTPS_NAME", DeploymentConstants.getTrustedKeystoreAlias()));
+        console.addEnv(new Env("HTTPS_PASSWORD", DeploymentConstants.getTrustedKeystorePwd()));
+        console.setKeystoreSecret(OpenShiftConstants.getKieApplicationSecretName());
     }
 
-    protected void registerCustomTrustedSecret(Console console) {
-        console.addEnv(new Env("HTTPS_NAME", DeploymentConstants.getCustomTrustedKeystoreAlias()));
-        console.addEnv(new Env("HTTPS_PASSWORD", DeploymentConstants.getCustomTrustedKeystorePwd()));
-        console.setKeystoreSecret(DeploymentConstants.getCustomTrustedSecretName());
+    protected void registerTrustedSecret(SmartRouter smartRouter) {
+        smartRouter.addEnv(new Env("KIE_SERVER_ROUTER_TLS_KEYSTORE_KEYALIAS", DeploymentConstants.getTrustedKeystoreAlias()));
+        smartRouter.addEnv(new Env("KIE_SERVER_ROUTER_TLS_KEYSTORE_PASSWORD", DeploymentConstants.getTrustedKeystorePwd()));
+        smartRouter.setKeystoreSecret(OpenShiftConstants.getKieApplicationSecretName());
     }
 
-    protected void registerCustomTrustedSecret(SmartRouter smartRouter) {
-        smartRouter.addEnv(new Env("KIE_SERVER_ROUTER_TLS_KEYSTORE_KEYALIAS", DeploymentConstants.getCustomTrustedKeystoreAlias()));
-        smartRouter.addEnv(new Env("KIE_SERVER_ROUTER_TLS_KEYSTORE_PASSWORD", DeploymentConstants.getCustomTrustedKeystorePwd()));
-        smartRouter.setKeystoreSecret(DeploymentConstants.getCustomTrustedSecretName());
-    }
-
-    protected void registerCustomTrustedSecret(Server server) {
-        server.addEnv(new Env("HTTPS_NAME", DeploymentConstants.getCustomTrustedKeystoreAlias()));
-        server.addEnv(new Env("HTTPS_PASSWORD", DeploymentConstants.getCustomTrustedKeystorePwd()));
-        server.setKeystoreSecret(DeploymentConstants.getCustomTrustedSecretName());
+    protected void registerTrustedSecret(Server server) {
+        server.addEnv(new Env("HTTPS_NAME", DeploymentConstants.getTrustedKeystoreAlias()));
+        server.addEnv(new Env("HTTPS_PASSWORD", DeploymentConstants.getTrustedKeystorePwd()));
+        server.setKeystoreSecret(OpenShiftConstants.getKieApplicationSecretName());
     }
 
     /**

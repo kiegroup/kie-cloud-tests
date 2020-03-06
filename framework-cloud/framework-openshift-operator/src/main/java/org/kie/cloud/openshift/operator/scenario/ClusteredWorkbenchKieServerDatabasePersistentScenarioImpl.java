@@ -98,9 +98,9 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
             kieApp.getSpec().setAuth(auth);
         }
 
-        registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());
+        registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            registerTrustedSecret(server);
         }
 
         // deploy application

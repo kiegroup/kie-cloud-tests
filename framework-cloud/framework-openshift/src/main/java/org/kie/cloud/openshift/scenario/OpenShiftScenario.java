@@ -15,8 +15,10 @@
 
 package org.kie.cloud.openshift.scenario;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import org.apache.commons.codec.binary.Base64;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
@@ -40,7 +43,6 @@ import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDe
 import org.kie.cloud.openshift.log.EventsRecorder;
 import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,9 +258,22 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     }
 
     private void deploySecretConfig() {
-        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+        if (OpenShiftConstants.getTrustedKeystoreFile() == null) {
+            throw new RuntimeException("Trusted keystore file is not set!");
+        }
 
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
+        logger.info("Creating generally used secret from " + OpenShiftConstants.getTrustedKeystoreFile());
+        try {
+            project.getOpenShift().secrets().createOrReplaceWithNew()
+                   .withNewMetadata()
+                   .withName(OpenShiftConstants.getKieApplicationSecretName())
+                   .withNamespace(project.getName())
+                   .endMetadata()
+                   .addToData("keystore.jks", Base64.encodeBase64String(Files.readAllBytes(Paths.get(OpenShiftConstants.getTrustedKeystoreFile()))))
+                   .done();
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading the secret", e);
+        }
     }
 
     private void deploySecretAppUser() {
