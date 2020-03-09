@@ -58,6 +58,11 @@ public class GitSettings {
         return this;
     }
 
+    /**
+     * Suscribe until the repository URL is loaded and then fire the repositoryLoadedAction action.
+     *
+     * @param repositoryLoadedAction action to use the repository URL.
+     */
     public void addOnRepositoryLoaded(Consumer<String> repositoryLoadedAction) {
         if (this.repositoryName == null) {
             throw new RuntimeException("Repository name not configured");
