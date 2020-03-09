@@ -37,6 +37,7 @@ import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.scenario.KjarDeploymentScenarioListener;
 import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -51,7 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category(Smoke.class)
+@Category({Smoke.class, OperatorNotSupported.class})
 @RunWith(Parameterized.class)
 public class KieServerWithBuiltKjarIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
