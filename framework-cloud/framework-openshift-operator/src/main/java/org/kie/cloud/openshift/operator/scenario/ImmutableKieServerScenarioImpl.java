@@ -84,7 +84,7 @@ public class ImmutableKieServerScenarioImpl extends OpenShiftOperatorScenario<Im
         }
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            registerTrustedSecret(server);
         }
 
         // deploy application

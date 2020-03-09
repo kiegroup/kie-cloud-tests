@@ -22,10 +22,8 @@ class OpenShiftTemplatePropertiesLoader {
 
     private static void loadTemplatePropertiesFromResources() {
         final ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        String secretConfigFile = projectProfile + "-app-secret.properties";
         String projectSpecificTemplate = String.format("templates-%s.properties", projectProfile);
 
-        templateUrlProperties.putAll(PropertyLoader.loadProperties(OpenShiftTemplatePropertiesLoader.class, secretConfigFile));
         templateUrlProperties.putAll(PropertyLoader.loadProperties(OpenShiftTemplatePropertiesLoader.class, projectSpecificTemplate));
     }
 }

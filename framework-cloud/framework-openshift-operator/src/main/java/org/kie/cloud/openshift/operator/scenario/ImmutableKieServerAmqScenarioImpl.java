@@ -90,7 +90,7 @@ public class ImmutableKieServerAmqScenarioImpl extends OpenShiftOperatorScenario
         }
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            registerTrustedSecret(server);
         }
 
         logger.info("Creating AMQ image stream");
