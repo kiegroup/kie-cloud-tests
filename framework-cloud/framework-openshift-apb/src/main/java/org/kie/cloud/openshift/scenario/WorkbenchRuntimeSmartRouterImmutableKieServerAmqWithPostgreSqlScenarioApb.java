@@ -85,7 +85,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Creating trusted secret");

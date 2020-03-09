@@ -76,7 +76,7 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Waiting for Workbench deployment to become ready.");

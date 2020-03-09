@@ -94,7 +94,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl().toString());

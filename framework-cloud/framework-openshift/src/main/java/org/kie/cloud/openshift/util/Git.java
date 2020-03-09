@@ -14,16 +14,11 @@
  */
 package org.kie.cloud.openshift.util;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
+import java.util.ServiceLoader;
 
-import org.kie.cloud.api.deployment.GogsDeployment;
 import org.kie.cloud.api.git.GitProvider;
+import org.kie.cloud.api.git.GitProviderFactory;
 import org.kie.cloud.api.settings.GitSettings;
-import org.kie.cloud.git.GitProviderService;
-import org.kie.cloud.git.gogs.GogsGitProvider;
 import org.kie.cloud.openshift.resource.Project;
 
 /**
@@ -35,19 +30,35 @@ import org.kie.cloud.openshift.resource.Project;
  */
 public class Git {
 
-    private static final String GOGS = "Gogs";
-    private static final Map<String, Function<Project, GitProvider>> SCENARIO_PROVIDERS = Collections.singletonMap(GOGS, deployGogs());
+    public static synchronized GitProvider createProvider(Project project, GitSettings settings) {
+        ServiceLoader<GitProviderFactory> factories = ServiceLoader.load(GitProviderFactory.class);
+        for (GitProviderFactory factory : factories) {
+            if (factory.providerType().equals(settings.getProvider())) {
+                initFactory(factory, project);
 
-    public static synchronized GitProvider getProvider(Project project, GitSettings settings) {
-        GitProvider provider = Optional.ofNullable(SCENARIO_PROVIDERS.get(settings.getProvider()))
-                                       .map(f -> f.apply(project))
-                                       .orElseGet(() -> new GitProviderService().createGitProvider());
+                GitProvider provider = createProvider(settings, factory);
+
+                onRepositoryLoaded(provider, settings);
+                return provider;
+            }
+        }
+
+        throw new RuntimeException("GIT provider not found");
+    }
+
+    private static GitProvider createProvider(GitSettings settings, GitProviderFactory factory) {
+        GitProvider provider = factory.createGitProvider();
 
         provider.createGitRepository(settings.getRepositoryName(), settings.getRepositoryPath());
-
-        onRepositoryLoaded(provider, settings);
-
         return provider;
+    }
+
+    private static void initFactory(GitProviderFactory factory, Project project) {
+        factory.initGitConfigurationProperties();
+
+        if (factory instanceof ProjectInitializer) {
+            ((ProjectInitializer) factory).load(project);
+        }
     }
 
     private static void onRepositoryLoaded(GitProvider provider, GitSettings settings) {
@@ -55,12 +66,5 @@ public class Git {
             String repoUrl = provider.getRepositoryUrl(settings.getRepositoryName());
             settings.getRepositoryLoadedActions().forEach(action -> action.accept(repoUrl));
         }
-    }
-
-    private static Function<Project, GitProvider> deployGogs() {
-        return project -> {
-            GogsDeployment deployment = GogsDeployer.deploy(project);
-            return new GogsGitProvider(deployment.getUrl(), deployment.getUsername(), deployment.getPassword());
-        };
     }
 }

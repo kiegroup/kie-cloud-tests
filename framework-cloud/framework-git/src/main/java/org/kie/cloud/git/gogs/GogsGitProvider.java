@@ -57,7 +57,8 @@ public class GogsGitProvider extends AbstractGitProvider {
         return repositoryName;
     }
 
-    @Override public synchronized void deleteGitRepository(String repositoryName) {
+    @Override
+    public synchronized void deleteGitRepository(String repositoryName) {
         try {
             final StatusLine statusLine = Request.Delete(deleteRepositoryUrl(repositoryName))
                     .addHeader(HttpHeaders.AUTHORIZATION, authHeaderValue())
@@ -75,7 +76,8 @@ public class GogsGitProvider extends AbstractGitProvider {
         }
     }
 
-    @Override public String getRepositoryUrl(String repositoryName) {
+    @Override
+    public String getRepositoryUrl(String repositoryName) {
         try {
             URL repositoryUrl = new URL(url);
             repositoryUrl = new URL(repositoryUrl, user + "/");

@@ -95,7 +95,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());

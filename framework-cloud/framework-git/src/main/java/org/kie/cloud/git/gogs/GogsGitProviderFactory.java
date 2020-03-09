@@ -16,14 +16,14 @@
 package org.kie.cloud.git.gogs;
 
 import org.kie.cloud.api.git.GitProvider;
-import org.kie.cloud.git.GitProviderFactory;
+import org.kie.cloud.api.git.GitProviderFactory;
 import org.kie.cloud.git.constants.GitConstants;
 
 public class GogsGitProviderFactory implements GitProviderFactory {
 
     @Override
     public String providerType() {
-        return "Gogs";
+        return "ExternalGogs";
     }
 
     @Override

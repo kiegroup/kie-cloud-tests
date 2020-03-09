@@ -13,9 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.git;
-
-import org.kie.cloud.api.git.GitProvider;
+package org.kie.cloud.api.git;
 
 public interface GitProviderFactory {
 
@@ -23,5 +21,7 @@ public interface GitProviderFactory {
 
     GitProvider createGitProvider();
 
-    void initGitConfigurationProperties();
+    default void initGitConfigurationProperties() {
+
+    }
 }

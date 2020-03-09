@@ -79,7 +79,7 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<W
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Creating trusted secret");

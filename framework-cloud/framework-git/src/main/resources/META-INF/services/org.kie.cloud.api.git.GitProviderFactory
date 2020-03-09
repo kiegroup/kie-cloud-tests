@@ -1,0 +1,2 @@
+org.kie.cloud.git.github.GitHubGitProviderFactory
+org.kie.cloud.git.gogs.GogsGitProviderFactory

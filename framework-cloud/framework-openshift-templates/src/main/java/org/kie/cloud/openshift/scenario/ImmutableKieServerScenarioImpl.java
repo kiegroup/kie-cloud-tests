@@ -71,7 +71,7 @@ public class ImmutableKieServerScenarioImpl extends KieCommonScenario<ImmutableK
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Processing template and creating resources from {}", OpenShiftTemplate.KIE_SERVER_HTTPS_S2I.getTemplateUrl());

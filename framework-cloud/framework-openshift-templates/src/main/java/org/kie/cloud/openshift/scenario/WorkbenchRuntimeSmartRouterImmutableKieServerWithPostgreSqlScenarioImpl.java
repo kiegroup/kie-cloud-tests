@@ -95,7 +95,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Processing template and creating resources from {}", OpenShiftTemplate.KIE_SERVER_DATABASE_HTTPS_S2I.getTemplateUrl());

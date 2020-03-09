@@ -80,7 +80,7 @@ public class ImmutableKieServerScenarioImpl extends OpenShiftOperatorScenario<Im
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {

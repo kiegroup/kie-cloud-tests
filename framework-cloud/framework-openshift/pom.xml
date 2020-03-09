@@ -22,10 +22,6 @@
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-common</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.kie.cloud</groupId>
-      <artifactId>framework-git</artifactId>
-    </dependency>
 
     <!-- XTF dependencies. -->
     <dependency>

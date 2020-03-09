@@ -16,7 +16,7 @@
 package org.kie.cloud.git.github;
 
 import org.kie.cloud.api.git.GitProvider;
-import org.kie.cloud.git.GitProviderFactory;
+import org.kie.cloud.api.git.GitProviderFactory;
 import org.kie.cloud.git.constants.GitConstants;
 
 public class GitHubGitProviderFactory implements GitProviderFactory {

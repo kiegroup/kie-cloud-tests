@@ -88,7 +88,7 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Waiting for Workbench deployment to become ready.");

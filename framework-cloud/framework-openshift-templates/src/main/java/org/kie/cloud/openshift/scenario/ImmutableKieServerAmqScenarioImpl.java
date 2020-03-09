@@ -77,7 +77,7 @@ public class ImmutableKieServerAmqScenarioImpl extends KieCommonScenario<Immutab
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Creating AMQ secret");

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.openshift.util;
+package org.kie.cloud.git;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,22 +21,49 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.GogsDeployment;
+import org.kie.cloud.api.git.GitProvider;
+import org.kie.cloud.api.git.GitProviderFactory;
+import org.kie.cloud.git.gogs.GogsGitProvider;
 import org.kie.cloud.openshift.deployment.GogsDeploymentImpl;
 import org.kie.cloud.openshift.resource.CloudProperties;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.util.ProjectInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class used for deploying Gogs instance to OpenShift project.
+ * GIT provider factory to deploy a GOGS instance into Openshift.
  */
-public class GogsDeployer {
+public class GogsOpenshiftProviderFactory implements GitProviderFactory, ProjectInitializer {
 
+    private static final String GOGS = "Gogs";
     private static final String GOGS_TEMPLATE = "/deployments/gogs.yaml";
 
-    private static final Logger logger = LoggerFactory.getLogger(GogsDeployer.class);
+    private static final Logger logger = LoggerFactory.getLogger(GogsOpenshiftProviderFactory.class);
 
-    public static GogsDeployment deploy(Project project) {
+    private Project project;
+
+    @Override
+    public void load(Project project) {
+        this.project = project;
+    }
+
+    @Override
+    public String providerType() {
+        return GOGS;
+    }
+
+    @Override
+    public GitProvider createGitProvider() {
+        if (project == null) {
+            throw new RuntimeException("Project not initialized. Call load() before creating GIT provider");
+        }
+
+        GogsDeployment deployment = deploy(project);
+        return new GogsGitProvider(deployment.getUrl(), deployment.getUsername(), deployment.getPassword());
+    }
+
+    private static GogsDeployment deploy(Project project) {
         logger.info("Creating internal GOGS instance.");
         project.runOcCommandAsAdmin("adm", "policy", "add-scc-to-user", "anyuid", "-z", "default");
         project.processTemplateAndCreateResources(getGogsTemplate(), getGogsProperties(project));
@@ -55,7 +82,7 @@ public class GogsDeployer {
 
     private static URL getGogsTemplate() {
         try {
-            return new URL("file://" + GogsDeployer.class.getResource(GOGS_TEMPLATE).getFile());
+            return new URL("file://" + GogsOpenshiftProviderFactory.class.getResource(GOGS_TEMPLATE).getFile());
         } catch (MalformedURLException e) {
             throw new RuntimeException("Wrong GOGS template location", e);
         }

@@ -14,17 +14,16 @@
 */
 package org.kie.cloud.git;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.kie.cloud.api.constants.ConfigurationInitializer;
 import org.kie.cloud.api.git.GitProvider;
+import org.kie.cloud.api.git.GitProviderFactory;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.git.constants.GitConstants;
-import org.kie.cloud.git.github.GitHubGitProviderFactory;
-import org.kie.cloud.git.gogs.ExternalGogsGitProviderFactory;
-import org.kie.cloud.git.gogs.GogsGitProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +36,9 @@ public class GitProviderService {
     private boolean isConfigurationInitialized = false;
 
     public GitProviderService() {
-        this.providerFactories = Collections.unmodifiableList(Arrays.asList(new GitHubGitProviderFactory(),
-                                                                            new GogsGitProviderFactory(),
-                                                                            new ExternalGogsGitProviderFactory()));
+        List<GitProviderFactory> factories = new ArrayList<>();
+        ServiceLoader.load(GitProviderFactory.class).forEach(factories::add);
+        this.providerFactories = Collections.unmodifiableList(factories);
     }
 
     public GitProvider createGitProvider() {

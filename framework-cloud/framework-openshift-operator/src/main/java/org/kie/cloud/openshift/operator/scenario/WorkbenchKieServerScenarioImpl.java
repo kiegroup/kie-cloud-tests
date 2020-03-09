@@ -83,7 +83,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
         }
 
         if (request.getGitSettings() != null) {
-            gitProvider = Git.getProvider(project, request.getGitSettings());
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Waiting until all services are created.");

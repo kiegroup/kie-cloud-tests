@@ -11,13 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-package org.kie.cloud.git.gogs;
+ */
+package org.kie.cloud.openshift.util;
 
-public class ExternalGogsGitProviderFactory extends GogsGitProviderFactory {
+import org.kie.cloud.openshift.resource.Project;
 
-    @Override
-    public String providerType() {
-        return "ExternalGogs";
-    }
+public interface ProjectInitializer {
+    void load(Project project);
 }
