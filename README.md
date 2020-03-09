@@ -29,7 +29,6 @@ Can be found in framework-openshift, class org.kie.cloud.openshift.constants.Ope
 | openshift.admin.password   |                | Password for logging into OpenShift as Administrator                                                                |
 | openshift.namespace.prefix |                | Prefix of Openshift project name                                                                                    |
 | kie.image.streams          |                | URL pointing to file with image stream definitions                                                                  |
-| kie.app.secret             | \<GitHub URL\> | URL pointing to file with secrets                                                                                   |
 | kie.app.template           | \<GitHub URL\> | URL pointing to file with Kie deployments template                                                                  |
 | kie.app.name               | myapp          | Application name used as prefix for Kie deployments                                                                 |
 | cloud.properties.location  | /path/to/private.properties          | Location of the cloud private properties (See more in org.kie.cloud.openshift.resource.CloudProperties.java file    |

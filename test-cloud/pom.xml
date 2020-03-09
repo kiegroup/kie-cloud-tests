@@ -78,12 +78,10 @@
     <kie.app.template.url/>
 
 
-    <!-- Custom trusted secret -->
-    <custom.trusted.app.secret/>
-    <custom.trusted.secret.name/>
-    <custom.trusted.keystore.alias/>
-    <custom.trusted.keystore.pwd/>
+    <!-- SSL configuration -->
     <certificate.dir>${project.build.testOutputDirectory}/certificate</certificate.dir>
+    <trusted.keystore.alias>jboss</trusted.keystore.alias> <!-- Must match with XX_HTTPS_NAME. Example: DECISION_CENTRAL_HTTPS_NAME -->
+    <trusted.keystore.pwd>mykeystorepass</trusted.keystore.pwd> <!-- Must match with XX_HTTPS_PASSWORD. Example: DECISION_CENTRAL_HTTPS_PASSWORD -->
 
     <!-- APB -->
     <apb.image.stream.name/>
@@ -234,6 +232,72 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
                 <noprompt>true</noprompt>
               </configuration>
             </execution>
+
+            <!-- Openshift SSL certificates -->
+<!-- Generate a self-signed certificate for the instance keystore:
+$ keytool -genkeypair -keyalg RSA -alias name -keystore .my.domain.jks -keypass pass -storepass pass -storetype jks -dname "CN=*.my.domain.com" -->
+            <execution>
+              <id>generateOpenshiftCertificate</id>
+              <goals>
+                <goal>generateKeyPair</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>${trusted.keystore.alias}</alias>
+                <keyalg>RSA</keyalg>
+                <keystore>${certificate.dir}/${default.domain.suffix}.jks</keystore>
+                <dname>CN=*${default.domain.suffix}</dname>
+                <keypass>${trusted.keystore.pwd}</keypass>
+                <storepass>${trusted.keystore.pwd}</storepass>
+              </configuration>
+            </execution>
+<!-- Export the keystore to be shared by clients:
+$ keytool -export -alias name -storepass pass -keystore my.domain.jks -file .my.domain_client.der -->
+            <execution>
+              <id>exportOpenshiftCertificate</id>
+              <goals>
+                <goal>exportCertificate</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>${trusted.keystore.alias}</alias>
+                <keystore>${certificate.dir}/${default.domain.suffix}.jks</keystore>
+                <file>${certificate.dir}/${default.domain.suffix}_client.der</file>
+                <storepass>${trusted.keystore.pwd}</storepass>
+              </configuration>
+            </execution>
+<!-- Generate a trusted certificate for the client:
+$ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keystore .my.domain_client.ts -file .my.domain_client.der -->
+            <execution>
+              <id>createOpenshiftClientTrustore</id>
+              <goals>
+                <goal>importCertificate</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <alias>${trusted.keystore.alias}</alias>
+                <file>${certificate.dir}/${default.domain.suffix}_client.der</file>
+                <keystore>${certificate.dir}/${default.domain.suffix}_client.ts</keystore>
+                <keypass>${trusted.keystore.pwd}</keypass>
+                <storepass>${trusted.keystore.pwd}</storepass>
+                <trustcacerts>true</trustcacerts>
+                <noprompt>true</noprompt>
+              </configuration>
+            </execution>
+            <execution>
+              <id>importJavaKeystore</id>
+              <goals>
+                <goal>importKeystore</goal>
+              </goals>
+              <phase>package</phase>
+              <configuration>
+                <srckeystore>${java.home}/lib/security/cacerts</srckeystore>
+                <srcstorepass>changeit</srcstorepass>
+                <destkeystore>${certificate.dir}/${default.domain.suffix}_client.ts</destkeystore>
+                <deststorepass>${trusted.keystore.pwd}</deststorepass>
+                <noprompt>true</noprompt>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
         <plugin>
@@ -252,6 +316,8 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
           <configuration>
             <excludedGroups>${failsafe.excluded.groups}</excludedGroups>
             <systemProperties combine.children="append">
+              <javax.net.ssl.trustStore>${certificate.dir}/${default.domain.suffix}_client.ts</javax.net.ssl.trustStore>
+              <javax.net.ssl.trustStorePassword>${trusted.keystore.pwd}</javax.net.ssl.trustStorePassword>
               <openshift.master.url>${openshift.master.url}</openshift.master.url>
               <openshift.username>${openshift.username}</openshift.username>
               <openshift.password>${openshift.password}</openshift.password>
@@ -298,10 +364,9 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
               <sso.service.username>${sso.service.username}</sso.service.username>
               <sso.service.password>${sso.service.password}</sso.service.password>
               <ldap.url>${ldap.url}</ldap.url>
-              <custom.trusted.app.secret>${custom.trusted.app.secret}</custom.trusted.app.secret>
-              <custom.trusted.secret.name>${custom.trusted.secret.name}</custom.trusted.secret.name>
-              <custom.trusted.keystore.alias>${custom.trusted.keystore.alias}</custom.trusted.keystore.alias>
-              <custom.trusted.keystore.pwd>${custom.trusted.keystore.pwd}</custom.trusted.keystore.pwd>
+              <trusted.keystore.alias>${trusted.keystore.alias}</trusted.keystore.alias>
+              <trusted.keystore.pwd>${trusted.keystore.pwd}</trusted.keystore.pwd>
+              <trusted.keystore.file>${certificate.dir}/${default.domain.suffix}.jks</trusted.keystore.file>
               <apb.image.stream.name>${apb.image.stream.name}</apb.image.stream.name>
               <apb.kie.image.stream.tag>${apb.kie.image.stream.tag}</apb.kie.image.stream.tag>
               <apb.image.docker.repo.tag>${apb.image.docker.repo.tag}</apb.image.docker.repo.tag>
@@ -411,10 +476,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
     <profile>
       <id>openshift-operator</id>
       <properties>
-        <custom.trusted.app.secret>file://${project.build.testOutputDirectory}/secret/rhpam-certs.secret-aws.yaml</custom.trusted.app.secret>
-        <custom.trusted.secret.name>rhpam-certs</custom.trusted.secret.name>
-        <custom.trusted.keystore.alias>jbossaws</custom.trusted.keystore.alias>
-        <custom.trusted.keystore.pwd>changeit</custom.trusted.keystore.pwd>
         <operator.excluded.group>org.kie.cloud.integrationtests.category.OperatorNotSupported</operator.excluded.group>
 
         <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
@@ -432,51 +493,11 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
         <pluginManagement>
           <plugins>
             <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>keytool-maven-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>importCustomCertificate</id>
-                  <goals>
-                    <goal>importCertificate</goal>
-                  </goals>
-                  <phase>package</phase>
-                  <configuration>
-                    <!-- certificate.dir set in project test-cloud-remote-->
-                    <storepass>changeit</storepass>
-                    <keystore>${certificate.dir}/test-keystore</keystore>
-                    <keypass>changeit</keypass>
-                    <alias>jbossaws</alias>
-                    <file>${certificate.dir}/rhpam-test-ca-aws.crt</file>
-                    <trustcacerts>true</trustcacerts>
-                    <noprompt>true</noprompt>
-                  </configuration>
-                </execution>
-                <execution>
-                  <id>importJavaKeystore</id>
-                  <goals>
-                    <goal>importKeystore</goal>
-                  </goals>
-                  <phase>package</phase>
-                  <configuration>
-                    <srckeystore>${java.home}/lib/security/cacerts</srckeystore>
-                    <srcstorepass>changeit</srcstorepass>
-                    <destkeystore>${certificate.dir}/test-keystore</destkeystore>
-                    <deststorepass>changeit</deststorepass>
-                    <noprompt>true</noprompt>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-            <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
                 <excludedGroups>${operator.excluded.group},${failsafe.excluded.groups}</excludedGroups>
                 <systemProperties>
-                  <javax.net.ssl.trustStore>${certificate.dir}/test-keystore</javax.net.ssl.trustStore>
-                  <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
-
                   <xtf.openshift.admin.token>${xtf.openshift.admin.token}</xtf.openshift.admin.token>
                   <xtf.openshift.master.token>${xtf.openshift.master.token}</xtf.openshift.master.token>
                 </systemProperties>
@@ -489,10 +510,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
     <profile>
       <id>openshift-apb</id>
       <properties>
-        <custom.trusted.app.secret>file://${project.build.testOutputDirectory}/secret/rhpam-certs.secret.yaml</custom.trusted.app.secret>
-        <custom.trusted.secret.name>rhpam-certs</custom.trusted.secret.name>
-        <custom.trusted.keystore.alias>jboss</custom.trusted.keystore.alias>
-        <custom.trusted.keystore.pwd>test</custom.trusted.keystore.pwd>
         <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.ApbNotSupported</failsafe.excluded.groups>
       </properties>
       <dependencies>
@@ -502,59 +519,6 @@ $ keytool -import -alias client -keystore broker.ts -file client_cert -->
           <scope>test</scope>
         </dependency>
       </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>keytool-maven-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>importCustomCertificate</id>
-                  <goals>
-                    <goal>importCertificate</goal>
-                  </goals>
-                  <phase>package</phase>
-                  <configuration>
-                    <!-- certificate.dir set in project test-cloud-remote-->
-                    <storepass>changeit</storepass>
-                    <keystore>${certificate.dir}/test-keystore</keystore>
-                    <keypass>changeit</keypass>
-                    <alias>jboss</alias>
-                    <file>${certificate.dir}/rhpam-test-ca.crt</file>
-                    <trustcacerts>true</trustcacerts>
-                    <noprompt>true</noprompt>
-                  </configuration>
-                </execution>
-                <execution>
-                  <id>importJavaKeystore</id>
-                  <goals>
-                    <goal>importKeystore</goal>
-                  </goals>
-                  <phase>package</phase>
-                  <configuration>
-                    <srckeystore>${java.home}/lib/security/cacerts</srckeystore>
-                    <srcstorepass>changeit</srcstorepass>
-                    <destkeystore>${certificate.dir}/test-keystore</destkeystore>
-                    <deststorepass>changeit</deststorepass>
-                    <noprompt>true</noprompt>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-              <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <systemProperties>
-                  <javax.net.ssl.trustStore>${certificate.dir}/test-keystore</javax.net.ssl.trustStore>
-                  <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
-                </systemProperties>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <profile>
       <id>parallel</id>

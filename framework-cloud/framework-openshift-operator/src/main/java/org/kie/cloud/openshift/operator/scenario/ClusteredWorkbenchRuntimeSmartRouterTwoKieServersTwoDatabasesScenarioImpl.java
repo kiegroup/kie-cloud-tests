@@ -90,10 +90,10 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
             kieApp.getSpec().setAuth(auth);
         }
 
-        registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());
-        registerCustomTrustedSecret(kieApp.getSpec().getObjects().getSmartRouter());
+        registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
+        registerTrustedSecret(kieApp.getSpec().getObjects().getSmartRouter());
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            registerTrustedSecret(server);
         }
 
         // deploy application

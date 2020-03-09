@@ -34,11 +34,11 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
-import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.util.ApbImageGetter;
 import org.kie.cloud.openshift.util.PrometheusDeployer;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
     @Override
     protected void deployKieDeployments() {
         logger.info("Creating trusted secret");
-        deployCustomTrustedSecret();
+        deployTrustedSecret();
 
         logger.info("Processesin APB image plan: " + extraVars.get(OpenShiftApbConstants.APB_PLAN_ID));
         extraVars.put(OpenShiftApbConstants.IMAGE_STREAM_NAMESPACE, projectName);
@@ -111,20 +111,13 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
         ((ExternalDeploymentApb) externalDeployment).removeConfiguration(extraVars);
     }
 
-    private void deployCustomTrustedSecret() {
-        project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(),
-                Collections.emptyMap());
-
-        extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_SECRET_NAME,
-                DeploymentConstants.getCustomTrustedSecretName());
-        extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
-        extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_PWD,
-                DeploymentConstants.getCustomTrustedKeystorePwd());
-        extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
-        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
-        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
+    private void deployTrustedSecret() {
+        extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
+        extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_ALIAS, DeploymentConstants.getTrustedKeystoreAlias());
+        extraVars.put(OpenShiftApbConstants.BUSINESSCENTRAL_KEYSTORE_PWD, DeploymentConstants.getTrustedKeystorePwd());
+        extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
+        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS, DeploymentConstants.getTrustedKeystoreAlias());
+        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getTrustedKeystorePwd());
     }
 
     @Override

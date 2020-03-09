@@ -37,9 +37,9 @@ public class KieServerWithExternalDatabaseScenarioBuilderApb extends AbstractOpe
         extraVars.put(OpenShiftApbConstants.APB_KIESERVER_DB_TYPE, ApbConstants.DbType.EXTERNAL);
         extraVars.put(OpenShiftApbConstants.APB_IMAGE_STREAM_TAG, OpenShiftConstants.getApbKieImageStreamTag());
         // Just for now set cert properties here.
-        extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
-        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS, DeploymentConstants.getCustomTrustedKeystoreAlias());
-        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
+        extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName());
+        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS, DeploymentConstants.getTrustedKeystoreAlias());
+        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getTrustedKeystorePwd());
         //apb_kieserver_image_stream_name -- can be also required, has default value (now rhpam72-kieserver-openshift)
 
         // Users
@@ -67,7 +67,7 @@ public class KieServerWithExternalDatabaseScenarioBuilderApb extends AbstractOpe
     @Override
     public KieServerWithExternalDatabaseScenarioBuilder withKieServerId(String kieServerId) {
         throw new UnsupportedOperationException("Not supported for APB.");
-        // has default not configureable value 
+        // has default not configureable value
     }
 
 }
