@@ -29,7 +29,6 @@ import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
-import org.kie.cloud.openshift.operator.model.components.Build;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Database;
@@ -158,13 +157,6 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
 
     @Override
     public KieServerWithDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            if (server.getBuild() == null) {
-                server.setBuild(new Build());
-            }
-            server.getBuild().setKieServerContainerDeployment(kieContainerDeployment);
-        }
-
-        return this;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
