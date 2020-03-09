@@ -67,6 +67,9 @@ public class ImmutableKieServerScenarioBuilderImpl extends KieScenarioBuilderImp
 
     @Override
     public ImmutableKieServerScenarioBuilder withSourceLocation(String gitReference, String gitContextDir) {
+        envVariables.put(OpenShiftTemplateConstants.SOURCE_REPOSITORY_REF, gitReference);
+        envVariables.put(OpenShiftTemplateConstants.CONTEXT_DIR, gitContextDir);
+
         if (request.getGitSettings() == null) {
             throw new RuntimeException("Need to configure the git settings first");
         }
