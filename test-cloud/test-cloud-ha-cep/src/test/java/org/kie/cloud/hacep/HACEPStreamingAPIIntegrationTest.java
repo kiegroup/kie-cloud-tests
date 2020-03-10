@@ -25,10 +25,16 @@ import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.hacep.core.InfraFactory;
 import org.kie.hacep.sample.kjar.StockTickEvent;
 import org.kie.remote.CommonConfig;
+import org.kie.remote.RemoteKieSession;
 import org.kie.remote.RemoteStreamingKieSession;
 import org.kie.remote.TopicsConfig;
+import org.kie.remote.impl.RemoteKieSessionImpl;
+import org.kie.remote.impl.RemoteStreamingKieSessionImpl;
+import org.kie.remote.impl.producer.Producer;
+import org.kie.remote.util.KafkaRemoteUtil;
 
 public class HACEPStreamingAPIIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<HACepScenario> {
 
@@ -41,9 +47,10 @@ public class HACEPStreamingAPIIntegrationTest extends AbstractMethodIsolatedClou
     public void testStreamingAPI() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteStreamingKieSession producer = RemoteStreamingKieSession.create(connectionProperties, topicsConfig)) {
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteStreamingKieSession producer = new RemoteStreamingKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             StockTickEvent stockTickEvent = new StockTickEvent("RHT",
                                                                ThreadLocalRandom.current().nextLong(80,
                                                                                                         100));
