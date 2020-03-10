@@ -25,11 +25,14 @@ import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.hacep.core.InfraFactory;
 import org.kie.hacep.sample.kjar.StockTickEvent;
-import org.kie.remote.CommonConfig;
 import org.kie.remote.RemoteFactHandle;
 import org.kie.remote.RemoteKieSession;
 import org.kie.remote.TopicsConfig;
+import org.kie.remote.impl.RemoteKieSessionImpl;
+import org.kie.remote.impl.producer.Producer;
+import org.kie.remote.util.KafkaRemoteUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +49,10 @@ public class HACEPRuleEngineIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testInsertRetrieveFact() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig)) {
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             final StockTickEvent fact = new StockTickEvent("RHT",
                                                              ThreadLocalRandom.current().nextLong(80,
                                                                                                   100));
@@ -64,10 +68,11 @@ public class HACEPRuleEngineIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testInsertMultipleFacts() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
         final int numberOfFacts = 100;
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig)) {
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             for (int i = 0; i < numberOfFacts; i++) {
                 StockTickEvent stockTickEvent = new StockTickEvent("RHT",
                                                            ThreadLocalRandom.current().nextLong(80,
@@ -86,8 +91,10 @@ public class HACEPRuleEngineIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testFireRules() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig)) {
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
+
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             StockTickEvent stockTickEvent = new StockTickEvent("RHT",
                                                                ThreadLocalRandom.current().nextLong(80,
                                                                                                     100));

@@ -28,11 +28,15 @@ import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.hacep.core.InfraFactory;
 import org.kie.hacep.sample.kjar.StockTickEvent;
 import org.kie.remote.CommonConfig;
 import org.kie.remote.RemoteFactHandle;
 import org.kie.remote.RemoteKieSession;
 import org.kie.remote.TopicsConfig;
+import org.kie.remote.impl.RemoteKieSessionImpl;
+import org.kie.remote.impl.producer.Producer;
+import org.kie.remote.util.KafkaRemoteUtil;
 
 public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<HACepScenario> {
 
@@ -45,11 +49,12 @@ public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudInt
     public void testLeaderFailoverFactCountTest() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
         final int numberOfFacts = 10;
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig);
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod);
             Project project = new ProjectImpl(deploymentScenario.getNamespace())) {
 
             for (int i = 0; i < numberOfFacts; i++) {
@@ -79,9 +84,10 @@ public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudInt
     public void testRulesAreEvaluatedByReplicas() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig);
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod);
              Project project = new ProjectImpl(deploymentScenario.getNamespace())) {
 
             StockTickEvent stockTickEvent = new StockTickEvent("RHT",
@@ -108,9 +114,10 @@ public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudInt
     public void testScaleToZeroAndBack() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig);
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod);
              Project project = new ProjectImpl(deploymentScenario.getNamespace())) {
 
             StockTickEvent stockTickEvent = new StockTickEvent("RHT",
