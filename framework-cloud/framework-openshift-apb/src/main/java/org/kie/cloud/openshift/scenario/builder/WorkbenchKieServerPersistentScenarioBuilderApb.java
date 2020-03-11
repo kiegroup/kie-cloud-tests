@@ -21,12 +21,14 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.ProjectApbSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerPersistentScenarioApb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb extends AbstractOpen
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerPersistentScenarioBuilderApb.class);
     private final Map<String, String> extraVars = new HashMap<>();
-    private boolean deploySSO = false;
+    private final ScenarioRequest request = new ScenarioRequest();
     private final ProjectApbSpecificPropertyNames propertyNames = ProjectApbSpecificPropertyNames.create();
 
     public WorkbenchKieServerPersistentScenarioBuilderApb() {
@@ -54,7 +56,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb extends AbstractOpen
 
     @Override
     public WorkbenchKieServerPersistentScenario getDeploymentScenarioInstance() {
-        return new WorkbenchKieServerPersistentScenarioApb(extraVars, deploySSO);
+        return new WorkbenchKieServerPersistentScenarioApb(extraVars, request);
     }
 
     @Override
@@ -65,9 +67,15 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb extends AbstractOpen
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         extraVars.put(OpenShiftApbConstants.SSO_USER, DeploymentConstants.getSsoServiceUser());
         extraVars.put(OpenShiftApbConstants.SSO_PWD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 

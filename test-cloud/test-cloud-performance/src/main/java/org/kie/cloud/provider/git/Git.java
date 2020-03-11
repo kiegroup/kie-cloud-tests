@@ -15,7 +15,7 @@
 
 package org.kie.cloud.provider.git;
 
-import org.kie.cloud.git.GitProvider;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.git.GitProviderService;
 
 public class Git {

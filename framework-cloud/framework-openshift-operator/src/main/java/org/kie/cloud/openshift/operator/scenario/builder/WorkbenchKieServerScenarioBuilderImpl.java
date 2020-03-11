@@ -22,6 +22,7 @@ import java.util.List;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
@@ -34,11 +35,12 @@ import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerScenarioImpl;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
 public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<WorkbenchKieServerScenario> implements WorkbenchKieServerScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deployPrometheus = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchKieServerScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
@@ -71,7 +73,7 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     @Override
     public WorkbenchKieServerScenario getDeploymentScenarioInstance() {
-        return new WorkbenchKieServerScenarioImpl(kieApp, deployPrometheus);
+        return new WorkbenchKieServerScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -115,10 +117,16 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     @Override
     public WorkbenchKieServerScenarioBuilder withPrometheusMonitoring() {
-        deployPrometheus = true;
+        request.enableDeployPrometheus();
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             server.addEnv(new Env(ImageEnvVariables.PROMETHEUS_SERVER_EXT_DISABLED, "false"));
         }
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 }

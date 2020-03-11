@@ -21,18 +21,20 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements
                                                                               ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
-    private boolean deploySso = false;
+    private final ScenarioRequest request = new ScenarioRequest();
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
@@ -46,7 +48,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
     @Override
     protected ClusteredWorkbenchKieServerDatabasePersistentScenario getDeploymentScenarioInstance() {
-        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(envVariables, deploySso);
+        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(envVariables, request);
     }
 
     @Override
@@ -63,9 +65,15 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso() {
-        deploySso = true;
+        request.enableDeploySso();
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 

@@ -38,6 +38,7 @@ public class ServiceUtil {
     private static final Pattern DOCKER_REGEXP = Pattern.compile("registry");
     private static final Pattern MAVEN_NEXUS_REPOSITORY_REGEXP = Pattern.compile("nexus");
     private static final Pattern LDAP_REGEXP = Pattern.compile(".*ldap.*");
+    private static final Pattern GOGS_REGEXP = Pattern.compile(".*gogs.*");
     private static final Pattern PROMETHEUS_REGEXP = Pattern.compile("prometheus-operated");
 
     public static String getControllerServiceName(OpenShift openShift) {
@@ -82,6 +83,10 @@ public class ServiceUtil {
 
     public static String getDockerServiceName(OpenShift openShift) {
         return getServiceName(openShift, DOCKER_REGEXP);
+    }
+
+    public static String getGogsServiceName(OpenShift openShift) {
+        return getServiceName(openShift, GOGS_REGEXP);
     }
 
     public static String getMavenNexusServiceName(OpenShift openShift) {

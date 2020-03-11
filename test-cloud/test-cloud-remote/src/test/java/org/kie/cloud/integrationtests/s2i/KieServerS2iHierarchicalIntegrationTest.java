@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -31,9 +31,10 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.Constants;
@@ -53,6 +54,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Category(JBPMOnly.class)
 public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iHierarchicalRepository");
+
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iHierarchicalIntegrationTest.class);
 
     @Parameter(value = 0)
@@ -66,10 +69,15 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             KieServerS2iHierarchicalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+
         try {
             KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
                                                                                                        .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
+                                                                                                       .withGitSettings(gitSettings)
+                                                                                                       .withSourceLocation(REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
                                                                                                        .build();
             scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
         } catch (UnsupportedOperationException ex) {
@@ -79,7 +87,8 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
         try {
             KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder()
                                                                                            .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
+                                                                                           .withGitSettings(gitSettings)
+                                                                                           .withSourceLocation(REPO_BRANCH, GIT_CONTEXT_DIR, BUILT_KJAR_FOLDER)
                                                                                            .build();
             scenarios.add(new Object[]{"Immutable KIE Server S2I", immutableKieServerScenario});
         } catch (UnsupportedOperationException ex) {
@@ -96,14 +105,10 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
     private static final Kjar USERTASK = Kjar.USERTASK;
     private static final String KIE_CONTAINER_DEPLOYMENT = CONTAINER_ID + "=" + USERTASK.toString();
 
-    private static final String GIT_REPOSITORY_PREFIX = "KieServerS2iHierarchicalRepository";
-
     private static final String REPO_BRANCH = "master";
     private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
     private static final String GIT_CONTEXT_DIR = "multimodule-project";
     private static final String BUILT_KJAR_FOLDER = "usertask-project/target,signaltask-project/target";
-
-    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix(GIT_REPOSITORY_PREFIX, KieServerS2iHierarchicalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
     @Override
     protected KieDeploymentScenario<?> createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
@@ -117,9 +122,9 @@ public class KieServerS2iHierarchicalIntegrationTest extends AbstractMethodIsola
         taskServicesClient = KieServerClientProvider.getTaskClient(deploymentScenario.getKieServerDeployments().get(0));
     }
 
-    @AfterClass
-    public static void deleteRepo() {
-        Git.getProvider().deleteGitRepository(gitRepositoryName);
+    @After
+    public void deleteRepo() {
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test

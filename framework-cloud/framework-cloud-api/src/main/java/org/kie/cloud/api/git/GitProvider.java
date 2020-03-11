@@ -13,11 +13,13 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.git;
+package org.kie.cloud.api.git;
 
-public interface GitProviderFactory {
+public interface GitProvider {
 
-    String providerType();
-    GitProvider createGitProvider();
-    void initGitConfigurationProperties();
+    String createGitRepository(String repositoryName, String repositoryPath);
+
+    void deleteGitRepository(String repositoryName);
+
+    String getRepositoryUrl(String repositoryName);
 }

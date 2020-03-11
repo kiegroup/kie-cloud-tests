@@ -16,13 +16,12 @@
 package org.kie.cloud.git.constants;
 
 import org.kie.cloud.api.constants.Constants;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.git.GitProviderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GitConstants implements Constants {
-
-    public static final String GIT_PROVIDER = "git.provider";
 
     public static final String GITHUB_USER = "github.username";
     public static final String GITHUB_PASSWORD = "github.password";
@@ -34,7 +33,7 @@ public class GitConstants implements Constants {
     private static final Logger logger = LoggerFactory.getLogger(GitConstants.class);
 
     public static String getGitProvider() {
-        return System.getProperty(GIT_PROVIDER);
+        return System.getProperty(GitSettings.GIT_PROVIDER);
     }
 
     public static String getGitHubUser() {

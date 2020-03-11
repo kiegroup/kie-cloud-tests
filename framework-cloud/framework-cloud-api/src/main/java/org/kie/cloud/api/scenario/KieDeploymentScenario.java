@@ -17,10 +17,11 @@ package org.kie.cloud.api.scenario;
 
 import java.util.List;
 
+import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
-import org.kie.cloud.api.deployment.ControllerDeployment;
+import org.kie.cloud.api.git.GitProvider;
 
 /**
  * Cloud deployment scenario representation.
@@ -62,4 +63,13 @@ public interface KieDeploymentScenario<T extends DeploymentScenario<T>> extends 
      * @see ControllerDeployment
      */
     List<ControllerDeployment> getControllerDeployments();
+
+    /**
+     * Return GIT provider.
+     *
+     * @return GIT provider.
+     */
+    default GitProvider getGitProvider() {
+        throw new RuntimeException("No GIT provider configured for this scenario");
+    }
 }

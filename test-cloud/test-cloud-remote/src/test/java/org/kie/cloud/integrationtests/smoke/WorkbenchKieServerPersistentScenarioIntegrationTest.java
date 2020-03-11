@@ -110,7 +110,7 @@ public class WorkbenchKieServerPersistentScenarioIntegrationTest extends Abstrac
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment(), deploymentScenario.getGitProvider());
     }
 
     @Test
