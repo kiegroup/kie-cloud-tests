@@ -24,14 +24,16 @@ import java.util.stream.Stream;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerScenarioImpl;
 
 public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<WorkbenchKieServerScenario> implements WorkbenchKieServerScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
-    private boolean deployPrometheus = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchKieServerScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
@@ -41,7 +43,7 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     @Override
     public WorkbenchKieServerScenario getDeploymentScenarioInstance() {
-        return new WorkbenchKieServerScenarioImpl(envVariables, deployPrometheus);
+        return new WorkbenchKieServerScenarioImpl(envVariables, request);
     }
 
     @Override
@@ -91,8 +93,14 @@ public class WorkbenchKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
 
     @Override
     public WorkbenchKieServerScenarioBuilder withPrometheusMonitoring() {
-        deployPrometheus = true;
+        request.enableDeployPrometheus();
         envVariables.put(OpenShiftTemplateConstants.PROMETHEUS_SERVER_EXT_DISABLED, "false");
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 }

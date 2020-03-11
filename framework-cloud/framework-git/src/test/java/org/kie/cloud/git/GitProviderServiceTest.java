@@ -17,6 +17,7 @@ package org.kie.cloud.git;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.git.constants.GitConstants;
 import org.kie.cloud.git.github.GitHubGitProvider;
 
@@ -40,26 +41,26 @@ public class GitProviderServiceTest {
 
     @Test
     public void testGetNotFoundGitProvider() {
-        System.setProperty(GitConstants.GIT_PROVIDER, "not-existing-provider");
+        System.setProperty(GitSettings.GIT_PROVIDER, "not-existing-provider");
 
         try {
             Throwable thrown = catchThrowable(() -> gitProviderService.createGitProvider());
             assertThat(thrown).isInstanceOf(RuntimeException.class).hasMessageContaining("Unknown type of Git provider not-existing-provider");
         } finally {
-            System.clearProperty(GitConstants.GIT_PROVIDER);
+            System.clearProperty(GitSettings.GIT_PROVIDER);
         }
     }
 
     @Test
     public void testGetGitHubGitProvider() {
-        System.setProperty(GitConstants.GIT_PROVIDER, "GitHub");
+        System.setProperty(GitSettings.GIT_PROVIDER, "GitHub");
         System.setProperty(GitConstants.GITHUB_USER, "GitHubUser");
         System.setProperty(GitConstants.GITHUB_PASSWORD, "GitHubPass");
 
         try {
             assertThat(gitProviderService.createGitProvider()).isInstanceOf(GitHubGitProvider.class);
         } finally {
-            System.clearProperty(GitConstants.GIT_PROVIDER);
+            System.clearProperty(GitSettings.GIT_PROVIDER);
             System.clearProperty(GitConstants.GITHUB_USER);
             System.clearProperty(GitConstants.GITHUB_PASSWORD);
         }

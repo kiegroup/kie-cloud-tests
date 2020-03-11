@@ -22,11 +22,13 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderApb.class);
     private final Map<String, String> extraVars = new HashMap<>();
 
-    private boolean deploySSO = false;
+    private final ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderApb() {
         // Required values to create persistence values.
@@ -72,14 +74,20 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario getDeploymentScenarioInstance() {
-        return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb(extraVars, deploySSO);
+        return new WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb(extraVars, request);
     }
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         extraVars.put(OpenShiftApbConstants.SSO_USER, DeploymentConstants.getSsoServiceUser());
         extraVars.put(OpenShiftApbConstants.SSO_PWD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 
@@ -101,16 +109,20 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
-        extraVars.put(OpenShiftApbConstants.SOURCE_REPOSITORY_URL, gitRepoUrl);
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir) {
+        if (request.getGitSettings() == null) {
+            throw new RuntimeException("Need to configure the git settings first");
+        }
+
+        request.getGitSettings().addOnRepositoryLoaded(gitRepoUrl -> extraVars.put(OpenShiftApbConstants.SOURCE_REPOSITORY_URL, gitRepoUrl));
         extraVars.put(OpenShiftApbConstants.SOURCE_REPOSITORY_REF, gitReference);
         extraVars.put(OpenShiftApbConstants.CONTEXT_DIR, gitContextDir);
         return this;
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
-        withSourceLocation(gitRepoUrl, gitReference, gitContextDir);
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs) {
+        withSourceLocation(gitReference, gitContextDir);
         extraVars.put(OpenShiftApbConstants.ARTIFACT_DIR, artifactDirs);
         return this;
     }

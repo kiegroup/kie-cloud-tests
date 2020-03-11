@@ -16,6 +16,7 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerDatabasePersistentScenario> {
@@ -44,11 +45,20 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso();
 
     /**
-     * Return setup builder with an external LDAP.
+     * Return setup builder with additional GIT settings.
      *
-     * @param ldapSettings configuration of LDAP represented by a class.
+     * @param gitSettings settings configuration of GIT
      * @return Builder
      */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings);
+
+    /**
+    *
+    * Return setup builder with an external LDAP.
+    *
+    * @param ldapSettings configuration of LDAP represented by a class.
+    * @return Builder
+    */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
 
     /**
@@ -100,4 +110,5 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @return Builder with configured memory limit.
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
+
 }

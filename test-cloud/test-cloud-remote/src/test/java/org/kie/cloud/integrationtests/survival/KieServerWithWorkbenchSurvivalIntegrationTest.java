@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -35,11 +33,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.provider.git.Git;
+import org.kie.cloud.integrationtests.jbpm.ProcessFailoverIntegrationTest;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -56,12 +56,14 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Category({JBPMOnly.class, Baseline.class})
 public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
-    private KieServerControllerClient kieServerControllerClient;
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(ProcessFailoverIntegrationTest.class.getSimpleName());
 
-    private String repositoryName;
+    private KieServerControllerClient kieServerControllerClient;
 
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
@@ -71,14 +73,16 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMetho
 
     @Override
     protected WorkbenchKieServerPersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder().build();
+        return deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+                .withGitSettings(GitSettings.fromProperties()
+                                 .withRepository(REPOSITORY_NAME,
+                                                 KieServerWithWorkbenchSurvivalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + DEFINITION_PROJECT_NAME))
+                .build();
     }
 
     @Before
     public void setUp() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), KieServerWithWorkbenchSurvivalIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile() + "/" + DEFINITION_PROJECT_NAME);
-
-        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(REPOSITORY_NAME, deploymentScenario, DEFINITION_PROJECT_NAME);
 
         kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
 
@@ -89,7 +93,7 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMetho
 
     @After
     public void tearDown() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test

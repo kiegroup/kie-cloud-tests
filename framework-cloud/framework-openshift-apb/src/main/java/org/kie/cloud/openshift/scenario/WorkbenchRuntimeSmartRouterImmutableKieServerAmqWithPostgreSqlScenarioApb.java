@@ -30,6 +30,7 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
@@ -43,6 +44,7 @@ import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.AmqImageStreamDeployer;
 import org.kie.cloud.openshift.util.AmqSecretDeployer;
 import org.kie.cloud.openshift.util.ApbImageGetter;
+import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,21 +56,22 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
     private DatabaseDeploymentImpl databaseDeployment;
     private SsoDeployment ssoDeployment;
     private AmqDeploymentImpl amqDeployment;
+    private GitProvider gitProvider;
 
-    private boolean deploySso;
+    private final ScenarioRequest request;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
     private Map<String, String> extraVars;
 
-    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb(Map<String, String> extraVars, boolean deploySso) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioApb(Map<String, String> extraVars, ScenarioRequest request) {
         this.extraVars = extraVars;
-        this.deploySso = deploySso;
+        this.request = request;
     }
 
     @Override
     protected void deployKieDeployments() {
-        if (deploySso) {
+        if (request.isDeploySso()) {
             logger.warn("SSO is configured for this test scenario. Kie Server SSO client can be set only for one Kie Server. For more deploymets it mus be configured manually.");
             ssoDeployment = SsoDeployer.deploy(project);
 
@@ -79,6 +82,10 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
             extraVars.put(OpenShiftApbConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
 
             extraVars.put(OpenShiftApbConstants.SSO_PRINCIPAL_ATTRIBUTE, "preferred_username");
+        }
+
+        if (request.getGitSettings() != null) {
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Creating trusted secret");
@@ -197,6 +204,11 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
     @Override
     public AmqDeployment getAmqDeployment() {
         return amqDeployment;
+    }
+
+    @Override
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 
     private KieServerDeploymentImpl createKieServerDeployment(Project project) {

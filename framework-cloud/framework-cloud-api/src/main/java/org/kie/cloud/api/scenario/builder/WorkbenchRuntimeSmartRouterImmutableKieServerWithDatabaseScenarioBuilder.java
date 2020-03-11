@@ -18,9 +18,11 @@ package org.kie.cloud.api.scenario.builder;
 import java.time.Duration;
 
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
-public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder extends KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> {
+public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder extends
+                                                                                          KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> {
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
@@ -48,24 +50,22 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenar
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir);
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir);
 
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @param artifactDirs Directories containing built kjars, separated by
      * commas. For example "usertask-project/target,signaltask-project/target".
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs);
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs);
 
     /**
      * Return setup builder with additional configuration for SSO deployment.
@@ -132,4 +132,12 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenar
      * @return Builder with configured memory limit.
      */
     WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withKieServerMemoryLimit(String limit);
+
+    /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param gitSettings settings configuration of GIT
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withGitSettings(GitSettings gitSettings);
 }
