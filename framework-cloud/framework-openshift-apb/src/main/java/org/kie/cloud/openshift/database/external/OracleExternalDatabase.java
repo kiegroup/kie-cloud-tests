@@ -22,7 +22,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 
 
-public class OracleExternalDatabase extends AbstractOracleExternalDatabase {
+public class OracleExternalDatabase extends AbstractOracleExternalDatabase implements ApbExternalDatabase {
 
 
     @Override

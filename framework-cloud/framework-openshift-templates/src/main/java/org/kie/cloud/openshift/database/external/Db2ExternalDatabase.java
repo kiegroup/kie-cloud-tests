@@ -18,10 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.openshift.database.external.AbstractDb2ExternalDatabase;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 
-public class Db2ExternalDatabase extends AbstractDb2ExternalDatabase {
+public class Db2ExternalDatabase extends AbstractDb2ExternalDatabase implements TemplateExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {
