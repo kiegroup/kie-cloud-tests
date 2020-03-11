@@ -120,7 +120,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
         }
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            registerTrustedSecret(server);
         }
 
         // deploy application
@@ -137,8 +137,8 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
 
         logger.info("Waiting until all services are created.");
         try {
-            new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
             new SimpleWaiter(() -> databaseDeployment.isReady()).reason("Waiting for Database service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
         } catch (WaiterException e) {
             throw new RuntimeException("Timeout while deploying application.", e);
         }
