@@ -41,22 +41,24 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.Sso;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario<KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenario {
 
+    private final ScenarioRequest request;
+
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
-    private boolean deploySso;
     private SsoDeployment ssoDeployment;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithDatabaseScenarioImpl.class);
 
-    public KieServerWithDatabaseScenarioImpl(KieApp kieApp, boolean deploySso) {
+    public KieServerWithDatabaseScenarioImpl(KieApp kieApp, ScenarioRequest request) {
         super(kieApp);
-        this.deploySso = deploySso;
+        this.request = request;
     }
 
     @Override
@@ -103,7 +105,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
 
     @Override
     protected void deployCustomResource() {
-        if (deploySso) {
+        if (request.isDeploySso()) {
             ssoDeployment = SsoDeployer.deploySecure(project);
             URL ssoSecureUrl = ssoDeployment.getSecureUrl().orElseThrow(() -> new RuntimeException("RH SSO secure URL not found."));
 
@@ -120,7 +122,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
         }
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            registerTrustedSecret(server);
         }
 
         // deploy application
@@ -137,8 +139,8 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
 
         logger.info("Waiting until all services are created.");
         try {
-            new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
             new SimpleWaiter(() -> databaseDeployment.isReady()).reason("Waiting for Database service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
         } catch (WaiterException e) {
             throw new RuntimeException("Timeout while deploying application.", e);
         }

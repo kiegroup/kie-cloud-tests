@@ -39,11 +39,12 @@ import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.KieServerWithDatabaseScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
 public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends AbstractOpenshiftScenarioBuilderOperator<KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public AbstractKieServerWithDatabaseScenarioBuilder() {
         List<Env> authenticationEnvVars = new ArrayList<>();
@@ -84,12 +85,12 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
 
     @Override
     public KieServerWithDatabaseScenario getDeploymentScenarioInstance() {
-        return new KieServerWithDatabaseScenarioImpl(kieApp, deploySSO);
+        return new KieServerWithDatabaseScenarioImpl(kieApp, request);
     }
 
     @Override
     public KieServerWithDatabaseScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         SsoClient ssoClient = new SsoClient();
         ssoClient.setName("workbench-client");
         ssoClient.setSecret("workbench-secret");
