@@ -11,7 +11,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-<<<<<<< HEAD:framework-cloud/framework-cloud-api/src/main/java/org/kie/cloud/api/scenario/EmployeeRosteringScenario.java
 */
 package org.kie.cloud.openshift.util;
 
