@@ -38,6 +38,7 @@ import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchKieSe
 import org.kie.cloud.openshift.operator.scenario.builder.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.ImmutableKieServerAmqScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.ImmutableKieServerScenarioBuilderImpl;
+import org.kie.cloud.openshift.operator.scenario.builder.KieServerWithExternalDatabaseScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.WorkbenchKieServerPersistentScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.WorkbenchKieServerScenarioBuilderImpl;
 import org.kie.cloud.openshift.operator.scenario.builder.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilderImpl;
@@ -78,7 +79,7 @@ public class OperatorDeploymentBuilderFactory implements DeploymentScenarioBuild
 
     @Override
     public KieServerWithExternalDatabaseScenarioBuilder getKieServerWithExternalDatabaseScenarioBuilder() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new KieServerWithExternalDatabaseScenarioBuilderImpl();
     }
 
     @Override
