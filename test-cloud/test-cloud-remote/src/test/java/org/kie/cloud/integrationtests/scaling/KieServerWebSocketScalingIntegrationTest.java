@@ -15,7 +15,6 @@
  */
 package org.kie.cloud.integrationtests.scaling;
 
-import java.time.Duration;
 import java.util.Collection;
 
 import org.junit.After;
@@ -25,7 +24,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.deployment.Instance;
+import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.api.scenario.MissingResourceException;
@@ -37,7 +36,6 @@ import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
-import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
@@ -49,6 +47,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.kie.cloud.tests.common.client.util.KieServerUtils.waitUntilKieServerContainerIsStarted;
+import static org.kie.cloud.tests.common.client.util.KieServerUtils.waitUntilKieServerIsConnected;
 
 @Category({Baseline.class, OperatorNotSupported.class}) // Operator doesn't contain any scenario with controller based strategy by default
 public class KieServerWebSocketScalingIntegrationTest {
@@ -62,9 +62,6 @@ public class KieServerWebSocketScalingIntegrationTest {
 
     private static final String CONTAINER_ID = "cont-id";
     private static final String CONTAINER_ALIAS = "cont-alias";
-
-    private static final String WEBSOCKET_CONNECTION = "Connection to Kie Controller over Web Socket is now open";
-    private static final String STARTED_CONTAINER = "Container cont-id (for release id org.kie.server.testing:definition-project-snapshot:1.0.0-SNAPSHOT) successfully started";
 
     @Before
     public void setUp() {
@@ -103,15 +100,15 @@ public class KieServerWebSocketScalingIntegrationTest {
         verifyServerDeploymentContainInstances(3);
 
         String kieServerId = getKieServerId(kieServerClient);
-        waitUntilKieServerLogsContain(WEBSOCKET_CONNECTION);
-        verifyKieServerLogsContain(WEBSOCKET_CONNECTION);
+        KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerOneDeployment();
+
+        waitUntilKieServerIsConnected(kieServerDeployment);
         // In case of WebSockets all Kie servers with same URL are registered under one server template instance
         verifyServerTemplateContainsKieServers(kieServerId, 1);
 
         deployAndStartContainer();
 
-        waitUntilKieServerLogsContain(STARTED_CONTAINER);
-        verifyKieServerLogsContain(STARTED_CONTAINER);
+        waitUntilKieServerContainerIsStarted(kieServerDeployment, CONTAINER_ID, Kjar.DEFINITION_SNAPSHOT);
         verifyServerTemplateContainsContainer(kieServerId, CONTAINER_ID);
 
         scaleKieServerTo(1);
@@ -124,18 +121,6 @@ public class KieServerWebSocketScalingIntegrationTest {
         assertThat(serverInfo.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
 
         return serverInfo.getResult().getServerId();
-    }
-
-    private void verifyKieServerLogsContain(String logMessage) {
-        for (Instance kieServerInstance : deploymentScenario.getKieServerOneDeployment().getInstances()) {
-            assertThat(kieServerInstance.getLogs()).contains(logMessage);
-        }
-    }
-
-    private void waitUntilKieServerLogsContain(String logMessage) {
-        for (Instance kieServerInstance : deploymentScenario.getKieServerOneDeployment().getInstances()) {
-            TimeUtils.wait(Duration.ofMinutes(1), Duration.ofSeconds(1), () -> kieServerInstance.getLogs().contains(logMessage));
-        }
     }
 
     private void verifyServerTemplateContainsContainer(String serverTemplate, String containerId) {

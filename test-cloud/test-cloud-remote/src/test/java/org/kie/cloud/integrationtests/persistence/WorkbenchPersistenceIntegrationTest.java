@@ -14,8 +14,6 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +31,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
@@ -58,6 +57,9 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.kie.cloud.tests.common.client.util.KieServerUtils.waitUntilKieServerIsConnectedAfterAction;
+
 @RunWith(Parameterized.class)
 @Category({OperatorNotSupported.class}) // Operator doesn't support scaling Workbench to 0 for this scenario
 public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
@@ -77,6 +79,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
     private KieServicesClient kieServerClient;
 
     private WorkbenchDeployment workbenchDeployment;
+    private KieServerDeployment kieServerDeployment;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -112,7 +115,8 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         workbenchDeployment = deploymentScenario.getWorkbenchDeployments().get(0);
         workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
-        kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployments().get(0));
+        kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
+        kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
     }
 
     @After
@@ -156,7 +160,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
         WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CONTAINER_ID, CONTAINER_ALIAS, Kjar.DEFINITION, KieContainerStatus.STARTED);
 
-        KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployments().get(0), CONTAINER_ID);
+        KieServerClientProvider.waitForContainerStart(kieServerDeployment, CONTAINER_ID);
 
         ServiceResponse<KieContainerResourceList> containersResponse = kieServerClient.listContainers();
         assertThat(containersResponse.getType()).isEqualTo(ResponseType.SUCCESS);
@@ -185,9 +189,11 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
     }
 
     private void scaleToZeroAndToOne(Deployment deployment) {
-        deployment.scale(0);
-        deployment.waitForScale();
-        deployment.scale(1);
-        deployment.waitForScale();
+        waitUntilKieServerIsConnectedAfterAction(kieServerDeployment, () -> {
+            deployment.scale(0);
+            deployment.waitForScale();
+            deployment.scale(1);
+            deployment.waitForScale();
+        });
     }
 }
