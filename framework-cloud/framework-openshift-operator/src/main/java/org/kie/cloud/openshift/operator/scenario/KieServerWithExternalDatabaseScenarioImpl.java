@@ -62,7 +62,7 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftOperator
 
         dockerDeployment = DockerRegistryDeployer.deploy(project);
 
-        // Create image stream from external image with driver and reference it for template
+        // Create image stream from external image with driver and reference it for custom resource
         installDriverImageToRegistry(dockerDeployment, externalDatabase.getExternalDriver());
         createDriverImageStreams(dockerDeployment, externalDatabase.getExternalDriver());
         String extensionImage = externalDatabase.getExternalDriver().getImageName() + ":" + externalDatabase.getExternalDriver().getImageVersion();
