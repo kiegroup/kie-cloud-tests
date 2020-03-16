@@ -15,38 +15,19 @@
 
 package org.kie.cloud.openshift.database.external;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import java.util.Arrays;
 
 public class ApbExternalDatabaseProvider {
 
-    private static Collection<ExternalDatabase> availableExternalDatabases = new ArrayList<>();
+    private static final ExternalDatabaseProvider<ApbExternalDatabase> PROVIDER = new ExternalDatabaseProvider<>(Arrays.asList(new Db2ExternalDatabase(),
+                                                                                                                               new MariaDbExternalDatabase(),
+                                                                                                                               new MssqlExternalDatabase(),
+                                                                                                                               new MySqlExternalDatabase(),
+                                                                                                                               new OracleExternalDatabase(),
+                                                                                                                               new PostgreSqlExternalDatabase(),
+                                                                                                                               new SybaseExternalDatabase()));
 
-    static {
-        availableExternalDatabases.add(new Db2ExternalDatabase());
-        availableExternalDatabases.add(new MariaDbExternalDatabase());
-        availableExternalDatabases.add(new MssqlExternalDatabase());
-        availableExternalDatabases.add(new MySqlExternalDatabase());
-        availableExternalDatabases.add(new OracleExternalDatabase());
-        availableExternalDatabases.add(new PostgreSqlExternalDatabase());
-        availableExternalDatabases.add(new SybaseExternalDatabase());
-    }
-
-    public static ExternalDatabase getExternalDatabase() {
-        String databaseDriver = DeploymentConstants.getDatabaseDriver();
-        if (databaseDriver == null || databaseDriver.isEmpty()) {
-            throw new RuntimeException("System property " + DeploymentConstants.DATABASE_DRIVER + " is not defined. Cannot retrieve external database instance.");
-        }
-
-        return availableExternalDatabases.stream().filter(d -> d.getDriverName().equals(databaseDriver))
-                                                  .findAny()
-                                                  .orElseThrow(() -> {
-                                                      List<String> driverNames = availableExternalDatabases.stream().map(d -> d.getDriverName()).collect(Collectors.toList());
-                                                      return new RuntimeException("External database with driver identifier " + databaseDriver + " is not found. Available driver identifiers: " + driverNames);
-                                                  });
+    public static ApbExternalDatabase getExternalDatabase() {
+        return PROVIDER.getExternalDatabase();
     }
 }

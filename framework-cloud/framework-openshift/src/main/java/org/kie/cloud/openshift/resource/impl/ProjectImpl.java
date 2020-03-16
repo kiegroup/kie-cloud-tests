@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cz.xtf.builder.builders.ImageStreamBuilder;
+import cz.xtf.builder.builders.ImageStreamBuilder.TagReferencePolicyType;
 import cz.xtf.builder.builders.SecretBuilder;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShiftBinary;
@@ -269,8 +270,17 @@ public class ProjectImpl implements Project {
 
     @Override
     public void createImageStream(String imageStreamName, String imageTag) {
-        ImageStream driverImageStream = new ImageStreamBuilder(imageStreamName).fromExternalImage(imageTag).build();
-        openShift.createImageStream(driverImageStream);
+        ImageStream imageStream = new ImageStreamBuilder(imageStreamName).fromExternalImage(imageTag).build();
+        openShift.createImageStream(imageStream);
+    }
+
+    @Override
+    public void createImageStreamFromInsecureRegistry(String imageStreamName, String imageTag) {
+        ImageStream imageStream = new ImageStreamBuilder(imageStreamName).insecure().fromExternalImage(imageTag).build();
+        imageStream.getSpec().getTags().forEach(tag -> {
+            tag.getReferencePolicy().setType(TagReferencePolicyType.LOCAL.toString());
+        });
+        openShift.createImageStream(imageStream);
     }
 
     @Override

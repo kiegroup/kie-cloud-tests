@@ -21,7 +21,7 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 
-public class SybaseExternalDatabase extends AbstractSybaseExternalDatabase {
+public class SybaseExternalDatabase extends AbstractSybaseExternalDatabase implements ApbExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

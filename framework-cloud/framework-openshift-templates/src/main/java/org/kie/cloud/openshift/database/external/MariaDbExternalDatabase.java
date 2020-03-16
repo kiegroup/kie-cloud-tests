@@ -20,9 +20,8 @@ import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.external.AbstractMariaDbExternalDatabase;
 
-public class MariaDbExternalDatabase extends AbstractMariaDbExternalDatabase  {
+public class MariaDbExternalDatabase extends AbstractMariaDbExternalDatabase implements TemplateExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

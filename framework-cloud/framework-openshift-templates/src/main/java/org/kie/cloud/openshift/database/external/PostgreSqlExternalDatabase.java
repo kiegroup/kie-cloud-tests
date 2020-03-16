@@ -19,10 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.openshift.database.external.AbstractPostgreSqlExternalDatabase;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 
-public class PostgreSqlExternalDatabase extends AbstractPostgreSqlExternalDatabase {
+public class PostgreSqlExternalDatabase extends AbstractPostgreSqlExternalDatabase implements TemplateExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {
