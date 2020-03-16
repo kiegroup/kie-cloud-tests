@@ -31,6 +31,7 @@ import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 
+@Category(JBPMOnly.class)
 public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static KieServerWithDatabaseScenario deploymentScenario;
