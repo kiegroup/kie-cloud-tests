@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2020 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,17 +11,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
-package org.kie.cloud.openshift.scenario;
+ */
+package org.kie.cloud.openshift.operator.scenario;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.WaiterException;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DockerDeployment;
@@ -30,61 +31,66 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
-import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
-import org.kie.cloud.openshift.database.external.ApbExternalDatabase;
-import org.kie.cloud.openshift.database.external.ApbExternalDatabaseProvider;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
-import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
-import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
-import org.kie.cloud.openshift.template.OpenShiftTemplate;
-import org.kie.cloud.openshift.util.ApbImageGetter;
+import org.kie.cloud.openshift.operator.database.external.OperatorExternalDatabase;
+import org.kie.cloud.openshift.operator.database.external.OperatorExternalDatabaseProvider;
+import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
+import org.kie.cloud.openshift.operator.model.KieApp;
+import org.kie.cloud.openshift.operator.model.components.Build;
+import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.util.DockerRegistryDeployer;
 import org.kie.cloud.openshift.util.ProcessExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<KieServerWithExternalDatabaseScenario> implements KieServerWithExternalDatabaseScenario {
+public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftOperatorScenario<KieServerWithExternalDatabaseScenario> implements KieServerWithExternalDatabaseScenario {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenarioImpl.class);
 
     private KieServerDeploymentImpl kieServerDeployment;
     private DockerDeployment dockerDeployment;
-    private Map<String, String> extraVars;
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
-
-    public KieServerWithExternalDatabaseScenarioApb(Map<String, String> extraVars) {
-        this.extraVars = extraVars;
+    public KieServerWithExternalDatabaseScenarioImpl(KieApp kieApp) {
+        super(kieApp);
     }
 
     @Override
-    public KieServerDeployment getKieServerDeployment() {
-        return kieServerDeployment;
-    }
-
-    @Override
-    protected void deployKieDeployments() {
-        ApbExternalDatabase externalDatabase = ApbExternalDatabaseProvider.getExternalDatabase();
-        extraVars.putAll(externalDatabase.getExternalDatabaseEnvironmentVariables());
+    protected void deployCustomResource() {
+        OperatorExternalDatabase externalDatabase = OperatorExternalDatabaseProvider.getExternalDatabase();
 
         dockerDeployment = DockerRegistryDeployer.deploy(project);
 
-        // Create image stream from external image with driver and reference it for template
+        // Create image stream from external image with driver and reference it for custom resource
         installDriverImageToRegistry(dockerDeployment, externalDatabase.getExternalDriver());
         createDriverImageStreams(dockerDeployment, externalDatabase.getExternalDriver());
+        String extensionImage = externalDatabase.getExternalDriver().getImageName() + ":" + externalDatabase.getExternalDriver().getImageVersion();
 
-        logger.info("Creating trusted secret");
-        deployCustomTrustedSecret();
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            if (server.getBuild() == null) {
+                server.setBuild(new Build());
+            }
 
-        logger.info("Processesin APB image plan: " + extraVars.get(OpenShiftApbConstants.APB_PLAN_ID));
-        extraVars.put(OpenShiftApbConstants.IMAGE_STREAM_NAMESPACE, projectName);
-        extraVars.put("namespace", projectName);
-        extraVars.put("cluster", "openshift");
-        project.processApbRun(ApbImageGetter.fromImageStream(), extraVars);
+            server.getBuild().setExtensionImageStreamTag(extensionImage);
+            server.getBuild().setExtensionImageStreamTagNamespace(project.getName());
+            server.setDatabase(externalDatabase.getDatabaseModel());
+            registerCustomTrustedSecret(server);
+        }
 
-        kieServerDeployment = new KieServerDeploymentImpl(project);
+        // deploy application
+        getKieAppClient().create(kieApp);
+
+        kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
         kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
         kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+
+        logger.info("Waiting until all services are created.");
+        try {
+            new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+        } catch (WaiterException e) {
+            throw new RuntimeException("Timeout while deploying application.", e);
+        }
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
@@ -93,20 +99,13 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    protected void configureWithExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        ((ExternalDeploymentApb) externalDeployment).configure(extraVars);
-    }
-
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
-        ((ExternalDeploymentApb) externalDeployment).removeConfiguration(extraVars);
+    public KieServerDeployment getKieServerDeployment() {
+        return kieServerDeployment;
     }
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(kieServerDeployment, dockerDeployment));
+        List<Deployment> deployments = new ArrayList<>(Arrays.asList(kieServerDeployment, dockerDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
@@ -151,16 +150,7 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
         String imageStreamName = externalDriver.getImageName();
         String dockerTag = externalDriver.getTargetDockerTag(dockerDeployment.getUrl());
 
-        project.createImageStream(imageStreamName, dockerTag);
+        project.createImageStreamFromInsecureRegistry(imageStreamName, dockerTag);
     }
 
-    private void deployCustomTrustedSecret() {
-        project.processTemplateAndCreateResources(OpenShiftTemplate.CUSTOM_TRUSTED_SECRET.getTemplateUrl(),
-                Collections.emptyMap());
-
-        extraVars.put(OpenShiftApbConstants.KIESERVER_SECRET_NAME, DeploymentConstants.getCustomTrustedSecretName());
-        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_ALIAS,
-                DeploymentConstants.getCustomTrustedKeystoreAlias());
-        extraVars.put(OpenShiftApbConstants.KIESERVER_KEYSTORE_PWD, DeploymentConstants.getCustomTrustedKeystorePwd());
-    }
 }

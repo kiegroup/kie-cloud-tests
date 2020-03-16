@@ -19,10 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.openshift.database.external.AbstractMySqlExternalDatabase;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 
-public class MySqlExternalDatabase extends AbstractMySqlExternalDatabase {
+public class MySqlExternalDatabase extends AbstractMySqlExternalDatabase implements TemplateExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

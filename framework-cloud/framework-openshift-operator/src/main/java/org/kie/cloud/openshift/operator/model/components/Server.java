@@ -36,6 +36,7 @@ public class Server {
     private Resources resources;
     private Build build;
     private Jms jms;
+    private Database database;
 
     public String getName() {
         return name;
@@ -115,5 +116,13 @@ public class Server {
 
     public void setJms(Jms jms) {
         this.jms = jms;
+    }
+
+    public Database getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(Database database) {
+        this.database = database;
     }
 }

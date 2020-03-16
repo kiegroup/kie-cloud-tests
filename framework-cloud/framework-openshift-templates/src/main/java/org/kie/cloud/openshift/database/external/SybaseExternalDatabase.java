@@ -20,9 +20,8 @@ import java.util.Map;
 
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-import org.kie.cloud.openshift.database.external.AbstractSybaseExternalDatabase;
 
-public class SybaseExternalDatabase extends AbstractSybaseExternalDatabase {
+public class SybaseExternalDatabase extends AbstractSybaseExternalDatabase implements TemplateExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

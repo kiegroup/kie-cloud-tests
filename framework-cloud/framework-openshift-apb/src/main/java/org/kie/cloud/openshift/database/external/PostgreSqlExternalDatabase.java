@@ -21,7 +21,7 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 
-public class PostgreSqlExternalDatabase extends AbstractPostgreSqlExternalDatabase {
+public class PostgreSqlExternalDatabase extends AbstractPostgreSqlExternalDatabase implements ApbExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {

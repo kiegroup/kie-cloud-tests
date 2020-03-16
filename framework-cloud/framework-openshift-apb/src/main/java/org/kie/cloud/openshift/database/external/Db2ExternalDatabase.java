@@ -20,7 +20,7 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 
-public class Db2ExternalDatabase extends AbstractDb2ExternalDatabase {
+public class Db2ExternalDatabase extends AbstractDb2ExternalDatabase implements ApbExternalDatabase {
 
     @Override
     public Map<String, String> getExternalDatabaseEnvironmentVariables() {
