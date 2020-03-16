@@ -27,6 +27,9 @@ public class Build {
     private GitSource gitSource;
     private String kieServerContainerDeployment;
     private String mavenMirrorURL;
+    private String extensionImageStreamTag;
+    private String extensionImageStreamTagNamespace;
+    private String extensionImageInstallDir;
 
     public String getArtifactDir() {
         return artifactDir;
@@ -58,5 +61,29 @@ public class Build {
 
     public void setMavenMirrorURL(String mavenMirrorURL) {
         this.mavenMirrorURL = mavenMirrorURL;
+    }
+
+    public String getExtensionImageStreamTag() {
+        return extensionImageStreamTag;
+    }
+
+    public void setExtensionImageStreamTag(String extensionImageStreamTag) {
+        this.extensionImageStreamTag = extensionImageStreamTag;
+    }
+
+    public String getExtensionImageStreamTagNamespace() {
+        return extensionImageStreamTagNamespace;
+    }
+
+    public void setExtensionImageStreamTagNamespace(String extensionImageStreamTagNamespace) {
+        this.extensionImageStreamTagNamespace = extensionImageStreamTagNamespace;
+    }
+
+    public String getExtensionImageInstallDir() {
+        return extensionImageInstallDir;
+    }
+
+    public void setExtensionImageInstallDir(String extensionImageInstallDir) {
+        this.extensionImageInstallDir = extensionImageInstallDir;
     }
 }

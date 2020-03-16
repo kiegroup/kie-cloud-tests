@@ -33,8 +33,8 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftApbConstants;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
+import org.kie.cloud.openshift.database.external.ApbExternalDatabase;
 import org.kie.cloud.openshift.database.external.ApbExternalDatabaseProvider;
-import org.kie.cloud.openshift.database.external.ExternalDatabase;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.deployment.external.ExternalDeploymentApb;
@@ -63,7 +63,7 @@ public class KieServerWithExternalDatabaseScenarioApb extends OpenShiftScenario<
 
     @Override
     protected void deployKieDeployments() {
-        ExternalDatabase externalDatabase = ApbExternalDatabaseProvider.getExternalDatabase();
+        ApbExternalDatabase externalDatabase = ApbExternalDatabaseProvider.getExternalDatabase();
         extraVars.putAll(externalDatabase.getExternalDatabaseEnvironmentVariables());
 
         dockerDeployment = DockerRegistryDeployer.deploy(project);

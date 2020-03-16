@@ -131,6 +131,14 @@ public interface Project extends AutoCloseable {
     public void createImageStream(String imageStreamName, String imageTag);
 
     /**
+     * Create image stream in current project from an insecure registry.
+     *
+     * @param imageStreamName Name of image stream
+     * @param imageTag Image tag used to resolve image,for example Docker tag.
+     */
+    public void createImageStreamFromInsecureRegistry(String imageStreamName, String imageTag);
+
+    /**
      * Run oc command
      * @param args Command parameters
      * @return Output of oc
