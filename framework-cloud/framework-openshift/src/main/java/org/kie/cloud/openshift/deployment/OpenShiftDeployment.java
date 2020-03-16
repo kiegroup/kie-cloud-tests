@@ -130,7 +130,7 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public List<Instance> getInstances() {
-        if (isReady()) {
+        if (isReady() && getReplicas() > 0) {
             String deploymentConfigName = getDeploymentConfigName();
 
             return OpenShiftCaller.repeatableCall(() -> openShift.getPods()
