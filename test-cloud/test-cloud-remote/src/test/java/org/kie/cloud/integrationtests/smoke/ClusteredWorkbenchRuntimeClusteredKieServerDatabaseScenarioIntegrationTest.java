@@ -107,7 +107,6 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
     }
 
     @Test
-    @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
         processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
     }

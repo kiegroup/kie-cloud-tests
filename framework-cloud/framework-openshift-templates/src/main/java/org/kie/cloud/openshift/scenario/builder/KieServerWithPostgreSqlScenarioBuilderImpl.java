@@ -27,12 +27,16 @@ import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
 import org.kie.cloud.openshift.scenario.KieServerWithPostgreSqlScenarioImpl;
 
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyJbpmScenarioOnly;
+
 public class KieServerWithPostgreSqlScenarioBuilderImpl extends KieScenarioBuilderImpl<KieServerWithDatabaseScenarioBuilder, KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
     private boolean deploySso = false;
 
     public KieServerWithPostgreSqlScenarioBuilderImpl() {
+        verifyJbpmScenarioOnly();
+
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
 

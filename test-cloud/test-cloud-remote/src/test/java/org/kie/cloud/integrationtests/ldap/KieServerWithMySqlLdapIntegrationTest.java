@@ -85,7 +85,6 @@ public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrat
     }
 
     @Test
-    @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
         processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }

@@ -45,7 +45,8 @@ import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
-import org.kie.cloud.openshift.template.ProjectProfile;
+
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyJbpmScenarioOnly;
 
 public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario> implements
                                                                                           WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder {
@@ -54,7 +55,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBu
     private ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilderImpl() {
-        isScenarioAllowed();
+        verifyJbpmScenarioOnly();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
@@ -215,18 +216,6 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBu
         }
 
         return this;
-    }
-
-    private static void isScenarioAllowed() {
-        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        switch (projectProfile) {
-            case JBPM:
-                return;
-            case DROOLS:
-                throw new UnsupportedOperationException("Not supported");
-            default:
-                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
-        }
     }
 
     @Override

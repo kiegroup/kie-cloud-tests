@@ -43,7 +43,8 @@ import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ImmutableKieServerAmqScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
-import org.kie.cloud.openshift.template.ProjectProfile;
+
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyDroolsScenarioOnly;
 
 public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ImmutableKieServerAmqScenario> implements ImmutableKieServerAmqScenarioBuilder {
 
@@ -51,7 +52,7 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
     private ScenarioRequest request = new ScenarioRequest();
 
     public ImmutableKieServerAmqScenarioBuilderImpl() {
-        isScenarioAllowed();
+        verifyDroolsScenarioOnly();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
@@ -215,17 +216,5 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
         }
 
         return this;
-    }
-
-    private static void isScenarioAllowed() {
-        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        switch (projectProfile) {
-            case JBPM:
-                throw new UnsupportedOperationException("Not supported");
-            case DROOLS:
-                return;
-            default:
-                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
-        }
     }
 }
