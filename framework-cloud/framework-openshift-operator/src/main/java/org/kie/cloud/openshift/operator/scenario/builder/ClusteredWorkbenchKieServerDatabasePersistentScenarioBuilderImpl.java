@@ -40,7 +40,8 @@ import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
-import org.kie.cloud.openshift.template.ProjectProfile;
+
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyJbpmScenarioOnly;
 
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements
                                                                               ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
@@ -49,7 +50,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
     private final ScenarioRequest request = new ScenarioRequest();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
-        isScenarioAllowed();
+        verifyJbpmScenarioOnly();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
@@ -165,18 +166,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         return withExternalLdap(ldapSettings);
-    }
-
-    private static void isScenarioAllowed() {
-        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        switch (projectProfile) {
-            case JBPM:
-                return;
-            case DROOLS:
-                throw new UnsupportedOperationException("Not supported");
-            default:
-                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
-        }
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -33,6 +34,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.Constants;
@@ -48,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Category(JBPMOnly.class)
 @RunWith(Parameterized.class)
 public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerWithDatabaseScenario> {
 

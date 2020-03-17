@@ -34,7 +34,8 @@ import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerPersistentScenarioImpl;
-import org.kie.cloud.openshift.template.ProjectProfile;
+
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyDroolsScenarioOnly;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ClusteredWorkbenchKieServerPersistentScenario> implements
                                                                       ClusteredWorkbenchKieServerPersistentScenarioBuilder {
@@ -43,7 +44,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
     private boolean deploySSO = false;
 
     public ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl() {
-        isScenarioAllowed();
+        verifyDroolsScenarioOnly();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
@@ -110,18 +111,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
             servers[i].setSsoClient(ssoClient);
         }
         return this;
-    }
-
-    private static void isScenarioAllowed() {
-        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        switch (projectProfile) {
-            case JBPM:
-                throw new UnsupportedOperationException("Not supported");
-            case DROOLS:
-                return;
-            default:
-                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
-        }
     }
 
     @Override
