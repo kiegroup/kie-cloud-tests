@@ -14,8 +14,6 @@
  */
 package org.kie.cloud.integrationtests.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +43,7 @@ import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.utils.AwaitilityUtils;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
@@ -52,11 +51,12 @@ import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.wb.test.rest.client.WorkbenchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 @Category({OperatorNotSupported.class}) // Operator doesn't support scaling Workbench to 0 for this scenario
@@ -164,16 +164,19 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         assertThat(containersResponse.getResult().getContainers().get(0).getContainerId()).isEqualTo(CONTAINER_ID);
     }
 
-    private void verifyOneServerTemplateWithContainer(String containerId) {
-        ServerTemplateList serverTemplates = kieControllerClient.listServerTemplates();
-        assertThat(serverTemplates.getServerTemplates()).as("Number of server templates differ.").hasSize(1);
+    private void verifyOneServerTemplate() {
+        ServerTemplate[] serverTemplates = AwaitilityUtils.untilIsNotEmpty(() -> kieControllerClient.listServerTemplates().getServerTemplates());
+        assertThat(serverTemplates).as("Number of server templates differ.").hasSize(1);
+    }
 
-        ServerTemplate serverTemplate = serverTemplates.getServerTemplates()[0];
-        assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
-        // Skip check on URL as the workbench has an internal IP to KIE server and we only have the route here
-        // assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
-        assertThat(serverTemplate.getContainersSpec()).hasSize(1);
-        assertThat(serverTemplate.getContainersSpec().iterator().next().getId()).isEqualTo(containerId);
+    private void verifyOneServerTemplateWithContainer(String containerId) {
+        AwaitilityUtils.untilAsserted(() -> kieControllerClient.listServerTemplates().getServerTemplates()[0], serverTemplate -> {
+            assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
+            // Skip check on URL as the workbench has an internal IP to KIE server and we only have the route here
+            // assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
+            assertThat(serverTemplate.getContainersSpec()).hasSize(1);
+            assertThat(serverTemplate.getContainersSpec().iterator().next().getId()).isEqualTo(containerId);
+        });
     }
 
     private void assertSpaceAndProjectExists(String spaceName, String projectName) {
@@ -189,5 +192,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         deployment.waitForScale();
         deployment.scale(1);
         deployment.waitForScale();
+
+        verifyOneServerTemplate();
     }
 }
