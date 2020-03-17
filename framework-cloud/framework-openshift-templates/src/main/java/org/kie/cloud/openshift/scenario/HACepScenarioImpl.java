@@ -46,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.HACepDeployment;
+import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.api.scenario.HACepScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerScenarioBuilder;
@@ -187,6 +188,18 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     @Override
     public void undeploy() {
+        final File logsDirectory = logsDirectory();
+        final List<Instance> instances = haCepDeployment.getInstances();
+        for (Instance instance : instances) {
+            File logFile = new File(logsDirectory, instance.getName() + ".log");
+            String logText = instance.getLogs();
+            try {
+                FileUtils.writeStringToFile(logFile, logText, "UTF-8");
+            } catch (IOException e) {
+                throw new RuntimeException("Error writing logs for Openshift pod", e);
+            }
+        }
+
         super.undeploy();
 
         deleteStrimziCustomResourceDefinitions();
@@ -329,6 +342,17 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
                      .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
                      .map(f -> f.getAbsolutePath())
                      .collect(Collectors.toList());
+    }
+
+    private File logsDirectory() {
+        final File current = new File(OpenShiftConstants.getProjectBuildDirectory());
+        final File dir = new File(current, "/pod-logs");
+
+        if (dir.isDirectory() == false) {
+            dir.mkdir();
+        }
+
+        return dir;
     }
 
     @Override
