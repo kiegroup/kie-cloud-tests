@@ -164,19 +164,19 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
         assertThat(containersResponse.getResult().getContainers().get(0).getContainerId()).isEqualTo(CONTAINER_ID);
     }
 
-    private ServerTemplate[] verifyOneServerTemplate() {
+    private void verifyOneServerTemplate() {
         ServerTemplate[] serverTemplates = AwaitilityUtils.untilIsNotEmpty(() -> kieControllerClient.listServerTemplates().getServerTemplates());
         assertThat(serverTemplates).as("Number of server templates differ.").hasSize(1);
-        return serverTemplates;
     }
 
     private void verifyOneServerTemplateWithContainer(String containerId) {
-        ServerTemplate serverTemplate = verifyOneServerTemplate()[0];
-        assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
-        // Skip check on URL as the workbench has an internal IP to KIE server and we only have the route here
-        // assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
-        assertThat(serverTemplate.getContainersSpec()).hasSize(1);
-        assertThat(serverTemplate.getContainersSpec().iterator().next().getId()).isEqualTo(containerId);
+        AwaitilityUtils.untilAsserted(() -> kieControllerClient.listServerTemplates().getServerTemplates()[0], serverTemplate -> {
+            assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
+            // Skip check on URL as the workbench has an internal IP to KIE server and we only have the route here
+            // assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
+            assertThat(serverTemplate.getContainersSpec()).hasSize(1);
+            assertThat(serverTemplate.getContainersSpec().iterator().next().getId()).isEqualTo(containerId);
+        });
     }
 
     private void assertSpaceAndProjectExists(String spaceName, String projectName) {

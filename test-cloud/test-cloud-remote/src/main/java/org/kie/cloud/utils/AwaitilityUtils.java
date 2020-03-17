@@ -14,10 +14,13 @@
  */
 package org.kie.cloud.utils;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.awaitility.Awaitility;
+import org.awaitility.core.ConditionFactory;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.slf4j.Logger;
@@ -55,14 +58,31 @@ public class AwaitilityUtils {
         return until(supplier, Matchers.arrayWithSize(Matchers.greaterThan(0)));
     }
 
+    /**
+     * Wait until the supplier returns an instance that satisfies the asserts.
+     *
+     * @param supplier method to return the instance.
+     * @param asserts custom assertions that the instance must satisfy.
+     */
+    public static final <T> void untilAsserted(Supplier<T> supplier, Consumer<T> asserts) {
+        awaits().untilAsserted(() -> asserts.accept(get(supplier).call()));
+    }
+
     private static final <T> T until(Supplier<T> supplier, Matcher<T> matcher) {
+        return awaits().until(get(supplier), matcher);
+    }
+
+    private static final <T> Callable<T> get(Supplier<T> supplier) {
+        return () -> {
+            T instance = supplier.get();
+            logger.trace("Checking ... {}", instance);
+            return instance;
+        };
+    }
+
+    private static final ConditionFactory awaits() {
         return Awaitility.await()
-                         .pollInterval(30, TimeUnit.SECONDS)
-                         .atMost(5, TimeUnit.MINUTES)
-                         .until(() -> {
-                             T instance = supplier.get();
-                             logger.trace("Checking ... {}", instance);
-                             return instance;
-                         }, matcher);
+                         .pollInterval(5, TimeUnit.SECONDS)
+                         .atMost(3, TimeUnit.MINUTES);
     }
 }
