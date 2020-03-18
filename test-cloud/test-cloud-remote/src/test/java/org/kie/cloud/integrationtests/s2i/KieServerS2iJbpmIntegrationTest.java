@@ -84,7 +84,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
     }
 
     @Test
-    @Category({OperatorNotSupported.class}) // Skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2267
+    @Category({OperatorNotSupported.class}) // Skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2825
     public void testProcessUsingSmartRouter() {
         processTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
         processTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ALIAS_ID);
