@@ -42,12 +42,12 @@ public class GogsDeploymentImpl extends OpenShiftDeployment implements GogsDeplo
     }
 
     @Override
-    public String getUrl() {
+    public URL getUrl() {
         if (url == null) {
             url = getHttpRouteUrl(getServiceName()).orElseThrow(() -> new RuntimeException("No Gogs URL is available."));
         }
 
-        return url.toString();
+        return url;
     }
 
     @Override
@@ -58,5 +58,14 @@ public class GogsDeploymentImpl extends OpenShiftDeployment implements GogsDeplo
     @Override
     public String getPassword() {
         return PASSWORD;
+    }
+
+    @Override
+    public void waitForScale() {
+        super.waitForScale();
+
+        if (getInstances().size() > 0) {
+            RouterUtil.waitForRouter(getUrl());
+        }
     }
 }

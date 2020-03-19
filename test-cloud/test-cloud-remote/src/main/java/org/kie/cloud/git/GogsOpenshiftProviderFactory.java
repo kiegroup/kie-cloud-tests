@@ -60,7 +60,7 @@ public class GogsOpenshiftProviderFactory implements GitProviderFactory, Project
         }
 
         GogsDeployment deployment = deploy(project);
-        return new GogsGitProvider(deployment.getUrl(), deployment.getUsername(), deployment.getPassword());
+        return new GogsGitProvider(deployment.getUrl().toString(), deployment.getUsername(), deployment.getPassword());
     }
 
     private static GogsDeployment deploy(Project project) {
