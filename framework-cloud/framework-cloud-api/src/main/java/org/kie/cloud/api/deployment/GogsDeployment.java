@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.api.deployment;
 
+import java.net.URL;
+
 /**
  * Gogs deployment representation in cloud.
  */
@@ -25,7 +27,7 @@ public interface GogsDeployment extends Deployment {
      *
      * @return Docker URL
      */
-    String getUrl();
+    URL getUrl();
 
     /**
      * @return get admin user to connect with Gogs instance.
