@@ -69,14 +69,6 @@ public interface KieServerScenarioBuilder extends KieDeploymentScenarioBuilder<K
     KieServerScenarioBuilder withHttpsKieServerHostname(String hostname);
 
     /**
-     * Return setup builder with an external LDAP.
-     *
-     * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
-     */
-    KieServerScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
-
-    /**
      * Return setup builder with additional configuration of internal ldap.
      *
      * Parameters will be used automatically
@@ -84,5 +76,5 @@ public interface KieServerScenarioBuilder extends KieDeploymentScenarioBuilder<K
      * @param ldapSettings configuration of LDAP represented by a class.
      * @return Builder with configured internal ldap.
      */
-    KieServerScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
+    KieServerScenarioBuilder withLdap(LdapSettings ldapSettings);
 }

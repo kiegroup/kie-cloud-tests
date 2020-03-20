@@ -88,13 +88,7 @@ public class KieServerWithPostgreSqlScenarioBuilderImpl extends KieScenarioBuild
     }
 
     @Override
-    public KieServerWithDatabaseScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
-        envVariables.putAll(ldapSettings.getEnvVariables());
-        return this;
-    }
-
-    @Override
-    public KieServerWithDatabaseScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+    public KieServerWithDatabaseScenarioBuilder withLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;

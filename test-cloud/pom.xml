@@ -42,9 +42,6 @@
     <sso.service.username>serviceUser</sso.service.username>
     <sso.service.password>serviceUser1!</sso.service.password>
 
-    <!-- Properties to configure LDAP -->
-    <ldap.url/>
-
     <kie.app.name>myapp</kie.app.name>
 
     <git.provider/> <!-- Currently supported GitLab and GitHub. Define one of them with related properties to run tests using GIT remote repository. -->
@@ -361,7 +358,6 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <sso.admin.password>${sso.admin.password}</sso.admin.password>
               <sso.service.username>${sso.service.username}</sso.service.username>
               <sso.service.password>${sso.service.password}</sso.service.password>
-              <ldap.url>${ldap.url}</ldap.url>
               <trusted.keystore.alias>${trusted.keystore.alias}</trusted.keystore.alias>
               <trusted.keystore.pwd>${trusted.keystore.pwd}</trusted.keystore.pwd>
               <trusted.keystore.file>${certificate.dir}/${default.domain.suffix}.jks</trusted.keystore.file>

@@ -100,14 +100,6 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenar
     WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withDroolsServerFilterClasses(boolean droolsFilter);
 
     /**
-     * Return setup builder with an external LDAP.
-     *
-     * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
-     */
-    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
-
-    /**
      * Return setup builder with additional configuration of internal ldap.
      *
      * Parameters will be used automatically
@@ -115,7 +107,7 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenar
      * @param ldapSettings configuration of LDAP represented by a class.
      * @return Builder with configured internal ldap.
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
+    WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withLdap(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with specified timer service data store refresh interval.

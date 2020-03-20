@@ -84,13 +84,7 @@ public class KieServerScenarioBuilderImpl extends KieScenarioBuilderImpl<KieServ
     }
 
     @Override
-    public KieServerScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
-        envVariables.putAll(ldapSettings.getEnvVariables());
-        return this;
-    }
-
-    @Override
-    public KieServerScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+    public KieServerScenarioBuilder withLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
