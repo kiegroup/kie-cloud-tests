@@ -62,7 +62,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
                 .build();
 
         deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder()
-                .withInternalLdap(ldapSettings)
+                .withLdap(ldapSettings)
                 .withInternalMavenRepo()
                 .build();
         deploymentScenario.setLogFolderName(ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioLdapIntegrationTest.class.getSimpleName());

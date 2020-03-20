@@ -16,7 +16,6 @@
 package org.kie.cloud.openshift.settings;
 
 import org.kie.cloud.api.settings.LdapSettings;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 
 public abstract class AbstractLdapSettings implements LdapSettings {
 
@@ -41,10 +40,6 @@ public abstract class AbstractLdapSettings implements LdapSettings {
     private Boolean parseRoleNameFromDn;
     private Boolean roleAttributeIsDn;
     private String referralUserAttributeIdToCheck;
-
-    public AbstractLdapSettings() {
-        url = OpenShiftConstants.getLdapUrl();
-    }
 
     @Override
     public String getLdapUrl() {

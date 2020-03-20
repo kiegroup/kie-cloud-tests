@@ -133,18 +133,13 @@ public class ImmutableKieServerScenarioBuilderImpl extends AbstractOpenshiftScen
     }
 
     @Override
-    public ImmutableKieServerScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
+    public ImmutableKieServerScenarioBuilder withLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
         Auth auth = new Auth();
         auth.setLdap(ldap);
         kieApp.getSpec().setAuth(auth);
         return this;
-    }
-
-    @Override
-    public ImmutableKieServerScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
-        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
-        return withExternalLdap(ldapSettings);
     }
 
     @Override

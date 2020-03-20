@@ -53,15 +53,6 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings);
 
     /**
-    *
-    * Return setup builder with an external LDAP.
-    *
-    * @param ldapSettings configuration of LDAP represented by a class.
-    * @return Builder
-    */
-    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withExternalLdap(LdapSettings ldapSettings);
-
-    /**
      * Return setup builder with additional configuration of internal ldap.
      *
      * Parameters will be used automatically
@@ -69,7 +60,7 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @param ldapSettings configuration of LDAP represented by a class.
      * @return Builder with configured internal ldap.
      */
-    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalLdap(LdapSettings ldapSettings);
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdap(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with configure Workbench http hostname.

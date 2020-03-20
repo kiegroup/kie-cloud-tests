@@ -70,7 +70,6 @@ mvn clean install -Popenshift
 -Dtemplate.project=jbpm 
 -Dopenshift.namespace.prefix=<your_name>-rhpam 
 -Ddefault.domain.suffix=.project.openshiftdomain 
--Dldap.url=ldap://master.openshiftdomain:30389 
 -Dkie.artifact.version=<version e.g.: 7.18.0.Final-redhat-00002> 
 -Dit.test=JbpmEJBSinglePointTimersPerfIntegrationTest 
 -Dcheckstyle.skip 

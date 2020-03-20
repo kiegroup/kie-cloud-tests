@@ -122,13 +122,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
     }
 
     @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
-        envVariables.putAll(ldapSettings.getEnvVariables());
-        return this;
-    }
-
-    @Override
-    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;

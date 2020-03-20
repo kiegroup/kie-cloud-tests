@@ -126,13 +126,7 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends KieScenarioBuilder
     }
 
     @Override
-    public ImmutableKieServerAmqScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
-        envVariables.putAll(ldapSettings.getEnvVariables());
-        return this;
-    }
-
-    @Override
-    public ImmutableKieServerAmqScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+    public ImmutableKieServerAmqScenarioBuilder withLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;

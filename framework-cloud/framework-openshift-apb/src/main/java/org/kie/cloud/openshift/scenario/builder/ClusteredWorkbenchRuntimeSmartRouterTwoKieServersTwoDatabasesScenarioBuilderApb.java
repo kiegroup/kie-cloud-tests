@@ -90,13 +90,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Override
-    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
-        extraVars.putAll(ldapSettings.getEnvVariables());
-        return this;
-    }
-
-    @Override
-    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         extraVars.putAll(ldapSettings.getEnvVariables());
         return this;

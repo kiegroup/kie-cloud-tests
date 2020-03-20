@@ -130,18 +130,13 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
     }
 
     @Override
-    public KieServerWithDatabaseScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
+    public KieServerWithDatabaseScenarioBuilder withLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
         Auth auth = new Auth();
         auth.setLdap(ldap);
         kieApp.getSpec().setAuth(auth);
         return this;
-    }
-
-    @Override
-    public KieServerWithDatabaseScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
-        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
-        return withExternalLdap(ldapSettings);
     }
 
     @Override

@@ -100,7 +100,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
                                                                                                        .withGitSettings(gitSettings)
                                                                                                        .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                                        .withDroolsServerFilterClasses(false)
-                                                                                                       .withInternalLdap(ldapSettings)
+                                                                                                       .withLdap(ldapSettings)
                                                                                                        .build();
             scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
         } catch (UnsupportedOperationException ex) {
@@ -113,7 +113,7 @@ public class KieServerS2iWithLdapDroolsIntegrationTest extends AbstractMethodIso
                                                                                            .withGitSettings(gitSettings)
                                                                                            .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                            .withDroolsServerFilterClasses(false)
-                                                                                           .withInternalLdap(ldapSettings)
+                                                                                           .withLdap(ldapSettings)
                                                                                            .build();
             scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenario });
         } catch (UnsupportedOperationException ex) {

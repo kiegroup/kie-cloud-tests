@@ -113,13 +113,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderApb extends AbstractOpen
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withExternalLdap(LdapSettings ldapSettings) {
-        extraVars.putAll(ldapSettings.getEnvVariables());
-        return this;
-    }
-
-    @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withInternalLdap(LdapSettings ldapSettings) {
+    public WorkbenchKieServerPersistentScenarioBuilder withLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         extraVars.putAll(ldapSettings.getEnvVariables());
         return this;
