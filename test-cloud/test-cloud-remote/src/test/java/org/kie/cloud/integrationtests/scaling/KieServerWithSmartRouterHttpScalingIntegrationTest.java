@@ -33,6 +33,7 @@ import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.SmartRouterUtils;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.utils.AwaitilityUtils;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -44,11 +45,10 @@ import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
-import org.kie.server.router.Configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({ApbNotSupported.class, OperatorNotSupported.class}) // Because DroolsServerFilterClasses not supported yet, Operator skipped as there is discrepancy between deployment methods and Kie server connection, should be unified for 7.4  
+@Category({ApbNotSupported.class, OperatorNotSupported.class}) // Because DroolsServerFilterClasses not supported yet, Operator skipped as there is discrepancy between deployment methods and Kie server connection, should be unified for 7.4
 public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final String SMART_ROUTER_ID = "test-kie-router";
@@ -86,12 +86,13 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
         verifyContainerIsDeployed(kieServerClient, CONTAINER_ID);
         verifyServerTemplateContainsContainer(kieServerId, CONTAINER_ID);
         verifyServerTemplateContainsContainer(SMART_ROUTER_ID, CONTAINER_ID);
-        verifySmartRouterContainsKieServers(kieServerId, 1);
 
-        scaleKieServerTo(3);
+        deploymentScenario.getSmartRouterDeployment().scale(0);
+        deploymentScenario.getSmartRouterDeployment().waitForScale();
+        deploymentScenario.getSmartRouterDeployment().scale(1);
+        deploymentScenario.getSmartRouterDeployment().waitForScale();
 
-        // In case of WebSockets (default option) all Kie servers with same URL are registered under one server template instance
-        verifyServerTemplateContainsKieServers(kieServerId, 1);
+        // by default, the numbers of kie servers is 3.
         verifySmartRouterContainsKieServers(kieServerId, 3);
 
         scaleKieServerTo(1);
@@ -129,13 +130,13 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
     }
 
     private void verifySmartRouterContainsKieServers(String kieServerId, int numberOfKieServers) {
-        Configuration routerConfig = smartRouterAdminClient.getRouterConfig();
-
-        assertThat(routerConfig.getHostsPerServer()).containsKey(kieServerId);
-        assertThat(routerConfig.getHostsPerServer().get(kieServerId)).hasSize(numberOfKieServers);
-        assertThat(routerConfig.getHostsPerContainer()).containsKey(CONTAINER_ID);
-        assertThat(routerConfig.getHostsPerContainer().get(CONTAINER_ID)).hasSize(numberOfKieServers);
-        assertThat(routerConfig.getContainerInfosPerContainer()).containsKey(CONTAINER_ID);
+        AwaitilityUtils.untilAsserted(() -> smartRouterAdminClient.getRouterConfig(), routerConfig -> {
+            assertThat(routerConfig.getHostsPerServer()).containsKey(kieServerId);
+            assertThat(routerConfig.getHostsPerServer().get(kieServerId)).hasSize(numberOfKieServers);
+            assertThat(routerConfig.getHostsPerContainer()).containsKey(CONTAINER_ID);
+            assertThat(routerConfig.getHostsPerContainer().get(CONTAINER_ID)).hasSize(numberOfKieServers);
+            assertThat(routerConfig.getContainerInfosPerContainer()).containsKey(CONTAINER_ID);
+        });
     }
 
     private void deployAndStartContainer() {
