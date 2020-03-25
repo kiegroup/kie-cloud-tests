@@ -78,6 +78,11 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
+    public int getVersion() {
+        return deploymentConfig().getStatus().getLatestVersion().intValue();
+    }
+
+    @Override
     public void deleteInstances(Instance... instance) {
         deleteInstances(Arrays.asList(instance));
     }
@@ -157,8 +162,21 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
+    public void waitForVersion(int version) {
+        try {
+            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
+                                                          .isDeploymentReady(getDeploymentConfigName(), version)
+                                                          .timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
+                                                          .reason("Waiting for deployment config " + getDeploymentConfigName() + " to deploy version " + version)
+                                                          .waitFor());
+        } catch (AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
+        }
+    }
+
+    @Override
     public int getReplicas() {
-        return openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
+        return deploymentConfig().getSpec().getReplicas().intValue();
     }
 
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {
@@ -273,6 +291,10 @@ public abstract class OpenShiftDeployment implements Deployment {
                         .routes()
                         .withLabel("service", getServiceName())
                         .list();
+    }
+
+    private DeploymentConfig deploymentConfig() {
+        return openShift.getDeploymentConfig(getDeploymentConfigName());
     }
 
     private Optional<String> getRoute(Protocol protocol, String serviceName) {

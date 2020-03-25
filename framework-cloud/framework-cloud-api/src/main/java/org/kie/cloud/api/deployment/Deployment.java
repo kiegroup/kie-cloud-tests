@@ -40,6 +40,11 @@ public interface Deployment {
     void scale(int instances);
 
     /**
+     * @return the current version of the deployment.
+     */
+    int getVersion();
+
+    /**
      * Return deployment replicas count. Replicas count is change as deployment is scale up or down.
      *
      * @return number of replicas
@@ -117,4 +122,11 @@ public interface Deployment {
      * @param requests map with the CPU, memory, ephemeral storage limits
      */
     void setResources(Map<String, String> requests, Map<String, String> limits);
+
+    /**
+     * This method waits until Deployment is deployed using a new version.
+     *
+     * @param version to wait for.
+     */
+    void waitForVersion(int version);
 }

@@ -17,6 +17,7 @@ package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.settings.GitSettings;
+import org.kie.cloud.api.settings.UpgradeSettings;
 
 public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerPersistentScenario> {
 
@@ -58,4 +59,11 @@ public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends De
      * @return Builder with configured memory limit.
      */
     ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
+
+    /**
+     * Mark the deployment that can be upgraded to a newer version.
+     * @param upgradeSettings upgrade settings.
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerPersistentScenarioBuilder withUpgrades(UpgradeSettings upgradeSettings);
 }
