@@ -30,7 +30,6 @@ import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
-import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
@@ -119,9 +118,6 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
         logger.info("Waiting for Kie server two deployment to become ready.");
         kieServerTwoDeployment.waitForScale();
-
-        logger.info("Waiting for Kie servers and Smart router to register itself to the Workbench.");
-        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment, 3);
 
         logNodeNameOfAllInstances();
     }

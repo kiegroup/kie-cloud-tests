@@ -37,7 +37,6 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
-import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.AmqDeploymentImpl;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
@@ -157,9 +156,6 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
 
         logger.info("Waiting for Database deployment to become ready.");
         databaseDeployment.waitForScale();
-
-        logger.info("Waiting for Kie server and Smart router to register itself to the Workbench.");
-        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchRuntimeDeployment, 2);
 
         logNodeNameOfAllInstances();
 
