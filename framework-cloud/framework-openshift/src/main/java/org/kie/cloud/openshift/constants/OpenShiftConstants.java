@@ -145,10 +145,6 @@ public class OpenShiftConstants implements Constants {
 
     public static final String AMQ_IMAGE_STREAMS = "amq.image.streams";
 
-    public static final String APB_IMAGE_STREAM_NAME = "apb.image.stream.name";
-    public static final String APB_IMAGE_DOCKER_REPO_TAG = "apb.image.docker.repo.tag";
-    public static final String APB_KIE_IAMGE_STREAM_TAG = "apb.kie.image.stream.tag";
-
     public static final String KIE_IMAGE_TAG_AMQ = "kie.image.tag.amq";
     public static final String KIE_IMAGE_TAG_CONSOLE = "kie.image.tag.console";
     public static final String KIE_IMAGE_TAG_CONTROLLER = "kie.image.tag.controller";
@@ -218,18 +214,6 @@ public class OpenShiftConstants implements Constants {
 
     public static String getAmqImageStreams() {
         return System.getProperty(AMQ_IMAGE_STREAMS);
-    }
-
-    public static String getApbImageStreamName() {
-        return System.getProperty(APB_IMAGE_STREAM_NAME);
-    }
-
-    public static String getApbImageDockerRepoTag() {
-        return System.getProperty(APB_IMAGE_DOCKER_REPO_TAG);
-    }
-
-    public static String getApbKieImageStreamTag() {
-        return System.getProperty(APB_KIE_IAMGE_STREAM_TAG);
     }
 
     public static String getKieApplicationName() {

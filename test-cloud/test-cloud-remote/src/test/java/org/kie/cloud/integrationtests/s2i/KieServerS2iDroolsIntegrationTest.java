@@ -41,7 +41,6 @@ import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.git.GitUtils;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
@@ -58,7 +57,7 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
-@Category({Baseline.class, ApbNotSupported.class}) // Because DroolsServerFilterClasses not supported yet
+@Category({Baseline.class}) // Because DroolsServerFilterClasses not supported yet
 public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
     private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iDroolsRepository");

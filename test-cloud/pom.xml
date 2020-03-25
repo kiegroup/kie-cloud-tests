@@ -80,11 +80,6 @@
     <trusted.keystore.alias>jboss</trusted.keystore.alias> <!-- Must match with XX_HTTPS_NAME. Example: DECISION_CENTRAL_HTTPS_NAME -->
     <trusted.keystore.pwd>mykeystorepass</trusted.keystore.pwd> <!-- Must match with XX_HTTPS_PASSWORD. Example: DECISION_CENTRAL_HTTPS_PASSWORD -->
 
-    <!-- APB -->
-    <apb.image.stream.name/>
-    <apb.kie.image.stream.tag/> <!-- Tag version of the Kie ImageStream to use. -->
-    <apb.image.docker.repo.tag/>
-
     <!-- Image tag properties for Image Stream Provider -->
     <kie.image.tag.amq/>
     <kie.image.tag.console/>
@@ -361,9 +356,6 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <trusted.keystore.alias>${trusted.keystore.alias}</trusted.keystore.alias>
               <trusted.keystore.pwd>${trusted.keystore.pwd}</trusted.keystore.pwd>
               <trusted.keystore.file>${certificate.dir}/${default.domain.suffix}.jks</trusted.keystore.file>
-              <apb.image.stream.name>${apb.image.stream.name}</apb.image.stream.name>
-              <apb.kie.image.stream.tag>${apb.kie.image.stream.tag}</apb.kie.image.stream.tag>
-              <apb.image.docker.repo.tag>${apb.image.docker.repo.tag}</apb.image.docker.repo.tag>
               <kie.image.tag.amq>${kie.image.tag.amq}</kie.image.tag.amq>
               <kie.image.tag.console>${kie.image.tag.console}</kie.image.tag.console>
               <kie.image.tag.controller>${kie.image.tag.controller}</kie.image.tag.controller>
@@ -525,19 +517,6 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
           </plugins>
         </pluginManagement>
       </build>
-    </profile>
-    <profile>
-      <id>openshift-apb</id>
-      <properties>
-        <failsafe.excluded.groups>org.kie.cloud.integrationtests.category.ApbNotSupported</failsafe.excluded.groups>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.kie.cloud</groupId>
-          <artifactId>framework-openshift-apb</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
     </profile>
     <profile>
       <id>parallel</id>

@@ -27,7 +27,6 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServ
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -48,7 +47,7 @@ import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({ApbNotSupported.class, OperatorNotSupported.class}) // Because DroolsServerFilterClasses not supported yet, Operator skipped as there is discrepancy between deployment methods and Kie server connection, should be unified for 7.4
+@Category({OperatorNotSupported.class}) // Because DroolsServerFilterClasses not supported yet, Operator skipped as there is discrepancy between deployment methods and Kie server connection, should be unified for 7.4  
 public class KieServerWithSmartRouterHttpScalingIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final String SMART_ROUTER_ID = "test-kie-router";
