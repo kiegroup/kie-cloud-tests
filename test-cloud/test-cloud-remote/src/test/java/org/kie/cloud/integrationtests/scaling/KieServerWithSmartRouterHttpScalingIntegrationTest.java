@@ -87,16 +87,11 @@ public class KieServerWithSmartRouterHttpScalingIntegrationTest extends Abstract
         verifyServerTemplateContainsContainer(kieServerId, CONTAINER_ID);
         verifyServerTemplateContainsContainer(SMART_ROUTER_ID, CONTAINER_ID);
 
-        deploymentScenario.getSmartRouterDeployment().scale(0);
-        deploymentScenario.getSmartRouterDeployment().waitForScale();
-        deploymentScenario.getSmartRouterDeployment().scale(1);
-        deploymentScenario.getSmartRouterDeployment().waitForScale();
-
-        // by default, the numbers of kie servers is 3.
-        verifySmartRouterContainsKieServers(kieServerId, 3);
+        scaleKieServerTo(2);
+        verifyServerTemplateContainsKieServers(kieServerId, 1);
+        verifySmartRouterContainsKieServers(kieServerId, 2);
 
         scaleKieServerTo(1);
-
         verifyServerTemplateContainsKieServers(kieServerId, 1);
         verifySmartRouterContainsKieServers(kieServerId, 1);
     }
