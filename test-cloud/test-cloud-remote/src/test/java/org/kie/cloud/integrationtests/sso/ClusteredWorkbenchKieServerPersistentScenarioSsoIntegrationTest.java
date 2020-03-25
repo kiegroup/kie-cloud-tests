@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
@@ -31,8 +32,11 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
+import org.kie.cloud.tests.common.client.util.Kjar;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
+
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
 
     private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
 
@@ -50,11 +54,17 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
 
     @BeforeClass
     public static void initializeDeployment() {
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getResource(
+                                                                                                                                               PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile());
+
         if (deploymentScenarioFactory.getCloudAPIImplementationName().equals("openshift-operator")) {
             try {
                 deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                         .deploySso()
                         .withInternalMavenRepo()
+                        .withGitSettings(gitSettings)
                         .build();
             } catch (UnsupportedOperationException ex) {
                 Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -64,6 +74,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
                 deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                         .deploySso()
                         .withInternalMavenRepo()
+                        .withGitSettings(gitSettings)
                         .withHttpWorkbenchHostname(RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                         .withHttpsWorkbenchHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + BUSINESS_CENTRAL_HOSTNAME)
                         .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
@@ -112,6 +123,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment(), deploymentScenario.getGitProvider());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
+                                                                  deploymentScenario.getKieServerDeployment(),
+                                                                  deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));
     }
 }

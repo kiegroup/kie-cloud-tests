@@ -21,6 +21,7 @@ import java.util.List;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
@@ -34,6 +35,7 @@ import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerPersistentScenarioImpl;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
 import static org.kie.cloud.openshift.util.ScenarioValidations.verifyDroolsScenarioOnly;
 
@@ -41,7 +43,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
                                                                       ClusteredWorkbenchKieServerPersistentScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private final ScenarioRequest request = new ScenarioRequest();
 
     public ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl() {
         verifyDroolsScenarioOnly();
@@ -80,7 +82,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
     @Override
     public ClusteredWorkbenchKieServerPersistentScenario getDeploymentScenarioInstance() {
-        return new ClusteredWorkbenchKieServerPersistentScenarioImpl(kieApp, deploySSO);
+        return new ClusteredWorkbenchKieServerPersistentScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -97,7 +99,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
     @Override
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         SsoClient ssoClient = new SsoClient();
         ssoClient.setName("workbench-client");
         ssoClient.setSecret("workbench-secret");
@@ -110,6 +112,12 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
             ssoClient.setSecret("kie-server-" + i + "-secret");
             servers[i].setSsoClient(ssoClient);
         }
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerPersistentScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 

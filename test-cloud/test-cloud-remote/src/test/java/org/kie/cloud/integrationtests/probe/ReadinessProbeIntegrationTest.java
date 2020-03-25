@@ -84,12 +84,14 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             ReadinessProbeIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+
         try {
             WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                     .withInternalMavenRepo()
-                    .withGitSettings(GitSettings.fromProperties()
-                                     .withRepository(REPOSITORY_NAME,
-                                                     ReadinessProbeIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile()))
+                    .withGitSettings(gitSettings)
                     .build();
             scenarios.add(new Object[]{"Workbench + KIE Server", workbenchKieServerScenario});
         } catch (UnsupportedOperationException ex) {
@@ -99,6 +101,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
         try {
             WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                     .withInternalMavenRepo()
+                    .withGitSettings(gitSettings)
                     .build();
             scenarios.add(new Object[]{"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario});
         } catch (UnsupportedOperationException ex) {

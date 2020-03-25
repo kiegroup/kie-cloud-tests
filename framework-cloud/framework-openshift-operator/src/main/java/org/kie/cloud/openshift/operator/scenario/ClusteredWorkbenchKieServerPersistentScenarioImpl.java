@@ -32,6 +32,7 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -43,6 +44,8 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.Sso;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
+import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +55,14 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private SsoDeployment ssoDeployment;
-    private boolean deploySso;
+    private GitProvider gitProvider;
+    private final ScenarioRequest request;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public ClusteredWorkbenchKieServerPersistentScenarioImpl(KieApp kieApp, boolean deploySso) {
+    public ClusteredWorkbenchKieServerPersistentScenarioImpl(KieApp kieApp, ScenarioRequest request) {
         super(kieApp);
-        this.deploySso = deploySso;
+        this.request = request;
     }
 
     @Override
@@ -73,8 +77,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     @Override
     protected void deployCustomResource() {
-
-        if (deploySso) {
+        if (request.isDeploySso()) {
             ssoDeployment = SsoDeployer.deploySecure(project);
             URL ssoSecureUrl = ssoDeployment.getSecureUrl().orElseThrow(() -> new RuntimeException("RH SSO secure URL not found."));
 
@@ -88,6 +91,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
             Auth auth = new Auth();
             auth.setSso(sso);
             kieApp.getSpec().setAuth(auth);
+        }
+
+        if (request.getGitSettings() != null) {
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
@@ -155,5 +162,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
+    }
+
+    @Override
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 }
