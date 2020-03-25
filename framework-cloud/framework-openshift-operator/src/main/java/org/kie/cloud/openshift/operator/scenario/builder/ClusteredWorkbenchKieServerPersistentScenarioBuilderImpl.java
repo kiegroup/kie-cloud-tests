@@ -35,6 +35,8 @@ import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerPersistentScenarioImpl;
 
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyDroolsScenarioOnly;
+
 public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ClusteredWorkbenchKieServerPersistentScenario> implements
                                                                       ClusteredWorkbenchKieServerPersistentScenarioBuilder {
 
@@ -42,6 +44,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
     private boolean deploySSO = false;
 
     public ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl() {
+        verifyDroolsScenarioOnly();
+
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword()));
