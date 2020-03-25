@@ -20,26 +20,26 @@ package org.kie.cloud.api.settings;
 public class UpgradeSettings {
 
     private boolean minor;
-    private String fromVersionTag;
 
+    /**
+     * @return whether to consider the minor versions (not only patch versions)
+     */
     public boolean isMinor() {
         return minor;
     }
 
-    public String getFromVersionTag() {
-        return fromVersionTag;
-    }
-
-    public UpgradeSettings fromVersionTag(String versionTag) {
-        this.fromVersionTag = versionTag;
-        return this;
-    }
-
+    /**
+     * Sets that we consider the minor versions (not only patch versions)
+     * @return UpgradeSettings.
+     */
     public UpgradeSettings withMinor() {
         this.minor = true;
         return this;
     }
 
+    /**
+     * @return Enable default upgrade settings with only patch updates.
+     */
     public static final UpgradeSettings enable() {
         return new UpgradeSettings();
     }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import cz.xtf.core.waiting.SimpleWaiter;
@@ -36,10 +35,10 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
-import org.kie.cloud.api.settings.UpgradeSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
 import org.kie.cloud.openshift.operator.deployment.WorkbenchOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
@@ -178,7 +177,11 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     @Override
     protected String overridesVersionTag() {
-        return Optional.ofNullable(request.getUpgradeSettings()).map(UpgradeSettings::getFromVersionTag).orElse(null);
+        if (request.getUpgradeSettings() != null) {
+            return OpenShiftOperatorConstants.getKieOperatorUpgradeFromImageTag();
+        }
+
+        return null;
     }
 
     private void configureOperatorForUpgrades() {

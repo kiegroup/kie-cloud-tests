@@ -61,7 +61,7 @@ public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends De
     ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
 
     /**
-     * Mark the deployment that can be upgraded to a newer version.
+     * Configure the upgrade settings for the current scenario.
      * @param upgradeSettings upgrade settings.
      * @return Builder
      */

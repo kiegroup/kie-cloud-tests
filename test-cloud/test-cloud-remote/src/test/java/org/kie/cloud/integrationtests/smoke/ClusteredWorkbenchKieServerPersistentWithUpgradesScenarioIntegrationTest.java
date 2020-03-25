@@ -48,7 +48,7 @@ import org.kie.server.controller.client.KieServerControllerClient;
 
 @Category({Smoke.class, ApbNotSupported.class, TemplateNotSupported.class})
 public class ClusteredWorkbenchKieServerPersistentWithUpgradesScenarioIntegrationTest extends AbstractCloudIntegrationTest {
-    private static final String VERSION_UPGRADE_FROM = "7.6.0";
+
     private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerPersistentWithUpgradesScenarioIntegrationTest.class.getSimpleName());
 
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
@@ -68,7 +68,7 @@ public class ClusteredWorkbenchKieServerPersistentWithUpgradesScenarioIntegratio
         try {
             deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
                     .withInternalMavenRepo()
-                    .withUpgrades(UpgradeSettings.enable().withMinor().fromVersionTag(VERSION_UPGRADE_FROM))
+                    .withUpgrades(UpgradeSettings.enable().withMinor())
                     .withGitSettings(GitSettings.fromProperties()
                                      .withRepository(REPOSITORY_NAME,
                                                      ClusteredWorkbenchKieServerPersistentWithUpgradesScenarioIntegrationTest.class.getResource(
