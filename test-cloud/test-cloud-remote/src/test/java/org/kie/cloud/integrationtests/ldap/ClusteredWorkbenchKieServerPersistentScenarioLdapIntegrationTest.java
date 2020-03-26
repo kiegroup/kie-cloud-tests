@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
@@ -29,9 +30,12 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
+import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
+
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerDatabasePersistentScenario.class.getSimpleName());
 
     private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
 
@@ -60,6 +64,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
             deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                     .withLdap(ldapSettings)
                     .withInternalMavenRepo()
+                    .withGitSettings(GitSettings.fromProperties()
+                                     .withRepository(REPOSITORY_NAME,
+                                                     ClusteredWorkbenchKieServerDatabasePersistentScenario.class.getResource(
+                                                                                                           PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
                     .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -106,6 +114,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
     public void testDeployContainerFromWorkbench() {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),
-                                                                  deploymentScenario.getGitProvider());
+                                                                  deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));
     }
 }
