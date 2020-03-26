@@ -127,7 +127,6 @@ public class OptaplannerTestProvider {
         AwaitilityUtils.untilAsserted(() -> solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID), solver -> {
             Assertions.assertThat(solver.getStatus()).isEqualTo(SolverInstance.SolverStatus.NOT_SOLVING);
             Assertions.assertThat(solver.getScoreWrapper()).isNotNull();
-            Assertions.assertThat(solver.getScoreWrapper().getScoreString()).isNotNull();
             Assertions.assertThat(solver.getScoreWrapper().getScoreString()).isNotEmpty();
         });
     }
