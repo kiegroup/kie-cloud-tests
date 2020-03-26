@@ -124,9 +124,9 @@ public interface Deployment {
     void setResources(Map<String, String> requests, Map<String, String> limits);
 
     /**
-     * This method waits until Deployment is deployed using a new version.
+     * This method waits until Deployment is deployed using the specified versionTag (for example, 7.7.0).
      *
-     * @param version to wait for.
+     * @param versionTag to wait for.
      */
-    void waitForVersion(int version);
+    void waitForVersionTag(String versionTag);
 }

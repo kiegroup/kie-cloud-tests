@@ -172,6 +172,9 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         ((ExternalDeploymentOperator) externalDeployment).removeConfiguration(kieApp);
     }
 
+    /**
+     * @return get the operator version to deploy from configuration.
+     */
     protected String getLatestOperatorVersion() {
         String operatorImageTag = OpenShiftOperatorConstants.getKieOperatorImageTag();
         String[] split = operatorImageTag.split(":");
@@ -184,6 +187,10 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         return operatorImageTag;
     }
 
+    /**
+     * Allows to override the operator version to deploy.
+     * @return null if overrides is disabled.
+     */
     protected String overridesVersionTag() {
         return null;
     }

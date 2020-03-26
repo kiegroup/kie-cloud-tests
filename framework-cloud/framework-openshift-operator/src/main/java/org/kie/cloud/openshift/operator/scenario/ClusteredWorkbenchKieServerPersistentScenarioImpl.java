@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.SupplierWaiter;
 import cz.xtf.core.waiting.WaiterException;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -45,7 +46,6 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.Sso;
-import org.kie.cloud.openshift.operator.model.components.Upgrades;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -98,8 +98,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
         if (request.getGitSettings() != null) {
             gitProvider = Git.createProvider(project, request.getGitSettings());
         }
-
-        configureOperatorForUpgrades();
 
         registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
@@ -178,48 +176,40 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     @Override
     protected String overridesVersionTag() {
         if (request.getUpgradeSettings() != null) {
-            return OpenShiftOperatorConstants.getKieOperatorUpgradeFromImageTag();
+            return OpenShiftOperatorConstants.getKieOperatorUpgradeFromVersion();
         }
 
         return null;
     }
 
-    private void configureOperatorForUpgrades() {
-        if (request.getUpgradeSettings() != null) {
-            Upgrades upgrades = new Upgrades();
-            upgrades.setEnabled(true);
-            upgrades.setMinor(request.getUpgradeSettings().isMinor());
-            kieApp.getSpec().setUpgrades(upgrades);
-        }
-    }
-
     private void upgradeDeploymentViaOperator() {
         if (request.getUpgradeSettings() != null) {
             logger.info("Upgrading deployment...");
+            
+            String latestVersionTag = upgradeOperatorToLatestVersion();
 
-            int expectedKieServerVersion = kieServerDeployment.getVersion() + 1;
-            int expectedWorkbenchVersion = workbenchDeployment.getVersion() + 1;
-
-            upgradeOperatorToLatestVersion();
-
-            kieServerDeployment.waitForVersion(expectedKieServerVersion);
-            workbenchDeployment.waitForVersion(expectedWorkbenchVersion);
+            kieServerDeployment.waitForVersionTag(latestVersionTag);
+            workbenchDeployment.waitForVersionTag(latestVersionTag);
 
             logger.info("Deployment upgraded.");
         }
     }
 
-    private void upgradeOperatorToLatestVersion() {
+    private String upgradeOperatorToLatestVersion() {
+        String latestImage = getLatestOperatorVersion();
+        
         project.getOpenShift().apps().deployments().withName(OPERATOR_DEPLOYMENT_NAME).edit()
                  .editSpec()
                      .editTemplate()
                          .editSpec()
                              .editFirstContainer()
-                                 .withNewImage(getLatestOperatorVersion())
+                                 .withNewImage(latestImage)
                              .endContainer()
                          .endSpec()
                      .endTemplate()
                  .endSpec()
                  .done();
+        
+        return StringUtils.substringAfterLast(latestImage, ":");
     }
 }

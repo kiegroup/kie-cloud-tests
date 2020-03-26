@@ -37,6 +37,7 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteList;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
@@ -162,13 +163,18 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
-    public void waitForVersion(int version) {
+    public void waitForVersionTag(String versionTag) {
         try {
             OpenShiftCaller.repeatableCall(() -> openShift.waiters()
-                                                          .isDeploymentReady(getDeploymentConfigName(), version)
+                                                          .havePodsBeenRestarted(getDeploymentConfigName())
                                                           .timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
-                                                          .reason("Waiting for deployment config " + getDeploymentConfigName() + " to deploy version " + version)
+                                                          .reason("Waiting for deployment config " + getDeploymentConfigName() + " to deploy version")
                                                           .waitFor());
+
+            if (deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> StringUtils.endsWith(c.getImage(), versionTag))) {
+                throw new RuntimeException("The deployment + " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag);
+            }
+
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
         }

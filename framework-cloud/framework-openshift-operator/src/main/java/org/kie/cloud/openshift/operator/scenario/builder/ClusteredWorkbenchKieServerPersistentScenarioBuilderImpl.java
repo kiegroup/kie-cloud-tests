@@ -35,6 +35,7 @@ import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
+import org.kie.cloud.openshift.operator.model.components.Upgrades;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerPersistentScenarioImpl;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
@@ -129,7 +130,13 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
     @Override
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder withUpgrades(UpgradeSettings upgradeSettings) {
-        request.setUpgradeSettings(upgradeSettings);
+        if (upgradeSettings != null) {
+            Upgrades upgrades = new Upgrades();
+            upgrades.setEnabled(true);
+            upgrades.setMinor(request.getUpgradeSettings().isMinor());
+            kieApp.getSpec().setUpgrades(upgrades);
+        }
+
         return this;
     }
 }
