@@ -32,7 +32,6 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
-import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
@@ -98,9 +97,6 @@ public class WorkbenchKieServerPersistentScenarioImpl extends KieCommonScenario<
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
-
-        logger.info("Waiting for Kie server to register itself to the Workbench.");
-        KieServerControllerClientProvider.waitForServerTemplateCreation(workbenchDeployment, 1);
 
         logNodeNameOfAllInstances();
 
