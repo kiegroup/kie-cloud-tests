@@ -15,11 +15,15 @@
 package org.kie.cloud.git;
 
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class with methods to work with the GIT provider (provided in the deployment scenario). *
  */
 public final class GitUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(GitUtils.class);
 
     private GitUtils() {
 
@@ -32,6 +36,10 @@ public final class GitUtils {
      * @param deploymentScenario git provider to use
      */
     public static final void deleteGitRepository(String repositoryName, KieDeploymentScenario<?> deploymentScenario) {
-        deploymentScenario.getGitProvider().deleteGitRepository(repositoryName);
+        try {
+            deploymentScenario.getGitProvider().deleteGitRepository(repositoryName);
+        } catch (Exception ex) {
+            logger.warn("Could not delete the GIT repository. Skipping.");
+        }
     }
 }
