@@ -121,7 +121,7 @@ public class OptaplannerTestProvider {
                 throw new RuntimeException(e);
             }
 
-            return solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID); // wait for 15 seconds
+            return solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID);
         });
 
         AwaitilityUtils.untilAsserted(() -> solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID), solver -> {
