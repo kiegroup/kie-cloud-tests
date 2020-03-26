@@ -38,12 +38,14 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
 import org.kie.cloud.openshift.operator.deployment.WorkbenchOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.Sso;
+import org.kie.cloud.openshift.operator.model.components.Upgrades;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -97,6 +99,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
             gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
+        configureOperatorForUpgrades();
+
         registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             registerTrustedSecret(server);
@@ -128,6 +132,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
+
+        upgradeDeploymentViaOperator();
 
         logNodeNameOfAllInstances();
     }
@@ -167,5 +173,53 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     @Override
     public GitProvider getGitProvider() {
         return gitProvider;
+    }
+
+    @Override
+    protected String overridesVersionTag() {
+        if (request.getUpgradeSettings() != null) {
+            return OpenShiftOperatorConstants.getKieOperatorUpgradeFromImageTag();
+        }
+
+        return null;
+    }
+
+    private void configureOperatorForUpgrades() {
+        if (request.getUpgradeSettings() != null) {
+            Upgrades upgrades = new Upgrades();
+            upgrades.setEnabled(true);
+            upgrades.setMinor(request.getUpgradeSettings().isMinor());
+            kieApp.getSpec().setUpgrades(upgrades);
+        }
+    }
+
+    private void upgradeDeploymentViaOperator() {
+        if (request.getUpgradeSettings() != null) {
+            logger.info("Upgrading deployment...");
+
+            int expectedKieServerVersion = kieServerDeployment.getVersion() + 1;
+            int expectedWorkbenchVersion = workbenchDeployment.getVersion() + 1;
+
+            upgradeOperatorToLatestVersion();
+
+            kieServerDeployment.waitForVersion(expectedKieServerVersion);
+            workbenchDeployment.waitForVersion(expectedWorkbenchVersion);
+
+            logger.info("Deployment upgraded.");
+        }
+    }
+
+    private void upgradeOperatorToLatestVersion() {
+        project.getOpenShift().apps().deployments().withName(OPERATOR_DEPLOYMENT_NAME).edit()
+                 .editSpec()
+                     .editTemplate()
+                         .editSpec()
+                             .editFirstContainer()
+                                 .withNewImage(getLatestOperatorVersion())
+                             .endContainer()
+                         .endSpec()
+                     .endTemplate()
+                 .endSpec()
+                 .done();
     }
 }

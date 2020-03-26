@@ -30,6 +30,7 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.openshift.api.model.ImageStream;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -50,6 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>> extends OpenShiftScenario<T> {
+
+    protected static final String OPERATOR_DEPLOYMENT_NAME = "kie-cloud-operator";
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftOperatorScenario.class);
 
@@ -113,18 +116,15 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         // Retrieve the image name and see if it fits an image stream.
         // If yes, then use the image stream image's name and same tag as defined (use latest if no tag).
         // If not, use as it is as image name.
-        String operatorImageTag = OpenShiftOperatorConstants.getKieOperatorImageTag();
-        String[] split = operatorImageTag.split(":");
-        ImageStream operatorImageStream = project.getOpenShiftAdmin().getImageStream(split[0]);
-        if (Objects.nonNull(operatorImageStream)) {
-            final String streamTag = split.length > 1 ? split[1] : "latest";
-            operatorImageTag = operatorImageStream.getStatus().getDockerImageRepository() + ":" + streamTag;
+        String operatorImage = getLatestOperatorVersion();
+        if (overridesVersionTag() != null) {
+            operatorImage = StringUtils.substringBeforeLast(operatorImage, ":") + ":" + overridesVersionTag();
         }
-        deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(operatorImageTag);
+        deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(operatorImage);
         project.getOpenShift().apps().deployments().create(deployment);
 
         // wait until operator is ready
-        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "kie-cloud-operator").waitFor();
+        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", OPERATOR_DEPLOYMENT_NAME).waitFor();
 
         if (!OpenShiftOperatorConstants.skipKieOperatorConsoleCheck()) {
             // wait until operator console is ready
@@ -170,6 +170,22 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected void removeConfigurationFromExternalDeployment(ExternalDeployment<?, ?> externalDeployment) {
         ((ExternalDeploymentOperator) externalDeployment).removeConfiguration(kieApp);
+    }
+
+    protected String getLatestOperatorVersion() {
+        String operatorImageTag = OpenShiftOperatorConstants.getKieOperatorImageTag();
+        String[] split = operatorImageTag.split(":");
+        ImageStream operatorImageStream = project.getOpenShiftAdmin().getImageStream(split[0]);
+        if (Objects.nonNull(operatorImageStream)) {
+            final String streamTag = split.length > 1 ? split[1] : "latest";
+            operatorImageTag = operatorImageStream.getStatus().getDockerImageRepository() + ":" + streamTag;
+        }
+
+        return operatorImageTag;
+    }
+
+    protected String overridesVersionTag() {
+        return null;
     }
 
     public Map<String, String> getScenarioEnvironment() {

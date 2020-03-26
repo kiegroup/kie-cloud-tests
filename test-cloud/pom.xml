@@ -467,6 +467,9 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
     </profile>
     <profile>
       <id>openshift</id>
+      <properties>
+        <template.excluded.group>org.kie.cloud.integrationtests.category.TemplateNotSupported</template.excluded.group>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.kie.cloud</groupId>
@@ -474,11 +477,26 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
           <scope>test</scope>
         </dependency>
       </dependencies>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>${template.excluded.group},${failsafe.excluded.groups}</excludedGroups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
     <profile>
       <id>openshift-operator</id>
       <properties>
         <operator.excluded.group>org.kie.cloud.integrationtests.category.OperatorNotSupported</operator.excluded.group>
+        
+        <kie.operator.upgrade.from.image.tag>7.6.0</kie.operator.upgrade.from.image.tag>
 
         <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
         <xtf.openshift.admin.token/>
@@ -502,6 +520,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
                 <systemProperties>
                   <xtf.openshift.admin.token>${xtf.openshift.admin.token}</xtf.openshift.admin.token>
                   <xtf.openshift.master.token>${xtf.openshift.master.token}</xtf.openshift.master.token>
+                  <kie.operator.upgrade.from.image.tag>${kie.operator.upgrade.from.image.tag}</kie.operator.upgrade.from.image.tag>
                 </systemProperties>
               </configuration>
             </plugin>
