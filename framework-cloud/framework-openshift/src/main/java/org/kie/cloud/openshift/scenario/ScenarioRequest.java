@@ -15,17 +15,20 @@
 package org.kie.cloud.openshift.scenario;
 
 import org.kie.cloud.api.settings.GitSettings;
-import org.kie.cloud.api.settings.UpgradeSettings;
 
 public class ScenarioRequest {
 
     private boolean deploySso = false;
     private GitSettings gitSettings;
     private boolean deployPrometheus = false;
-    private UpgradeSettings upgradeSettings;
+    private boolean upgrade = false;
 
     public boolean isDeploySso() {
         return deploySso;
+    }
+
+    public boolean isUpgrade() {
+        return upgrade;
     }
 
     public GitSettings getGitSettings() {
@@ -51,12 +54,9 @@ public class ScenarioRequest {
         return this;
     }
 
-    public UpgradeSettings getUpgradeSettings() {
-        return upgradeSettings;
-    }
-
-    public void setUpgradeSettings(UpgradeSettings upgradeSettings) {
-        this.upgradeSettings = upgradeSettings;
+    public ScenarioRequest enableUpgrade() {
+        this.upgrade = true;
+        return this;
     }
 
 }

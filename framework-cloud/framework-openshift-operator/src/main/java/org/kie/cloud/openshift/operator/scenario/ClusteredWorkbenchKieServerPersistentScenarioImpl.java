@@ -175,7 +175,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     @Override
     protected String overridesVersionTag() {
-        if (request.getUpgradeSettings() != null) {
+        if (request.isUpgrade()) {
             return OpenShiftOperatorConstants.getKieOperatorUpgradeFromVersion();
         }
 
@@ -183,9 +183,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     }
 
     private void upgradeDeploymentViaOperator() {
-        if (request.getUpgradeSettings() != null) {
+        if (request.isUpgrade()) {
             logger.info("Upgrading deployment...");
-            
+
             String latestVersionTag = upgradeOperatorToLatestVersion();
 
             kieServerDeployment.waitForVersionTag(latestVersionTag);
@@ -197,7 +197,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     private String upgradeOperatorToLatestVersion() {
         String latestImage = getLatestOperatorVersion();
-        
+
         project.getOpenShift().apps().deployments().withName(OPERATOR_DEPLOYMENT_NAME).edit()
                  .editSpec()
                      .editTemplate()
@@ -209,7 +209,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
                      .endTemplate()
                  .endSpec()
                  .done();
-        
+
         return StringUtils.substringAfterLast(latestImage, ":");
     }
 }

@@ -133,8 +133,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
         if (upgradeSettings != null) {
             Upgrades upgrades = new Upgrades();
             upgrades.setEnabled(true);
-            upgrades.setMinor(request.getUpgradeSettings().isMinor());
+            upgrades.setMinor(upgradeSettings.isMinor());
             kieApp.getSpec().setUpgrades(upgrades);
+            request.enableUpgrade();
         }
 
         return this;

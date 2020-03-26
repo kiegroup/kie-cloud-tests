@@ -171,8 +171,8 @@ public abstract class OpenShiftDeployment implements Deployment {
                                                           .reason("Waiting for deployment config " + getDeploymentConfigName() + " to deploy version")
                                                           .waitFor());
 
-            if (deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> StringUtils.endsWith(c.getImage(), versionTag))) {
-                throw new RuntimeException("The deployment + " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag);
+            if (deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().noneMatch(c -> StringUtils.endsWith(c.getImage(), versionTag))) {
+                throw new RuntimeException("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag);
             }
 
         } catch (AssertionError e) {
