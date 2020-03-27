@@ -104,9 +104,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
             registerTrustedSecret(server);
         }
 
-        // Workaround for RHPAM-2830
-        kieApp.getSpec().getObjects().getConsole().setReplicas(1);
-
         // deploy application
         getKieAppClient().create(kieApp);
         // Wait until the operator reconciliate the KieApp and add there missing informations
