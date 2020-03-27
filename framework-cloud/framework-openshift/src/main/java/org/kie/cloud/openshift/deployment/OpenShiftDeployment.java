@@ -27,10 +27,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.waiting.SimpleWaiter;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
@@ -165,15 +167,11 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void waitForVersionTag(String versionTag) {
         try {
-            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
-                                                          .havePodsBeenRestarted(getDeploymentConfigName())
-                                                          .timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
-                                                          .reason("Waiting for deployment config " + getDeploymentConfigName() + " to deploy version")
-                                                          .waitFor());
+            Supplier<Boolean> checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().noneMatch(c -> StringUtils.endsWith(c.getImage(), versionTag));
 
-            if (deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().noneMatch(c -> StringUtils.endsWith(c.getImage(), versionTag))) {
-                throw new RuntimeException("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag);
-            }
+            new SimpleWaiter(() -> OpenShiftCaller.repeatableCall(checkNewVersionTag)).timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
+                                                                                      .reason("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag)
+                                                                                      .waitFor();
 
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");

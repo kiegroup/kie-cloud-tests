@@ -97,6 +97,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
         workbenchDeployment = new WorkbenchDeploymentImpl(project);
         workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
         workbenchDeployment.setPassword(DeploymentConstants.getAppPassword());
+        // Workaround for RHPAM-2830
+        workbenchDeployment.scale(1);
 
         kieServerDeployment = new KieServerDeploymentImpl(project);
         kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
