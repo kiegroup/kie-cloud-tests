@@ -40,11 +40,6 @@ public interface Deployment {
     void scale(int instances);
 
     /**
-     * @return the current version of the deployment.
-     */
-    int getVersion();
-
-    /**
      * Return deployment replicas count. Replicas count is change as deployment is scale up or down.
      *
      * @return number of replicas

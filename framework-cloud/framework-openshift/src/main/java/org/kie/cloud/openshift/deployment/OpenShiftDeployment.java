@@ -81,11 +81,6 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
-    public int getVersion() {
-        return deploymentConfig().getStatus().getLatestVersion().intValue();
-    }
-
-    @Override
     public void deleteInstances(Instance... instance) {
         deleteInstances(Arrays.asList(instance));
     }
@@ -167,7 +162,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void waitForVersionTag(String versionTag) {
         try {
-            Supplier<Boolean> checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().noneMatch(c -> StringUtils.endsWith(c.getImage(), versionTag));
+            Supplier<Boolean> checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> StringUtils.endsWith(c.getImage(), versionTag));
 
             new SimpleWaiter(() -> OpenShiftCaller.repeatableCall(checkNewVersionTag)).timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
                                                                                       .reason("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag)
