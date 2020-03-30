@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.SupplierWaiter;
 import cz.xtf.core.waiting.WaiterException;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -38,6 +39,7 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
 import org.kie.cloud.openshift.operator.deployment.WorkbenchOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
@@ -129,6 +131,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
 
+        upgradeDeploymentViaOperator();
+
         logNodeNameOfAllInstances();
     }
 
@@ -167,5 +171,45 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     @Override
     public GitProvider getGitProvider() {
         return gitProvider;
+    }
+
+    @Override
+    protected String overridesVersionTag() {
+        if (request.isUpgrade()) {
+            return OpenShiftOperatorConstants.getKieOperatorUpgradeFromVersion();
+        }
+
+        return null;
+    }
+
+    private void upgradeDeploymentViaOperator() {
+        if (request.isUpgrade()) {
+            logger.info("Upgrading deployment...");
+
+            String latestVersionTag = upgradeOperatorToLatestVersion();
+
+            kieServerDeployment.waitForVersionTag(latestVersionTag);
+            workbenchDeployment.waitForVersionTag(latestVersionTag);
+
+            logger.info("Deployment upgraded.");
+        }
+    }
+
+    private String upgradeOperatorToLatestVersion() {
+        String latestImage = getLatestOperatorVersion();
+
+        project.getOpenShift().apps().deployments().withName(OPERATOR_DEPLOYMENT_NAME).edit()
+                 .editSpec()
+                     .editTemplate()
+                         .editSpec()
+                             .editFirstContainer()
+                                 .withNewImage(latestImage)
+                             .endContainer()
+                         .endSpec()
+                     .endTemplate()
+                 .endSpec()
+                 .done();
+
+        return StringUtils.substringAfterLast(latestImage, ":");
     }
 }

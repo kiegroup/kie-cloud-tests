@@ -21,9 +21,14 @@ public class ScenarioRequest {
     private boolean deploySso = false;
     private GitSettings gitSettings;
     private boolean deployPrometheus = false;
+    private boolean upgrade = false;
 
     public boolean isDeploySso() {
         return deploySso;
+    }
+
+    public boolean isUpgrade() {
+        return upgrade;
     }
 
     public GitSettings getGitSettings() {
@@ -46,6 +51,11 @@ public class ScenarioRequest {
 
     public ScenarioRequest enableDeployPrometheus() {
         this.deployPrometheus = true;
+        return this;
+    }
+
+    public ScenarioRequest enableUpgrade() {
+        this.upgrade = true;
         return this;
     }
 

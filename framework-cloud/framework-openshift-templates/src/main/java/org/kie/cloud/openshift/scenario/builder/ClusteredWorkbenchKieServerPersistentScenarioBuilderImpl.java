@@ -22,6 +22,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.settings.GitSettings;
+import org.kie.cloud.api.settings.UpgradeSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
@@ -84,5 +85,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit) {
         envVariables.put(propertyNames.workbenchMemoryLimit(), limit);
         return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerPersistentScenarioBuilder withUpgrades(UpgradeSettings upgradeSettings) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

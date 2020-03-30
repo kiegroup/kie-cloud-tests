@@ -22,6 +22,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
 import org.kie.cloud.api.settings.GitSettings;
+import org.kie.cloud.api.settings.UpgradeSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
@@ -34,6 +35,7 @@ import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
+import org.kie.cloud.openshift.operator.model.components.Upgrades;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerPersistentScenarioImpl;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
@@ -124,5 +126,18 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
     @Override
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerPersistentScenarioBuilder withUpgrades(UpgradeSettings upgradeSettings) {
+        if (upgradeSettings != null) {
+            Upgrades upgrades = new Upgrades();
+            upgrades.setEnabled(true);
+            upgrades.setMinor(upgradeSettings.isMinor());
+            kieApp.getSpec().setUpgrades(upgrades);
+            request.enableUpgrade();
+        }
+
+        return this;
     }
 }

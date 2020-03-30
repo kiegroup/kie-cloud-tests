@@ -67,6 +67,11 @@ public class OpenShiftOperatorConstants implements Constants {
     public static final String KIE_OPERATOR_IMAGE_TAG = "kie.operator.image.tag";
 
     /**
+     * Image tag for Kie Operator to upgrade from.
+     */
+    public static final String KIE_OPERATOR_UPGRADE_FROM_VERSION = "rhba.operator.upgrade.from.version";
+
+    /**
      * Set to true if you don't need Kie Operator UI up and running. Skipping of this check can save around 30 seconds.
      */
     public static final String KIE_OPERATOR_CONSOLE_CHECK_SKIP = "kie.operator.console.check.skip";
@@ -85,6 +90,14 @@ public class OpenShiftOperatorConstants implements Constants {
             throw new RuntimeException("System property " + KIE_OPERATOR_IMAGE_TAG + " has to be defined so specific Kie Operator version is deployed.");
         }
         return kieOperatorImageTag;
+    }
+
+    public static String getKieOperatorUpgradeFromVersion() {
+        String imageTag = System.getProperty(KIE_OPERATOR_UPGRADE_FROM_VERSION);
+        if (imageTag == null || imageTag.isEmpty()) {
+            throw new RuntimeException("System property " + KIE_OPERATOR_UPGRADE_FROM_VERSION + " has to be defined to upgrade the Kie Operator from this version.");
+        }
+        return imageTag;
     }
 
     public static boolean skipKieOperatorConsoleCheck() {
