@@ -108,14 +108,20 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     @Override
     protected void deployKieDeployments() {
-        final File amqStreamsDirectory = downloadAndUnzipAMQStreams();
-        final File amqStreamsInstallDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_INSTALL_SUBDIRECTORY);
-        filterNamespaceInInstallationFiles(amqStreamsInstallDirectory, project.getName());
+        if (OpenShiftConstants.getAMQStreamsZip() != null) {
+            logger.info("System property for AMQ Streams zip is set {}. Will install AMQ streams from zip.",
+                    OpenShiftConstants.getAMQStreamsZip());
+            final File amqStreamsDirectory = downloadAndUnzipAMQStreams();
+            final File amqStreamsInstallDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_INSTALL_SUBDIRECTORY);
+            filterNamespaceInInstallationFiles(amqStreamsInstallDirectory, project.getName());
 
-        project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsInstallDirectory));
-        final File amqStreamsTemplatesDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_TEMPLATES_SUBDIRECTORY);
+            project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsInstallDirectory));
+            final File amqStreamsTemplatesDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_TEMPLATES_SUBDIRECTORY);
 
-        project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsTemplatesDirectory));
+            project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsTemplatesDirectory));
+        } else {
+            logger.info("System property for AMQ Streams zip is not set. Running AMQ streams operator is expected");
+        }
 
         final StrimziOperatorDeployment strimziOperatorDeployment = new StrimziOperatorDeployment(project);
         strimziOperatorDeployment.waitForScale();
@@ -185,8 +191,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     @Override
     public void undeploy() {
         super.undeploy();
-
-        deleteStrimziCustomResourceDefinitions();
     }
 
     private File downloadAndUnzipAMQStreams() {
@@ -280,12 +284,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
             logger.info("Creating topic from file: {}", kafkaTopicFile.getAbsolutePath());
             project.createResourcesFromYamlAsAdmin(kafkaTopicFile.getAbsolutePath());
         }
-    }
-
-    private void deleteStrimziCustomResourceDefinitions() {
-        logger.info("Deleting AMQ streams custom resource definitions");
-        project.runOcCommandAsAdmin("delete", "customresourcedefinition", "-l", STRIMZI_LABEL_KEY
-                                            + "=" + STRIMZI_LABEL_VALUE);
     }
 
     private static void filterNamespaceInInstallationFiles(final File amqStreamsInstallDirectory,
