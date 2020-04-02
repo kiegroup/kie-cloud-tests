@@ -25,7 +25,6 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.category.Smoke;
@@ -138,7 +137,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     @Test
-    @Category({ApbNotSupported.class, OperatorNotSupported.class}) //failing because of RHPAM-1561, skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2825
+    @Category({OperatorNotSupported.class}) //failing because of RHPAM-1561, skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2825
     public void testSmartRouter() {
         smartRouterTestProvider.testRouterLoadBalancing(deploymentScenario.getWorkbenchRuntimeDeployment(),
                                                         deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerOneDeployment(),

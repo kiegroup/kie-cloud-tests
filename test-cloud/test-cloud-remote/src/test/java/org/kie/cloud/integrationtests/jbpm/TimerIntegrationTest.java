@@ -29,7 +29,6 @@ import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
@@ -47,7 +46,7 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({ApbNotSupported.class, OperatorNotSupported.class, JBPMOnly.class}) // Because TimerServiceDataStoreRefreshInterval is not supported yet, Operator is skipped as scenario use different startup strategy than template.
+@Category({OperatorNotSupported.class, JBPMOnly.class}) // Because TimerServiceDataStoreRefreshInterval is not supported yet, Operator is skipped as scenario use different startup strategy than template.
 public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario> {
 
     private static final Kjar DEPLOYED_KJAR = Kjar.TIMER;

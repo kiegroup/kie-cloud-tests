@@ -48,14 +48,14 @@ public interface ExternalDeployment<T extends Deployment, U> {
     /**
      * Configure the given object with this external deployment information
      *
-     * @param object This object should be specific for deployment process (templates, operator, apb ...)
+     * @param object This object should be specific for deployment process (templates, operator)
      */
     void configure(U object);
 
     /**
      * Remove configuration from the given object with this external deployment information
      *
-     * @param object This object should be specific for deployment process (templates, operator, apb ...)
+     * @param object This object should be specific for deployment process (templates, operator)
      */
     void removeConfiguration(U object);
 }

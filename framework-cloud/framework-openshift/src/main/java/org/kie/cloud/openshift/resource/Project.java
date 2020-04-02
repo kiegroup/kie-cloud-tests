@@ -65,12 +65,6 @@ public interface Project extends AutoCloseable {
      */
     void createSecret(String secretName, Map<String, String> secrets);
 
-    /**
-     * Process APB and create all resources defined there.
-     * @param image APB Image to be provision
-     * @param extraVars Map of extra vars to override default values from the APB image
-     */
-    public void processApbRun(String image, Map<String, String> extraVars);
 
     /**
      * Create resources from YAML file using command line client.

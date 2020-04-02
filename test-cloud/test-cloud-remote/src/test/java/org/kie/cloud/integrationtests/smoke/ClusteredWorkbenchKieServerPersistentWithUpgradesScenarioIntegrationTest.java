@@ -27,7 +27,6 @@ import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.UpgradeSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.category.TemplateNotSupported;
@@ -46,7 +45,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-@Category({Smoke.class, ApbNotSupported.class, TemplateNotSupported.class})
+@Category({Smoke.class, TemplateNotSupported.class})
 public class ClusteredWorkbenchKieServerPersistentWithUpgradesScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerPersistentWithUpgradesScenarioIntegrationTest.class.getSimpleName());
