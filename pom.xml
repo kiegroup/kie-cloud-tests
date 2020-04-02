@@ -169,8 +169,8 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-remote</artifactId>
+        <groupId>org.drools</groupId>
+        <artifactId>ha-remote</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
@@ -179,7 +179,7 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.drools</groupId>
         <artifactId>ha-core-infra</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
