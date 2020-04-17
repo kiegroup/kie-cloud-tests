@@ -25,6 +25,7 @@ import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.ProcessMigrationDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
@@ -54,7 +55,8 @@ public class KieServerWithMySqlScenarioImpl extends KieCommonScenario<KieServerW
         this.deploySso = deploySso;
     }
 
-    @Override public KieServerDeployment getKieServerDeployment() {
+    @Override
+    public KieServerDeployment getKieServerDeployment() {
         return kieServerDeployment;
     }
 
@@ -95,7 +97,8 @@ public class KieServerWithMySqlScenarioImpl extends KieCommonScenario<KieServerW
         logNodeNameOfAllInstances();
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(kieServerDeployment, databaseDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
@@ -124,5 +127,10 @@ public class KieServerWithMySqlScenarioImpl extends KieCommonScenario<KieServerW
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
+
+    @Override
+    public ProcessMigrationDeployment getProcessMigrationDeployment() {
+        throw new UnsupportedOperationException("Not supported for templates.");
+    }
 }

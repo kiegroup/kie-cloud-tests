@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.api.deployment;
 
-import java.util.Map;
-
 import org.kie.cloud.maven.MavenDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 

@@ -14,9 +14,6 @@
  */
 package org.kie.cloud.openshift.operator.scenario.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
@@ -35,23 +32,23 @@ import org.kie.cloud.openshift.operator.model.components.Database;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Ldap;
+import org.kie.cloud.openshift.operator.model.components.Limits;
+import org.kie.cloud.openshift.operator.model.components.ProcessMigration;
+import org.kie.cloud.openshift.operator.model.components.Resources;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.KieServerWithDatabaseScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
 public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends AbstractOpenshiftScenarioBuilderOperator<KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public AbstractKieServerWithDatabaseScenarioBuilder() {
-        List<Env> authenticationEnvVars = new ArrayList<>();
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword()));
-
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
-        kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING);
+        kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.TRIAL);
         kieApp.getSpec().setUseImageTags(true);
 
         OpenShiftOperatorConstants.getKieImageRegistryCustom().ifPresent(registry -> {
@@ -67,7 +64,6 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
-        server.addEnvs(authenticationEnvVars);
 
         Database database = new Database();
         database.setType(getDatabaseType());
@@ -76,7 +72,6 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
         kieApp.getSpec().getObjects().addServer(server);
 
         Console console = new Console();
-        console.addEnvs(authenticationEnvVars);
         kieApp.getSpec().getObjects().setConsole(console);
     }
 
@@ -84,12 +79,12 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
 
     @Override
     public KieServerWithDatabaseScenario getDeploymentScenarioInstance() {
-        return new KieServerWithDatabaseScenarioImpl(kieApp, deploySSO);
+        return new KieServerWithDatabaseScenarioImpl(kieApp, request);
     }
 
     @Override
     public KieServerWithDatabaseScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         SsoClient ssoClient = new SsoClient();
         ssoClient.setName("workbench-client");
         ssoClient.setSecret("workbench-secret");
@@ -146,12 +141,43 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
 
     @Override
     public KieServerWithDatabaseScenarioBuilder withInternalMavenRepo(boolean waitForRunning) {
-        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
+        if(waitForRunning) {
+            setSyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
+        } else {
+            setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
+        }
         return this;
     }
 
     @Override
     public KieServerWithDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_CONTAINER_DEPLOYMENT, kieContainerDeployment));
+        }
+        return this;
+    }
+
+    
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withMemoryLimit(String memoryLimit) {
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            if (server.getResources() == null) {
+                Resources resources = new Resources();
+                resources.setLimits(new Limits());
+                server.setResources(resources);
+            }
+            server.getResources().getLimits().setMemory(memoryLimit);
+        }
+        return this;
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withProcessMigrationDeployment() {
+        request.enableDeployProcessMigration();
+        ProcessMigration processMigration = new ProcessMigration();
+        processMigration.setDatabase(kieApp.getSpec().getObjects().getServers()[0].getDatabase());
+        kieApp.getSpec().getObjects().setProcessMigration(processMigration);
+
+        return this;
     }
 }

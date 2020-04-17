@@ -77,4 +77,18 @@ public interface KieServerWithDatabaseScenarioBuilder extends KieDeploymentScena
      * @return Builder with configured internal ldap.
      */
     KieServerWithDatabaseScenarioBuilder withLdap(LdapSettings ldapSettings);
+
+    /**
+     * Return configured builder with set container memory limit for the Kie Server.
+     * @param memoryLimit Memory limit in correct oc string format e.g. "2Gi"
+     * @return Builder with configured memory limit
+     */
+    KieServerWithDatabaseScenarioBuilder withMemoryLimit(String memoryLimit);
+    
+    /**
+     * Return configured builder with Process Migration deployment.
+     *
+     * @return Builder with configured Kie container deployment
+     */
+    KieServerWithDatabaseScenarioBuilder withProcessMigrationDeployment();
 }

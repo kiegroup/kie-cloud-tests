@@ -17,6 +17,7 @@ package org.kie.cloud.api.scenario;
 
 import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.ProcessMigrationDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 
 /**
@@ -39,6 +40,14 @@ public interface KieServerWithDatabaseScenario extends KieDeploymentScenario<Kie
      * @see DatabaseDeployment
      */
     DatabaseDeployment getDatabaseDeployment();
+
+    /**
+     * Return Process Migration server deployment.
+     *
+     * @return ProcessMigrationDeployment
+     * @see ProcessMigrationDeployment
+     */
+    ProcessMigrationDeployment getProcessMigrationDeployment();
 
     /**
      * Return SSO deployment.

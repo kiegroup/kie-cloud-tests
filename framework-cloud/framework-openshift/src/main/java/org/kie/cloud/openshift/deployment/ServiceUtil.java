@@ -40,6 +40,7 @@ public class ServiceUtil {
     private static final Pattern LDAP_REGEXP = Pattern.compile(".*ldap.*");
     private static final Pattern GOGS_REGEXP = Pattern.compile(".*gogs.*");
     private static final Pattern PROMETHEUS_REGEXP = Pattern.compile("prometheus-operated");
+    private static final Pattern PROCESS_MIGRATION_REGEXP = Pattern.compile("(?!secure-).*-process-migration");
 
     public static String getControllerServiceName(OpenShift openShift) {
         return getServiceName(openShift, CONTROLLER_REGEXP);
@@ -99,6 +100,10 @@ public class ServiceUtil {
 
     public static String getPrometheusServiceName(OpenShift openShift) {
         return getServiceName(openShift, PROMETHEUS_REGEXP);
+    }
+
+    public static String getProcessMigrationServiceName(OpenShift openShift) {
+        return getServiceName(openShift, PROCESS_MIGRATION_REGEXP);
     }
 
     public static String getServiceName(OpenShift openShift, Pattern regexp) {

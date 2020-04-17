@@ -27,6 +27,8 @@ public enum Kjar {
     RULE_SNAPSHOT("org.kie.server.testing", "rule-project", "1.0.0-SNAPSHOT"),
     HELLO_RULES("org.kie.server.testing", "hello-rules", "1.0.0.Final"),
     HELLO_RULES_SNAPSHOT("org.kie.server.testing", "hello-rules-snapshot", "1.0.0-SNAPSHOT"),
+    MIGRATION_PROJECT_100_SNAPSHOT("org.kie.server.testing", "migration-project", "1.0.0-SNAPSHOT", "migration-project-100-snapshot"),
+    MIGRATION_PROJECT_200_SNAPSHOT("org.kie.server.testing", "migration-project", "2.0.0-SNAPSHOT", "migration-project-200-snapshot"),
     USERTASK("org.kie.server.testing", "usertask-project", "1.0.0.Final"),
     STATELESS_SESSION("org.kie.server.testing", "stateless-session", "1.0.0.Final"),
     EXTERNAL_SIGNAL("org.kie.server.testing", "external-signal", "1.0.0.Final");

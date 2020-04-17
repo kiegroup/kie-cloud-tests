@@ -30,9 +30,18 @@ public class Objects {
     private Console console;
     private List<Server> servers = new ArrayList<>();
     private SmartRouter smartRouter;
+    private ProcessMigration processMigration;
 
     public Console getConsole() {
         return console;
+    }
+
+    public ProcessMigration getProcessMigration() {
+        return processMigration;
+    }
+
+    public void setProcessMigration(ProcessMigration processMigration) {
+        this.processMigration = processMigration;
     }
 
     public void setConsole(Console console) {

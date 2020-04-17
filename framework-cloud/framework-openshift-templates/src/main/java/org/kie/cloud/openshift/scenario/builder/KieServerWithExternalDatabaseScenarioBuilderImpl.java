@@ -55,4 +55,9 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl extends AbstractOp
         return this;
     }
 
+    @Override
+    public KieServerWithExternalDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
+        throw new UnsupportedOperationException("Not supported for templates.");
+    }
+
 }

@@ -124,6 +124,4 @@ public class KieServerWithExternalDatabaseScenarioImpl extends OpenShiftOperator
         return Collections.emptyList();
     }
 
-
-
 }
