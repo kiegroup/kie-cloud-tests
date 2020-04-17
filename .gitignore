@@ -2,7 +2,7 @@
 /local
 *.tlog
 
-# Eclipse, Netbeans and IntelliJ files
+# Eclipse, Netbeans, IntelliJ and VS Code files
 /.*
 !.gitignore
 /nbproject
@@ -13,6 +13,7 @@
 .project
 .settings
 target
+.factorypath
 
 # Repository wide ignore mac DS_Store files
 .DS_Store
