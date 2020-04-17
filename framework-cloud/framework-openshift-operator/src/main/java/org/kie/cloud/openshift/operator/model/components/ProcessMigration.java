@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2020 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,36 @@ package org.kie.cloud.openshift.operator.model.components;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * OpenShift resource requests and limits.
+ * KieApp Process Migration configuration.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Resources {
+public class ProcessMigration {
 
-    private Limits limits;
-    private Requests requests;
+    private String image;
+    private String imageTag;
+    private Database database;
 
-    public Limits getLimits() {
-        return limits;
+    public String getImage() {
+        return image;
     }
 
-    public void setLimits(Limits limits) {
-        this.limits = limits;
+    public Database getDatabase() {
+        return database;
     }
 
-    public Requests getRequests() {
-        return requests;
+    public void setDatabase(Database database) {
+        this.database = database;
     }
 
-    public void setRequests(Requests requests) {
-        this.requests = requests;
+    public String getImageTag() {
+        return imageTag;
     }
 
+    public void setImageTag(String imageTag) {
+        this.imageTag = imageTag;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }

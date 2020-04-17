@@ -27,7 +27,11 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl extends AbstractTr
 
     @Override
     public KieServerWithExternalDatabaseScenarioBuilder withInternalMavenRepo(boolean waitForRunning) {
-        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
+        if(waitForRunning) {
+            setSyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
+        } else {
+            setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
+        }
         return this;
     }
 
@@ -45,4 +49,11 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl extends AbstractTr
         return new KieServerWithExternalDatabaseScenarioImpl(getKieApp());
     }
 
+    @Override
+    public KieServerWithExternalDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment) {
+        for (Server server : getKieApp().getSpec().getObjects().getServers()) {
+            server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_CONTAINER_DEPLOYMENT, kieContainerDeployment));
+        }
+        return this;
+    }
 }

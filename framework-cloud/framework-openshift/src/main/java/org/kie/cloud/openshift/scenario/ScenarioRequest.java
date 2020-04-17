@@ -22,6 +22,7 @@ public class ScenarioRequest {
     private GitSettings gitSettings;
     private boolean deployPrometheus = false;
     private boolean upgrade = false;
+    private boolean deployProcessMigration = false;
 
     public boolean isDeploySso() {
         return deploySso;
@@ -37,6 +38,10 @@ public class ScenarioRequest {
 
     public boolean isDeployPrometheus() {
         return deployPrometheus;
+    }
+
+    public boolean isDeployProcessMigration() {
+        return deployProcessMigration;
     }
 
     public ScenarioRequest enableDeploySso() {
@@ -56,6 +61,11 @@ public class ScenarioRequest {
 
     public ScenarioRequest enableUpgrade() {
         this.upgrade = true;
+        return this;
+    }
+
+    public ScenarioRequest enableDeployProcessMigration() {
+        this.deployProcessMigration = true;
         return this;
     }
 
