@@ -90,6 +90,7 @@
     <kie.image.tag.kieserver/>
     <kie.image.tag.mysql/>
     <kie.image.tag.postgresql/>
+    <kie.image.tag.process.migration/>
     <kie.image.tag.smartrouter/>
     <kie.image.tag.workbench/>
     <kie.image.tag.workbench.indexing/>
@@ -365,6 +366,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <kie.image.tag.kieserver>${kie.image.tag.kieserver}</kie.image.tag.kieserver>
               <kie.image.tag.mysql>${kie.image.tag.mysql}</kie.image.tag.mysql>
               <kie.image.tag.postgresql>${kie.image.tag.postgresql}</kie.image.tag.postgresql>
+              <kie.image.tag.process.migration>${kie.image.tag.process.migration}</kie.image.tag.process.migration>
               <kie.image.tag.smartrouter>${kie.image.tag.smartrouter}</kie.image.tag.smartrouter>
               <kie.image.tag.workbench>${kie.image.tag.workbench}</kie.image.tag.workbench>
               <kie.image.tag.workbench.indexing>${kie.image.tag.workbench.indexing}</kie.image.tag.workbench.indexing>

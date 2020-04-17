@@ -31,4 +31,12 @@ public interface KieServerWithExternalDatabaseScenarioBuilder extends Deployment
     KieServerWithExternalDatabaseScenarioBuilder withInternalMavenRepo(boolean waitForRunning);
 
     KieServerWithExternalDatabaseScenarioBuilder withKieServerId(String kieServerId);
+
+    /**
+     * Return configured builder with Kie Container deployment.
+     *
+     * @param kieContainerDeployment Kie Container deployment.
+     * @return Builder with configured Kie container deployment
+     */
+    KieServerWithExternalDatabaseScenarioBuilder withContainerDeployment(String kieContainerDeployment);
 }

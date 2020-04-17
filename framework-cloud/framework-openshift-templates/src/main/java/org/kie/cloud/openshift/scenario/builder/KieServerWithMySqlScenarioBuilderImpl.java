@@ -93,4 +93,14 @@ public class KieServerWithMySqlScenarioBuilderImpl extends KieScenarioBuilderImp
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
     }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withProcessMigrationDeployment() {
+        throw new UnsupportedOperationException("Not supported for templates.");
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withMemoryLimit(String memoryLimit) {
+        throw new UnsupportedOperationException("Not supported for templates.");
+    }
 }
