@@ -66,14 +66,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         commonConfig.setAdminUser(DeploymentConstants.getAppUser());
         commonConfig.setAdminPassword(DeploymentConstants.getAppPassword());
         kieApp.getSpec().setCommonConfig(commonConfig);
-
-        Server server = new Server();
-        server.addEnvs(authenticationEnvVars);
-        kieApp.getSpec().getObjects().addServer(server);
-
-        Console console = new Console();
-        console.addEnvs(authenticationEnvVars);
-        kieApp.getSpec().getObjects().setConsole(console);
     }
 
     @Override

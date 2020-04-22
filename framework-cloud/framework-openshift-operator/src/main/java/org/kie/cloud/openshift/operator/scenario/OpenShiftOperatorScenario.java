@@ -181,6 +181,30 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         server.setKeystoreSecret(OpenShiftConstants.getKieApplicationSecretName());
     }
 
+    protected boolean isCustomTrustedSecretRegistered(Console console) {
+        if (console.getKeystoreSecret() != null && !console.getKeystoreSecret().isEmpty() && console.getEnv().length > 0) {
+            return Stream.of(console.getEnv()).map(Env::getName).anyMatch("HTTPS_NAME"::equals) &&
+                    Stream.of(console.getEnv()).map(Env::getName).anyMatch("HTTPS_PASSWORD"::equals);
+        }
+        return false;
+    }
+
+    protected boolean isCustomTrustedSecretRegistered(SmartRouter smartRouter) {
+        if (smartRouter.getKeystoreSecret() != null && !smartRouter.getKeystoreSecret().isEmpty() && smartRouter.getEnv().length > 0) {
+            return Stream.of(smartRouter.getEnv()).map(Env::getName).anyMatch("KIE_SERVER_ROUTER_TLS_KEYSTORE_KEYALIAS"::equals) && 
+                    Stream.of(smartRouter.getEnv()).map(Env::getName).anyMatch("KIE_SERVER_ROUTER_TLS_KEYSTORE_PASSWORD"::equals);
+        }
+        return false;
+    }
+
+    protected boolean isCustomTrustedSecretRegistered(Server server) {
+        if (server.getKeystoreSecret() != null && !server.getKeystoreSecret().isEmpty() && server.getEnv().length > 0) {
+            return Stream.of(server.getEnv()).map(Env::getName).anyMatch("HTTPS_NAME"::equals) &&
+                    Stream.of(server.getEnv()).map(Env::getName).anyMatch("HTTPS_PASSWORD"::equals);
+        }
+        return false;
+    }
+
     /**
      * @return OpenShift client which is aware of KieApp custom resource.
      */

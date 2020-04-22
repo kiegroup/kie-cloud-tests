@@ -52,6 +52,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private final ScenarioRequest request;
+
     private PrometheusDeployment prometheusDeployment;
     private GitProvider gitProvider;
 
@@ -161,5 +162,10 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     @Override
     public GitProvider getGitProvider() {
         return gitProvider;
+    }
+
+    @Override
+    public void changeUsernameAndPassword(String username, String password) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 }

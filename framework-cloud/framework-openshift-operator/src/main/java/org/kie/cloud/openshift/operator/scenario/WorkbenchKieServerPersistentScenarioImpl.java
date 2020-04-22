@@ -19,15 +19,20 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.SupplierWaiter;
 import cz.xtf.core.waiting.WaiterException;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.Pod;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
+import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
@@ -89,24 +94,29 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
             gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
-        registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
-
+        if (!isCustomTrustedSecretRegistered(kieApp.getSpec().getObjects().getConsole())) {
+            registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
+        }
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerTrustedSecret(server);
+            if (!isCustomTrustedSecretRegistered(server)) {
+                registerTrustedSecret(server);
+            }
         }
 
         // deploy application
-        getKieAppClient().create(kieApp);
-        // Wait until the operator reconciliate the KieApp and add there missing informations
+        getKieAppClient().createOrReplace(kieApp);
         new SupplierWaiter<KieApp>(() -> getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get(), kieApp -> kieApp.getStatus() != null).reason("Waiting for reconciliation to initialize all fields.").timeout(TimeUnit.MINUTES,1).waitFor();
+        new SimpleWaiter(this::isKieAppDeployed).reason("Waiting for KieApp to be deployed.")
+                                                .timeout(TimeUnit.MINUTES, 1)
+                                                .waitFor();
 
         workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
-        workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchDeployment.setUsername(kieApp.getSpec().getCommonConfig().getAdminUser());
+        workbenchDeployment.setPassword(kieApp.getSpec().getCommonConfig().getAdminPassword());
 
         kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(kieApp.getSpec().getCommonConfig().getAdminUser());
+        kieServerDeployment.setPassword(kieApp.getSpec().getCommonConfig().getAdminPassword());
 
         logger.info("Waiting until all services are created.");
         try {
@@ -126,6 +136,10 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
 
         // Used to track persistent volume content due to issues with volume cleanup
         storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/kie");
+    }
+
+    private boolean isKieAppDeployed() {
+        return getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get().getStatus().getPhase().equals("Deployed");
     }
 
     @Override
@@ -178,5 +192,37 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
     @Override
     public GitProvider getGitProvider() {
         return gitProvider;
+    }
+
+    @Override
+    public void changeUsernameAndPassword(String username, String password) {
+        if(getDeployments().stream().allMatch(Deployment::isReady)) {
+            List<String> oldInstances = workbenchDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());
+            oldInstances.addAll(kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList()));
+
+            kieApp = getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get();
+            kieApp.getSpec().getCommonConfig().setAdminUser(username);
+            kieApp.getSpec().getCommonConfig().setAdminPassword(password);
+            deployCustomResource();
+
+            try {
+                new SimpleWaiter(() -> areInstancesDeleted(oldInstances)).timeout(TimeUnit.MINUTES, 5).interval(TimeUnit.SECONDS, 5).waitFor();
+            } catch (WaiterException e) {
+                throw new RuntimeException("Timeout while deploying application.", e);
+            }
+            logger.info("Waiting for Workbench deployment to become ready.");
+            workbenchDeployment.waitForScale();
+
+            logger.info("Waiting for Kie server deployment to become ready.");
+            kieServerDeployment.waitForScale();
+        } else{
+            throw new RuntimeException("Application is not ready for Username and password change. Please check first that application is ready.");
+        }
+    }
+
+    private boolean areInstancesDeleted(Collection<String> oldInstancesNames) {
+        return project.getOpenShift().getPods().stream().map(Pod::getMetadata)
+                                                        .map(ObjectMeta::getName)
+                                                        .noneMatch(oldInstancesNames::contains);
     }
 }

@@ -50,5 +50,14 @@ public interface WorkbenchKieServerScenario extends KieDeploymentScenario<Workbe
      */
     default Optional<PrometheusDeployment> getPrometheusDeployment() {
         return Optional.empty();
-    };
+    }
+
+    /**
+     * Change Kie Admin username and password for the scenario.
+     * After the change are deployments updated and method waits for new available pods.
+     *
+     * @param username New admin name. (To change only password put there same username as it was)
+     * @param password New admin password.
+     */
+    void changeUsernameAndPassword(String username, String password);
 }

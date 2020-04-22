@@ -66,8 +66,13 @@ public class KieServerClientProvider {
                 kieServerDeployment.getUrl().toString() + "/services/rest/server", kieServerDeployment.getUsername(),
                 kieServerDeployment.getPassword(), clientTimeout);
         configuration.addExtraClasses(extraClasses);
-        KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
-        return kieServerClient;
+        return KieServicesFactory.newKieServicesClient(configuration);
+    }
+
+    public static KieServicesClient getKieServerClient(String url, String username, String password) {
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(
+                url + "/services/rest/server", username, password, KIE_SERVER_TIMEOUT);
+        return KieServicesFactory.newKieServicesClient(configuration);
     }
 
     public static KieServicesClient getKieServerJmsClient(URL amqHost) {
@@ -139,8 +144,7 @@ public class KieServerClientProvider {
                 KieServerConstants.CAPABILITY_CASE,
                 KieServerConstants.CAPABILITY_DMN);
         configuration.setCapabilities(capabilities);
-        KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
-        return kieServerClient;
+        return KieServicesFactory.newKieServicesClient(configuration);
     }
 
     public static ProcessServicesClient getProcessClient(KieServerDeployment kieServerDeployment) {
