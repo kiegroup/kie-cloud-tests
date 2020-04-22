@@ -67,4 +67,19 @@ public interface WorkbenchDeployment extends Deployment {
      * @return Workbench user password
      */
     String getPassword();
+
+    /**
+     * Change Kie Workbench user password.
+     *
+     * @param newPassword New workbench user password
+     */
+    void changePassword(String newPassword);
+
+    /**
+     * Change Kie Workbench user name and password.
+     *
+     * @param newUsername New workbench user name
+     * @param newPassword New workbench user password.
+     */
+    void changeUsernameAndPassword(String newUsername, String newPassword);
 }

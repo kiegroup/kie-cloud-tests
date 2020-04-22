@@ -71,6 +71,10 @@ public abstract class OpenShiftDeployment implements Deployment {
         this.openShift = openShift;
     }
 
+    protected Project getProject() {
+        return project;
+    }
+
     @Override
     public String getNamespace() {
         return project.getName();

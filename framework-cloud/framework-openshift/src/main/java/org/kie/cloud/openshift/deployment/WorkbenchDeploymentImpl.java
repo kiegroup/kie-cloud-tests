@@ -17,12 +17,22 @@ package org.kie.cloud.openshift.deployment;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import cz.xtf.core.waiting.SimpleWaiter;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.resource.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements WorkbenchDeployment {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkbenchDeploymentImpl.class);
 
     private Optional<URL> insecureUrl;
     private Optional<URL> secureUrl;
@@ -94,5 +104,43 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
             getInsecureUrl().ifPresent(RouterUtil::waitForRouter);
             getSecureUrl().ifPresent(RouterUtil::waitForRouter);
         }
+    }
+
+    @Override
+    public void changePassword(String newPassword) {
+        deploySecretAppUser(DeploymentConstants.getAppUser(), newPassword);
+    }
+
+    @Override
+    public void changeUsernameAndPassword(String newUsername, String newPassword) {
+        deploySecretAppUser(newUsername, newPassword);
+    }
+
+    private void deploySecretAppUser(String user, String password) {
+        logger.info("Delete old secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
+        getOpenShift().secrets().withName(DeploymentConstants.getAppCredentialsSecretName()).delete();
+        new SimpleWaiter(() -> getOpenShift().getSecret(DeploymentConstants.getAppCredentialsSecretName()) == null).timeout(TimeUnit.MINUTES, 2)
+                                                                                                                   .reason("Waiting for old secret to be deleted.")
+                                                                                                                   .waitFor();
+
+        logger.info("Creating user secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
+        Map<String, String> data = new HashMap<>();
+        data.put(OpenShiftConstants.KIE_ADMIN_USER, user);
+        data.put(OpenShiftConstants.KIE_ADMIN_PWD, password);
+        
+        getProject().createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
+        new SimpleWaiter(() -> getOpenShift().getSecret(DeploymentConstants.getAppCredentialsSecretName()) != null).timeout(TimeUnit.MINUTES, 2)
+                                                                                                                   .reason("Waiting for new secret to be created.")
+                                                                                                                   .waitFor();
+        logger.info("Restart the environment to update Workbench deployment.");
+        scaleToZeroAndBackToReplicas();
+    }
+
+    private void scaleToZeroAndBackToReplicas() {
+        int replicas = getInstances().size();
+        scale(0);
+        waitForScale();
+        scale(replicas);
+        waitForScale();
     }
 }

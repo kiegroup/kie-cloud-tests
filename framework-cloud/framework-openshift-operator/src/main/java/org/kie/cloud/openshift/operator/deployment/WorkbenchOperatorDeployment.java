@@ -60,4 +60,23 @@ public class WorkbenchOperatorDeployment extends WorkbenchDeploymentImpl {
             RouterUtil.waitForRouter(getUrl());
         }
     }
+
+    @Override
+    public void changePassword(String newPassword) {
+        if (isReady()) {
+            KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
+            kieApp.getSpec().getCommonConfig().setAdminPassword(newPassword);
+            kieAppClient.createOrReplace(kieApp);
+        }
+    }
+
+    @Override
+    public void changeUsernameAndPassword(String newUsername, String newPassword) {
+        if (isReady()) {
+            KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
+            kieApp.getSpec().getCommonConfig().setAdminUser(newUsername);
+            kieApp.getSpec().getCommonConfig().setAdminPassword(newPassword);
+            kieAppClient.createOrReplace(kieApp);
+        }
+    }
 }
