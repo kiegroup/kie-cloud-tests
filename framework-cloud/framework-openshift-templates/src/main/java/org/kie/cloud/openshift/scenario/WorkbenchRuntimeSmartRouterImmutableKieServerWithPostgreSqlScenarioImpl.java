@@ -34,12 +34,14 @@ import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.template.ProjectProfile;
 import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
@@ -53,6 +55,8 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
     private DatabaseDeploymentImpl databaseDeployment;
     private SsoDeployment ssoDeployment;
     private GitProvider gitProvider;
+
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
     private final ScenarioRequest request;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
@@ -89,6 +93,10 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
+
+            ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
+            envVariables.put(propertyNames.workbenchSsoClient(), projectProfile.getWorkbenchName() + "-client");
+            envVariables.put(propertyNames.workbenchSsoSecret(), projectProfile.getWorkbenchName() + "-secret");
 
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
