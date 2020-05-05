@@ -86,10 +86,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER2_SSO_SECRET, "kie-server2-secret");
         }
 
-        // Workaround for RHPAM-2830
+        // Workaround for RHPAM-2919
         envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_MONITORING_CONTAINER_REPLICAS, "1");
-        // Workaround for BAQE-1358
-        envVariables.put(OpenShiftTemplateConstants.SMART_ROUTER_CONTAINER_REPLICAS, "1");
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_CONTAINER_REPLICAS, "1");
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_CONSOLE_SMARTROUTER_TWO_KIE_SERVERS_TWO_DATABASES.getTemplateUrl().toString());
