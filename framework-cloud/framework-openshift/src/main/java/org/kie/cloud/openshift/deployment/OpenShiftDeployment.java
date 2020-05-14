@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.waiting.SimpleWaiter;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
@@ -164,6 +166,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {
         waitUntilAllPodsAreReady(expectedPods);
         waitUntilAllPodsAreRunning(expectedPods);
+        waitUntilOneSetOfDeploymentPodsAvailable();
     }
 
     protected void waitUntilAllPodsAreReady(int expectedPods) {
@@ -185,6 +188,21 @@ public abstract class OpenShiftDeployment implements Deployment {
                                                           .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
                                                           .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
                                                           .waitFor());
+        } catch (AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
+        }
+    }
+
+    protected void waitUntilOneSetOfDeploymentPodsAvailable() {
+        try {
+            new SimpleWaiter(()-> openShift.getPods(getDeploymentConfigName()).stream().map(Pod::getMetadata)
+                                                                                       .map(ObjectMeta::getName)
+                                                                                       .map(name -> name.substring(0, name.lastIndexOf('-')))
+                                                                                       .distinct()
+                                                                                       .count() <= 1)
+                    .reason("Waiting for only one set of deployment config pods available " + getDeploymentConfigName())
+                    .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
+                    .waitFor();
         } catch (AssertionError e) {
             throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
         }

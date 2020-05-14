@@ -65,7 +65,6 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
 
     @Override
     protected void deployCustomResource() {
-
         if (deploySso) {
             ssoDeployment = SsoDeployer.deploySecure(project);
             URL ssoSecureUrl = ssoDeployment.getSecureUrl().orElseThrow(() -> new RuntimeException("RH SSO secure URL not found."));
@@ -82,23 +81,36 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
             kieApp.getSpec().setAuth(auth);
         }
 
-        registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());
+        if (!isCustomTrustedSecretRegistered(kieApp.getSpec().getObjects().getConsole())) {
+            registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());
+        }
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            if (!isCustomTrustedSecretRegistered(server)) {
+                registerCustomTrustedSecret(server);
+            }
         }
 
         // deploy application
-        getKieAppClient().create(kieApp);
+        getKieAppClient().createOrReplace(kieApp);
         // Wait until the operator reconciliate the KieApp and add there missing informations
+        try {
+            logger.info("Waiting for 10 seconds to let KieApp deployment start - on Jenkins when kieApp replaced following waiters are skipped as old deployment exists.");
+            Thread.sleep(TimeUnit.SECONDS.toMillis(10)); //Dummy waiting
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Waiting was interrupted", e);
+        }
         new SupplierWaiter<KieApp>(() -> getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get(), kieApp -> kieApp.getStatus() != null).reason("Waiting for reconciliation to initialize all fields.").timeout(TimeUnit.MINUTES,1).waitFor();
+        new SimpleWaiter(this::isKieAppDeployed).reason("Waiting for KieApp to be deployed.")
+                                                .timeout(TimeUnit.MINUTES, 1)
+                                                .waitFor();
 
         workbenchDeployment = new WorkbenchOperatorDeployment(project, getKieAppClient());
-        workbenchDeployment.setUsername(DeploymentConstants.getAppUser());
-        workbenchDeployment.setPassword(DeploymentConstants.getAppPassword());
+        workbenchDeployment.setUsername(kieApp.getSpec().getCommonConfig().getAdminUser());
+        workbenchDeployment.setPassword(kieApp.getSpec().getCommonConfig().getAdminPassword());
 
         kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
-        kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
-        kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
+        kieServerDeployment.setUsername(kieApp.getSpec().getCommonConfig().getAdminUser());
+        kieServerDeployment.setPassword(kieApp.getSpec().getCommonConfig().getAdminPassword());
 
         logger.info("Waiting until all services are created.");
         try {
@@ -121,6 +133,10 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
 
         // Used to track persistent volume content due to issues with volume cleanup
         storeProjectInfoToPersistentVolume(workbenchDeployment, "/opt/eap/standalone/data/kie");
+    }
+
+    private boolean isKieAppDeployed() {
+        return getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get().getStatus().getPhase().equals("Deployed");
     }
 
     @Override
@@ -168,5 +184,17 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
+    }
+
+    @Override
+    public void changeUsernameAndPassword(final String username, final String password) {
+        if(getDeployments().stream().allMatch(Deployment::isReady)) {
+            kieApp = getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get();
+            kieApp.getSpec().getCommonConfig().setAdminUser(username);
+            kieApp.getSpec().getCommonConfig().setAdminPassword(password);
+            deployCustomResource();
+        } else{
+            throw new RuntimeException("Application is not ready for Username and password change. Please check first that application is ready.");
+        }
     }
 }

@@ -18,7 +18,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
-import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
+import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
@@ -26,7 +26,7 @@ public class WorkbenchAdminUserPersistenceIntegrationTest extends AbstractCloudI
 
     private static WorkbenchKieServerScenario deploymentScenario;
 
-    private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
+    private static PersistenceTestProvider persistenceTestProvider;
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -37,7 +37,7 @@ public class WorkbenchAdminUserPersistenceIntegrationTest extends AbstractCloudI
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
-        httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
+        persistenceTestProvider = PersistenceTestProvider.create();
     }
 
     @AfterClass
@@ -47,11 +47,11 @@ public class WorkbenchAdminUserPersistenceIntegrationTest extends AbstractCloudI
 
     @Test
     public void testAdminUserPasswordChange() {
-        httpsWorkbenchTestProvider.testAdminUserPasswordChange(deploymentScenario.getWorkbenchDeployment());
+        persistenceTestProvider.testAdminUserPasswordChange(deploymentScenario);
     }
 
     @Test
     public void testAdminUserNameAndPasswordChange() {
-        httpsWorkbenchTestProvider.testAdminUserNameAndPasswordChange(deploymentScenario.getWorkbenchDeployment());
+        persistenceTestProvider.testAdminUserNameAndPasswordChange(deploymentScenario);
     }
 }

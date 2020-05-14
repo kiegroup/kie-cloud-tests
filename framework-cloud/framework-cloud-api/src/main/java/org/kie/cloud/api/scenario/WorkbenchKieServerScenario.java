@@ -50,5 +50,7 @@ public interface WorkbenchKieServerScenario extends KieDeploymentScenario<Workbe
      */
     default Optional<PrometheusDeployment> getPrometheusDeployment() {
         return Optional.empty();
-    };
+    }
+
+    void changeUsernameAndPassword(String username, String password);
 }
