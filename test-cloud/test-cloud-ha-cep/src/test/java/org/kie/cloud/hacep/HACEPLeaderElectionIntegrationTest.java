@@ -15,6 +15,7 @@
 
 package org.kie.cloud.hacep;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,9 @@ import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 
 public class HACEPLeaderElectionIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<HACepScenario> {
+
+    private static final String REPLICA_MESSAGE = "Unable to acquire the leadership";
+    private static final String LEADER_MESSAGE = "Leadership acquired by current pod with immediate effect";
 
     @Override
     protected HACepScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
@@ -46,6 +50,16 @@ public class HACEPLeaderElectionIntegrationTest extends AbstractMethodIsolatedCl
 
             final String leaderPodName = HACEPTestsUtils.leaderPodName(project);
             Assertions.assertThat(leaderPodName).isIn(podNames);
+
+            final List<String> logs = deploymentScenario
+                    .getDeployments()
+                    .get(0)
+                    .getInstances()
+                    .stream().map(instance -> instance.getLogs())
+                    .collect(Collectors.toList());
+
+            Assertions.assertThat(logs.stream().filter(x -> x.contains(LEADER_MESSAGE)).count()).isEqualTo(1);
+            Assertions.assertThat(logs.stream().filter(x -> x.contains(REPLICA_MESSAGE)).count()).isEqualTo(2);
         }
     }
 
