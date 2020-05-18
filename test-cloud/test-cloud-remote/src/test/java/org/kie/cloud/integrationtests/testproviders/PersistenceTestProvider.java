@@ -92,9 +92,9 @@ public class PersistenceTestProvider {
     }
 
 
-    // Verifies https://issues.redhat.com/browse/RHPAM-2762
+    // Verifies https://issues.redhat.com/browse/RHPAM-2777
     public void testAdminUserPasswordChange(WorkbenchKieServerScenario deploymentScenario) {
-        final String NEW_PASSWORD = "newpassword1234!";
+        final String newPassword = "newpassword1234!";
         final String oldPassword = deploymentScenario.getWorkbenchDeployment().getPassword();
 
         final String username = deploymentScenario.getWorkbenchDeployment().getUsername();
@@ -114,18 +114,17 @@ public class PersistenceTestProvider {
                 softly.assertAlso(isUserAuthorizedInKieServer(kieServerUrl, username, oldPassword));
             });
 
-            logger.info("Change username to {} and password to {} in credential secret", username, NEW_PASSWORD);
-            deploymentScenario.changeUsernameAndPassword(username, NEW_PASSWORD);
-            //workbenchDeployment.changeUsernameAndPassword(NEW_USERNAME, NEW_PASSWORD);
+            logger.info("Change username to {} and password to {} in credential secret", username, newPassword);
+            deploymentScenario.changeUsernameAndPassword(username, newPassword);
 
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertAlso(isUserUnauthorizedInWorkbench(workbenchUrl, username, oldPassword));
 
-                softly.assertAlso(isUserAuthorizedInWorkbench(workbenchUrl, username, NEW_PASSWORD));
+                softly.assertAlso(isUserAuthorizedInWorkbench(workbenchUrl, username, newPassword));
 
                 softly.assertAlso(isUserUnauthorizedInKieServer(kieServerUrl, username, oldPassword));
 
-                softly.assertAlso(isUserAuthorizedInKieServer(kieServerUrl, username, NEW_PASSWORD));
+                softly.assertAlso(isUserAuthorizedInKieServer(kieServerUrl, username, newPassword));
             });
         } finally {
             deploymentScenario.changeUsernameAndPassword(username, oldPassword);
@@ -133,10 +132,10 @@ public class PersistenceTestProvider {
         }
     }
 
-    // Verifies https://issues.redhat.com/browse/RHPAM-2777
+    // Verifies https://issues.redhat.com/browse/RHPAM-2762
     public void testAdminUserNameAndPasswordChange(WorkbenchKieServerScenario deploymentScenario) {
-        final String NEW_USERNAME = "newadminusername";
-        final String NEW_PASSWORD = "newpassword4321!";
+        final String newUsername = "newadminusername";
+        final String newPassword = "newpassword4321!";
 
         final String oldUsername = deploymentScenario.getWorkbenchDeployment().getUsername();
         final String oldPassword = deploymentScenario.getWorkbenchDeployment().getPassword();
@@ -156,22 +155,21 @@ public class PersistenceTestProvider {
                 softly.assertAlso(isUserAuthorizedInKieServer(kieServerUrl, oldUsername, oldPassword));
             });
 
-            logger.info("Change username to {} and password to {} in credential secret", NEW_USERNAME, NEW_PASSWORD);
-            deploymentScenario.changeUsernameAndPassword(NEW_USERNAME, NEW_PASSWORD);
-            //workbenchDeployment.changeUsernameAndPassword(NEW_USERNAME, NEW_PASSWORD);
+            logger.info("Change username to {} and password to {} in credential secret", newUsername, newPassword);
+            deploymentScenario.changeUsernameAndPassword(newUsername, newPassword);
 
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertAlso(isUserUnauthorizedInWorkbench(workbenchUrl, oldUsername, oldPassword));
-                softly.assertAlso(isUserUnauthorizedInWorkbench(workbenchUrl, oldUsername, NEW_PASSWORD));
-                softly.assertAlso(isUserUnauthorizedInWorkbench(workbenchUrl, NEW_USERNAME, oldPassword));
+                softly.assertAlso(isUserUnauthorizedInWorkbench(workbenchUrl, oldUsername, newPassword));
+                softly.assertAlso(isUserUnauthorizedInWorkbench(workbenchUrl, newUsername, oldPassword));
 
-                softly.assertAlso(isUserAuthorizedInWorkbench(workbenchUrl, NEW_USERNAME, NEW_PASSWORD));
+                softly.assertAlso(isUserAuthorizedInWorkbench(workbenchUrl, newUsername, newPassword));
 
                 softly.assertAlso(isUserUnauthorizedInKieServer(kieServerUrl, oldUsername, oldPassword));
-                softly.assertAlso(isUserUnauthorizedInKieServer(kieServerUrl, oldUsername, NEW_PASSWORD));
-                softly.assertAlso(isUserUnauthorizedInKieServer(kieServerUrl, NEW_USERNAME, oldPassword));
+                softly.assertAlso(isUserUnauthorizedInKieServer(kieServerUrl, oldUsername, newPassword));
+                softly.assertAlso(isUserUnauthorizedInKieServer(kieServerUrl, newUsername, oldPassword));
 
-                softly.assertAlso(isUserAuthorizedInKieServer(kieServerUrl, NEW_USERNAME, NEW_PASSWORD));
+                softly.assertAlso(isUserAuthorizedInKieServer(kieServerUrl, newUsername, newPassword));
             });
         } finally {
             deploymentScenario.changeUsernameAndPassword(oldUsername, oldPassword);

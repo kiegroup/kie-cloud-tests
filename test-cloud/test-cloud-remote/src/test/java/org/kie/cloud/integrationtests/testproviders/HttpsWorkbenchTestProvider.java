@@ -17,7 +17,6 @@
 package org.kie.cloud.integrationtests.testproviders;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -31,7 +30,6 @@ import com.google.gson.JsonObject;
 import cz.xtf.client.Http;
 import cz.xtf.client.HttpResponseParser;
 import org.apache.http.entity.ContentType;
-import org.assertj.core.api.SoftAssertions;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
@@ -144,92 +142,6 @@ public class HttpsWorkbenchTestProvider {
             logger.error("Unable to connect to workbench REST API", e);
             throw new RuntimeException("Unable to connect to workbench REST API", e);
         }
-    }
-
-    // Verifies https://issues.redhat.com/browse/RHPAM-2762
-    public void testAdminUserPasswordChange(WorkbenchDeployment workbenchDeployment) {
-        final String NEW_PASSWORD = "newpassword1234!";
-        try {
-            // Check if old user can connect
-            HttpResponseParser responseCheckServerTemplate = getListServerTemplatesResponse(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
-            assertThat(responseCheckServerTemplate.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
-
-            logger.info("Change password to {} in credential secret", NEW_PASSWORD);
-            workbenchDeployment.changePassword(NEW_PASSWORD);
-
-            SoftAssertions.assertSoftly(softly -> {
-                try {
-                    // Check if user with old password cannot connect
-                    softly.assertThat(getListServerTemplatesResponse(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword()).code())
-                          .as("Response code after login with old password")
-                          .isEqualTo(HttpsURLConnection.HTTP_UNAUTHORIZED);
-
-                    // Check if user with new password can connect  
-                    softly.assertThat(getListServerTemplatesResponse(workbenchDeployment, workbenchDeployment.getUsername(), NEW_PASSWORD).code())
-                          .as("Response code after login with new password")
-                          .isEqualTo(HttpsURLConnection.HTTP_OK);
-                } catch (IOException e) {
-                    logger.error("Unable to connect to workbench REST API when using SoftAssertions", e);
-                    throw new UncheckedIOException("Unable to connect to workbench REST API when using SoftAssertions", e);
-                }
-            });
-        } catch (IOException e) {
-            logger.error("Unable to connect to workbench REST API", e);
-            throw new RuntimeException("Unable to connect to workbench REST API", e);
-        } finally {
-            workbenchDeployment.changePassword(workbenchDeployment.getPassword());
-        }
-    }
-
-    // Verifies https://issues.redhat.com/browse/RHPAM-2777
-    public void testAdminUserNameAndPasswordChange(WorkbenchDeployment workbenchDeployment) {
-        final String NEW_USERNAME = "newadminusername";
-        final String NEW_PASSWORD = "newpassword4321!";
-        try {
-            // Check if old user can connect
-            HttpResponseParser responseCheckServerTemplate = getListServerTemplatesResponse(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
-            assertThat(responseCheckServerTemplate.code()).isEqualTo(HttpsURLConnection.HTTP_OK);
-
-            logger.info("Change username to {} and password to {} in credential secret", NEW_USERNAME, NEW_PASSWORD);
-            workbenchDeployment.changeUsernameAndPassword(NEW_USERNAME, NEW_PASSWORD);
-
-            SoftAssertions.assertSoftly(softly -> {
-                try {
-                    // Check if old user cannot connect
-                    softly.assertThat(getListServerTemplatesResponse(workbenchDeployment, workbenchDeployment.getUsername(), workbenchDeployment.getPassword()).code())
-                          .as("Response code after login with old username and old password")
-                          .isEqualTo(HttpsURLConnection.HTTP_UNAUTHORIZED);
-                    softly.assertThat(getListServerTemplatesResponse(workbenchDeployment, workbenchDeployment.getUsername(), NEW_PASSWORD).code())
-                          .as("Response code after login with old username and new password")
-                          .isEqualTo(HttpsURLConnection.HTTP_UNAUTHORIZED);
-                    softly.assertThat(getListServerTemplatesResponse(workbenchDeployment, NEW_USERNAME, workbenchDeployment.getPassword()).code())
-                          .as("Response code after login with new username and old password")
-                          .isEqualTo(HttpsURLConnection.HTTP_UNAUTHORIZED);
-
-                    // Check if new user can connect
-                    softly.assertThat(getListServerTemplatesResponse(workbenchDeployment, NEW_USERNAME, NEW_PASSWORD).code())
-                          .as("Response code after login with new username and new password")
-                          .isEqualTo(HttpsURLConnection.HTTP_OK);
-                } catch (IOException e) {
-                    logger.error("Unable to connect to workbench REST API when using SoftAssertions", e);
-                    throw new UncheckedIOException("Unable to connect to workbench REST API when using SoftAssertions", e);
-                }
-            });
-        } catch (IOException e) {
-            logger.error("Unable to connect to workbench REST API", e);
-            throw new RuntimeException("Unable to connect to workbench REST API", e);
-        } finally {
-            workbenchDeployment.changeUsernameAndPassword(workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
-        }
-    }
-
-    private HttpResponseParser getListServerTemplatesResponse(WorkbenchDeployment workbenchDeployment, String username, String password) throws IOException {
-        return Http.get(listServerTemplatesRequestUrl(workbenchDeployment))
-                   .basicAuth(username, password)
-                   .header("Accept", "application/json")
-                   .preemptiveAuth()
-                   .trustAll()
-                   .execute();
     }
 
     private static void verifyServerTemplateExists(String serverTemplateId, String responseContent) {

@@ -19,13 +19,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
-import cz.xtf.core.waiting.SimpleWaiter;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -35,7 +32,6 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
@@ -140,39 +136,6 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
 
     @Override
     public void changeUsernameAndPassword(String username, String password) {
-        if(getDeployments().stream().allMatch(Deployment::isReady)) {
-            deploySecretAppUser(username,password);
-            logger.info("Restart the environment to update Workbench deployment.");
-            getDeployments().parallelStream().forEach(this::scaleToZeroAndBackToReplicas); // if parallel stream make mess because of common fork-join pool use normal stream and adjust scaling (scale all deployments to zero at the same time)
-        } else{
-            throw new RuntimeException("Application is not ready for Username and password change. Please check first that application is ready.");
-        }
-
-    }
-
-    private void deploySecretAppUser(String user, String password) {
-        logger.info("Delete old secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
-        project.getOpenShift().secrets().withName(DeploymentConstants.getAppCredentialsSecretName()).delete();
-        new SimpleWaiter(() -> project.getOpenShift().getSecret(DeploymentConstants.getAppCredentialsSecretName()) == null).timeout(TimeUnit.MINUTES, 2)
-                                                                                                                   .reason("Waiting for old secret to be deleted.")
-                                                                                                                   .waitFor();
-
-        logger.info("Creating user secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
-        Map<String, String> data = new HashMap<>();
-        data.put(OpenShiftConstants.KIE_ADMIN_USER, user);
-        data.put(OpenShiftConstants.KIE_ADMIN_PWD, password);
-        
-        project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
-        new SimpleWaiter(() -> project.getOpenShift().getSecret(DeploymentConstants.getAppCredentialsSecretName()) != null).timeout(TimeUnit.MINUTES, 2)
-                                                                                                                   .reason("Waiting for new secret to be created.")
-                                                                                                                   .waitFor();
-    }
-
-    private void scaleToZeroAndBackToReplicas(Deployment deployment) {
-        int replicas = deployment.getInstances().size();
-        deployment.scale(0);
-        deployment.waitForScale();
-        deployment.scale(replicas);
-        deployment.waitForScale();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

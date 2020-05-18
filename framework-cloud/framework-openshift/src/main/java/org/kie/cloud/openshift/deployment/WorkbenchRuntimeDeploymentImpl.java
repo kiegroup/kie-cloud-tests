@@ -99,14 +99,4 @@ public class WorkbenchRuntimeDeploymentImpl extends OpenShiftDeployment implemen
             getSecureUrl().ifPresent(RouterUtil::waitForRouter);
         }
     }
-
-    @Override
-    public void changePassword(String newPassword) {
-        throw new UnsupportedOperationException("Not supported");
-    }
-
-    @Override
-    public void changeUsernameAndPassword(String newUsername, String newPassword) {
-        throw new UnsupportedOperationException("Not supported");
-    }
 }

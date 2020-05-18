@@ -49,12 +49,12 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
 
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
-    private final boolean deployPrometheus;
+    private boolean deployPrometheus;
     private PrometheusDeployment prometheusDeployment;
 
     private static final Logger logger = LoggerFactory.getLogger(WorkbenchKieServerScenarioImpl.class);
 
-    public WorkbenchKieServerScenarioImpl(final KieApp kieApp, final boolean deployPrometheus) {
+    public WorkbenchKieServerScenarioImpl(KieApp kieApp, boolean deployPrometheus) {
         super(kieApp);
         this.deployPrometheus = deployPrometheus;
     }
@@ -62,7 +62,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     @Override
     protected void deployCustomResource() {
         // deploy application
-        getKieAppClient().createOrReplace(kieApp);
+        getKieAppClient().create(kieApp);
         // Wait until the operator reconciliate the KieApp and add there missing informations
         new SupplierWaiter<KieApp>(() -> getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get(), kieApp -> kieApp.getStatus() != null).reason("Waiting for reconciliation to initialize all fields.").timeout(TimeUnit.MINUTES,1).waitFor();
 
@@ -82,7 +82,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
         try {
             new SimpleWaiter(() -> workbenchDeployment.isReady()).reason("Waiting for Workbench service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
             new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
-        } catch (final WaiterException e) {
+        } catch (WaiterException e) {
             throw new RuntimeException("Timeout while deploying application.", e);
         }
 
@@ -119,13 +119,13 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
 
     @Override
     public List<Deployment> getDeployments() {
-        final List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment));
+        List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
 
-    private void storeProjectInfoToPersistentVolume(final Deployment deployment, final String persistentVolumeMountPath) {
-        final String storeCommand = "echo \"Project " + projectName + ", time " + Instant.now() + "\" > " + persistentVolumeMountPath + "/info.txt";
+    private void storeProjectInfoToPersistentVolume(Deployment deployment, String persistentVolumeMountPath) {
+        String storeCommand = "echo \"Project " + projectName + ", time " + Instant.now() + "\" > " + persistentVolumeMountPath + "/info.txt";
         workbenchDeployment.getInstances().get(0).runCommand("/bin/bash", "-c", storeCommand);
     }
 
@@ -155,14 +155,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
     }
 
     @Override
-    public void changeUsernameAndPassword(final String username, final String password) {
-        if(getDeployments().stream().allMatch(Deployment::isReady)) {
-            kieApp = getKieAppClient().withName(OpenShiftConstants.getKieApplicationName()).get();
-            kieApp.getSpec().getCommonConfig().setAdminUser(username);
-            kieApp.getSpec().getCommonConfig().setAdminPassword(password);
-            deployCustomResource();
-        } else{
-            throw new RuntimeException("Application is not ready for Username and password change. Please check first that application is ready.");
-        }
+    public void changeUsernameAndPassword(String username, String password) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

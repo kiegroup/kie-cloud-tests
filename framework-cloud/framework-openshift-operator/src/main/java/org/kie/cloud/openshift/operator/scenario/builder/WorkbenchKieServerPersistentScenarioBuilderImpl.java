@@ -66,11 +66,9 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
-        //server.addEnvs(authenticationEnvVars); TODO remove this? not needed as we have set user in common config
         kieApp.getSpec().getObjects().addServer(server);
 
         Console console = new Console();
-        //console.addEnvs(authenticationEnvVars);  TODO remove this? not needed as we have set user in common config
         kieApp.getSpec().getObjects().setConsole(console);
     }
 

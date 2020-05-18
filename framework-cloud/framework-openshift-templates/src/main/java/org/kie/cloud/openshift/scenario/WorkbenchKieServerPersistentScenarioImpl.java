@@ -154,14 +154,13 @@ public class WorkbenchKieServerPersistentScenarioImpl extends KieCommonScenario<
 
     @Override
     public void changeUsernameAndPassword(String username, String password) {
-        if(getDeployments().stream().allMatch(Deployment::isReady)) {
-            deploySecretAppUser(username,password);
+        if (getDeployments().stream().allMatch(Deployment::isReady)) {
+            deploySecretAppUser(username, password);
             logger.info("Restart the environment to update Workbench deployment.");
-            getDeployments().parallelStream().forEach(this::scaleToZeroAndBackToReplicas); // if parallel stream make mess because of common fork-join pool use normal stream and adjust scaling (scale all deployments to zero at the same time)
-        } else{
+            getDeployments().parallelStream().forEach(this::scaleToZeroAndBackToReplicas);
+        } else {
             throw new RuntimeException("Application is not ready for Username and password change. Please check first that application is ready.");
         }
-
     }
 
     private void deploySecretAppUser(String user, String password) {
