@@ -33,9 +33,9 @@
     <template.project/> <!-- valid values: jbpm, drools-->
 
     <!-- Properties to configure SSO -->
-    <sso.image.streams>https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/sso73-dev/templates/sso73-image-stream.json</sso.image.streams>
+    <sso.image.streams>https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/sso74-dev/templates/sso74-image-stream.json</sso.image.streams>
     <sso.app.secrets>https://raw.githubusercontent.com/jboss-openshift/application-templates/master/secrets/sso-app-secret.json</sso.app.secrets>
-    <sso.app.template>https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/sso73-dev/templates/sso73-https.json</sso.app.template>
+    <sso.app.template>https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/sso74-dev/templates/sso74-https.json</sso.app.template>
     <sso.app.realm>demo</sso.app.realm>
     <sso.admin.username>admin</sso.admin.username>
     <sso.admin.password>admin</sso.admin.password>
