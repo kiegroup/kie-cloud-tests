@@ -182,4 +182,9 @@ public class WorkbenchKieServerPersistentScenarioApb extends OpenShiftScenario<W
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
     }
+
+    @Override
+    public void changeUsernameAndPassword(String username, String password) {
+        throw new UnsupportedOperationException("Not supported."); 
+    }
 }

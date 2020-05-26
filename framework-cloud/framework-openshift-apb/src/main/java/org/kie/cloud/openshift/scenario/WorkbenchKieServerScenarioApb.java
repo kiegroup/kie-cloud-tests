@@ -173,4 +173,9 @@ public class WorkbenchKieServerScenarioApb extends OpenShiftScenario<WorkbenchKi
     public Optional<PrometheusDeployment> getPrometheusDeployment() {
         return Optional.ofNullable(prometheusDeployment);
     }
+
+    @Override
+    public void changeUsernameAndPassword(String username, String password) {
+        throw new UnsupportedOperationException("Not supported."); 
+    }
 }

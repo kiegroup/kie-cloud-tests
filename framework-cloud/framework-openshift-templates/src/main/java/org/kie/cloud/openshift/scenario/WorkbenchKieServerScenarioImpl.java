@@ -133,4 +133,9 @@ public class WorkbenchKieServerScenarioImpl extends KieCommonScenario<WorkbenchK
     public Optional<PrometheusDeployment> getPrometheusDeployment() {
         return Optional.ofNullable(prometheusDeployment);
     }
+
+    @Override
+    public void changeUsernameAndPassword(String username, String password) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

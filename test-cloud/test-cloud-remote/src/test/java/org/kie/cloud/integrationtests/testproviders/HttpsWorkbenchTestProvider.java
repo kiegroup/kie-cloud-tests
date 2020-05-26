@@ -18,7 +18,6 @@ package org.kie.cloud.integrationtests.testproviders;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
