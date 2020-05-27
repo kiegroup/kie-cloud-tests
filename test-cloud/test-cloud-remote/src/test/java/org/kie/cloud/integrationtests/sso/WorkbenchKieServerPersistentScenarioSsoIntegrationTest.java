@@ -22,6 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
@@ -33,9 +34,12 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
+import org.kie.cloud.tests.common.client.util.Kjar;
 
 @Category(Baseline.class)
 public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
+
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
 
     private static WorkbenchKieServerScenario deploymentScenario;
 
@@ -52,7 +56,10 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                                                       .deploySso()
                                                       .withInternalMavenRepo()
-                                                      .usePublicIpAddress()
+                                                      .withGitSettings(GitSettings.fromProperties()
+                                                                       .withRepository(REPOSITORY_NAME,
+                                                                                       WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getResource(
+                                                                                                                                              PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
                                                       .build();
 
         deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentScenarioSsoIntegrationTest.class.getSimpleName());
@@ -102,7 +109,9 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
+                                                                  deploymentScenario.getKieServerDeployment(),
+                                                                  deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));
     }
 
     @Test

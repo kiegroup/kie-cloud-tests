@@ -25,10 +25,11 @@ import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -49,12 +50,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Category(JBPMOnly.class)
 public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(ProcessFailoverIntegrationTest.class.getSimpleName());
+
     protected KieServerControllerClient kieServerControllerClient;
     protected KieServicesClient kieServicesClient;
     protected ProcessServicesClient processServicesClient;
     protected QueryServicesClient queryServicesClient;
-
-    private String repositoryName;
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessFailoverIntegrationTest.class);
 
@@ -64,14 +65,16 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
 
     @Override
     protected WorkbenchKieServerPersistentScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder().build();
+        return deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+                                        .withGitSettings(GitSettings.fromProperties()
+                                                                    .withRepository(REPOSITORY_NAME,
+                                                                                    ProcessFailoverIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile()))
+                                        .build();
     }
 
     @Before
     public void setUp() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ProcessFailoverIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
-
-        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(REPOSITORY_NAME, deploymentScenario, DEFINITION_PROJECT_NAME);
 
         kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
 
@@ -82,7 +85,7 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
 
     @After
     public void tearDown() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test

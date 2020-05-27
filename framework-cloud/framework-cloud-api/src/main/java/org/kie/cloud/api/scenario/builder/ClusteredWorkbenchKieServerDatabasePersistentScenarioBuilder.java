@@ -16,15 +16,16 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerDatabasePersistentScenario> {
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalMavenRepo();
@@ -44,13 +45,22 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso();
 
     /**
+     * Return setup builder with additional GIT settings.
      *
-     * Return setup builder with configured LDAP.
-     *
-     * @param ldapSettings configuration of LDAP represented by a class.
+     * @param gitSettings settings configuration of GIT
      * @return Builder
      */
-    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings);
+
+    /**
+     * Return setup builder with additional configuration of internal ldap.
+     *
+     * Parameters will be used automatically
+     *
+     * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder with configured internal ldap.
+     */
+    ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdap(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with configure Workbench http hostname.
@@ -91,4 +101,5 @@ public interface ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder ex
      * @return Builder with configured memory limit.
      */
     ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
+
 }

@@ -21,6 +21,8 @@ import java.util.List;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerPersistentScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
+import org.kie.cloud.api.settings.UpgradeSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
@@ -33,17 +35,20 @@ import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
+import org.kie.cloud.openshift.operator.model.components.Upgrades;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerPersistentScenarioImpl;
-import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
+
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyDroolsScenarioOnly;
 
 public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ClusteredWorkbenchKieServerPersistentScenario> implements
                                                                       ClusteredWorkbenchKieServerPersistentScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private final ScenarioRequest request = new ScenarioRequest();
 
     public ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl() {
-        isScenarioAllowed();
+        verifyDroolsScenarioOnly();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
@@ -79,7 +84,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
     @Override
     public ClusteredWorkbenchKieServerPersistentScenario getDeploymentScenarioInstance() {
-        return new ClusteredWorkbenchKieServerPersistentScenarioImpl(kieApp, deploySSO);
+        return new ClusteredWorkbenchKieServerPersistentScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -96,7 +101,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
     @Override
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         SsoClient ssoClient = new SsoClient();
         ssoClient.setName("workbench-client");
         ssoClient.setSecret("workbench-secret");
@@ -112,20 +117,27 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
         return this;
     }
 
-    private static void isScenarioAllowed() {
-        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        switch (projectProfile) {
-            case JBPM:
-                throw new UnsupportedOperationException("Not supported");
-            case DROOLS:
-                return;
-            default:
-                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
-        }
+    @Override
+    public ClusteredWorkbenchKieServerPersistentScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
+        return this;
     }
 
     @Override
     public ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerPersistentScenarioBuilder withUpgrades(UpgradeSettings upgradeSettings) {
+        if (upgradeSettings != null) {
+            Upgrades upgrades = new Upgrades();
+            upgrades.setEnabled(true);
+            upgrades.setMinor(upgradeSettings.isMinor());
+            kieApp.getSpec().setUpgrades(upgrades);
+            request.enableUpgrade();
+        }
+
+        return this;
     }
 }

@@ -44,12 +44,13 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -70,22 +71,27 @@ import org.slf4j.LoggerFactory;
 @Category({Baseline.class, OperatorNotSupported.class}) // Operator doesn't support scaling Workbench to 0 for this scenario
 public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(ReadinessProbeIntegrationTest.class.getSimpleName());
+
     @Parameter(value = 0)
     public String testScenarioName;
 
     @Parameter(value = 1)
     public WorkbenchKieServerScenario workbenchKieServerScenario;
 
-    String repositoryName;
-
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             ReadinessProbeIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
+
         try {
             WorkbenchKieServerScenario workbenchKieServerScenario = deploymentScenarioFactory.getWorkbenchKieServerScenarioBuilder()
                     .withInternalMavenRepo()
+                    .withGitSettings(gitSettings)
                     .build();
             scenarios.add(new Object[]{"Workbench + KIE Server", workbenchKieServerScenario});
         } catch (UnsupportedOperationException ex) {
@@ -95,6 +101,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
         try {
             WorkbenchKieServerPersistentScenario workbenchKieServerPersistentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                     .withInternalMavenRepo()
+                    .withGitSettings(gitSettings)
                     .build();
             scenarios.add(new Object[]{"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario});
         } catch (UnsupportedOperationException ex) {
@@ -129,10 +136,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
             httpKieServerClient.close();
         }
 
-        if (repositoryName != null) {
-            Git.getProvider().deleteGitRepository(repositoryName);
-            repositoryName = null;
-        }
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test
@@ -162,9 +166,7 @@ public class ReadinessProbeIntegrationTest extends AbstractMethodIsolatedCloudIn
 
     @Test
     public void testKieServerReadinessProbe() {
-        String repositoryName = Git.getProvider().createGitRepositoryWithPrefix(deploymentScenario.getWorkbenchDeployment().getNamespace(), ReadinessProbeIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER + "/" + DEFINITION_PROJECT_NAME).getFile());
-
-        WorkbenchUtils.deployProjectToWorkbench(Git.getProvider().getRepositoryUrl(repositoryName), deploymentScenario.getWorkbenchDeployment(), DEFINITION_PROJECT_NAME);
+        WorkbenchUtils.deployProjectToWorkbench(REPOSITORY_NAME, deploymentScenario, DEFINITION_PROJECT_NAME);
 
         KieServerInfo serverInfo = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment()).getServerInfo().getResult();
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());

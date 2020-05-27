@@ -108,14 +108,20 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
 
     @Override
     protected void deployKieDeployments() {
-        final File amqStreamsDirectory = downloadAndUnzipAMQStreams();
-        final File amqStreamsInstallDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_INSTALL_SUBDIRECTORY);
-        filterNamespaceInInstallationFiles(amqStreamsInstallDirectory, project.getName());
+        if (OpenShiftConstants.getAMQStreamsZip() != null) {
+            logger.info("System property for AMQ Streams zip is set {}. Will install AMQ streams from zip.",
+                    OpenShiftConstants.getAMQStreamsZip());
+            final File amqStreamsDirectory = downloadAndUnzipAMQStreams();
+            final File amqStreamsInstallDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_INSTALL_SUBDIRECTORY);
+            filterNamespaceInInstallationFiles(amqStreamsInstallDirectory, project.getName());
 
-        project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsInstallDirectory));
-        final File amqStreamsTemplatesDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_TEMPLATES_SUBDIRECTORY);
+            project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsInstallDirectory));
+            final File amqStreamsTemplatesDirectory = new File(amqStreamsDirectory, AMQ_STREAMS_TEMPLATES_SUBDIRECTORY);
 
-        project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsTemplatesDirectory));
+            project.createResourcesFromYamlAsAdmin(sortedFolderContent(amqStreamsTemplatesDirectory));
+        } else {
+            logger.info("System property for AMQ Streams zip is not set. Running AMQ streams operator is expected");
+        }
 
         final StrimziOperatorDeployment strimziOperatorDeployment = new StrimziOperatorDeployment(project);
         strimziOperatorDeployment.waitForScale();
@@ -165,13 +171,10 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         logger.info("Building and deploying kjars");
         buildAndDeployKjars();
 
-        final String userUUID = project.getOpenShift().getProject(projectName)
-                .getMetadata().getAnnotations().get("openshift.io/sa.scc.uid-range").split("/")[0];
-
-        final String dockerImageRepository = buildHACEPImage(userUUID);
+        final String dockerImageRepository = buildHACEPImage();
         final File haCepDeploymentYamlFile = new File(haCepSourcesDir, SOURCES_FILE_HACEP_DEPLOYMENT);
 
-        deployHACEPDeployment(haCepDeploymentYamlFile, dockerImageRepository, userUUID, springDeploymentEnvironmentVariables);
+        deployHACEPDeployment(haCepDeploymentYamlFile, dockerImageRepository, springDeploymentEnvironmentVariables);
 
         final File haCepService = new File(haCepSourcesDir, SOURCES_FILE_HACEP_SERVICE);
         logger.info("Creating HACEP service from file: {}", haCepService.getAbsolutePath());
@@ -188,8 +191,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     @Override
     public void undeploy() {
         super.undeploy();
-
-        deleteStrimziCustomResourceDefinitions();
     }
 
     private File downloadAndUnzipAMQStreams() {
@@ -215,27 +216,15 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
         return amqStreamsDirectory;
     }
 
-    private String buildHACEPImage(final String userUUID) {
+    private String buildHACEPImage() {
         final File springModuleDir = new File(OpenShiftConstants.getHaCepSourcesDir(), "springboot");
         final File dockerFile = new File(springModuleDir, "Dockerfile");
-        try {
-            final String originalDockerFileContent = FileUtils.readFileToString(dockerFile, "UTF-8");
-            String dockerFileContent = originalDockerFileContent.replace(USER_ID_DOCKERFILE_PLACEHOLDER, userUUID);
-            dockerFileContent = dockerFileContent.replace(GROUP_ID_DOCKERFILE_PLACEHOLDER, "1000");
-            FileUtils.writeStringToFile(dockerFile, dockerFileContent, "UTF-8");
-
-            project.runOcCommandAsAdmin("new-build", "--binary", "--strategy=docker",
+        project.runOcCommandAsAdmin("new-build", "--binary", "--strategy=docker",
                                         "--name", IMAGE_BUILD_ARTIFACT_NAME);
-            logger.info("Building HA-CEP Spring boot image");
-            final String buildOutput = project.runOcCommandAsAdmin("start-build", IMAGE_BUILD_ARTIFACT_NAME,
+        logger.info("Building HA-CEP Spring boot image");
+        final String buildOutput = project.runOcCommandAsAdmin("start-build", IMAGE_BUILD_ARTIFACT_NAME,
                                                                    "--from-dir=" + springModuleDir.getAbsolutePath(), "--follow");
-            logger.info(buildOutput);
-
-            FileUtils.writeStringToFile(dockerFile, originalDockerFileContent, "UTF-8");
-        } catch (IOException e) {
-            logger.error("Unable to read/write Dockerfile {}", dockerFile);
-            throw new RuntimeException("Unable to read/write Dockerfile", e);
-        }
+        logger.info(buildOutput);
 
         final String dockerImageRepository = project.getOpenShiftAdmin().getImageStream(IMAGE_BUILD_ARTIFACT_NAME)
                 .getStatus().getDockerImageRepository();
@@ -246,7 +235,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
     private void deployHACEPDeployment(
             final File deploymentYamlFile,
             final String dockerImageRepository,
-            final String userUUID,
             final Map<String, String> additionalEnvVars) {
         try {
             String deploymentYamlContent = FileUtils.readFileToString(deploymentYamlFile, "UTF-8");
@@ -264,7 +252,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
                 logger.error("Can not find HA-CEP container in deployment");
                 throw new RuntimeException("Can not find HA-CEP container in deployment");
             }
-            container.get().getSecurityContext().setRunAsUser(Long.valueOf(userUUID));
             container.get().setImage(dockerImageRepository);
             if (container.get().getEnv() == null) {
                 container.get().setEnv(new ArrayList<>());
@@ -297,12 +284,6 @@ public class HACepScenarioImpl extends OpenShiftScenario<HACepScenario> implemen
             logger.info("Creating topic from file: {}", kafkaTopicFile.getAbsolutePath());
             project.createResourcesFromYamlAsAdmin(kafkaTopicFile.getAbsolutePath());
         }
-    }
-
-    private void deleteStrimziCustomResourceDefinitions() {
-        logger.info("Deleting AMQ streams custom resource definitions");
-        project.runOcCommandAsAdmin("delete", "customresourcedefinition", "-l", STRIMZI_LABEL_KEY
-                                            + "=" + STRIMZI_LABEL_VALUE);
     }
 
     private static void filterNamespaceInInstallationFiles(final File amqStreamsInstallDirectory,

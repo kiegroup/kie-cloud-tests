@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
@@ -45,6 +46,8 @@ import org.kie.server.controller.client.KieServerControllerClient;
 @Category({Smoke.class, JBPMOnly.class})
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest.class.getSimpleName());
+
     private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
 
     private static FireRulesTestProvider fireRulesTestProvider;
@@ -63,6 +66,11 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
             deploymentScenario = deploymentScenarioFactory
                     .getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                     .withInternalMavenRepo()
+                    .withInternalMavenRepo()
+                        .withGitSettings(GitSettings.fromProperties()
+                                                     .withRepository(REPOSITORY_NAME,
+                                                                     ClusteredWorkbenchKieServerDatabasePersistentScenario.class.getResource(
+                                                                                                                           PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
                     .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -115,7 +123,9 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
+                                                                  deploymentScenario.getKieServerDeployment(),
+                                                                  deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));
     }
 
     @Test

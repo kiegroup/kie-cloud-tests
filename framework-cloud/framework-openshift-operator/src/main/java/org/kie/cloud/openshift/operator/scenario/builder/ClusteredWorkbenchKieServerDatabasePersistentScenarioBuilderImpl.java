@@ -21,6 +21,7 @@ import java.util.List;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.scenario.builder.ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -38,16 +39,18 @@ import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
-import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
+
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyJbpmScenarioOnly;
 
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements
                                                                               ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private final ScenarioRequest request = new ScenarioRequest();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
-        isScenarioAllowed();
+        verifyJbpmScenarioOnly();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
@@ -83,7 +86,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenario getDeploymentScenarioInstance() {
-        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(kieApp, deploySSO);
+        return new ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -100,7 +103,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         SsoClient ssoClient = new SsoClient();
         ssoClient.setName("workbench-client");
         ssoClient.setSecret("workbench-secret");
@@ -113,6 +116,12 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
             ssoClient.setSecret("kie-server-" + i + "-secret");
             servers[i].setSsoClient(ssoClient);
         }
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 
@@ -145,24 +154,13 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
     }
 
     @Override
-    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
         Auth auth = new Auth();
         auth.setLdap(ldap);
         kieApp.getSpec().setAuth(auth);
         return this;
-    }
-
-    private static void isScenarioAllowed() {
-        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        switch (projectProfile) {
-            case JBPM:
-                return;
-            case DROOLS:
-                throw new UnsupportedOperationException("Not supported");
-            default:
-                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
-        }
     }
 
     @Override

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.kie.cloud</groupId>
     <artifactId>test-cloud</artifactId>
-    <version>7.34.0-SNAPSHOT</version>
+    <version>7.39.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-cloud-remote</artifactId>
@@ -24,11 +24,14 @@
     <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-api</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-openshift</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-git</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
@@ -38,10 +41,6 @@
       <groupId>org.kie.cloud</groupId>
       <artifactId>framework-cloud-common</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.cloud</groupId>
-      <artifactId>framework-git</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.cloud</groupId>
@@ -72,6 +71,12 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>compile</scope>
+    </dependency>
 
     <!-- XTF dependencies -->
     <dependency>
@@ -95,12 +100,6 @@
     </profile>
     <profile>
       <id>openshift-operator</id>
-      <properties>
-        <skipTests>false</skipTests>
-      </properties>
-    </profile>
-    <profile>
-      <id>openshift-apb</id>
       <properties>
         <skipTests>false</skipTests>
       </properties>
@@ -155,22 +154,11 @@
             <systemProperties>
               <kjars.build.settings.xml>${kjars.build.settings.xml}</kjars.build.settings.xml>
               <instance.logs>${project.build.directory}/instances</instance.logs>
-              <apb.build.logs>${project.build.directory}/apbBuilds</apb.build.logs>
               <kie.operator.console.check.skip>true</kie.operator.console.check.skip>
             </systemProperties>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>keytool-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
   </build>
 </project>

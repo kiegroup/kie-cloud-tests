@@ -30,6 +30,7 @@ import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
+import org.kie.cloud.utils.AwaitilityUtils;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -55,7 +56,7 @@ public class OptaplannerTestProvider {
 
     /**
      * Create provider instance
-     * 
+     *
      * @return provider instance
      */
     public static OptaplannerTestProvider create() {
@@ -64,9 +65,9 @@ public class OptaplannerTestProvider {
 
     /**
      * Create provider instance and init it with given environment
-     * 
+     *
      * @param environment if not null, initialize this provider with the environment
-     * 
+     *
      * @return provider instance
      */
     public static OptaplannerTestProvider create(DeploymentScenario<?> deploymentScenario) {
@@ -88,7 +89,7 @@ public class OptaplannerTestProvider {
         KieContainer kieContainer = KieServices.Factory.get().newKieContainer(CLOUD_BALANCE_RELEASE_ID);
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment, extraClasses(kieContainer), Duration.ofMinutes(3).toMillis());
         KieServerUtils.createContainer(kieServerClient, new KieContainerResource(containerId, CLOUD_BALANCE_RELEASE_ID), Duration.ofMinutes(3));
-
+        KieServerClientProvider.waitForContainerStart(kieServerDeployment, containerId);
         kieServerDeployment.waitForContainerRespin();
 
         try {
@@ -111,24 +112,23 @@ public class OptaplannerTestProvider {
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment, extraClasses(kieContainer));
 
         SolverServicesClient solverClient = kieServerClient.getServicesClient(SolverServicesClient.class);
-        SolverInstance solverInstance = solverClient.createSolver(containerId,
-                                                                  CLOUD_BALANCE_SOLVER_ID, CLOUD_BALANCE_SOLVER_CONFIG);
-        Assertions.assertThat(solverInstance).isNotNull();
+        AwaitilityUtils.untilIsNotNull(() -> solverClient.createSolver(containerId, CLOUD_BALANCE_SOLVER_ID, CLOUD_BALANCE_SOLVER_CONFIG));
 
-        Object planningProblem = loadPlanningProblem(kieContainer, 5, 15);
-        solverClient.solvePlanningProblem(containerId, CLOUD_BALANCE_SOLVER_ID, planningProblem);
+        AwaitilityUtils.untilIsNotNull(() -> {
+            try {
+                solverClient.solvePlanningProblem(containerId, CLOUD_BALANCE_SOLVER_ID, loadPlanningProblem(kieContainer, 5, 15));
+            } catch (NoSuchMethodException | ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
 
-        solverInstance = solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID); // wait for 15 seconds
-        for (int i = 0; i < 5 && solverInstance.getStatus() == SolverInstance.SolverStatus.SOLVING; i++) {
-            Thread.sleep(3000);
-            solverInstance = solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID);
-        }
+            return solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID);
+        });
 
-        solverInstance = solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID);
-        Assertions.assertThat(solverInstance.getStatus()).isEqualTo(SolverInstance.SolverStatus.NOT_SOLVING);
-        Assertions.assertThat(solverInstance.getScoreWrapper()).isNotNull();
-        Assertions.assertThat(solverInstance.getScoreWrapper().getScoreString()).isNotNull();
-        Assertions.assertThat(solverInstance.getScoreWrapper().getScoreString()).isNotEmpty();
+        AwaitilityUtils.untilAsserted(() -> solverClient.getSolver(containerId, CLOUD_BALANCE_SOLVER_ID), solver -> {
+            Assertions.assertThat(solver.getStatus()).isEqualTo(SolverInstance.SolverStatus.NOT_SOLVING);
+            Assertions.assertThat(solver.getScoreWrapper()).isNotNull();
+            Assertions.assertThat(solver.getScoreWrapper().getScoreString()).isNotEmpty();
+        });
     }
 
     private static Set<Class<?>> extraClasses(KieContainer kieContainer) {

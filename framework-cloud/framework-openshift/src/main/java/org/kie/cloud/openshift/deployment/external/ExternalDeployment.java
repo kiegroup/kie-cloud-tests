@@ -24,17 +24,18 @@ import org.kie.cloud.openshift.resource.Project;
 public interface ExternalDeployment<T extends Deployment, U> {
 
     enum ExternalDeploymentID {
-        MAVEN_REPOSITORY;
+        MAVEN_REPOSITORY,
+        LDAP;
     }
 
-    /** 
+    /**
      * @return ID used to identify the extra deployment
      */
     ExternalDeploymentID getKey();
 
     /**
      * Launch deployment into the given project
-     * 
+     *
      * @return Deployment entity
      */
     T deploy(Project project);
@@ -46,15 +47,15 @@ public interface ExternalDeployment<T extends Deployment, U> {
 
     /**
      * Configure the given object with this external deployment information
-     * 
-     * @param object This object should be specific for deployment process (templates, operator, apb ...)
+     *
+     * @param object This object should be specific for deployment process (templates, operator)
      */
     void configure(U object);
 
     /**
      * Remove configuration from the given object with this external deployment information
-     * 
-     * @param object This object should be specific for deployment process (templates, operator, apb ...)
+     *
+     * @param object This object should be specific for deployment process (templates, operator)
      */
     void removeConfiguration(U object);
 }

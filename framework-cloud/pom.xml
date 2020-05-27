@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.kie.cloud</groupId>
     <artifactId>kie-cloud-tests</artifactId>
-    <version>7.34.0-SNAPSHOT</version>
+    <version>7.39.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>framework-cloud</artifactId>
@@ -23,7 +23,6 @@
     <module>framework-git</module>
     <module>framework-maven</module>
     <module>framework-openshift</module>
-    <module>framework-openshift-apb</module>
     <module>framework-openshift-templates</module>
     <module>framework-openshift-operator</module>
     <module>framework-openshift-strimzi</module>

@@ -29,9 +29,9 @@ public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesSc
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withInternalMavenRepo();
@@ -58,13 +58,14 @@ public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesSc
     ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder deploySso();
 
     /**
+     * Return setup builder with additional configuration of internal ldap.
      *
-     * Return setup builder with configured LDAP.
+     * Parameters will be used automatically
      *
      * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
+     * @return Builder with configured internal ldap.
      */
-    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withLdap(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with configure Workbench http hostname.

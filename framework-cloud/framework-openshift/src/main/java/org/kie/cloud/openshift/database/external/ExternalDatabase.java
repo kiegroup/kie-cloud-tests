@@ -15,8 +15,6 @@
 
 package org.kie.cloud.openshift.database.external;
 
-import java.util.Map;
-
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
 
 /**
@@ -33,9 +31,4 @@ public interface ExternalDatabase {
      * @return Custom external driver.
      */
     ExternalDriver getExternalDriver();
-
-    /**
-     * @return All environment variables required for connection to this database.
-     */
-    Map<String, String> getExternalDatabaseEnvironmentVariables();
 }

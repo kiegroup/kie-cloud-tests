@@ -30,7 +30,7 @@ import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
-@Category(Smoke.class)
+@Category({Smoke.class, JBPMOnly.class})
 public class KieServerWithMySqlScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static KieServerWithDatabaseScenario deploymentScenario;
@@ -70,7 +70,6 @@ public class KieServerWithMySqlScenarioIntegrationTest extends AbstractCloudInte
     }
 
     @Test
-    @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
         processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }

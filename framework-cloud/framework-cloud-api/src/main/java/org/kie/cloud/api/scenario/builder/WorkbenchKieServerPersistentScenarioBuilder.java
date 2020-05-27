@@ -16,6 +16,7 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentScenarioBuilder<WorkbenchKieServerPersistentScenario> {
@@ -34,6 +35,14 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
      * @return Builder
      */
     WorkbenchKieServerPersistentScenarioBuilder deploySso();
+
+    /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param gitSettings settings configuration of GIT
+     * @return Builder
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withGitSettings(GitSettings gitSettings);
 
     /**
      * @param kieServerId kie-server id
@@ -74,13 +83,14 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
     WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String hostname);
 
     /**
+     * Return setup builder with additional configuration of internal ldap.
      *
-     * Return setup builder with configured LDAP.
+     * Parameters will be used automatically
      *
      * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
+     * @return Builder with configured internal ldap.
      */
-    WorkbenchKieServerPersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    WorkbenchKieServerPersistentScenarioBuilder withLdap(LdapSettings ldapSettings);
 
     /**
      * Return setup builder with configured Git hooks dir.

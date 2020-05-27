@@ -18,11 +18,10 @@ package org.kie.cloud.integrationtests.s2i;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,11 +38,11 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.server.api.model.KieContainerResource;
@@ -58,8 +57,10 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
-@Category({Baseline.class, ApbNotSupported.class}) // Because DroolsServerFilterClasses not supported yet
+@Category({Baseline.class}) // Because DroolsServerFilterClasses not supported yet
 public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
+
+    private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iDroolsRepository");
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iDroolsIntegrationTest.class);
 
@@ -74,10 +75,15 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             KieServerS2iDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+
         try {
             KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
                                                                                                        .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
+                                                                                                       .withGitSettings(gitSettings)
+                                                                                                       .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                                        .withDroolsServerFilterClasses(false)
                                                                                                        .build();
             scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
@@ -88,7 +94,8 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
         try {
             KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder()
                                                                                            .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
+                                                                                           .withGitSettings(gitSettings)
+                                                                                           .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                            .withDroolsServerFilterClasses(false)
                                                                                            .build();
             scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenario });
@@ -115,7 +122,6 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
 
     private static final String REPO_BRANCH = "master";
     private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
-    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", KieServerS2iDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
 
     private ClassLoader kjarClassLoader;
     private KieCommands commandsFactory = KieServices.Factory.get().getCommands();
@@ -140,9 +146,9 @@ public class KieServerS2iDroolsIntegrationTest extends AbstractMethodIsolatedClo
         ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
     }
 
-    @AfterClass
-    public static void deleteRepo() {
-        Git.getProvider().deleteGitRepository(gitRepositoryName);
+    @After
+    public void deleteRepo() {
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test

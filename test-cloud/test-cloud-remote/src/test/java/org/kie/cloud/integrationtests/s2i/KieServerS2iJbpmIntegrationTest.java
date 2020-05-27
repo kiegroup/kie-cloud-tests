@@ -21,12 +21,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
+import org.kie.cloud.api.settings.GitSettings;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -34,8 +35,9 @@ import org.kie.cloud.tests.common.client.util.Kjar;
 @Category({JBPMOnly.class})
 public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTest {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iJbpmRepository");
+
     private static WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario deploymentScenario;
-    private static String repositoryName;
     private static ProcessTestProvider processTestProvider;
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
     private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
@@ -48,12 +50,13 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
 
     @BeforeClass
     public static void initializeDeployment() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iJbpmRepository", KieServerS2iJbpmIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
         try {
             deploymentScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
                     .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                    .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, DEFINITION_PROJECT_NAME)
+                    .withGitSettings(GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             KieServerS2iJbpmIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile()))
+                    .withSourceLocation(REPO_BRANCH, DEFINITION_PROJECT_NAME)
                     .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -70,7 +73,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
 
     @AfterClass
     public static void cleanEnvironment() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
@@ -81,7 +84,7 @@ public class KieServerS2iJbpmIntegrationTest extends AbstractCloudIntegrationTes
     }
 
     @Test
-    @Category({OperatorNotSupported.class}) // Skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2267
+    @Category({OperatorNotSupported.class}) // Skipping the test for Operator as Smart router doesn't support HTTPS in Kie server location yet, see RHPAM-2825
     public void testProcessUsingSmartRouter() {
         processTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
         processTestProvider.testExecuteProcesses(deploymentScenario.getSmartRouterDeployment(), deploymentScenario.getKieServerDeployment(), CONTAINER_ALIAS_ID);

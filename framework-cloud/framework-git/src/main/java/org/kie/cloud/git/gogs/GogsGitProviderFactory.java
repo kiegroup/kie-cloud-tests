@@ -15,17 +15,19 @@
 
 package org.kie.cloud.git.gogs;
 
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderFactory;
+import org.kie.cloud.api.git.GitProvider;
+import org.kie.cloud.api.git.GitProviderFactory;
 import org.kie.cloud.git.constants.GitConstants;
 
 public class GogsGitProviderFactory implements GitProviderFactory {
 
-    @Override public String providerType() {
-        return "Gogs";
+    @Override
+    public String providerType() {
+        return "ExternalGogs";
     }
 
-    @Override public GitProvider createGitProvider() {
+    @Override
+    public GitProvider createGitProvider() {
         final String url = GitConstants.readMandatoryParameter(GitConstants.GOGS_URL);
         final String username = GitConstants.readMandatoryParameter(GitConstants.GOGS_USER);
         final String password = GitConstants.readMandatoryParameter(GitConstants.GOGS_PASSWORD);
@@ -33,7 +35,8 @@ public class GogsGitProviderFactory implements GitProviderFactory {
         return new GogsGitProvider(url, username, password);
     }
 
-    @Override public void initGitConfigurationProperties() {
+    @Override
+    public void initGitConfigurationProperties() {
         GitConstants.verifySystemPropertyIsSet(GitConstants.GOGS_URL);
         GitConstants.verifySystemPropertyIsSet(GitConstants.GOGS_USER);
         GitConstants.verifySystemPropertyIsSet(GitConstants.GOGS_PASSWORD);

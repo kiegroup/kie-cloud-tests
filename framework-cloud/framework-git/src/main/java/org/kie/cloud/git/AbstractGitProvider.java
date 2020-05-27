@@ -17,7 +17,6 @@ package org.kie.cloud.git;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -26,19 +25,13 @@ import org.eclipse.jgit.api.RemoteRemoveCommand;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.kie.cloud.api.git.GitProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractGitProvider implements GitProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractGitProvider.class);
-
-    protected String generateRepositoryName(String repositoryPrefixName) {
-        final String repositoryName = repositoryPrefixName + "-" + UUID.randomUUID().toString().substring(0, 4);
-        logger.debug("Repository name {} was generated", repositoryName);
-
-        return repositoryName;
-    }
 
     protected void pushToGitRepository(String httpUrl, String repositoryPath,
             String username, String password) {

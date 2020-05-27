@@ -25,12 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cz.xtf.builder.builders.ImageStreamBuilder;
+import cz.xtf.builder.builders.ImageStreamBuilder.TagReferencePolicyType;
 import cz.xtf.builder.builders.SecretBuilder;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShiftBinary;
@@ -131,56 +130,6 @@ public class ProjectImpl implements Project {
         openShift.createSecret(builder.build());
     }
 
-    static Semaphore semaphore = new Semaphore(1);
-
-    @Override
-    public synchronized void processApbRun(String image, Map<String, String> extraVars) {
-        String podName = "apb-pod-" + UUID.randomUUID().toString().substring(0, 4);
-
-        try {
-            semaphore.acquire();
-            OpenShiftBinary oc = getOpenShiftBinary(projectName);
-            if (openShift.getServiceAccount("apb") == null) {
-                oc.execute("create", "serviceaccount", "apb");
-                oc.execute("create", "rolebinding", "apb", "--clusterrole=admin", "--serviceaccount=" + projectName + ":apb");
-            }
-
-            List<String> args = new ArrayList<>();
-            args.add("run");
-            args.add(podName);
-            // args.add("--namespace=" + projectName);
-            args.add("--env=POD_NAME=" + podName);
-            args.add("--env=POD_NAMESPACE=" + projectName);
-            args.add("--image=" + image);
-            args.add("--restart=Never");
-            args.add("--attach=true");
-            args.add("--serviceaccount=apb");
-            args.add("--");
-            args.add("provision");
-            args.add("--extra-vars");
-            args.add(formatExtraVars(extraVars));
-
-            logger.info("Executing command: oc " + getApbCommand(args));
-            oc.execute(args.toArray(new String[0]));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted while waiting for scenario to be initialized.", e);
-        } finally {
-            semaphore.release();
-        }
-    }
-
-    private String getApbCommand(List<String> args) {
-        return args.stream().collect(Collectors.joining(" "));
-    }
-
-    private String formatExtraVars(Map<String, String> extraVars) {
-        return extraVars.entrySet()
-                .stream()
-                .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
-                .collect(Collectors.joining(", ", "{", "}"));
-    }
-
     @Override
     public void createResources(String resourceUrl) {
         try {
@@ -269,8 +218,17 @@ public class ProjectImpl implements Project {
 
     @Override
     public void createImageStream(String imageStreamName, String imageTag) {
-        ImageStream driverImageStream = new ImageStreamBuilder(imageStreamName).fromExternalImage(imageTag).build();
-        openShift.createImageStream(driverImageStream);
+        ImageStream imageStream = new ImageStreamBuilder(imageStreamName).fromExternalImage(imageTag).build();
+        openShift.createImageStream(imageStream);
+    }
+
+    @Override
+    public void createImageStreamFromInsecureRegistry(String imageStreamName, String imageTag) {
+        ImageStream imageStream = new ImageStreamBuilder(imageStreamName).insecure().fromExternalImage(imageTag).build();
+        imageStream.getSpec().getTags().forEach(tag -> {
+            tag.getReferencePolicy().setType(TagReferencePolicyType.LOCAL.toString());
+        });
+        openShift.createImageStream(imageStream);
     }
 
     @Override

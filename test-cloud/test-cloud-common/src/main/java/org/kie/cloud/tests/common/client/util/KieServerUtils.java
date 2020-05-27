@@ -54,8 +54,8 @@ public class KieServerUtils {
     private static BooleanSupplier createContainerStartedBooleanSupplier(KieServicesClient kieServerClient, String containerId) {
         return () -> {
             ServiceResponse<KieContainerResource> containerInfo = kieServerClient.getContainerInfo(containerId);
-            boolean isSuccessfulRequest = containerInfo.getType().equals(ResponseType.SUCCESS);
-            boolean isContainerStarted = containerInfo.getResult().getStatus().equals(KieContainerStatus.STARTED);
+            boolean isSuccessfulRequest = ResponseType.SUCCESS.equals(containerInfo.getType());
+            boolean isContainerStarted = containerInfo.getResult() != null && KieContainerStatus.STARTED.equals(containerInfo.getResult().getStatus());
             return isSuccessfulRequest && isContainerStarted;
         };
     }

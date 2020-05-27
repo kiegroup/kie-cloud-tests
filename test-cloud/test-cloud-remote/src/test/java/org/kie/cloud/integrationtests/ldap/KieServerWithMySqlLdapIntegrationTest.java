@@ -31,6 +31,7 @@ import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 
+@Category(JBPMOnly.class)
 public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static KieServerWithDatabaseScenario deploymentScenario;
@@ -57,7 +58,7 @@ public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrat
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
         try {
             deploymentScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
-                    .withLdapSettings(ldapSettings)
+                    .withLdap(ldapSettings)
                     .withInternalMavenRepo(false)
                     .build();
         } catch (UnsupportedOperationException ex) {
@@ -84,7 +85,6 @@ public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrat
     }
 
     @Test
-    @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
         processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
     }

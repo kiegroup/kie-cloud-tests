@@ -21,6 +21,7 @@ import java.util.List;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -38,11 +39,12 @@ import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerPersistentScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
 public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<WorkbenchKieServerPersistentScenario> implements WorkbenchKieServerPersistentScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private final ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
         List<Env> authenticationEnvVars = new ArrayList<>();
@@ -76,7 +78,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
 
     @Override
     public WorkbenchKieServerPersistentScenario getDeploymentScenarioInstance() {
-        return new WorkbenchKieServerPersistentScenarioImpl(kieApp, deploySSO);
+        return new WorkbenchKieServerPersistentScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -87,7 +89,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         SsoClient ssoClient = new SsoClient();
         ssoClient.setName("workbench-client");
         ssoClient.setSecret("workbench-secret");
@@ -100,6 +102,12 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
             ssoClient.setSecret("kie-server-" + i + "-secret");
             servers[i].setSsoClient(ssoClient);
         }
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 
@@ -140,7 +148,8 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public WorkbenchKieServerPersistentScenarioBuilder withLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
         Auth auth = new Auth();
         auth.setLdap(ldap);
@@ -156,9 +165,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress() {
-        for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE, Boolean.FALSE.toString()));
-        }
-        return this;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

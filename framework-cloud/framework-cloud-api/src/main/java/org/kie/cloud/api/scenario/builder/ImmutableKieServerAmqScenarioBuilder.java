@@ -16,15 +16,16 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.ImmutableKieServerAmqScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
 public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScenarioBuilder<ImmutableKieServerAmqScenarioBuilder, ImmutableKieServerAmqScenario> {
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     ImmutableKieServerAmqScenarioBuilder withInternalMavenRepo();
@@ -46,24 +47,22 @@ public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScena
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @return Builder
      */
-    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir);
+    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitReference, String gitContextDir);
 
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @param artifactDirs Directories containing built kjars, separated by
      * commas. For example "usertask-project/target,signaltask-project/target".
      * @return Builder
      */
-    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs);
+    ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs);
 
     /**
      * Return setup builder with additional configuration for SSO deployment.
@@ -98,11 +97,20 @@ public interface ImmutableKieServerAmqScenarioBuilder extends KieDeploymentScena
     ImmutableKieServerAmqScenarioBuilder withDroolsServerFilterClasses(boolean droolsFilter);
 
     /**
+     * Return setup builder with additional configuration of internal ldap.
      *
-     * Return setup builder with configured LDAP.
+     * Parameters will be used automatically
      *
      * @param ldapSettings configuration of LDAP represented by a class.
+     * @return Builder with configured internal ldap.
+     */
+    ImmutableKieServerAmqScenarioBuilder withLdap(LdapSettings ldapSettings);
+
+    /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param gitSettings settings configuration of GIT
      * @return Builder
      */
-    ImmutableKieServerAmqScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    ImmutableKieServerAmqScenarioBuilder withGitSettings(GitSettings gitSettings);
 }

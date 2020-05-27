@@ -65,12 +65,6 @@ public interface Project extends AutoCloseable {
      */
     void createSecret(String secretName, Map<String, String> secrets);
 
-    /**
-     * Process APB and create all resources defined there.
-     * @param image APB Image to be provision
-     * @param extraVars Map of extra vars to override default values from the APB image
-     */
-    public void processApbRun(String image, Map<String, String> extraVars);
 
     /**
      * Create resources from YAML file using command line client.
@@ -129,6 +123,14 @@ public interface Project extends AutoCloseable {
      * @param imageTag Image tag used to resolve image,for example Docker tag.
      */
     public void createImageStream(String imageStreamName, String imageTag);
+
+    /**
+     * Create image stream in current project from an insecure registry.
+     *
+     * @param imageStreamName Name of image stream
+     * @param imageTag Image tag used to resolve image,for example Docker tag.
+     */
+    public void createImageStreamFromInsecureRegistry(String imageStreamName, String imageTag);
 
     /**
      * Run oc command

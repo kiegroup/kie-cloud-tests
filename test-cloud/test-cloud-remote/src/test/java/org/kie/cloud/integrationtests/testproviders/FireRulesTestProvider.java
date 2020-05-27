@@ -31,8 +31,6 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.git.GitProvider;
-import org.kie.cloud.git.GitProviderService;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResource;
@@ -61,7 +59,7 @@ public class FireRulesTestProvider {
 
     /**
      * Create provider instance
-     * 
+     *
      * @return provider instance
      */
     public static FireRulesTestProvider create() {
@@ -70,9 +68,9 @@ public class FireRulesTestProvider {
 
     /**
      * Create provider instance and init it with given environment
-     * 
+     *
      * @param environment if not null, initialize this provider with the environment
-     * 
+     *
      * @return provider instance
      */
     public static FireRulesTestProvider create(DeploymentScenario<?> deploymentScenario) {
@@ -105,17 +103,15 @@ public class FireRulesTestProvider {
         }
     }
 
-    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment) {
+    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, String gitRepositoryUrl) {
         String containerId = "testDeployFromWorkbenchAndFireRules";
         String containerAlias = "alias-testDeployFromWorkbenchAndFireRules";
-        GitProvider gitProvider = new GitProviderService().createGitProvider();
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
-        String repositoryName = gitProvider.createGitRepositoryWithPrefix(workbenchDeployment.getNamespace(), FireRulesTestProvider.class.getResource("/kjars-sources/hello-rules").getFile());
         try {
-            WorkbenchUtils.deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, Kjar.HELLO_RULES.getArtifactName());
+            WorkbenchUtils.deployProjectToWorkbench(gitRepositoryUrl, workbenchDeployment, Kjar.HELLO_RULES.getArtifactName());
 
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerAlias, Kjar.HELLO_RULES, KieContainerStatus.STARTED);
 
@@ -124,7 +120,6 @@ public class FireRulesTestProvider {
 
             testFireRules(kieServerDeployment, containerId);
         } finally {
-            gitProvider.deleteGitRepository(repositoryName);
             kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
             kieServerDeployment.waitForContainerRespin();
         }

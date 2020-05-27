@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.SupplierWaiter;
 import cz.xtf.core.waiting.WaiterException;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
@@ -32,17 +33,21 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
+import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
 import org.kie.cloud.openshift.operator.deployment.WorkbenchOperatorDeployment;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.Sso;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
+import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +57,14 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private SsoDeployment ssoDeployment;
-    private boolean deploySso;
+    private GitProvider gitProvider;
+    private final ScenarioRequest request;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public ClusteredWorkbenchKieServerPersistentScenarioImpl(KieApp kieApp, boolean deploySso) {
+    public ClusteredWorkbenchKieServerPersistentScenarioImpl(KieApp kieApp, ScenarioRequest request) {
         super(kieApp);
-        this.deploySso = deploySso;
+        this.request = request;
     }
 
     @Override
@@ -73,8 +79,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
     @Override
     protected void deployCustomResource() {
-
-        if (deploySso) {
+        if (request.isDeploySso()) {
             ssoDeployment = SsoDeployer.deploySecure(project);
             URL ssoSecureUrl = ssoDeployment.getSecureUrl().orElseThrow(() -> new RuntimeException("RH SSO secure URL not found."));
 
@@ -90,9 +95,13 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
             kieApp.getSpec().setAuth(auth);
         }
 
-        registerCustomTrustedSecret(kieApp.getSpec().getObjects().getConsole());
+        if (request.getGitSettings() != null) {
+            gitProvider = Git.createProvider(project, request.getGitSettings());
+        }
+
+        registerTrustedSecret(kieApp.getSpec().getObjects().getConsole());
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            registerCustomTrustedSecret(server);
+            registerTrustedSecret(server);
         }
 
         // deploy application
@@ -121,6 +130,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
+
+        upgradeDeploymentViaOperator();
 
         logNodeNameOfAllInstances();
     }
@@ -155,5 +166,50 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
+    }
+
+    @Override
+    public GitProvider getGitProvider() {
+        return gitProvider;
+    }
+
+    @Override
+    protected String overridesVersionTag() {
+        if (request.isUpgrade()) {
+            return OpenShiftOperatorConstants.getKieOperatorUpgradeFromVersion();
+        }
+
+        return null;
+    }
+
+    private void upgradeDeploymentViaOperator() {
+        if (request.isUpgrade()) {
+            logger.info("Upgrading deployment...");
+
+            String latestVersionTag = upgradeOperatorToLatestVersion();
+
+            kieServerDeployment.waitForVersionTag(latestVersionTag);
+            workbenchDeployment.waitForVersionTag(latestVersionTag);
+
+            logger.info("Deployment upgraded.");
+        }
+    }
+
+    private String upgradeOperatorToLatestVersion() {
+        String latestImage = getLatestOperatorVersion();
+
+        project.getOpenShift().apps().deployments().withName(OPERATOR_DEPLOYMENT_NAME).edit()
+                 .editSpec()
+                     .editTemplate()
+                         .editSpec()
+                             .editFirstContainer()
+                                 .withNewImage(latestImage)
+                             .endContainer()
+                         .endSpec()
+                     .endTemplate()
+                 .endSpec()
+                 .done();
+
+        return StringUtils.substringAfterLast(latestImage, ":");
     }
 }

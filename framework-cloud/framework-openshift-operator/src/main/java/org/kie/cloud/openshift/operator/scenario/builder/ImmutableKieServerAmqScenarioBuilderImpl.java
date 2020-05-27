@@ -22,6 +22,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
 import org.kie.cloud.api.scenario.ImmutableKieServerAmqScenario;
 import org.kie.cloud.api.scenario.builder.ImmutableKieServerAmqScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.ImageEnvVariables;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -41,15 +42,17 @@ import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.ImmutableKieServerAmqScenarioImpl;
 import org.kie.cloud.openshift.operator.settings.LdapSettingsMapper;
-import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
+
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyDroolsScenarioOnly;
 
 public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderOperator<ImmutableKieServerAmqScenario> implements ImmutableKieServerAmqScenarioBuilder {
 
     private KieApp kieApp = new KieApp();
-    private boolean deploySSO = false;
+    private ScenarioRequest request = new ScenarioRequest();
 
     public ImmutableKieServerAmqScenarioBuilderImpl() {
-        isScenarioAllowed();
+        verifyDroolsScenarioOnly();
 
         List<Env> authenticationEnvVars = new ArrayList<>();
         authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
@@ -90,7 +93,7 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
 
     @Override
     public ImmutableKieServerAmqScenario getDeploymentScenarioInstance() {
-        return new ImmutableKieServerAmqScenarioImpl(kieApp, deploySSO);
+        return new ImmutableKieServerAmqScenarioImpl(kieApp, request);
     }
 
     @Override
@@ -101,7 +104,7 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
 
     @Override
     public ImmutableKieServerAmqScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         Server[] servers = kieApp.getSpec().getObjects().getServers();
         for (int i = 0; i < servers.length; i++) {
             SsoClient ssoClient = new SsoClient();
@@ -109,6 +112,12 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
             ssoClient.setSecret("kie-server-" + i + "-secret");
             servers[i].setSsoClient(ssoClient);
         }
+        return this;
+    }
+
+    @Override
+    public ImmutableKieServerAmqScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 
@@ -137,7 +146,8 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
     }
 
     @Override
-    public ImmutableKieServerAmqScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public ImmutableKieServerAmqScenarioBuilder withLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
         Auth auth = new Auth();
         auth.setLdap(ldap);
@@ -163,11 +173,15 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
     }
 
     @Override
-    public ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir) {
+    public ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitReference, String gitContextDir) {
+        if (request.getGitSettings() == null) {
+            throw new RuntimeException("Need to configure the git settings first");
+        }
+
         GitSource gitSource = new GitSource();
         gitSource.setContextDir(gitContextDir);
         gitSource.setReference(gitReference);
-        gitSource.setUri(gitRepoUrl);
+        request.getGitSettings().addOnRepositoryLoaded(gitSource::setUri);
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             if (server.getBuild() == null) {
@@ -180,8 +194,8 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
     }
 
     @Override
-    public ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs) {
-        withSourceLocation(gitRepoUrl, gitReference, gitContextDir);
+    public ImmutableKieServerAmqScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs) {
+        withSourceLocation(gitReference, gitContextDir);
 
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
             server.getBuild().setArtifactDir(artifactDirs);
@@ -197,17 +211,5 @@ public class ImmutableKieServerAmqScenarioBuilderImpl extends AbstractOpenshiftS
         }
 
         return this;
-    }
-
-    private static void isScenarioAllowed() {
-        ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
-        switch (projectProfile) {
-            case JBPM:
-                throw new UnsupportedOperationException("Not supported");
-            case DROOLS:
-                return;
-            default:
-                throw new IllegalStateException("Unrecognized ProjectProfile: " + projectProfile);
-        }
     }
 }

@@ -24,11 +24,11 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
+import org.kie.cloud.utils.AwaitilityUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.client.KieServerControllerClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,16 +70,16 @@ public class PersistenceTestProvider {
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
 
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        String kieServerLocation = serverInfo.getLocation();
+        String kieServerId = serverInfo.getServerId();
         try {
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerId, Kjar.DEFINITION, KieContainerStatus.STARTED);
             KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), containerId);
 
-            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerLocation, containerId);
+            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerId, containerId);
 
             scaleToZeroAndBackToOne(deploymentScenario.getWorkbenchDeployment());
 
-            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerLocation, containerId);
+            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerId, containerId);
         } finally {
             kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
         }
@@ -92,13 +92,14 @@ public class PersistenceTestProvider {
         deployment.waitForScale();
     }
 
-    private static void verifyOneServerTemplateWithContainer(KieServerControllerClient kieControllerClient, String kieServerLocation, String containerId) {
-        ServerTemplateList serverTemplates = kieControllerClient.listServerTemplates();
-        assertThat(serverTemplates.getServerTemplates()).as("Number of server templates differ.").hasSize(1);
+    private static void verifyOneServerTemplateWithContainer(KieServerControllerClient kieControllerClient, String kieServerId, String containerId) {
+        AwaitilityUtils.untilAsserted(() -> kieControllerClient.listServerTemplates(), serverTemplates -> {
+            assertThat(serverTemplates.getServerTemplates()).as("Number of server templates differ.").hasSize(1);
 
-        ServerTemplate serverTemplate = serverTemplates.getServerTemplates()[0];
-        assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
-        assertThat(serverTemplate.getServerInstanceKeys().iterator().next().getUrl()).isEqualTo(kieServerLocation);
-        assertThat(serverTemplate.getContainersSpec()).anyMatch(containerSpec -> containerSpec.getId().equals(containerId));
+            ServerTemplate serverTemplate = serverTemplates.getServerTemplates()[0];
+            assertThat(serverTemplate.getServerInstanceKeys()).hasSize(1);
+            assertThat(serverTemplate.getId()).isEqualTo(kieServerId);
+            assertThat(serverTemplate.getContainersSpec()).anyMatch(containerSpec -> containerSpec.getId().equals(containerId));
+        });
     }
 }

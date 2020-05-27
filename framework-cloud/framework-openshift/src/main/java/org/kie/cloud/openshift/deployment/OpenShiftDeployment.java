@@ -25,17 +25,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.waiting.SimpleWaiter;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteList;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
 import org.kie.cloud.api.deployment.Instance;
@@ -129,7 +133,7 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public List<Instance> getInstances() {
-        if (isReady()) {
+        if (isReady() && getReplicas() > 0) {
             String deploymentConfigName = getDeploymentConfigName();
 
             return OpenShiftCaller.repeatableCall(() -> openShift.getPods()
@@ -156,8 +160,22 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
+    public void waitForVersionTag(String versionTag) {
+        try {
+            Supplier<Boolean> checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> StringUtils.endsWith(c.getImage(), versionTag));
+
+            new SimpleWaiter(() -> OpenShiftCaller.repeatableCall(checkNewVersionTag)).timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
+                                                                                      .reason("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag)
+                                                                                      .waitFor();
+
+        } catch (AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
+        }
+    }
+
+    @Override
     public int getReplicas() {
-        return openShift.getDeploymentConfig(getDeploymentConfigName()).getSpec().getReplicas().intValue();
+        return deploymentConfig().getSpec().getReplicas().intValue();
     }
 
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {
@@ -256,33 +274,15 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     protected Optional<URL> getHttpRouteUrl(String serviceName) {
-        Optional<URI> uri = getRouteUri(Protocol.http, serviceName);
-        if (uri.isPresent()) {
-            try {
-                return Optional.ofNullable(uri.get().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return Optional.empty();
-        }
+        return getRoute(Protocol.http, serviceName).map(toURL());
     }
 
     protected Optional<URL> getHttpsRouteUrl(String serviceName) {
-        Optional<URI> uri = getRouteUri(Protocol.https, serviceName);
-        if (uri.isPresent()) {
-            try {
-                return Optional.ofNullable(uri.get().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return Optional.empty();
-        }
+        return getRoute(Protocol.https, serviceName).map(toURL());
     }
 
     protected Optional<URI> getWebSocketRouteUri(String serviceName) {
-        return getRouteUri(Protocol.ws, serviceName);
+        return getRoute(Protocol.ws, serviceName).map(toURI());
     }
 
     protected RouteList getRoutes() {
@@ -292,8 +292,11 @@ public abstract class OpenShiftDeployment implements Deployment {
                         .list();
     }
 
-    private Optional<URI> getRouteUri(Protocol protocol, String serviceName) {
-        URI uri;
+    private DeploymentConfig deploymentConfig() {
+        return openShift.getDeploymentConfig(getDeploymentConfigName());
+    }
+
+    private Optional<String> getRoute(Protocol protocol, String serviceName) {
         Service service = openShift.getService(serviceName);
         Predicate<Route> httpsPredicate = n -> n.getSpec().getTls() != null;
         Predicate<Route> httpPredicate = n -> n.getSpec().getTls() == null;
@@ -320,15 +323,8 @@ public abstract class OpenShiftDeployment implements Deployment {
                 //throw new RuntimeException(protocol + " route leading to service " + serviceName + " not found. Available routes " + routeNames);
             }
         }
-        String uriValue = protocol.name() + "://" + routeHost + ":" + retrievePort(protocol);
 
-        try {
-            uri = new URI(uriValue.toString());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-
-        return Optional.of(uri);
+        return Optional.ofNullable(protocol.name() + "://" + routeHost + ":" + retrievePort(protocol));
     }
 
     private String retrievePort(Protocol protocol) {
@@ -348,6 +344,26 @@ public abstract class OpenShiftDeployment implements Deployment {
                 .collect(Collectors.toMap(
                                           e -> e.getKey(),
                                           e -> new Quantity(e.getValue())));
+    }
+
+    private static Function<String, URI> toURI() {
+        return route -> {
+            try {
+                return new URI(route);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    private static Function<String, URL> toURL() {
+        return route -> {
+            try {
+                return new URL(route);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
 }

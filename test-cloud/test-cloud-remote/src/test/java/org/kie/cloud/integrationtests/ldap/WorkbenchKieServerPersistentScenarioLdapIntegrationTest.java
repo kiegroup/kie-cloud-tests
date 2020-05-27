@@ -24,6 +24,7 @@ import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
@@ -49,6 +50,8 @@ import org.kie.server.controller.client.KieServerControllerClient;
 
 @Category(Baseline.class)
 public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
+
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
 
     private static WorkbenchKieServerScenario deploymentScenario;
 
@@ -81,10 +84,13 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
                 .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE).build();
 
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
-                  .withLdapSettings(ldapSettings)
-                  .withInternalMavenRepo()
-                  .usePublicIpAddress()
-                  .build();
+                                  .withLdap(ldapSettings)
+                                  .withInternalMavenRepo()
+                                  .withGitSettings(GitSettings.fromProperties()
+                                                              .withRepository(REPOSITORY_NAME,
+                                                                              WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getResource(
+                                                                                                                                      PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
+                                  .build();
         deploymentScenario
                   .setLogFolderName(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
@@ -113,8 +119,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
         });
     }
-
-
 
     @AfterClass
     public static void cleanEnvironment() {
@@ -151,7 +155,8 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     @Test
     public void testDeployContainerFromWorkbench() {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
-                                                                  deploymentScenario.getKieServerDeployment());
+                                                                  deploymentScenario.getKieServerDeployment(),
+                                                                  deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));
     }
 
     @Test

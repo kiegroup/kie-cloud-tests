@@ -15,23 +15,28 @@
 
 package org.kie.cloud.openshift.scenario;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import org.apache.commons.codec.binary.Base64;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.DeploymentScenarioListener;
+import org.kie.cloud.common.after.AfterLoadScenario;
 import org.kie.cloud.openshift.OpenShiftController;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.images.imagestream.ImageStreamProvider;
@@ -40,13 +45,13 @@ import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDe
 import org.kie.cloud.openshift.log.EventsRecorder;
 import org.kie.cloud.openshift.log.InstancesLogCollectorRunnable;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> implements DeploymentScenario<T> {
 
     private static final Integer DEFAULT_SCHEDULED_FIX_RATE_LOG_COLLECTOR_IN_SECONDS = 5;
+    private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
 
     protected String projectName;
     protected Project project;
@@ -59,7 +64,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     private List<DeploymentScenarioListener<T>> deploymentScenarioListeners = new ArrayList<>();
     protected List<ExternalDeployment<?, ?>> externalDeployments = new ArrayList<>();
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenShiftScenario.class);
+    private final ServiceLoader<AfterLoadScenario> afterLoadActions;
 
     public OpenShiftScenario() {
         this(true);
@@ -67,6 +72,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
     public OpenShiftScenario(boolean createImageStreams) {
         this.createImageStreams = createImageStreams;
+        this.afterLoadActions = ServiceLoader.load(AfterLoadScenario.class);
     }
 
     @Override
@@ -116,6 +122,7 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         }
 
         deployKieDeployments();
+        runOnAfterActions();
     }
 
     /**
@@ -162,6 +169,10 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
                 logger.info("Node name of the {}: {} ", podName, instanceNodeName);
             });
         }
+    }
+
+    private void runOnAfterActions() {
+        afterLoadActions.forEach(action -> action.after(this));
     }
 
     private void initLogCollectors() {
@@ -256,9 +267,22 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
     }
 
     private void deploySecretConfig() {
-        logger.info("Creating generally used secret from " + OpenShiftTemplate.SECRET.getTemplateUrl().toString());
+        if (OpenShiftConstants.getTrustedKeystoreFile() == null) {
+            throw new RuntimeException("Trusted keystore file is not set!");
+        }
 
-        project.processTemplateAndCreateResources(OpenShiftTemplate.SECRET.getTemplateUrl(), Collections.singletonMap(OpenShiftConstants.SECRET_NAME, OpenShiftConstants.getKieApplicationSecretName()));
+        logger.info("Creating generally used secret from " + OpenShiftConstants.getTrustedKeystoreFile());
+        try {
+            project.getOpenShift().secrets().createOrReplaceWithNew()
+                   .withNewMetadata()
+                   .withName(OpenShiftConstants.getKieApplicationSecretName())
+                   .withNamespace(project.getName())
+                   .endMetadata()
+                   .addToData("keystore.jks", Base64.encodeBase64String(Files.readAllBytes(Paths.get(OpenShiftConstants.getTrustedKeystoreFile()))))
+                   .done();
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading the secret", e);
+        }
     }
 
     private void deploySecretAppUser() {

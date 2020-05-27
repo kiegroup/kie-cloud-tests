@@ -52,16 +52,11 @@ public class OpenShiftConstants implements Constants {
     public static final String KIE_ADMIN_USER = "KIE_ADMIN_USER";
     public static final String KIE_ADMIN_PWD = "KIE_ADMIN_PWD";
 
-    public static final String SECRET_NAME = "SECRET_NAME";
     public static final String CREDENTIALS_SECRET = "CREDENTIALS_SECRET";
     /**
-     * URL pointing to OpenShift resource file containing keystore for HTTPS communication.
+     * File containing the SSL certificate for HTTPS commnication.
      */
-    public static final String KIE_APP_SECRET = "kie.app.secret";
-    /**
-     * URL pointing to OpenShift resource file containing keystore for HTTPS communication.
-     */
-    public static final String CUSTOM_TRUSTED_APP_SECRET = "custom.trusted.app.secret";
+    public static final String TRUSTED_KEYSTORE_FILE = "trusted.keystore.file";
 
     /**
      * URL pointing to OpenShift resource file containing image streams with all available images.
@@ -150,10 +145,6 @@ public class OpenShiftConstants implements Constants {
 
     public static final String AMQ_IMAGE_STREAMS = "amq.image.streams";
 
-    public static final String APB_IMAGE_STREAM_NAME = "apb.image.stream.name";
-    public static final String APB_IMAGE_DOCKER_REPO_TAG = "apb.image.docker.repo.tag";
-    public static final String APB_KIE_IAMGE_STREAM_TAG = "apb.kie.image.stream.tag";
-
     public static final String KIE_IMAGE_TAG_AMQ = "kie.image.tag.amq";
     public static final String KIE_IMAGE_TAG_CONSOLE = "kie.image.tag.console";
     public static final String KIE_IMAGE_TAG_CONTROLLER = "kie.image.tag.controller";
@@ -180,11 +171,6 @@ public class OpenShiftConstants implements Constants {
      * URL pointing to JDBC driver binary.
      */
     public static final String KIE_JDBC_DRIVER_BINARY_URL = "kie.jdbc.driver.binary.url";
-
-    /**
-     * URL pointing to running LDAP.
-     */
-    public static final String LDAP_URL = "ldap.url";
 
     public static String getOpenShiftUrl() {
         return System.getProperty(OPENSHIFT_URL);
@@ -214,12 +200,8 @@ public class OpenShiftConstants implements Constants {
         return Optional.ofNullable(System.getProperty(NAMESPACE_PREFIX));
     }
 
-    public static String getKieAppSecret() {
-        return System.getProperty(KIE_APP_SECRET);
-    }
-
-    public static String getCustomTrustedAppSecret() {
-        return System.getProperty(CUSTOM_TRUSTED_APP_SECRET);
+    public static String getTrustedKeystoreFile() {
+        return System.getProperty(TRUSTED_KEYSTORE_FILE);
     }
 
     public static String getKieImageStreams() {
@@ -232,22 +214,6 @@ public class OpenShiftConstants implements Constants {
 
     public static String getAmqImageStreams() {
         return System.getProperty(AMQ_IMAGE_STREAMS);
-    }
-
-    public static String getApbImageStreamName() {
-        return System.getProperty(APB_IMAGE_STREAM_NAME);
-    }
-
-    public static String getApbImageDockerRepoTag() {
-        return System.getProperty(APB_IMAGE_DOCKER_REPO_TAG);
-    }
-
-    public static String getApbKieImageStreamTag() {
-        return System.getProperty(APB_KIE_IAMGE_STREAM_TAG);
-    }
-
-    public static String getLdapUrl() {
-        return System.getProperty(LDAP_URL);
     }
 
     public static String getKieApplicationName() {

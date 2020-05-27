@@ -42,7 +42,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-@Category(Smoke.class)
+@Category({Smoke.class, JBPMOnly.class})
 public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenario deploymentScenario;
@@ -102,7 +102,6 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
     }
 
     @Test
-    @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
         processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
     }

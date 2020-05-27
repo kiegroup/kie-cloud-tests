@@ -29,16 +29,20 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
+import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.SmartRouterDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
+import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,14 +54,16 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
     private SsoDeployment ssoDeployment;
+    private GitProvider gitProvider;
 
-    private boolean deploySso;
+    private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
+    private final ScenarioRequest request;
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioImpl(Map<String, String> envVariables, ScenarioRequest request) {
         super(envVariables);
-        this.deploySso = deploySso;
+        this.request = request;
     }
 
     @Override
@@ -82,14 +88,22 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
 
     @Override
     protected void deployKieDeployments() {
-        if (deploySso) {
+        if (request.isDeploySso()) {
             ssoDeployment = SsoDeployer.deploy(project);
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
             envVariables.put(OpenShiftTemplateConstants.SSO_REALM, DeploymentConstants.getSsoRealm());
 
+            ProjectProfile projectProfile = ProjectProfile.fromSystemProperty();
+            envVariables.put(propertyNames.workbenchSsoClient(), projectProfile.getWorkbenchName() + "-client");
+            envVariables.put(propertyNames.workbenchSsoSecret(), projectProfile.getWorkbenchName() + "-secret");
+
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
+        }
+
+        if (request.getGitSettings() != null) {
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Processing template and creating resources from {}", OpenShiftTemplate.KIE_SERVER_DATABASE_HTTPS_S2I.getTemplateUrl());
@@ -151,6 +165,11 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
 	}
+
+    @Override
+    public GitProvider getGitProvider() {
+        return gitProvider;
+    }
 
     private WorkbenchDeployment createWorkbenchRuntimeDeployment(Project project) {
         WorkbenchRuntimeDeploymentImpl deployment = new WorkbenchRuntimeDeploymentImpl(project);

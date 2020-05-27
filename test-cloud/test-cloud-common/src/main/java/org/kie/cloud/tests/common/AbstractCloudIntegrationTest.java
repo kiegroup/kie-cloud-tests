@@ -15,6 +15,8 @@
 
 package org.kie.cloud.tests.common;
 
+import java.util.UUID;
+
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 
@@ -52,4 +54,8 @@ public abstract class AbstractCloudIntegrationTest {
     protected static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
     protected static final DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+    protected static String generateNameWithPrefix(String prefix) {
+        return prefix + "-" + UUID.randomUUID().toString().substring(0, 4);
+    }
 }

@@ -33,10 +33,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.s2i.KieServerS2iJbpmIntegrationTest;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -50,8 +51,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Category({JBPMOnly.class})
 public class KieServerS2iAmqExternalSignalIntegrationTest extends AbstractCloudIntegrationTest {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iAmqExternalSignalRepository");
+
     private static WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario deploymentScenario;
-    private static String repositoryName;
 
     private KieServicesClient kieServicesClient;
     private QueryServicesClient queryServicesClient;
@@ -66,12 +68,13 @@ public class KieServerS2iAmqExternalSignalIntegrationTest extends AbstractCloudI
 
     @BeforeClass
     public static void initializeDeployment() {
-        repositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iAmqExternalSignalRepository", KieServerS2iJbpmIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
-
         try {
             deploymentScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScenarioBuilder()
                     .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                    .withSourceLocation(Git.getProvider().getRepositoryUrl(repositoryName), REPO_BRANCH, Kjar.EXTERNAL_SIGNAL.getArtifactName())
+                    .withGitSettings(GitSettings.fromProperties()
+                                     .withRepository(REPOSITORY_NAME,
+                                                     KieServerS2iJbpmIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile()))
+                    .withSourceLocation(REPO_BRANCH, Kjar.EXTERNAL_SIGNAL.getArtifactName())
                     .enableExternalJmsSignalQueue(SIGNAL_QUEUE_JNDI)
                     .build();
         } catch (UnsupportedOperationException ex) {
@@ -84,7 +87,7 @@ public class KieServerS2iAmqExternalSignalIntegrationTest extends AbstractCloudI
 
     @AfterClass
     public static void cleanEnvironment() {
-        Git.getProvider().deleteGitRepository(repositoryName);
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 

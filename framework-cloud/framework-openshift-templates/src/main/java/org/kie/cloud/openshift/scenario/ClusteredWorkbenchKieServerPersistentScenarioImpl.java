@@ -28,6 +28,7 @@ import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
@@ -36,6 +37,7 @@ import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.WorkbenchDeploymentImpl;
 import org.kie.cloud.openshift.template.OpenShiftTemplate;
 import org.kie.cloud.openshift.template.ProjectProfile;
+import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,19 +47,16 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
     private WorkbenchDeploymentImpl workbenchDeployment;
     private KieServerDeploymentImpl kieServerDeployment;
     private SsoDeployment ssoDeployment;
+    private GitProvider gitProvider;
 
-    private boolean deploySso;
+    private final ScenarioRequest request;
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithExternalDatabaseScenario.class);
 
-    public ClusteredWorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, boolean deploySso) {
+    public ClusteredWorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables, ScenarioRequest request) {
         super(envVariables);
-        this.deploySso = deploySso;
-    }
-
-    public ClusteredWorkbenchKieServerPersistentScenarioImpl(Map<String, String> envVariables) {
-        this(envVariables, false);
+        this.request = request;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
 
     @Override
     protected void deployKieDeployments() {
-        if (deploySso) {
+        if (request.isDeploySso()) {
             ssoDeployment = SsoDeployer.deploy(project);
 
             envVariables.put(OpenShiftTemplateConstants.SSO_URL, SsoDeployer.createSsoEnvVariable(ssoDeployment.getUrl().toString()));
@@ -84,6 +83,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
 
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_CLIENT, "kie-server-client");
             envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_SSO_SECRET, "kie-server-secret");
+        }
+
+        if (request.getGitSettings() != null) {
+            gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_PERSISTENT.getTemplateUrl().toString());
@@ -108,7 +111,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
         logNodeNameOfAllInstances();
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(workbenchDeployment, kieServerDeployment, ssoDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
@@ -137,5 +141,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends KieCommon
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
+    }
+
+    @Override
+    public GitProvider getGitProvider() {
+        return gitProvider;
     }
 }

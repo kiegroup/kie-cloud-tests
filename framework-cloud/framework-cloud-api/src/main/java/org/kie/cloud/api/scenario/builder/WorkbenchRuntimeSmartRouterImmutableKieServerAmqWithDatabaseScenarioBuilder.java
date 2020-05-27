@@ -16,9 +16,11 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 
-public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder extends KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> {
+public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder extends
+                                                                                             KieDeploymentScenarioBuilder<WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder, WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenario> {
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
@@ -46,24 +48,22 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseSce
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir);
 
     /**
      * Return configured builder with Source location
      *
-     * @param gitRepoUrl Repository url.
      * @param gitReference Repository reference (branch/tag). E.g. 'master'.
      * @param gitContextDir Repository context (location of pom file).
      * @param artifactDirs Directories containing built kjars, separated by
      * commas. For example "usertask-project/target,signaltask-project/target".
      * @return Builder
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitRepoUrl, String gitReference, String gitContextDir, String artifactDirs);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withSourceLocation(String gitReference, String gitContextDir, String artifactDirs);
 
     /**
      * Return setup builder with additional configuration for SSO deployment.
@@ -98,13 +98,14 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseSce
     WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withDroolsServerFilterClasses(boolean droolsFilter);
 
     /**
+     * Return setup builder with additional configuration of internal ldap.
      *
-     * Return setup builder with configured LDAP.
+     * Parameters will be used automatically
      *
      * @param ldapSettings configuration of LDAP represented by a class.
-     * @return Builder
+     * @return Builder with configured internal ldap.
      */
-    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withLdapSettings(LdapSettings ldapSettings);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withLdap(LdapSettings ldapSettings);
 
     /**
     *
@@ -113,5 +114,13 @@ public interface WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseSce
     *
     * @return Builder
     */
-   WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueJndiName);
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder enableExternalJmsSignalQueue(String queueJndiName);
+
+    /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param gitSettings settings configuration of GIT
+     * @return Builder
+     */
+    WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withGitSettings(GitSettings gitSettings);
 }

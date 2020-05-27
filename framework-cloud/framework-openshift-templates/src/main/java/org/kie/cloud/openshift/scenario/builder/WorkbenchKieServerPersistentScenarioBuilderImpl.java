@@ -21,18 +21,20 @@ import java.util.Map;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 import org.kie.cloud.openshift.constants.ProjectSpecificPropertyNames;
 import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDeploymentID;
+import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.scenario.WorkbenchKieServerPersistentScenarioImpl;
 
 public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<WorkbenchKieServerPersistentScenario> implements WorkbenchKieServerPersistentScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
-    private boolean deploySSO = false;
+    private final ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
@@ -42,7 +44,7 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
 
     @Override
     public WorkbenchKieServerPersistentScenario getDeploymentScenarioInstance() {
-        return new WorkbenchKieServerPersistentScenarioImpl(envVariables, deploySSO);
+        return new WorkbenchKieServerPersistentScenarioImpl(envVariables, request);
     }
 
     @Override
@@ -59,9 +61,15 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder deploySso() {
-        deploySSO = true;
+        request.enableDeploySso();
         envVariables.put(OpenShiftTemplateConstants.SSO_USERNAME, DeploymentConstants.getSsoServiceUser());
         envVariables.put(OpenShiftTemplateConstants.SSO_PASSWORD, DeploymentConstants.getSsoServicePassword());
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withGitSettings(GitSettings gitSettings) {
+        request.setGitSettings(gitSettings);
         return this;
     }
 
@@ -96,7 +104,8 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
     }
 
     @Override
-    public WorkbenchKieServerPersistentScenarioBuilder withLdapSettings(LdapSettings ldapSettings) {
+    public WorkbenchKieServerPersistentScenarioBuilder withLdap(LdapSettings ldapSettings) {
+        setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
     }

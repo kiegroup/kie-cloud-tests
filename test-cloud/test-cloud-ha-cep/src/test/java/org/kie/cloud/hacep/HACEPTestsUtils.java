@@ -19,6 +19,11 @@ import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.Pod;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.openshift.resource.Project;
+import org.kie.remote.CommonConfig;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class HACEPTestsUtils {
 
@@ -37,5 +42,17 @@ public class HACEPTestsUtils {
         Assertions.assertThat(pod).isNotNull();
 
         return pod;
+    }
+
+    public static Properties getProperties() {
+        Properties props = CommonConfig.getStatic();
+
+        try (InputStream is = HACEPTestsUtils.class.getClassLoader().getResourceAsStream("consumer.properties")) {
+            props.load(is);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to find configuration properties", e);
+        }
+
+        return props;
     }
 }

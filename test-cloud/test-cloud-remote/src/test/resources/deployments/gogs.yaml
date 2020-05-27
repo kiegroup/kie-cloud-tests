@@ -1,0 +1,82 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: gogs
+  annotations:
+    name: gogs
+    description: Application template for gogs server
+message: A new gogs server was created
+
+parameters:
+- name: GOGS_DOCKER_IMAGE
+  displayName: GOGS Docker Image
+  description: The GOGS Docker Image URL
+  required: true
+objects:
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "rhba-qe-gogs"
+    annotations:
+      openshift.io/image.insecureRepository: 'true'
+  spec:
+    tags:
+    - name: 'latest'
+      from:
+        kind: DockerImage
+        name: ${GOGS_DOCKER_IMAGE}
+      importPolicy:
+        insecure: true
+      referencePolicy:
+        type: Local
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "gogs"
+    labels:
+      application: "gogs"
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - "gogs"
+        from:
+          kind: ImageStreamTag
+          name: "rhba-qe-gogs:latest"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      deploymentConfig: "gogs"
+    template:
+      metadata:
+        name: "gogs"
+        labels:
+          application: "gogs"
+          deploymentConfig: "gogs"
+      spec:
+        containers:
+        - name: "gogs"
+          image: "rhba-qe-gogs:latest"
+          imagePullPolicy: Always
+          ports:
+          - name: "http"
+            containerPort: 3000
+            protocol: TCP
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "gogs"
+    labels:
+      application: "gogs"
+  spec:
+    ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+    selector:
+      deploymentConfig: "gogs"

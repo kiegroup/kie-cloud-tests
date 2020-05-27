@@ -22,11 +22,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -40,10 +39,10 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.integrationtests.category.ApbNotSupported;
+import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.maven.MavenDeployer;
-import org.kie.cloud.provider.git.Git;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.server.api.model.KieContainerResource;
@@ -58,8 +57,9 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
-@Category(ApbNotSupported.class) // Because DroolsServerFilterClasses not supported yet
 public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
+
+    private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iDroolsRepository");
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerS2iWithSsoDroolsIntegrationTest.class);
 
@@ -74,10 +74,15 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
         List<Object[]> scenarios = new ArrayList<>();
         DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
 
+        GitSettings gitSettings = GitSettings.fromProperties()
+                                             .withRepository(REPOSITORY_NAME,
+                                                             KieServerS2iWithSsoDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
+
         try {
             KieDeploymentScenario<?> immutableKieServerWithDatabaseScenario = deploymentScenarioFactory.getWorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenarioBuilder()
                                                                                                        .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                                       .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
+                                                                                                       .withGitSettings(gitSettings)
+                                                                                                       .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                                        .withDroolsServerFilterClasses(false)
                                                                                                        .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                                                                                                        .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
@@ -91,7 +96,8 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
         try {
             KieDeploymentScenario<?> immutableKieServerScenario = deploymentScenarioFactory.getImmutableKieServerScenarioBuilder()
                                                                                            .withContainerDeployment(KIE_CONTAINER_DEPLOYMENT)
-                                                                                           .withSourceLocation(Git.getProvider().getRepositoryUrl(gitRepositoryName), REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
+                                                                                           .withGitSettings(gitSettings)
+                                                                                           .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                            .withDroolsServerFilterClasses(false)
                                                                                            .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                                                                                            .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
@@ -122,7 +128,6 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
     private static final String REPO_BRANCH = "master";
     private static final String PROJECT_SOURCE_FOLDER = "/kjars-sources";
 
-    private static String gitRepositoryName = Git.getProvider().createGitRepositoryWithPrefix("KieServerS2iDroolsRepository", KieServerS2iWithSsoDroolsIntegrationTest.class.getResource(PROJECT_SOURCE_FOLDER).getFile());
     private ClassLoader kjarClassLoader;
     private KieCommands commandsFactory = KieServices.Factory.get().getCommands();
     private Set<Class<?>> extraClasses;
@@ -151,9 +156,9 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
         ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
     }
 
-    @AfterClass
-    public static void deleteRepo() {
-        Git.getProvider().deleteGitRepository(gitRepositoryName);
+    @After
+    public void deleteRepo() {
+        GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
     }
 
     @Test

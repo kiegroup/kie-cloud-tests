@@ -53,10 +53,8 @@ public class DeploymentConstants implements Constants {
 
     public static final String KIE_ARTIFACT_VERSION = "kie.artifact.version";
 
-    public static final String CUSTOM_TRUSTED_SECRET_NAME = "custom.trusted.secret.name";
-    public static final String CUSTOM_TRUSTED_KEYSTORE_ALIAS = "custom.trusted.keystore.alias";
-    public static final String CUSTOM_TRUSTED_KEYSTORE_PWD = "custom.trusted.keystore.pwd";
-
+    public static final String TRUSTED_KEYSTORE_ALIAS = "trusted.keystore.alias";
+    public static final String TRUSTED_KEYSTORE_PWD = "trusted.keystore.pwd";
     public static final String CERTIFICATE_DIR = "certificate.dir";
 
     public static String getAppUser() {
@@ -142,16 +140,12 @@ public class DeploymentConstants implements Constants {
         return System.getProperty(KIE_ARTIFACT_VERSION);
     }
 
-    public static String getCustomTrustedSecretName() {
-        return System.getProperty(CUSTOM_TRUSTED_SECRET_NAME);
+    public static String getTrustedKeystoreAlias() {
+        return System.getProperty(TRUSTED_KEYSTORE_ALIAS);
     }
 
-    public static String getCustomTrustedKeystoreAlias() {
-        return System.getProperty(CUSTOM_TRUSTED_KEYSTORE_ALIAS);
-    }
-
-    public static String getCustomTrustedKeystorePwd() {
-        return System.getProperty(CUSTOM_TRUSTED_KEYSTORE_PWD);
+    public static String getTrustedKeystorePwd() {
+        return System.getProperty(TRUSTED_KEYSTORE_PWD);
     }
 
     public static String getCertificateDir() {

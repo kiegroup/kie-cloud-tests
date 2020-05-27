@@ -15,6 +15,8 @@
 
 package org.kie.cloud.hacep;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import org.apache.commons.math3.stat.inference.TestUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -31,10 +34,12 @@ import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
-import org.kie.remote.CommonConfig;
-import org.kie.remote.RemoteFactHandle;
-import org.kie.remote.RemoteKieSession;
-import org.kie.remote.TopicsConfig;
+import org.kie.hacep.core.InfraFactory;
+import org.kie.remote.*;
+import org.kie.remote.impl.RemoteKieSessionImpl;
+import org.kie.remote.impl.RemoteStreamingKieSessionImpl;
+import org.kie.remote.impl.producer.Producer;
+import org.kie.remote.util.KafkaRemoteUtil;
 
 public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<HACepScenario> {
 
@@ -72,9 +77,10 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testInstallFromKjar() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig)) {
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             final RemoteFactHandle<Map<String, String>> factHandle = producer.insert(new HashMap<>());
 
             final CompletableFuture<Long> fireAllRulesFuture = producer.fireAllRules();
@@ -92,9 +98,10 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testUpdateKjar() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig)) {
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             final CompletableFuture<Boolean> updateKjarFuture = producer
                     .updateKJarGAV(KJAR2_GAV);
             final boolean updateKjarResult = updateKjarFuture.get();
@@ -117,9 +124,10 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testInsertUpdateKjarRetrieve() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig)) {
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             final String testFact = "test fact";
             final RemoteFactHandle<String> factHandle = producer.insert(testFact);
 
@@ -137,9 +145,10 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testUpdateKjarLeaderFailover() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig);
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod);
              Project project = new ProjectImpl(deploymentScenario.getNamespace())) {
             final CompletableFuture<Boolean> updateKjarFuture = producer
                     .updateKJarGAV(KJAR2_GAV);
@@ -169,7 +178,9 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
         connectionProperties.putAll(CommonConfig.getStatic());
 
-        try (RemoteKieSession producer = RemoteKieSession.create(connectionProperties, topicsConfig)) {
+        final Properties props = HACEPTestsUtils.getProperties();
+        final Producer prod = InfraFactory.getProducer(false);
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(props, topicsConfig, KafkaRemoteUtil.getListener(props, false), prod)) {
             final CompletableFuture<Boolean> updateKjarFuture = producer
                     .updateKJarGAV(KJAR2_GAV);
             final boolean updateKjarResult = updateKjarFuture.get();

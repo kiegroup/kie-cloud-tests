@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
@@ -45,6 +46,8 @@ import org.kie.server.controller.client.KieServerControllerClient;
 @Category(Smoke.class)
 public class ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest.class.getSimpleName());
+
     private static ClusteredWorkbenchKieServerPersistentScenario deploymentScenario;
 
     private static FireRulesTestProvider fireRulesTestProvider;
@@ -62,6 +65,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest extend
         try {
             deploymentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerPersistentScenarioBuilder()
                     .withInternalMavenRepo()
+                    .withGitSettings(GitSettings.fromProperties()
+                                     .withRepository(REPOSITORY_NAME,
+                                                     ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest.class.getResource(
+                                                                                                                  PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
                     .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -114,7 +121,9 @@ public class ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest extend
 
     @Test
     public void testDeployContainerFromWorkbench() {
-        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(), deploymentScenario.getKieServerDeployment());
+        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
+                                                                  deploymentScenario.getKieServerDeployment(),
+                                                                  deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));
     }
 
     @Test

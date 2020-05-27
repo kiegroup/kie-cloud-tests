@@ -16,14 +16,16 @@
 package org.kie.cloud.api.scenario.builder;
 
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
+import org.kie.cloud.api.settings.GitSettings;
+import org.kie.cloud.api.settings.UpgradeSettings;
 
 public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends DeploymentScenarioBuilder<ClusteredWorkbenchKieServerPersistentScenario> {
 
     /**
      * Return setup builder with additional configuration of internal maven repo.
-     * 
+     *
      * Parameters will be used automatically
-     * 
+     *
      * @return Builder with configured internal maven repo.
      */
     ClusteredWorkbenchKieServerPersistentScenarioBuilder withInternalMavenRepo();
@@ -43,10 +45,25 @@ public interface ClusteredWorkbenchKieServerPersistentScenarioBuilder extends De
     ClusteredWorkbenchKieServerPersistentScenarioBuilder deploySso();
 
     /**
+     * Return setup builder with additional GIT settings.
+     *
+     * @param gitSettings settings configuration of GIT
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerPersistentScenarioBuilder withGitSettings(GitSettings gitSettings);
+
+    /**
      * Return setup builder with specified memory limit.
      *
      * @param limit memory limit (e.g.: 4Gi, etc).
      * @return Builder with configured memory limit.
      */
     ClusteredWorkbenchKieServerPersistentScenarioBuilder withWorkbenchMemoryLimit(String limit);
+
+    /**
+     * Configure the upgrade settings for the current scenario.
+     * @param upgradeSettings upgrade settings.
+     * @return Builder
+     */
+    ClusteredWorkbenchKieServerPersistentScenarioBuilder withUpgrades(UpgradeSettings upgradeSettings);
 }
