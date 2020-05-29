@@ -16,12 +16,13 @@
 package org.kie.cloud.openshift.database.driver;
 
 import java.net.URL;
+import java.util.Optional;
 
 public abstract class AbstractExternalDriver implements ExternalDriver {
 
     @Override
     public String getSourceDockerTag() {
-        return "kiegroup/" + getImageName() + ":" + getImageVersion();
+        return "quay.io/kiegroup/" + getImageName() + ":" + getImageVersion();
     }
 
     @Override
@@ -31,6 +32,11 @@ public abstract class AbstractExternalDriver implements ExternalDriver {
 
     @Override
     public String getCekitImageBuildCommand() {
-        return "make build " + getName();
+        return "make build " + getName() + " BUILD_ENGINE=docker";
+    }
+
+    @Override
+    public Optional<String> getJdbcDriverUrl() {
+        return Optional.empty();
     }
 }

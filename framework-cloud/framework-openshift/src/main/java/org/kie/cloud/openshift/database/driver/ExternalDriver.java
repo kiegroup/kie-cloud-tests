@@ -15,8 +15,8 @@
 
 package org.kie.cloud.openshift.database.driver;
 
-import java.io.File;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Represents driver used by external database. This driver needs to be incorporated into Kie server image.
@@ -54,4 +54,9 @@ public interface ExternalDriver {
      * @return Cekit command to build driver image.
      */
     String getCekitImageBuildCommand();
+
+    /**
+     * @return a custom JDBC driver URL to be downloaded and use in the cekit command.
+     */
+    Optional<String> getJdbcDriverUrl();
 }

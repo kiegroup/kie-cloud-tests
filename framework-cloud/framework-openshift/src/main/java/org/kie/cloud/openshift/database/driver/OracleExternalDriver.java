@@ -15,6 +15,10 @@
 
 package org.kie.cloud.openshift.database.driver;
 
+import java.util.Optional;
+
+import org.kie.cloud.openshift.resource.CloudProperties;
+
 public class OracleExternalDriver extends AbstractExternalDriver {
 
     @Override
@@ -24,11 +28,16 @@ public class OracleExternalDriver extends AbstractExternalDriver {
 
     @Override
     public String getImageName() {
-        return "oracle-driver-image";
+        return "jboss-kie-oracle-extension-openshift-image";
     }
 
     @Override
     public String getImageVersion() {
         return "12c";
+    }
+
+    @Override
+    public Optional<String> getJdbcDriverUrl() {
+        return Optional.ofNullable(CloudProperties.getInstance().getOracleJdbcDriverUrl());
     }
 }

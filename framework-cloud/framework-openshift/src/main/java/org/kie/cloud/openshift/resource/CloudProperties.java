@@ -33,6 +33,10 @@ public final class CloudProperties {
     private static final String CLOUD_PROPERTIES_LOCATION = "cloud.properties.location";
     private static final String LDAP_DOCKER_IMAGE_PROPERTY = "ldap.docker.image";
     private static final String GOGS_DOCKER_IMAGE_PROPERTY = "gogs.docker.image";
+    
+    private static final String ORACLE_JDBC_DRIVER_URL = "oracle.jdbc.driver.url";
+    private static final String DB2_JDBC_DRIVER_URL = "db2.jdbc.driver.url";
+    private static final String SYBASE_JDBC_DRIVER_URL = "sybase.jdbc.driver.url";
 
     private static CloudProperties INSTANCE;
 
@@ -54,6 +58,18 @@ public final class CloudProperties {
 
     public String getGogsDockerImage() {
         return getProperty(GOGS_DOCKER_IMAGE_PROPERTY);
+    }
+    
+    public String getOracleJdbcDriverUrl() {
+        return getProperty(ORACLE_JDBC_DRIVER_URL);
+    }
+    
+    public String getSybaseJdbcDriverUrl() {
+        return getProperty(SYBASE_JDBC_DRIVER_URL);
+    }
+    
+    public String getDb2JdbcDriverUrl() {
+        return getProperty(DB2_JDBC_DRIVER_URL);
     }
 
     private String getProperty(String key) {

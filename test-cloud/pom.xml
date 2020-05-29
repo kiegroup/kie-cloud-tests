@@ -324,7 +324,6 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <db.jdbc_url>${db.jdbc_url}</db.jdbc_url>
               <hibernate.dialect>${hibernate.dialect}</hibernate.dialect>
               <db.driver>${db.driver}</db.driver>
-              <kie.jdbc.driver.binary.url>${kie.jdbc.driver.binary.url}</kie.jdbc.driver.binary.url>
               <kie.jdbc.driver.scripts>${kie.jdbc.driver.scripts}</kie.jdbc.driver.scripts>
               <kie.app.name>${kie.app.name}</kie.app.name>
               <git.provider>${git.provider}</git.provider>
