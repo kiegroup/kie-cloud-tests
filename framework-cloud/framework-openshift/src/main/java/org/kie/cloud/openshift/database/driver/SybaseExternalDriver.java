@@ -15,6 +15,10 @@
 
 package org.kie.cloud.openshift.database.driver;
 
+import java.util.Optional;
+
+import org.kie.cloud.openshift.resource.CloudProperties;
+
 public class SybaseExternalDriver extends AbstractExternalDriver {
 
     @Override
@@ -24,11 +28,16 @@ public class SybaseExternalDriver extends AbstractExternalDriver {
 
     @Override
     public String getImageName() {
-        return "sybase-driver-image";
+        return "jboss-kie-sybase-extension-openshift-image";
     }
 
     @Override
     public String getImageVersion() {
         return "16.0";
+    }
+
+    @Override
+    public Optional<String> getJdbcDriverUrl() {
+        return Optional.ofNullable(CloudProperties.getInstance().getSybaseJdbcDriverUrl());
     }
 }

@@ -16,8 +16,6 @@
 package org.kie.cloud.openshift.constants;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Optional;
 
 import cz.xtf.core.config.OpenShiftConfig;
@@ -167,11 +165,6 @@ public class OpenShiftConstants implements Constants {
      */
     public static final String KIE_JDBC_DRIVER_SCRIPTS = "kie.jdbc.driver.scripts";
 
-    /**
-     * URL pointing to JDBC driver binary.
-     */
-    public static final String KIE_JDBC_DRIVER_BINARY_URL = "kie.jdbc.driver.binary.url";
-
     public static String getOpenShiftUrl() {
         return System.getProperty(OPENSHIFT_URL);
     }
@@ -245,15 +238,6 @@ public class OpenShiftConstants implements Constants {
         }
 
         return kieJdbcDriverScriptsFolder;
-    }
-
-    public static URL getKieJdbcDriverBinaryUrl() {
-        String kieJdbcDriverBinaryUrl = System.getProperty(KIE_JDBC_DRIVER_BINARY_URL);
-        try {
-            return new URL(kieJdbcDriverBinaryUrl);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed URL of Kie server JDBC driver binary.", e);
-        }
     }
 
     /**

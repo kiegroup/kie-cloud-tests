@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.openshift.util;
 
-import java.io.IOException;
-
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import org.kie.cloud.api.deployment.DockerDeployment;
