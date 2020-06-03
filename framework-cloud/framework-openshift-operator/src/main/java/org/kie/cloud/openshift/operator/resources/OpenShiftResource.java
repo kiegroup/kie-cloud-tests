@@ -33,6 +33,8 @@ public enum OpenShiftResource {
     SERVICE_ACCOUNT(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_SERVICE_ACCOUNT),
     ROLE(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_ROLE),
     ROLE_BINDING(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_ROLE_BINDING),
+    CLUSTER_ROLE(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTER_ROLE),
+    CLUSTER_ROLE_BINDING(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTER_ROLE_BINDING),
     OPERATOR(OpenShiftOperatorConstants.KIE_APP_OPERATOR_DEPLOYMENTS_OPERATOR);
 
     private static final Properties resourceProperties = OpenShiftResourcePropertiesLoader.getProperties();

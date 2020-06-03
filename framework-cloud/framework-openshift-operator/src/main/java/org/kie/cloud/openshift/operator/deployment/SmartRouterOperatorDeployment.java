@@ -49,7 +49,7 @@ public class SmartRouterOperatorDeployment extends SmartRouterDeploymentImpl {
     public void waitForScale() {
         KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
 
-        Integer replicas = kieApp.getSpec().getObjects().getSmartRouter().getReplicas();
+        Integer replicas = kieApp.getStatus().getApplied().getObjects().getSmartRouter().getReplicas();
         if (replicas == null) {
             // If replicas are not set in custom resource then get them from deployment config.
             replicas = getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas();

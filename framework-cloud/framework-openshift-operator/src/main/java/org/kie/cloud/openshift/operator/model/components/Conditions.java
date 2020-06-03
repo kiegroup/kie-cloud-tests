@@ -26,6 +26,7 @@ public class Conditions {
     private String lastTransitionTime;
     private String status;
     private String type;
+    private String version;
 
     public String getLastTransitionTime() {
         return lastTransitionTime;
@@ -49,5 +50,13 @@ public class Conditions {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

@@ -49,7 +49,7 @@ public class WorkbenchRuntimeOperatorDeployment extends WorkbenchRuntimeDeployme
     public void waitForScale() {
         KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
 
-        Integer replicas = kieApp.getSpec().getObjects().getConsole().getReplicas();
+        Integer replicas = kieApp.getStatus().getApplied().getObjects().getConsole().getReplicas();
         if (replicas == null) {
             // If replicas are not set in custom resource then get them from deployment config.
             replicas = getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas();
