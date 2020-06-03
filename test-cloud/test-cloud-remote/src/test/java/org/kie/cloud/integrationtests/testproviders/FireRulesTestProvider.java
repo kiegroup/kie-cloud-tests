@@ -110,14 +110,14 @@ public class FireRulesTestProvider {
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
+        WorkbenchUtils.deployProjectToWorkbench(gitRepositoryUrl, workbenchDeployment, Kjar.HELLO_RULES.getArtifactName());
+
+        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerAlias, Kjar.HELLO_RULES, KieContainerStatus.STARTED);
+
+        KieServerClientProvider.waitForContainerStart(kieServerDeployment, containerId);
+        kieServerDeployment.waitForContainerRespin();
+
         try {
-            WorkbenchUtils.deployProjectToWorkbench(gitRepositoryUrl, workbenchDeployment, Kjar.HELLO_RULES.getArtifactName());
-
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerAlias, Kjar.HELLO_RULES, KieContainerStatus.STARTED);
-
-            KieServerClientProvider.waitForContainerStart(kieServerDeployment, containerId);
-            kieServerDeployment.waitForContainerRespin();
-
             testFireRules(kieServerDeployment, containerId);
         } finally {
             kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
@@ -125,6 +125,7 @@ public class FireRulesTestProvider {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testFireRules(KieServerDeployment kieServerDeployment, String containerId) {
         RuleServicesClient ruleClient = KieServerClientProvider.getRuleClient(kieServerDeployment);
 

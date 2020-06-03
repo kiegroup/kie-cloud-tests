@@ -66,11 +66,10 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
             deploymentScenario = deploymentScenarioFactory
                     .getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                     .withInternalMavenRepo()
-                    .withInternalMavenRepo()
-                        .withGitSettings(GitSettings.fromProperties()
-                                                     .withRepository(REPOSITORY_NAME,
-                                                                     ClusteredWorkbenchKieServerDatabasePersistentScenario.class.getResource(
-                                                                                                                           PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
+                    .withGitSettings(GitSettings.fromProperties()
+                                                .withRepository(REPOSITORY_NAME,
+                                                                ClusteredWorkbenchKieServerDatabasePersistentScenario.class.getResource(
+                                                                                                                      PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
                     .build();
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
