@@ -33,6 +33,7 @@ public class SybaseExternalDatabase extends AbstractSybaseExternalDatabase imple
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_USER, DeploymentConstants.getDatabaseUsername());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_PWD, DeploymentConstants.getDatabasePassword());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_DIALECT, DeploymentConstants.getHibernatePersistenceDialect());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_URL, DeploymentConstants.getDatabaseUrl());
         return envVariables;
     }
 }

@@ -22,7 +22,7 @@ public abstract class AbstractExternalDriver implements ExternalDriver {
 
     @Override
     public String getSourceDockerTag() {
-        return "quay.io/kiegroup/" + getImageName() + ":" + getImageVersion();
+        return "kiegroup/" + getImageName() + ":" + getImageVersion();
     }
 
     @Override
@@ -32,7 +32,7 @@ public abstract class AbstractExternalDriver implements ExternalDriver {
 
     @Override
     public String getCekitImageBuildCommand() {
-        return "make build " + getName() + " BUILD_ENGINE=docker";
+        return "make build " + getName();
     }
 
     @Override
