@@ -42,6 +42,16 @@ public class OpenShiftOperatorConstants implements Constants {
     public static final String KIE_APP_OPERATOR_DEPLOYMENTS_ROLE_BINDING = "kie.app.operator.deployments.role-binding";
 
     /**
+     * URL pointing to Operator cluster role.
+     */
+    public static final String KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTER_ROLE = "kie.app.operator.deployments.cluster-role";
+
+    /**
+     * URL pointing to Operator cluster role bindings file.
+     */
+    public static final String KIE_APP_OPERATOR_DEPLOYMENTS_CLUSTER_ROLE_BINDING = "kie.app.operator.deployments.cluster-role-binding";
+
+    /**
      * URL pointing to Operator definition file.
      */
     public static final String KIE_APP_OPERATOR_DEPLOYMENTS_OPERATOR = "kie.app.operator.deployments.operator";

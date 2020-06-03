@@ -27,6 +27,7 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.KieAppDoneable;
 import org.kie.cloud.openshift.operator.model.KieAppList;
 import org.kie.cloud.openshift.operator.model.components.Server;
+import org.kie.cloud.openshift.operator.model.components.Spec;
 import org.kie.cloud.openshift.resource.Project;
 
 public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
@@ -42,8 +43,13 @@ public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
     public void scale(int instances) {
         if (isReady()) {
             KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
-            Server server = getAssociatedServerObject(kieApp);
+
+            Spec appliedSpec = kieApp.getStatus().getApplied();
+            Server server = getAssociatedServerObject(appliedSpec);
             server.setReplicas(instances);
+
+            // Update current spec
+            kieApp.setSpec(appliedSpec);
             kieAppClient.createOrReplace(kieApp);
         }
     }
@@ -52,7 +58,7 @@ public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
     public void waitForScale() {
         KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
 
-        Integer replicas = getAssociatedServerObject(kieApp).getReplicas();
+        Integer replicas = getAssociatedServerObject(kieApp.getStatus().getApplied()).getReplicas();
         if (replicas == null) {
             // If replicas are not set in custom resource then get them from deployment config.
             replicas = getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas();
@@ -64,15 +70,13 @@ public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
         }
     }
 
-    private Server getAssociatedServerObject(KieApp kieApp) {
-        return Arrays.asList(kieApp.getSpec().getObjects().getServers()).stream().filter(s -> s.getName().equals(getServiceName()))
+    private Server getAssociatedServerObject(Spec spec) {
+        return Arrays.asList(spec.getObjects().getServers()).stream().filter(s -> s.getName().equals(getServiceName()))
                                                                                  .findAny()
-                                                                                 .orElseThrow(() -> new RuntimeException("Server with name " + getServiceName() + " not found. Available server names are: " + getAvailableServerNames(kieApp)));
+                                                                                 .orElseThrow(() -> new RuntimeException("Server with name " + getServiceName() + " not found. Available server names are: " + getAvailableServerNames(spec)));
     }
 
-    private String getAvailableServerNames(KieApp kieApp) {
-        String serverNames = Arrays.asList(kieApp.getSpec().getObjects().getServers()).stream().map(s -> s.getName())
-                                                                                               .collect(Collectors.joining(", "));
-        return serverNames;
+    private String getAvailableServerNames(Spec spec) {
+        return Arrays.asList(spec.getObjects().getServers()).stream().map(s -> s.getName()).collect(Collectors.joining(", "));
     }
 }

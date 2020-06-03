@@ -18,15 +18,25 @@ package org.kie.cloud.openshift.operator.model.components;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Custom resource status. 
+ * Custom resource status.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Status {
 
+    private Spec applied;
     private Conditions[] conditions;
     private String consoleHost;
     private Deployments deployments;
     private String phase;
+    private String version;
+
+    public Spec getApplied() {
+        return applied;
+    }
+
+    public void setApplied(Spec applied) {
+        this.applied = applied;
+    }
 
     public Conditions[] getConditions() {
         return conditions;
@@ -58,5 +68,13 @@ public class Status {
 
     public void setPhase(String phase) {
         this.phase = phase;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

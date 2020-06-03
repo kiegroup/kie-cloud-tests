@@ -25,6 +25,8 @@ import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
+import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.Role;
 import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
@@ -69,6 +71,12 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         deployCustomResource();
     }
 
+    @Override
+    public void undeploy() {
+        deleteClusterRoleBindingsInProject(project);
+        super.undeploy();
+    }
+
     private void deployOperator() {
         // Operations need to be done as an administrator
         OpenShiftBinary adminBinary = OpenShifts.adminBinary();
@@ -77,6 +85,8 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         createServiceAccountInProject(project);
         createRoleInProject(project);
         createRoleBindingsInProject(project);
+        createClusterRoleInProject(project);
+        createClusterRoleBindingsInProject(project);
         createOperatorInProject(project);
     }
 
@@ -106,6 +116,25 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         logger.info("Creating role bindings in project '" + project.getName() + "' from " + OpenShiftResource.ROLE_BINDING.getResourceUrl().toString());
         RoleBinding roleBinding = project.getOpenShiftAdmin().rbac().roleBindings().load(OpenShiftResource.ROLE_BINDING.getResourceUrl()).get();
         project.getOpenShiftAdmin().rbac().roleBindings().inNamespace(project.getName()).create(roleBinding);
+    }
+
+    private void createClusterRoleInProject(Project project) {
+        logger.info("Creating cluster role in project '" + getNamespace() + "' from " + OpenShiftResource.CLUSTER_ROLE.getResourceUrl().toString());
+        ClusterRole role = project.getOpenShiftAdmin().rbac().clusterRoles().load(OpenShiftResource.CLUSTER_ROLE.getResourceUrl()).get();
+        project.getOpenShiftAdmin().rbac().clusterRoles().inNamespace(getNamespace()).createOrReplace(role);
+    }
+
+    private void createClusterRoleBindingsInProject(Project project) {
+        logger.info("Creating cluster role bindings in project '" + getNamespace() + "' from " + OpenShiftResource.CLUSTER_ROLE_BINDING.getResourceUrl().toString());
+        ClusterRoleBinding roleBinding = project.getOpenShiftAdmin().rbac().clusterRoleBindings().load(OpenShiftResource.CLUSTER_ROLE_BINDING.getResourceUrl()).get();
+        roleBinding.getMetadata().setName(OPERATOR_DEPLOYMENT_NAME + getNamespace());
+        roleBinding.getMetadata().setNamespace(getNamespace());
+        roleBinding.getSubjects().forEach(subject -> subject.setNamespace(getNamespace()));
+        project.getOpenShiftAdmin().rbac().clusterRoleBindings().inNamespace(getNamespace()).create(roleBinding);
+    }
+
+    private void deleteClusterRoleBindingsInProject(Project project) {
+        project.getOpenShiftAdmin().rbac().clusterRoleBindings().withName(OPERATOR_DEPLOYMENT_NAME + getNamespace()).delete();
     }
 
     private void createOperatorInProject(Project project) {
