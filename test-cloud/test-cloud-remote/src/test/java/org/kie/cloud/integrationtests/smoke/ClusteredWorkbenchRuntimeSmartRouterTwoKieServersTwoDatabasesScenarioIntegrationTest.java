@@ -26,6 +26,7 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServ
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.MonitoringK8sFs;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
@@ -44,7 +45,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-@Category({Smoke.class, JBPMOnly.class})
+@Category({Smoke.class, JBPMOnly.class, MonitoringK8sFs.class})
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario deploymentScenario;

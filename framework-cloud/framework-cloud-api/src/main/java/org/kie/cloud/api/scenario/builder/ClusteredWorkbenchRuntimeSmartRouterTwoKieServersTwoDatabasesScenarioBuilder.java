@@ -114,4 +114,12 @@ public interface ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesSc
      * @return Builder
      */
     ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String hostname);
+
+    /**
+     * Return setup builder with configured nio2.k8s file system for Business Central Monitoring image.
+     * 
+     * @param k8sFsEnabled set to "true" to enable k8s FS for Monitoring
+     * @return Builder
+     */
+    ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withMonitoringK8sFileSystem(boolean k8sFsEnabled);
 }

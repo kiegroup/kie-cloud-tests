@@ -93,6 +93,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         console.addEnvs(authenticationEnvVars);
         console.setReplicas(1);
         kieApp.getSpec().getObjects().setConsole(console);
+        // Set k8s FS if is activated by maven profile
+        withMonitoringK8sFileSystem();
 
         // Instantiate Smart router as it needs to be configured for custom secret
         kieApp.getSpec().getObjects().setSmartRouter(new SmartRouter());
@@ -184,6 +186,19 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         Auth auth = new Auth();
         auth.setLdap(ldap);
         kieApp.getSpec().setAuth(auth);
+        return this;
+    }
+
+    private ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withMonitoringK8sFileSystem() {
+        if(OpenShiftOperatorConstants.getOrgAppformerSimplifiedMonitoringEnabled()) {
+            kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.ORG_APPFORMER_SIMPLIFIED_MONITORING_ENABLED, Boolean.toString(OpenShiftOperatorConstants.getOrgAppformerSimplifiedMonitoringEnabled())));
+        }
+        return this;
+    }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withMonitoringK8sFileSystem(boolean k8sFsEnabled) {
+        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.ORG_APPFORMER_SIMPLIFIED_MONITORING_ENABLED, Boolean.toString(k8sFsEnabled)));
         return this;
     }
 }
