@@ -31,4 +31,11 @@ public interface ExternalDatabase {
      * @return Custom external driver.
      */
     ExternalDriver getExternalDriver();
+
+    /**
+     * @return the hibernate dialect.
+     */
+    default String getHibernateDialect() {
+        return null;
+    }
 }

@@ -31,4 +31,9 @@ public abstract class AbstractPostgreSqlExternalDatabase implements ExternalData
     public ExternalDriver getExternalDriver() {
         return driver;
     }
+
+    @Override
+    public String getHibernateDialect() {
+        return "org.hibernate.dialect.PostgreSQL95Dialect";
+    }
 }

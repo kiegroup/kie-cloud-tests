@@ -25,6 +25,7 @@ public class TemplateExternalDatabaseProvider {
                                                                                                                                     new MySqlExternalDatabase(),
                                                                                                                                     new OracleExternalDatabase(),
                                                                                                                                     new PostgreSqlExternalDatabase(),
+                                                                                                                                    new PostgreSqlPlusExternalDatabase(),
                                                                                                                                     new SybaseExternalDatabase()));
 
     public static TemplateExternalDatabase getExternalDatabase() {

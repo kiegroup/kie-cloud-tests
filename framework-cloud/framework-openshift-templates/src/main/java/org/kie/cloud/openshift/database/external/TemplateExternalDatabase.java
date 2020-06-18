@@ -14,12 +14,38 @@
  */
 package org.kie.cloud.openshift.database.external;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
 
 public interface TemplateExternalDatabase extends ExternalDatabase {
 
     /**
      * @return All environment variables required for connection to this database.
      */
-    Map<String, String> getExternalDatabaseEnvironmentVariables();
+    default Map<String, String> getExternalDatabaseEnvironmentVariables() {
+        Map<String, String> envVariables = new HashMap<>();
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_DRIVER, getExternalDriver().getName());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_SERVICE_HOST, DeploymentConstants.getDatabaseHost());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_SERVICE_PORT, DeploymentConstants.getDatabasePort());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_DB, DeploymentConstants.getExternalDatabaseName());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_USER, DeploymentConstants.getDatabaseUsername());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_PWD, DeploymentConstants.getDatabasePassword());
+        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_DIALECT, Optional.ofNullable(getHibernateDialect()).orElse(DeploymentConstants.getHibernatePersistenceDialect()));
+        if (needsToSetExternalUrl()) {
+            envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_URL, DeploymentConstants.getDatabaseUrl());
+        }
+
+        return envVariables;
+    }
+
+    /**
+     * @return Flag to indicate that the KIE_SERVER_EXTERNALDB_URL argument needs to be populated (default true).
+     */
+    default boolean needsToSetExternalUrl() {
+        return true;
+    }
 }

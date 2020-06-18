@@ -31,4 +31,9 @@ public abstract class AbstractMssqlExternalDatabase implements ExternalDatabase 
     public ExternalDriver getExternalDriver() {
         return driver;
     }
+
+    @Override
+    public String getHibernateDialect() {
+        return "org.hibernate.dialect.SQLServer2012Dialect";
+    }
 }

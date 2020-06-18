@@ -15,5 +15,20 @@
 
 package org.kie.cloud.openshift.database.external;
 
-public class MssqlExternalDatabase extends AbstractMssqlExternalDatabase implements TemplateExternalDatabase {
+import org.kie.cloud.openshift.database.driver.ExternalDriver;
+import org.kie.cloud.openshift.database.driver.PostgreSqlExternalDriver;
+
+public abstract class AbstractPostgreSqlPlusExternalDatabase implements ExternalDatabase {
+
+    private ExternalDriver driver = new PostgreSqlExternalDriver();
+
+    @Override
+    public String getDriverName() {
+        return "postgresplus";
+    }
+
+    @Override
+    public ExternalDriver getExternalDriver() {
+        return driver;
+    }
 }

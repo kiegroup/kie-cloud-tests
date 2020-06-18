@@ -14,6 +14,8 @@
  */
 package org.kie.cloud.openshift.operator.database.external;
 
+import java.util.Optional;
+
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.database.external.ExternalDatabase;
 import org.kie.cloud.openshift.operator.model.components.Database;
@@ -27,8 +29,8 @@ public interface OperatorExternalDatabase extends ExternalDatabase {
         database.setType("external");
 
         ExternalConfig config = new ExternalConfig();
-        config.setDriver(DeploymentConstants.getDatabaseDriver());
-        config.setDialect(DeploymentConstants.getHibernatePersistenceDialect());
+        config.setDriver(getExternalDriver().getName());
+        config.setDialect(Optional.ofNullable(getHibernateDialect()).orElse(DeploymentConstants.getHibernatePersistenceDialect()));
         config.setHost(DeploymentConstants.getDatabaseHost());
         config.setPort(DeploymentConstants.getDatabasePort());
         config.setUsername(DeploymentConstants.getDatabaseUsername());
