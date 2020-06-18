@@ -26,6 +26,7 @@ public class OperatorExternalDatabaseProvider {
                                                                                                                                   new MySqlExternalDatabase(),
                                                                                                                                   new OracleExternalDatabase(),
                                                                                                                                   new PostgreSqlExternalDatabase(),
+                                                                                                                                  new PostgreSqlPlusExternalDatabase(),
                                                                                                                                   new SybaseExternalDatabase()));
 
     public static OperatorExternalDatabase getExternalDatabase() {

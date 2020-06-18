@@ -15,7 +15,6 @@
 
 package org.kie.cloud.openshift.database.external;
 
-
 import org.kie.cloud.openshift.database.driver.Db2ExternalDriver;
 import org.kie.cloud.openshift.database.driver.ExternalDriver;
 

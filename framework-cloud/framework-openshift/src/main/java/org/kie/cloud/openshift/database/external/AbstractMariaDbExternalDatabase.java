@@ -31,4 +31,9 @@ public abstract class AbstractMariaDbExternalDatabase implements ExternalDatabas
     public ExternalDriver getExternalDriver() {
         return driver;
     }
+
+    @Override
+    public String getHibernateDialect() {
+        return "org.hibernate.dialect.MariaDB102Dialect";
+    }
 }

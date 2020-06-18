@@ -14,24 +14,10 @@
 */
 package org.kie.cloud.openshift.database.external;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.openshift.constants.OpenShiftTemplateConstants;
-
 public class Db2ExternalDatabase extends AbstractDb2ExternalDatabase implements TemplateExternalDatabase {
 
     @Override
-    public Map<String, String> getExternalDatabaseEnvironmentVariables() {
-        Map<String, String> envVariables = new HashMap<>();
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_DRIVER, getDriverName());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_SERVICE_HOST, DeploymentConstants.getDatabaseHost());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_SERVICE_PORT, DeploymentConstants.getDatabasePort());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_DB, DeploymentConstants.getExternalDatabaseName());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_USER, DeploymentConstants.getDatabaseUsername());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_PWD, DeploymentConstants.getDatabasePassword());
-        envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_EXTERNALDB_DIALECT, DeploymentConstants.getHibernatePersistenceDialect());
-        return envVariables;
+    public boolean needsToSetExternalUrl() {
+        return false;
     }
 }
