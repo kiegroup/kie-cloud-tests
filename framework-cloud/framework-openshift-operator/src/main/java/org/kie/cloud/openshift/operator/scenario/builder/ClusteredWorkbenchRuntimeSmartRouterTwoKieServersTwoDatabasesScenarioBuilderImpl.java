@@ -190,8 +190,8 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     }
 
     private ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withMonitoringK8sFileSystem() {
-        if(OpenShiftOperatorConstants.getOrgAppformerSimplifiedMonitoringEnabled()) {
-            kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.ORG_APPFORMER_SIMPLIFIED_MONITORING_ENABLED, Boolean.toString(OpenShiftOperatorConstants.getOrgAppformerSimplifiedMonitoringEnabled())));
+        if (OpenShiftOperatorConstants.getOrgAppformerSimplifiedMonitoringEnabled()) {
+            withMonitoringK8sFileSystem(OpenShiftOperatorConstants.getOrgAppformerSimplifiedMonitoringEnabled());
         }
         return this;
     }
