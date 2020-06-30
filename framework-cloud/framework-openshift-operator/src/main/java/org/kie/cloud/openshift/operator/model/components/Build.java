@@ -15,10 +15,6 @@
 
 package org.kie.cloud.openshift.operator.model.components;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -34,7 +30,7 @@ public class Build {
     private String extensionImageStreamTag;
     private String extensionImageStreamTagNamespace;
     private String extensionImageInstallDir;
-    private List<Webhooks> webhooks = new ArrayList<>();
+    private Webhooks[] webhooks;
 
     public String getArtifactDir() {
         return artifactDir;
@@ -92,20 +88,12 @@ public class Build {
         this.extensionImageInstallDir = extensionImageInstallDir;
     }
 
-    public void addWebhooks(Webhooks webhooks) {
-        this.webhooks.add(webhooks);
-    }
-
-    public void addWebhooks(List<Webhooks> webhooks) {
-        this.webhooks.addAll(webhooks);
-    }
-
     public Webhooks[] getWebhooks() {
-        return webhooks.toArray(new Webhooks[0]);
+        return webhooks;
     }
 
     public void setWebhooks(Webhooks[] webhooks) {
-        this.webhooks = Arrays.asList(webhooks);
+        this.webhooks = webhooks;
     }
 
 }
