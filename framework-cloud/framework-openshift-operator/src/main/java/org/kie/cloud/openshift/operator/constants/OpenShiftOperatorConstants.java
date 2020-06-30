@@ -86,6 +86,11 @@ public class OpenShiftOperatorConstants implements Constants {
      */
     public static final String KIE_OPERATOR_CONSOLE_CHECK_SKIP = "kie.operator.console.check.skip";
 
+    /**
+     * Set to true if you want to run Monitoring with enabled ConfigMap base file system. By default this property is set to false.
+     */
+    public static final String ORG_APPFORMER_SIMPLIFIED_MONITORING_ENABLED = "org.appformer.simplified.monitoring.enabled";
+
     public static Optional<String> getKieImageRegistryCustom() {
         String kieOperatorImageTag = System.getProperty(KIE_IMAGE_REGISTRY_CUSTOM);
         if (kieOperatorImageTag != null && !kieOperatorImageTag.isEmpty()) {
@@ -113,6 +118,11 @@ public class OpenShiftOperatorConstants implements Constants {
     public static boolean skipKieOperatorConsoleCheck() {
         String skipKieOperatorConsoleCheck = System.getProperty(KIE_OPERATOR_CONSOLE_CHECK_SKIP, "false");
         return Boolean.valueOf(skipKieOperatorConsoleCheck);
+    }
+
+    public static boolean getOrgAppformerSimplifiedMonitoringEnabled() {
+        String orgAppformerSimplifiedMonitoringEnabled = System.getProperty(ORG_APPFORMER_SIMPLIFIED_MONITORING_ENABLED, "false");
+        return Boolean.valueOf(orgAppformerSimplifiedMonitoringEnabled);
     }
 
     @Override
