@@ -434,6 +434,24 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
       </build>
     </profile>
     <profile>
+      <id>monitoring-k8s-fs</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <groups>org.kie.cloud.integrationtests.category.MonitoringK8sFs</groups>
+                <systemProperties>
+                  <org.appformer.simplified.monitoring.enabled>true</org.appformer.simplified.monitoring.enabled>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>custom-parameters</id>
       <activation>
         <property>

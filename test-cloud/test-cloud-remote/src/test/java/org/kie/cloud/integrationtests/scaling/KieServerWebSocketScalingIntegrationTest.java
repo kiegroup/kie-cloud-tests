@@ -33,6 +33,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.MonitoringK8sFs;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({Baseline.class, OperatorNotSupported.class}) // Operator doesn't contain any scenario with controller based strategy by default
+@Category({Baseline.class, OperatorNotSupported.class, MonitoringK8sFs.class}) // Operator doesn't contain any scenario with controller based strategy by default
 public class KieServerWebSocketScalingIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWebSocketScalingIntegrationTest.class);
