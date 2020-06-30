@@ -30,6 +30,7 @@ public class Build {
     private String extensionImageStreamTag;
     private String extensionImageStreamTagNamespace;
     private String extensionImageInstallDir;
+    private Webhooks[] webhooks;
 
     public String getArtifactDir() {
         return artifactDir;
@@ -86,4 +87,13 @@ public class Build {
     public void setExtensionImageInstallDir(String extensionImageInstallDir) {
         this.extensionImageInstallDir = extensionImageInstallDir;
     }
+
+    public Webhooks[] getWebhooks() {
+        return webhooks;
+    }
+
+    public void setWebhooks(Webhooks[] webhooks) {
+        this.webhooks = webhooks;
+    }
+
 }

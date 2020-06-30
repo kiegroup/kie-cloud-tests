@@ -37,6 +37,7 @@ import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.MonitoringK8sFs;
 import org.kie.cloud.integrationtests.s2i.KieServerS2iJbpmIntegrationTest;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
@@ -48,7 +49,7 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({JBPMOnly.class})
+@Category({JBPMOnly.class, MonitoringK8sFs.class})
 public class KieServerS2iAmqExternalSignalIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final String REPOSITORY_NAME = generateNameWithPrefix("KieServerS2iAmqExternalSignalRepository");

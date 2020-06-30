@@ -142,4 +142,9 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithPostgreSqlScena
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_JMS_QUEUE_SIGNAL, queueJndiName);
         return this;
     }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withMonitoringK8sFileSystem(boolean k8sFsEnabled) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 }

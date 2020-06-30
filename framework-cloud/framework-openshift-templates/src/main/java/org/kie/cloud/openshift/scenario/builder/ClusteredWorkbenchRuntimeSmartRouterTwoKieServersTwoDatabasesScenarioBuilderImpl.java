@@ -121,4 +121,9 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         envVariables.putAll(ldapSettings.getEnvVariables());
         return this;
     }
+
+    @Override
+    public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withMonitoringK8sFileSystem(boolean k8sFsEnabled) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 }

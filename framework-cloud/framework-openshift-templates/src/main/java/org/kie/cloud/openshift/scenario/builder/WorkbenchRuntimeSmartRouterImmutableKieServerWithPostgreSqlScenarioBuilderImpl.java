@@ -140,4 +140,9 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_MEMORY_LIMIT, limit);
         return this;
     }
+
+    @Override
+    public WorkbenchRuntimeSmartRouterImmutableKieServerWithDatabaseScenarioBuilder withMonitoringK8sFileSystem(boolean k8sFsEnabled) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 }
