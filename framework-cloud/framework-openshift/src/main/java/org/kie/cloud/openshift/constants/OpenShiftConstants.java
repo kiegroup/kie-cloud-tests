@@ -141,6 +141,8 @@ public class OpenShiftConstants implements Constants {
     public static final String SSO_APP_SECRETS = "sso.app.secrets";
     public static final String SSO_IMAGE_STREAMS = "sso.image.streams";
 
+    public static final String PROMETHEUS_VERSION = "prometheus.version";
+
     public static final String AMQ_IMAGE_STREAMS = "amq.image.streams";
 
     public static final String KIE_IMAGE_TAG_AMQ = "kie.image.tag.amq";
@@ -203,6 +205,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getSsoImageStreams() {
         return System.getProperty(SSO_IMAGE_STREAMS);
+    }
+
+    public static String getPrometheusVersion() {
+        return System.getProperty(PROMETHEUS_VERSION);
     }
 
     public static String getAmqImageStreams() {
