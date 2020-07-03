@@ -41,6 +41,9 @@
     <sso.admin.password>admin</sso.admin.password>
     <sso.service.username>serviceUser</sso.service.username>
     <sso.service.password>serviceUser1!</sso.service.password>
+    
+    <!-- Properties to configure Prometheus -->
+    <prometheus.version>v0.38.1</prometheus.version>
 
     <kie.app.name>myapp</kie.app.name>
 
@@ -352,6 +355,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <sso.admin.password>${sso.admin.password}</sso.admin.password>
               <sso.service.username>${sso.service.username}</sso.service.username>
               <sso.service.password>${sso.service.password}</sso.service.password>
+              <prometheus.version>${prometheus.version}</prometheus.version>
               <trusted.keystore.alias>${trusted.keystore.alias}</trusted.keystore.alias>
               <trusted.keystore.pwd>${trusted.keystore.pwd}</trusted.keystore.pwd>
               <trusted.keystore.file>${certificate.dir}/${default.domain.suffix}.jks</trusted.keystore.file>
