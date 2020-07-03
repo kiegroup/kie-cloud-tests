@@ -65,14 +65,14 @@ public class PrometheusDeployer {
     private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
     private static final Logger logger = LoggerFactory.getLogger(PrometheusDeployer.class);
 
-    private static final String PROMETHEUS_OPERATOR_SERVICE_ACCOUNT = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-service-account.yaml";
-    private static final String PROMETHEUS_SERVICE_ACCOUNT = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus/prometheus-service-account.yaml";
-    private static final String PROMETHEUS_OPERATOR_CLUSTER_ROLE = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role.yaml";
-    private static final String PROMETHEUS_CLUSTER_ROLE = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus/prometheus-cluster-role.yaml";
-    private static final String PROMETHEUS_OPERATOR_CLUSTER_ROLE_BINDING = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-cluster-role-binding.yaml";
-    private static final String PROMETHEUS_CLUSTER_ROLE_BINDING = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus/prometheus-cluster-role-binding.yaml";
-    private static final String PROMETHEUS_OPERATOR_DEPLOYMENT = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus-operator/prometheus-operator-deployment.yaml";
-    private static final String PROMETHEUS_CUSTOM_RESOURCE = "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/rbac/prometheus/prometheus.yaml";
+    private static final String PROMETHEUS_OPERATOR_SERVICE_ACCOUNT = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus-operator/prometheus-operator-service-account.yaml";
+    private static final String PROMETHEUS_SERVICE_ACCOUNT = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus/prometheus-service-account.yaml";
+    private static final String PROMETHEUS_OPERATOR_CLUSTER_ROLE = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus-operator/prometheus-operator-cluster-role.yaml";
+    private static final String PROMETHEUS_CLUSTER_ROLE = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus/prometheus-cluster-role.yaml";
+    private static final String PROMETHEUS_OPERATOR_CLUSTER_ROLE_BINDING = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus-operator/prometheus-operator-cluster-role-binding.yaml";
+    private static final String PROMETHEUS_CLUSTER_ROLE_BINDING = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus/prometheus-cluster-role-binding.yaml";
+    private static final String PROMETHEUS_OPERATOR_DEPLOYMENT = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus-operator/prometheus-operator-deployment.yaml";
+    private static final String PROMETHEUS_CUSTOM_RESOURCE = "https://raw.githubusercontent.com/coreos/prometheus-operator/%s/example/rbac/prometheus/prometheus.yaml";
 
     private static final String METRIC_SECRET_NAME = "metrics-secret";
     private static final String METRIC_SECRET_USERNAME_KEY = "username";
@@ -83,17 +83,17 @@ public class PrometheusDeployer {
     public static PrometheusDeployment deploy(Project project, KieServerDeployment kieServerDeployment) {
         addClusterRoleToAdminUser(project);
 
-        createServiceAccount(project, PROMETHEUS_OPERATOR_SERVICE_ACCOUNT);
-        createServiceAccount(project, PROMETHEUS_SERVICE_ACCOUNT);
+        createServiceAccount(project, versioned(PROMETHEUS_OPERATOR_SERVICE_ACCOUNT));
+        createServiceAccount(project, versioned(PROMETHEUS_SERVICE_ACCOUNT));
         addPrometheusOperatorSecurityConstrains(project);
 
-        createPrometheusOperatorClusterRole(project, PROMETHEUS_OPERATOR_CLUSTER_ROLE);
-        createPrometheusOperatorClusterRoleBinding(project, PROMETHEUS_OPERATOR_CLUSTER_ROLE_BINDING);
-        createPrometheusOperatorDeployment(project, PROMETHEUS_OPERATOR_DEPLOYMENT);
+        createPrometheusOperatorClusterRole(project, versioned(PROMETHEUS_OPERATOR_CLUSTER_ROLE));
+        createPrometheusOperatorClusterRoleBinding(project, versioned(PROMETHEUS_OPERATOR_CLUSTER_ROLE_BINDING));
+        createPrometheusOperatorDeployment(project, versioned(PROMETHEUS_OPERATOR_DEPLOYMENT));
 
-        createPrometheusOperatorClusterRole(project, PROMETHEUS_CLUSTER_ROLE);
-        createPrometheusOperatorClusterRoleBinding(project, PROMETHEUS_CLUSTER_ROLE_BINDING);
-        createPrometheusCustomResource(project, PROMETHEUS_CUSTOM_RESOURCE);
+        createPrometheusOperatorClusterRole(project, versioned(PROMETHEUS_CLUSTER_ROLE));
+        createPrometheusOperatorClusterRoleBinding(project, versioned(PROMETHEUS_CLUSTER_ROLE_BINDING));
+        createPrometheusCustomResource(project, versioned(PROMETHEUS_CUSTOM_RESOURCE));
         exposePrometheusRoute(project);
 
         createMetricsSecret(project, kieServerDeployment);
@@ -121,6 +121,10 @@ public class PrometheusDeployer {
 
     public static void undeployOperator(Project project) {
         OperatorDeployer.undeploy(project, PROMETHEUS_OPERATOR_NAME);
+    }
+
+    private static String versioned(String url) {
+        return String.format(url, OpenShiftConstants.getPrometheusVersion());
     }
 
     private static void addClusterRoleToAdminUser(Project project) {
