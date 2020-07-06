@@ -106,10 +106,10 @@ public class PrometheusDeployer {
     public static PrometheusDeployment deployAsOperator(Project project, KieServerDeployment kieServerDeployment) {
         OperatorDeployer.deploy(project, PROMETHEUS_OPERATOR_NAME, "beta", OperatorSource.COMMUNITY);
 
-        createServiceAccount(project, PROMETHEUS_SERVICE_ACCOUNT);
-        createPrometheusOperatorClusterRole(project, PROMETHEUS_CLUSTER_ROLE);
-        createPrometheusOperatorClusterRoleBinding(project, PROMETHEUS_CLUSTER_ROLE_BINDING);
-        createPrometheusCustomResource(project, PROMETHEUS_CUSTOM_RESOURCE);
+        createServiceAccount(project, versioned(PROMETHEUS_SERVICE_ACCOUNT));
+        createPrometheusOperatorClusterRole(project, versioned(PROMETHEUS_CLUSTER_ROLE));
+        createPrometheusOperatorClusterRoleBinding(project, versioned(PROMETHEUS_CLUSTER_ROLE_BINDING));
+        createPrometheusCustomResource(project, versioned(PROMETHEUS_CUSTOM_RESOURCE));
         exposePrometheusRoute(project);
 
         createMetricsSecret(project, kieServerDeployment);
