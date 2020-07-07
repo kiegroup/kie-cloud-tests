@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.operator.deployment;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
@@ -58,11 +59,10 @@ public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
     public void waitForScale() {
         KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
 
-        Integer replicas = getAssociatedServerObject(kieApp.getStatus().getApplied()).getReplicas();
-        if (replicas == null) {
-            // If replicas are not set in custom resource then get them from deployment config.
-            replicas = getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas();
-        }
+        Integer replicas = Optional.ofNullable(kieApp.getStatus())
+                                   .map(status -> status.getApplied())
+                                   .map(applied -> getAssociatedServerObject(applied).getReplicas())
+                                   .orElseGet(() -> getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas());
 
         waitUntilAllPodsAreReadyAndRunning(replicas);
         if (replicas > 0) {
