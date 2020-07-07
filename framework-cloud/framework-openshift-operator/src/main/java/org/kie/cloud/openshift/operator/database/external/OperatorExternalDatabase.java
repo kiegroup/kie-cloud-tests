@@ -29,15 +29,27 @@ public interface OperatorExternalDatabase extends ExternalDatabase {
         database.setType("external");
 
         ExternalConfig config = new ExternalConfig();
+        if (needsToSetExternalUrl()) {
+            config.setJdbcURL(DeploymentConstants.getDatabaseUrl());
+        } else {
+            config.setHost(DeploymentConstants.getDatabaseHost());
+            config.setPort(DeploymentConstants.getDatabasePort());
+        }
+
         config.setDriver(getExternalDriver().getName());
         config.setDialect(Optional.ofNullable(getHibernateDialect()).orElse(DeploymentConstants.getHibernatePersistenceDialect()));
-        config.setHost(DeploymentConstants.getDatabaseHost());
-        config.setPort(DeploymentConstants.getDatabasePort());
         config.setUsername(DeploymentConstants.getDatabaseUsername());
         config.setPassword(DeploymentConstants.getDatabasePassword());
         config.setName(DeploymentConstants.getExternalDatabaseName());
         database.setExternalConfig(config);
 
         return database;
+    }
+
+    /**
+     * @return Flag to indicate that the jdbcURL field needs to be populated (default true).
+     */
+    default boolean needsToSetExternalUrl() {
+        return true;
     }
 }

@@ -17,4 +17,9 @@ package org.kie.cloud.openshift.operator.database.external;
 import org.kie.cloud.openshift.database.external.AbstractPostgreSqlPlusExternalDatabase;
 
 public class PostgreSqlPlusExternalDatabase extends AbstractPostgreSqlPlusExternalDatabase implements OperatorExternalDatabase {
+
+    @Override
+    public boolean needsToSetExternalUrl() {
+        return false;
+    }
 }
