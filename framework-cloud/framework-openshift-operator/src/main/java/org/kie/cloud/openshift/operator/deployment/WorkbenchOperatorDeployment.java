@@ -58,7 +58,8 @@ public class WorkbenchOperatorDeployment extends WorkbenchDeploymentImpl {
 
         waitUntilAllPodsAreReadyAndRunning(replicas);
         if (replicas > 0) {
-            RouterUtil.waitForRouter(getUrl());
+            getInsecureUrl().ifPresent(RouterUtil::waitForRouter);
+            getSecureUrl().ifPresent(RouterUtil::waitForRouter);
         }
     }
 }
