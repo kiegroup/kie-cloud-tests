@@ -37,6 +37,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.ImageStreamTag;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteList;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +58,7 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class OpenShiftDeployment implements Deployment {
 
+    private static final String SHA_TAG = "@sha256:";
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftDeployment.class);
 
     private OpenShift openShift;
@@ -162,7 +164,7 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void waitForVersionTag(String versionTag) {
         try {
-            Supplier<Boolean> checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> StringUtils.endsWith(c.getImage(), versionTag));
+            Supplier<Boolean> checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> checkImageVersion(c.getImage(), versionTag));
 
             new SimpleWaiter(() -> OpenShiftCaller.repeatableCall(checkNewVersionTag)).timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
                                                                                       .reason("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag)
@@ -337,6 +339,19 @@ public abstract class OpenShiftDeployment implements Deployment {
             default:
                 throw new IllegalArgumentException("Unrecognized protocol '" + protocol + "'");
         }
+    }
+
+    private boolean checkImageVersion(String image, String versionTag) {
+        if (StringUtils.contains(image, SHA_TAG)) {
+            String actualReference = StringUtils.substringAfterLast(image, SHA_TAG);
+
+            String imageName = image.substring(image.lastIndexOf("/") + 1, image.lastIndexOf(SHA_TAG));
+            ImageStreamTag imageTag = openShift.imageStreamTags().withName(String.format("%s:%s", imageName, versionTag)).get();
+
+            return StringUtils.endsWith(imageTag.getImage().getDockerImageReference(), actualReference);
+        }
+
+        return StringUtils.endsWith(image, versionTag);
     }
 
     private Map<String, Quantity> transformMap(Map<String, String> x) {
