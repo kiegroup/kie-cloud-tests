@@ -17,4 +17,9 @@ package org.kie.cloud.openshift.operator.database.external;
 import org.kie.cloud.openshift.database.external.AbstractDb2ExternalDatabase;
 
 public class Db2ExternalDatabase extends AbstractDb2ExternalDatabase implements OperatorExternalDatabase {
+
+    @Override
+    public boolean needsToSetExternalUrl() {
+        return false;
+    }
 }
