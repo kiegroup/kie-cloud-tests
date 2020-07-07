@@ -29,12 +29,16 @@ import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDe
 import org.kie.cloud.openshift.scenario.ImmutableKieServerAmqScenarioImpl;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyDroolsScenarioOnly;
+
 public class ImmutableKieServerAmqScenarioBuilderImpl extends KieScenarioBuilderImpl<ImmutableKieServerAmqScenarioBuilder, ImmutableKieServerAmqScenario> implements ImmutableKieServerAmqScenarioBuilder {
 
     private final Map<String, String> envVariables = new HashMap<>();
     private ScenarioRequest request = new ScenarioRequest();
 
     public ImmutableKieServerAmqScenarioBuilderImpl() {
+        verifyDroolsScenarioOnly();
+
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
 

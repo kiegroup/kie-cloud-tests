@@ -30,6 +30,8 @@ import org.kie.cloud.openshift.deployment.external.ExternalDeployment.ExternalDe
 import org.kie.cloud.openshift.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
 
+import static org.kie.cloud.openshift.util.ScenarioValidations.verifyJbpmScenarioOnly;
+
 public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl extends AbstractOpenshiftScenarioBuilderTemplates<ClusteredWorkbenchKieServerDatabasePersistentScenario> implements
                                                                               ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder {
 
@@ -38,6 +40,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
     private final ProjectSpecificPropertyNames propertyNames = ProjectSpecificPropertyNames.create();
 
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl() {
+        verifyJbpmScenarioOnly();
         envVariables.put(OpenShiftTemplateConstants.CREDENTIALS_SECRET, DeploymentConstants.getAppCredentialsSecretName());
         envVariables.put(OpenShiftTemplateConstants.KIE_SERVER_HTTPS_SECRET, OpenShiftConstants.getKieApplicationSecretName());
 
