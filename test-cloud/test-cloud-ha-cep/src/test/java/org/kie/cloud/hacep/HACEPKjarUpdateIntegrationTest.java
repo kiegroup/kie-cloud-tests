@@ -176,11 +176,10 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
     public void testUpdateKjarScaleToZeroAndBack() throws Exception {
         final TopicsConfig topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         final Properties connectionProperties = deploymentScenario.getKafkaConnectionProperties();
-        connectionProperties.putAll(CommonConfig.getStatic());
+        connectionProperties.putAll(HACEPTestsUtils.getProperties());
 
-        final Properties props = HACEPTestsUtils.getProperties();
         final Producer prod = InfraFactory.getProducer(false);
-        try (RemoteKieSession producer = new RemoteKieSessionImpl(props, topicsConfig, KafkaRemoteUtil.getListener(props, false), prod)) {
+        try (RemoteKieSession producer = new RemoteKieSessionImpl(connectionProperties, topicsConfig, KafkaRemoteUtil.getListener(connectionProperties, false), prod)) {
             final CompletableFuture<Boolean> updateKjarFuture = producer
                     .updateKJarGAV(KJAR2_GAV);
             final boolean updateKjarResult = updateKjarFuture.get();
