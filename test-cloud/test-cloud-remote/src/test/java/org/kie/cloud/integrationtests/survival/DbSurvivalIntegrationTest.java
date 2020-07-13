@@ -36,6 +36,7 @@ import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.Constants;
 import org.kie.server.api.exception.KieServicesException;
@@ -105,8 +106,9 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         processServicesClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
         queryServicesClient = KieServerClientProvider.getQueryClient(deploymentScenario.getKieServerDeployment());
 
-        kieServicesClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME, DEFINITION_PROJECT_SNAPSHOT_VERSION)));
-        deploymentScenario.getKieServerDeployment().waitForContainerRespin();
+        KieServerUtils.waitForContainerRespinAfter(deploymentScenario.getKieServerDeployment(),
+                                                   () -> kieServicesClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME,
+                                                                                                                                                              DEFINITION_PROJECT_SNAPSHOT_VERSION))));
     }
 
     @Test

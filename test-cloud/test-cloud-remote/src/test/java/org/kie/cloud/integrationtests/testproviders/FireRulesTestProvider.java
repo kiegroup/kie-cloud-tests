@@ -31,6 +31,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResource;
@@ -98,8 +99,7 @@ public class FireRulesTestProvider {
         try {
             testFireRules(kieServerDeployment, containerId);
         } finally {
-            kieServerClient.disposeContainer(containerId);
-            kieServerDeployment.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
         }
     }
 
@@ -120,8 +120,7 @@ public class FireRulesTestProvider {
         try {
             testFireRules(kieServerDeployment, containerId);
         } finally {
-            kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
-            kieServerDeployment.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfter(kieServerDeployment, () -> kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId));
         }
     }
 

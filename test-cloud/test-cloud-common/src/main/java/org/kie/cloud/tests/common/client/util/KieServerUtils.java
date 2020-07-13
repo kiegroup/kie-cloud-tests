@@ -16,8 +16,15 @@
 package org.kie.cloud.tests.common.client.util;
 
 import java.time.Duration;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.BooleanSupplier;
 
+import cz.xtf.core.waiting.WaiterException;
+import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.KieContainerResource;
@@ -25,8 +32,12 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KieServerUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KieServerUtils.class);
 
     /**
      * Create a container in Kie server.
@@ -48,6 +59,34 @@ public class KieServerUtils {
                 return kieServerClient.getContainerInfo(containerId);
             }
             throw e;
+        }
+    }
+
+    /**
+     * Wait for container respin after disposing a container.
+     * @param kieServer
+     * @param containerId
+     */
+    public static void waitForContainerRespinAfterDisposeContainer(KieServerDeployment kieServer, String containerId) {
+        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServer);
+        waitForContainerRespinAfter(kieServer, () -> kieServerClient.disposeContainer(containerId));
+    }
+
+    /**
+     * Wait for container respin after doing an action.
+     * @param kieServer
+     * @param action
+     */
+    public static void waitForContainerRespinAfter(KieServerDeployment kieServer, Runnable action) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> waiter = executor.submit(kieServer::waitForContainerRespin);
+
+        action.run();
+        try {
+            waiter.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error("Error waiting for container respin", e);
+            throw new WaiterException("Error waiting for container respin");
         }
     }
 

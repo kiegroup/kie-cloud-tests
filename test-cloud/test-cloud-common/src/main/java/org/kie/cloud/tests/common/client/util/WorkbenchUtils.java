@@ -20,11 +20,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
+import org.kie.cloud.tests.common.curl.CurlCommand;
 import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
@@ -54,8 +56,26 @@ public class WorkbenchUtils {
 
         WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
         workbenchClient.createSpace(SPACE_NAME, workbenchDeployment.getUsername());
+        waitUntilSpaceIsSynchronised(workbenchDeployment, SPACE_NAME);
         workbenchClient.cloneRepository(SPACE_NAME, cloneProjectRequest);
         workbenchClient.deployProject(SPACE_NAME, projectName);
+    }
+
+    /**
+     * Wait until the space is present in all the workbench pods.
+     * @param workbenchDeployment workbench deployment
+     * @param spaceName space
+     */
+    public static void waitUntilSpaceIsSynchronised(WorkbenchDeployment workbenchDeployment, String spaceName) {
+        workbenchDeployment.getInstances().forEach(i -> {
+            TimeUtils.wait(MAX_WAIT_DURATION, WAIT_STEP, () -> {
+                String spaces = CurlCommand.onInstance(i)
+                                           .withUsername(workbenchDeployment.getUsername())
+                                           .withPassword(workbenchDeployment.getPassword())
+                                           .get("rest/spaces");
+                return StringUtils.contains(spaces, spaceName);
+            });
+        });
     }
 
     private static CloneProjectRequest createCloneProjectRequest(String repositoryUrl, String projectName) {
