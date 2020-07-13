@@ -48,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Category(JBPMOnly.class)
 @RunWith(Parameterized.class)
@@ -116,14 +115,8 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         assertThat(signalPid).isNotNull().isGreaterThan(0L);
         assertThat(queryServicesClient.findProcessInstances(0, 10)).isNotNull().hasSize(1);
 
-        scaleDatabaseTo(0);
-
-        logger.debug("Try to get process instances");
-        assertThatThrownBy(() -> {
-            processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.SIGNALTASK);
-        }).isInstanceOf(KieServicesException.class);
-
-        scaleDatabaseTo(1);
+        deploymentScenario.getDatabaseDeployment().deleteInstances();
+        deploymentScenario.getDatabaseDeployment().waitForScale();
 
         waitForKieServerResponse();
 
@@ -136,12 +129,6 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         logger.debug("Check that prcoess is completed");
         assertThat(queryServicesClient.findProcessInstanceById(signalPid).getState()).isEqualTo(ProcessInstance.STATE_COMPLETED);
 
-    }
-
-    private void scaleDatabaseTo(int count) {
-        logger.debug("Scale Database to " + count);
-        deploymentScenario.getDatabaseDeployment().scale(count);
-        deploymentScenario.getDatabaseDeployment().waitForScale();
     }
 
     private void waitForKieServerResponse() {

@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -83,16 +82,8 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     @Override
-    public void deleteInstances(Instance... instance) {
-        deleteInstances(Arrays.asList(instance));
-    }
-
-    @Override
-    public void deleteInstances(List<Instance> instances) {
-        for (Instance instance : instances) {
-            Pod pod = openShift.getPod(instance.getName());
-            openShift.deletePod(pod);
-        }
+    public void deleteInstances() {
+        getInstances().forEach(this::deleteInstance);
     }
 
     public abstract String getServiceName();
@@ -352,6 +343,11 @@ public abstract class OpenShiftDeployment implements Deployment {
         }
 
         return StringUtils.endsWith(image, versionTag);
+    }
+
+    private void deleteInstance(Instance instance) {
+        Pod pod = openShift.getPod(instance.getName());
+        openShift.deletePod(pod);
     }
 
     private Map<String, Quantity> transformMap(Map<String, String> x) {

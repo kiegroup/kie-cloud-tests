@@ -15,8 +15,10 @@
  */
 package org.kie.cloud.integrationtests.jbpm;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -96,7 +98,7 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), CONTAINER_ID);
 
         logger.debug("Get Kie Server Instance");
-        Instance kieServerInstance = deploymentScenario.getKieServerDeployment().getInstances().iterator().next();
+        Collection<String> kieServerOldInstances = getKieServerInstanceNames();
 
         logger.debug("Start process instance");
         Long longScriptPid = processServicesClient.startProcess(CONTAINER_ID, Constants.ProcessId.LONG_SCRIPT, Collections.emptyMap());
@@ -110,7 +112,7 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
         signalStartLongScript(longScriptPid);
 
         logger.debug("Force delete (Kill) Kie server instance.");
-        deploymentScenario.getKieServerDeployment().deleteInstances(kieServerInstance);
+        deploymentScenario.getKieServerDeployment().deleteInstances();
         logger.debug("Wait for scale");
         deploymentScenario.getKieServerDeployment().waitForScale();
 
@@ -129,7 +131,7 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
         processServicesClient.signalProcessInstance(CONTAINER_ID, longScriptPid, Constants.Signal.SIGNAL_2_NAME, null);
         assertProcessInstanceState(longScriptPid, org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
 
-        assertThat(deploymentScenario.getKieServerDeployment().getInstances().iterator().next()).isNotEqualTo(kieServerInstance);
+        assertThat(kieServerOldInstances).doesNotContainAnyElementsOf(getKieServerInstanceNames());
     }
 
     private void signalStartLongScript(Long pid) {
@@ -153,6 +155,13 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
         ProcessInstance processInstance = processServicesClient.getProcessInstance(CONTAINER_ID, pid);
         assertThat(processInstance).isNotNull();
         assertThat(processInstance.getState()).isNotNull().isEqualTo(state);
+    }
+
+    private Collection<String> getKieServerInstanceNames() {
+        return deploymentScenario.getKieServerDeployment().getInstances()
+                                 .stream()
+                                 .map(Instance::getName)
+                                 .collect(Collectors.toSet());
     }
 
 }
