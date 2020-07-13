@@ -15,8 +15,6 @@
 
 package org.kie.cloud.hacep;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +23,6 @@ import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import org.apache.commons.math3.stat.inference.TestUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -35,9 +32,10 @@ import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.hacep.core.InfraFactory;
-import org.kie.remote.*;
+import org.kie.remote.RemoteFactHandle;
+import org.kie.remote.RemoteKieSession;
+import org.kie.remote.TopicsConfig;
 import org.kie.remote.impl.RemoteKieSessionImpl;
-import org.kie.remote.impl.RemoteStreamingKieSessionImpl;
 import org.kie.remote.impl.producer.Producer;
 import org.kie.remote.util.KafkaRemoteUtil;
 
@@ -185,8 +183,7 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
             final boolean updateKjarResult = updateKjarFuture.get();
             Assertions.assertThat(updateKjarResult).isTrue();
 
-            deploymentScenario.getDeployments().get(0)
-                    .deleteInstances(deploymentScenario.getDeployments().get(0).getInstances());
+            deploymentScenario.getDeployments().get(0).deleteInstances();
             deploymentScenario.getDeployments().get(0).waitForScale();
 
             final RemoteFactHandle<Map<String, String>> factHandle = producer.insert(new HashMap<>());
