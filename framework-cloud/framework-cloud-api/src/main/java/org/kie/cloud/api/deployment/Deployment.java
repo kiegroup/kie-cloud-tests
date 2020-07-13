@@ -70,7 +70,7 @@ public interface Deployment {
     List<Instance> getInstances();
 
     /**
-     * This method delete given list of the cloud instances. Cloud should
+     * This method delete all instances for Deployment. Cloud should
      * automaticly start new instances. Number of available instance is same as
      * before.
      */
