@@ -101,8 +101,7 @@ public class OptaplannerTestProvider {
             throw new RuntimeException("Interrupted while loading planning problem.", e);
         } finally {
             kieServerDeployment.resetRouterTimeout();
-            kieServerClient.disposeContainer(containerId);
-            kieServerDeployment.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
         }
     }
 

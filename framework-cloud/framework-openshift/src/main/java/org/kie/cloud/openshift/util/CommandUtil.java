@@ -21,6 +21,7 @@ import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
+import io.fabric8.kubernetes.client.dsl.internal.ExecWebSocketListener;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 
 public class CommandUtil {
@@ -28,15 +29,21 @@ public class CommandUtil {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ByteArrayOutputStream error = new ByteArrayOutputStream();
 
-        CommandExecutionResult commandExecutionResult = new CommandExecutionResult();
-        commandExecutionResult.setOutput(output);
-        commandExecutionResult.setError(error);
+        try (ExecWatch execWatch = pod.writingOutput(output).writingError(error).exec(command)) {
 
-        ExecWatch execWatch = pod
-                .writingOutput(output)
-                .writingError(error)
-                .exec(command);
+            waitUntilCommandIsFinished(execWatch);
 
-        return commandExecutionResult;
+            CommandExecutionResult commandExecutionResult = new CommandExecutionResult();
+            commandExecutionResult.setOutput(output.toString());
+            commandExecutionResult.setError(error.toString());
+            return commandExecutionResult;
+        }
+
+    }
+
+    private static void waitUntilCommandIsFinished(ExecWatch execWatch) {
+        if (execWatch instanceof ExecWebSocketListener) {
+            ((ExecWebSocketListener) execWatch).waitUntilReady();
+        }
     }
 }
