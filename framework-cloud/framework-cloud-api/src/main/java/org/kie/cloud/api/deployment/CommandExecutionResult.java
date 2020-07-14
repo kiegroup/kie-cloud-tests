@@ -15,25 +15,24 @@
 
 package org.kie.cloud.api.deployment;
 
-import java.io.ByteArrayOutputStream;
-
 public class CommandExecutionResult {
-    private ByteArrayOutputStream output;
-    private ByteArrayOutputStream error;
+
+    private String output;
+    private String error;
 
     public String getOutput() {
-        return output.toString();
+        return output;
     }
 
-    public void setOutput(ByteArrayOutputStream output) {
+    public void setOutput(String output) {
         this.output = output;
     }
 
     public String getError() {
-        return error.toString();
+        return error;
     }
 
-    public void setError(ByteArrayOutputStream error) {
+    public void setError(String error) {
         this.error = error;
     }
 }

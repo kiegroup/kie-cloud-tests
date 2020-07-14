@@ -20,6 +20,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.function.BooleanSupplier;
 
+import static org.junit.Assert.assertTrue;
+
 public class TimeUtils {
 
     private static final Duration DEFAULT_WAIT_STEP = Duration.of(5, ChronoUnit.SECONDS);
@@ -41,5 +43,7 @@ public class TimeUtils {
         while (startTime.plus(maxDuration).isAfter(Instant.now()) && !booleanSupplier.getAsBoolean()) {
             wait(waitStep);
         }
+
+        assertTrue("Condition was not fulfilled within the time window", booleanSupplier.getAsBoolean());
     }
 }
