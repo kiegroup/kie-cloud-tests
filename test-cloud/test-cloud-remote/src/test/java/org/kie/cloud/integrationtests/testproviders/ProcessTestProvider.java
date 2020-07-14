@@ -22,6 +22,7 @@ import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.time.Constants;
 import org.kie.server.api.model.KieContainerResource;
@@ -108,8 +109,7 @@ public class ProcessTestProvider {
         try {
             testExecuteProcessWithUserTask(processClient, taskClient, containerId);
         } finally {
-            kieServerClient.disposeContainer(containerId);
-            kieServerDeployment.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
         }
     }
 
@@ -143,8 +143,7 @@ public class ProcessTestProvider {
         try {
             testExecuteProcessWithSignal(processClient, containerId);
         } finally {
-            kieServerClient.disposeContainer(containerId);
-            kieServerDeployment.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
         }
     }
 

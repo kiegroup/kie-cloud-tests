@@ -28,6 +28,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.cloud.tests.common.time.Constants;
@@ -115,10 +116,8 @@ public class SmartRouterTestProvider {
             assertLogMessages(kieServerDeploymentOne);
             assertLogMessages(kieServerDeploymentTwo);
         } finally {
-            kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId);
-            kieServerDeploymentOne.waitForContainerRespin();
-            kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId);
-            kieServerDeploymentTwo.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentOne, () -> kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId));
+            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentTwo, () -> kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId));
         }
     }
 
@@ -164,12 +163,9 @@ public class SmartRouterTestProvider {
                 verifyProcessAvailableInContainer(smartRouterClient, containerIdUpdated, Constants.ProcessId.UPDATED_USERTASK);
             }
         } finally {
-            kieServerClientOne.disposeContainer(containerId);
-            kieServerDeploymentOne.waitForContainerRespin();
-            kieServerClientOne.disposeContainer(containerIdUpdated);
-            kieServerDeploymentOne.waitForContainerRespin();
-            kieServerClientTwo.disposeContainer(containerId);
-            kieServerDeploymentTwo.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeploymentOne, containerId);
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeploymentOne, containerIdUpdated);
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeploymentTwo, containerId);
         }
     }
 
@@ -197,10 +193,8 @@ public class SmartRouterTestProvider {
             assertThat(kieServerDeploymentTwo.getInstances()).hasSize(1);
             assertThat(kieServerDeploymentTwo.getInstances().get(0).getLogs()).contains(LOG_MESSAGE);
         } finally {
-            kieServerClientOne.disposeContainer(containerId);
-            kieServerClientTwo.disposeContainer(containerId);
-            kieServerDeploymentOne.waitForContainerRespin();
-            kieServerDeploymentTwo.waitForContainerRespin();
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeploymentOne, containerId);
+            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeploymentTwo, containerId);
         }
     }
 
@@ -209,8 +203,7 @@ public class SmartRouterTestProvider {
                                                                  new ReleaseId(project.getGroupId(), project.getArtifactName(), project.getVersion()));
         resource.setContainerAlias(containerAlias);
 
-        kieServerClient.createContainer(containerId, resource);
-        kieServerDeployment.waitForContainerRespin();
+        KieServerUtils.waitForContainerRespinAfter(kieServerDeployment, () -> kieServerClient.createContainer(containerId, resource));
     }
 
     private void verifyProcessAvailableInContainer(KieServicesClient kieServerClient, String containerId, String processId) {
