@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -195,19 +196,24 @@ public class ProjectImpl implements Project {
     }
 
     private OpenShiftBinary openShiftBinaryClient() {
-        final OpenShiftBinary oc = OpenShifts.masterBinary(this.getName());
-        oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftUserName(),
-                 OpenShiftConstants.getOpenShiftPassword());
-
-        return oc;
+        Optional<OpenShiftBinary> oc;
+        synchronized (ProjectImpl.class) {
+            oc = Optional.of(OpenShifts.masterBinary(this.getName()));
+            oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftUserName(),
+                           OpenShiftConstants.getOpenShiftPassword());
+        }
+        return oc.orElseThrow(RuntimeException::new);
     }
 
     private OpenShiftBinary openShiftBinaryClientAsAdmin() {
-        final OpenShiftBinary oc = OpenShifts.masterBinary(this.getName());
-        oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
-                 OpenShiftConstants.getOpenShiftAdminPassword());
+        Optional<OpenShiftBinary> oc;
+        synchronized (ProjectImpl.class) {
+            oc = Optional.of(OpenShifts.masterBinary(this.getName()));
+            oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
+                           OpenShiftConstants.getOpenShiftAdminPassword());
+        }
 
-        return oc;
+        return oc.orElseThrow(RuntimeException::new);
     }
 
     @Override
