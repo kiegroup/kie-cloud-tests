@@ -39,6 +39,7 @@ import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.jbpm.ProcessFailoverIntegrationTest;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
@@ -58,7 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Category({JBPMOnly.class, Baseline.class})
+@Category({JBPMOnly.class, Smoke.class, Baseline.class})
 public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerPersistentScenario> {
 
     private static final String REPOSITORY_NAME = generateNameWithPrefix(ProcessFailoverIntegrationTest.class.getSimpleName());
