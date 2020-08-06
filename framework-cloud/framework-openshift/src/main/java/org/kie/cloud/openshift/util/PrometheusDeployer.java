@@ -53,7 +53,6 @@ import org.kie.cloud.openshift.prometheus.servicemonitor.components.Selector;
 import org.kie.cloud.openshift.prometheus.servicemonitor.components.Spec;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.util.operator.OperatorDeployer;
-import org.kie.cloud.openshift.util.operator.OperatorSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,22 +90,6 @@ public class PrometheusDeployer {
         createPrometheusOperatorClusterRoleBinding(project, versioned(PROMETHEUS_OPERATOR_CLUSTER_ROLE_BINDING));
         createPrometheusOperatorDeployment(project, versioned(PROMETHEUS_OPERATOR_DEPLOYMENT));
 
-        createPrometheusOperatorClusterRole(project, versioned(PROMETHEUS_CLUSTER_ROLE));
-        createPrometheusOperatorClusterRoleBinding(project, versioned(PROMETHEUS_CLUSTER_ROLE_BINDING));
-        createPrometheusCustomResource(project, versioned(PROMETHEUS_CUSTOM_RESOURCE));
-        exposePrometheusRoute(project);
-
-        createMetricsSecret(project, kieServerDeployment);
-        createServiceMonitorCustomResource(project);
-
-        PrometheusDeployment prometheusDeployment = new PrometheusDeploymentImpl(project);
-        return prometheusDeployment;
-    }
-
-    public static PrometheusDeployment deployAsOperator(Project project, KieServerDeployment kieServerDeployment) {
-        OperatorDeployer.deploy(project, PROMETHEUS_OPERATOR_NAME, "beta", OperatorSource.COMMUNITY);
-
-        createServiceAccount(project, versioned(PROMETHEUS_SERVICE_ACCOUNT));
         createPrometheusOperatorClusterRole(project, versioned(PROMETHEUS_CLUSTER_ROLE));
         createPrometheusOperatorClusterRoleBinding(project, versioned(PROMETHEUS_CLUSTER_ROLE_BINDING));
         createPrometheusCustomResource(project, versioned(PROMETHEUS_CUSTOM_RESOURCE));

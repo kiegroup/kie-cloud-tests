@@ -78,7 +78,7 @@ public class WorkbenchKieServerScenarioImpl extends OpenShiftOperatorScenario<Wo
         kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
 
         if (request.isDeployPrometheus()) {
-            prometheusDeployment = PrometheusDeployer.deployAsOperator(project, kieServerDeployment);
+            prometheusDeployment = PrometheusDeployer.deploy(project, kieServerDeployment);
         }
 
         if (request.getGitSettings() != null) {
