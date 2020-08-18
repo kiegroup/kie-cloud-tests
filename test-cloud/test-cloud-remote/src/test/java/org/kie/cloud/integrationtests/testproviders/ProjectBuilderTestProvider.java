@@ -21,7 +21,6 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
-import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -65,7 +64,6 @@ public class ProjectBuilderTestProvider {
         final String spaceName = "testBuildProject-space";
         WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
         workbenchClient.createSpace(spaceName, workbenchDeployment.getUsername());
-        WorkbenchUtils.waitUntilSpaceIsSynchronised(workbenchDeployment, spaceName);
         final String projectName = "testBuildProject-project";
         final String projectVersion = "1.0";
         workbenchClient.createProject(spaceName, projectName, workbenchClient.getSpace(spaceName).getDefaultGroupId(),
