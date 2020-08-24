@@ -32,6 +32,7 @@ public class Console {
     private Integer replicas;
     private SsoClient ssoClient;
     private Resources resources;
+    private Jvm jvm;
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -79,5 +80,13 @@ public class Console {
 
     public void setResources(Resources resources) {
         this.resources = resources;
+    }
+
+    public Jvm getJvm() {
+        return jvm;
+    }
+
+    public void setJvm(Jvm jvm) {
+        this.jvm = jvm;
     }
 }

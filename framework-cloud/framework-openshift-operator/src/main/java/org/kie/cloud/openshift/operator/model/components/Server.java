@@ -37,6 +37,7 @@ public class Server {
     private Build build;
     private Jms jms;
     private Database database;
+    private Jvm jvm;
 
     public String getName() {
         return name;
@@ -123,5 +124,13 @@ public class Server {
 
     public void setDatabase(Database database) {
         this.database = database;
+    }
+
+    public Jvm getJvm() {
+        return jvm;
+    }
+
+    public void setJvm(Jvm jvm) {
+        this.jvm = jvm;
     }
 }
