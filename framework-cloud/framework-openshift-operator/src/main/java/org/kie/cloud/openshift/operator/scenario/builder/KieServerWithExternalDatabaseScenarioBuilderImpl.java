@@ -27,7 +27,7 @@ public class KieServerWithExternalDatabaseScenarioBuilderImpl extends AbstractTr
 
     @Override
     public KieServerWithExternalDatabaseScenarioBuilder withInternalMavenRepo(boolean waitForRunning) {
-        if(waitForRunning) {
+        if (waitForRunning) {
             setSyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         } else {
             setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
