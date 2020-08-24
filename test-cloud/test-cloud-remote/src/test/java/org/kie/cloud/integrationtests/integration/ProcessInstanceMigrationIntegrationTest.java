@@ -95,7 +95,7 @@ public class ProcessInstanceMigrationIntegrationTest extends AbstractMethodIsola
     protected ProcessServicesClient processServicesClient;
     protected String kieServerId;
     protected HttpClient client;
-    protected List<Long> instancesIds;
+    protected Long instanceToBeMigrated, instanceToNotBeMigrated;
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
@@ -141,7 +141,6 @@ public class ProcessInstanceMigrationIntegrationTest extends AbstractMethodIsola
 
         kieServerId = kieServicesClient.getServerInfo().getResult().getServerId();
         client = HttpClientBuilder.create().setDefaultCredentialsProvider(getBasicAuth()).build();
-        instancesIds = new ArrayList<>();
     }
 
     @Test
@@ -155,11 +154,11 @@ public class ProcessInstanceMigrationIntegrationTest extends AbstractMethodIsola
         // Then
         List<ProcessInstance> instances = processServicesClient.findProcessInstances(OLD_CONTAINER_ID, 0, 10);
         Assertions.assertThat(instances).hasSize(1);
-        Assertions.assertThat(instances.get(0).getId()).isIn(instancesIds);
+        Assertions.assertThat(instances.get(0).getId()).isEqualTo(instanceToNotBeMigrated);
 
         instances = processServicesClient.findProcessInstances(NEW_CONTAINER_ID, 0, 10);
         Assertions.assertThat(instances).hasSize(1);
-        Assertions.assertThat(instances.get(0).getId()).isIn(instancesIds);
+        Assertions.assertThat(instances.get(0).getId()).isEqualTo(instanceToBeMigrated);
     }
 
     private Migration createMigration() throws IOException, JAXBException {
@@ -167,7 +166,7 @@ public class ProcessInstanceMigrationIntegrationTest extends AbstractMethodIsola
         MigrationDefinition def = new MigrationDefinition();
         def.setPlanId(plan.getId());
         def.setKieServerId(kieServerId);
-        def.setProcessInstanceIds(Arrays.asList(instancesIds.get(0)));
+        def.setProcessInstanceIds(Arrays.asList(instanceToBeMigrated));
         def.setExecution(new Execution().setType(Execution.ExecutionType.SYNC));
 
         HttpPost post = preparePost("/migrations");
@@ -208,8 +207,8 @@ public class ProcessInstanceMigrationIntegrationTest extends AbstractMethodIsola
     }
 
     private void startProcesses() {
-        instancesIds.add(processServicesClient.startProcess(OLD_CONTAINER_ID, PROCESS_ID));
-        instancesIds.add(processServicesClient.startProcess(OLD_CONTAINER_ID, PROCESS_ID));
+        instanceToBeMigrated = processServicesClient.startProcess(OLD_CONTAINER_ID, PROCESS_ID);
+        instanceToNotBeMigrated = processServicesClient.startProcess(OLD_CONTAINER_ID, PROCESS_ID);
     }
 
 
