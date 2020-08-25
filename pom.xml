@@ -184,6 +184,12 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>process-migration-service</artifactId>
+        <version>7.39.0-SNAPSHOT</version>
+        <classifier>classes</classifier>
+      </dependency>
+      <dependency>
         <groupId>org.kie</groupId>
         <artifactId>openshift-kie-hacep</artifactId>
         <version>${version.org.kie}</version>

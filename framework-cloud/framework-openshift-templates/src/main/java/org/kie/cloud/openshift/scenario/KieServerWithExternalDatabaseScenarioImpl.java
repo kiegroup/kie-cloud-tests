@@ -50,7 +50,8 @@ public class KieServerWithExternalDatabaseScenarioImpl extends KieCommonScenario
         super(envVariables);
     }
 
-    @Override public KieServerDeployment getKieServerDeployment() {
+    @Override
+    public KieServerDeployment getKieServerDeployment() {
         return kieServerDeployment;
     }
 
@@ -81,7 +82,8 @@ public class KieServerWithExternalDatabaseScenarioImpl extends KieCommonScenario
         logNodeNameOfAllInstances();
     }
 
-    @Override public List<Deployment> getDeployments() {
+    @Override
+    public List<Deployment> getDeployments() {
         List<Deployment> deployments = new ArrayList<Deployment>(Arrays.asList(kieServerDeployment, dockerDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
@@ -106,4 +108,5 @@ public class KieServerWithExternalDatabaseScenarioImpl extends KieCommonScenario
     public List<ControllerDeployment> getControllerDeployments() {
         return Collections.emptyList();
     }
+
 }
