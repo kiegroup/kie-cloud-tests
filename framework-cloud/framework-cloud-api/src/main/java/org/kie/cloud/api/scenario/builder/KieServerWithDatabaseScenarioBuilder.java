@@ -84,11 +84,17 @@ public interface KieServerWithDatabaseScenarioBuilder extends KieDeploymentScena
      * @return Builder with configured memory limit
      */
     KieServerWithDatabaseScenarioBuilder withMemoryLimit(String memoryLimit);
-    
+
     /**
      * Return configured builder with Process Migration deployment.
      *
      * @return Builder with configured Kie container deployment
      */
     KieServerWithDatabaseScenarioBuilder withProcessMigrationDeployment();
+
+    /**
+     * Return configured builder to use permanent storage.
+     * @return Builder with configured Kie container deployment
+     */
+    KieServerWithDatabaseScenarioBuilder withPermanentStorage();
 }
