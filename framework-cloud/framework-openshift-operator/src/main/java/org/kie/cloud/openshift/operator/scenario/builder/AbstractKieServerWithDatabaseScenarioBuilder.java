@@ -157,7 +157,7 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
         return this;
     }
 
-    
+
     @Override
     public KieServerWithDatabaseScenarioBuilder withMemoryLimit(String memoryLimit) {
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
@@ -177,6 +177,13 @@ public abstract class AbstractKieServerWithDatabaseScenarioBuilder extends Abstr
         ProcessMigration processMigration = new ProcessMigration();
         processMigration.setDatabase(kieApp.getSpec().getObjects().getServers()[0].getDatabase());
         kieApp.getSpec().getObjects().setProcessMigration(processMigration);
+
+        return this;
+    }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withPermanentStorage() {
+        kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING);
 
         return this;
     }
