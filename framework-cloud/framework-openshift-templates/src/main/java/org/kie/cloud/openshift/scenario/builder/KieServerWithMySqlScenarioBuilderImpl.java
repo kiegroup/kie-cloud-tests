@@ -103,4 +103,10 @@ public class KieServerWithMySqlScenarioBuilderImpl extends KieScenarioBuilderImp
     public KieServerWithDatabaseScenarioBuilder withMemoryLimit(String memoryLimit) {
         throw new UnsupportedOperationException("Not supported for templates.");
     }
+
+    @Override
+    public KieServerWithDatabaseScenarioBuilder withPermanentStorage() {
+        // already permanent
+        return this;
+    }
 }

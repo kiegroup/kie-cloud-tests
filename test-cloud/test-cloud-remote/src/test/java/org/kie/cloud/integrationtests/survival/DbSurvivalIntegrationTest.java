@@ -68,6 +68,7 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         try {
             KieServerWithDatabaseScenario kieServerMySqlScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
                     .withInternalMavenRepo(false)
+                    .withPermanentStorage()
                     .build();
             scenarios.add(new Object[]{"KIE Server + MySQL", kieServerMySqlScenario});
         } catch (UnsupportedOperationException ex) {
@@ -77,6 +78,7 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         try {
             KieServerWithDatabaseScenario kieServerPostgreSqlScenario = deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
                     .withInternalMavenRepo(false)
+                    .withPermanentStorage()
                     .build();
             scenarios.add(new Object[]{"KIE Server + PostgreSQL", kieServerPostgreSqlScenario});
         } catch (UnsupportedOperationException ex) {
