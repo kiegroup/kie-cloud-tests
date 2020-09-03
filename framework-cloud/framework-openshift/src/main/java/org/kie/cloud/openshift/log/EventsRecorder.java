@@ -26,10 +26,6 @@ import org.kie.cloud.openshift.resource.Project;
 public class EventsRecorder {
 
     public static void recordProjectEvents(Project project, String logFolderName) {
-        if (project == null) {
-            return;
-        }
-
         StringBuffer writer = new StringBuffer();
         writer.append("LAST SEEN");
         writer.append('\t');

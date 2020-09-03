@@ -65,6 +65,25 @@ public interface Project extends AutoCloseable {
      */
     void createSecret(String secretName, Map<String, String> secrets);
 
+
+    /**
+     * Create resources from YAML file using command line client.
+     * @param yamlUrl Url to yaml file with resources
+     */
+    public void createResourcesFromYaml(String yamlUrl);
+
+    /**
+     * Create resources from YAML files using command line client.
+     * @param yamlUrls Urls to yaml files with resources
+     */
+    public void createResourcesFromYaml(List<String> yamlUrls);
+
+    /**
+     * Create resources from YAML string using command line client.
+     * @param yamlString String with yaml
+     */
+    public void createResourceFromYamlString(String yamlString);
+
     /**
      * Create resources from YAML files as admin using command line client.
      * @param yamlUrl Url to yaml files with resources
