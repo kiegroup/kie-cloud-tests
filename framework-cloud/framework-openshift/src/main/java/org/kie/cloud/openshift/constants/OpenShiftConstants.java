@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.Optional;
 
 import cz.xtf.core.config.OpenShiftConfig;
-import cz.xtf.core.openshift.OpenShifts;
 import org.kie.cloud.api.constants.Constants;
 
 public class OpenShiftConstants implements Constants {
@@ -265,9 +264,5 @@ public class OpenShiftConstants implements Constants {
         System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_PASSWORD, getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
         System.setProperty(OpenShiftConfig.OPENSHIFT_VERSION, getOpenShiftVersion());
         System.setProperty(OpenShiftConfig.OPENSHIFT_NAMESPACE, "openshift");
-
-        if (OpenShifts.adminBinary() == null) {
-            throw new RuntimeException("Oc client is not installed");
-        }
     }
 }
