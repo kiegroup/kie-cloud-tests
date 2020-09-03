@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -141,6 +142,33 @@ public class ProjectImpl implements Project {
     }
 
     @Override
+    public void createResourcesFromYaml(String yamlUrl) {
+        final String output = openShiftBinaryClient().execute("create", "-f", yamlUrl);
+        logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
+    }
+
+    @Override
+    public void createResourcesFromYaml(List<String> yamlUrls) {
+        final OpenShiftBinary oc = openShiftBinaryClient();
+        for (String url : yamlUrls) {
+            final String output = oc.execute("create", "-f", url);
+            logger.info("Yaml resources from file {} were created by oc client. Output = {}", url, output);
+        }
+    }
+
+    @Override
+    public void createResourceFromYamlString(String yamlString) {
+        try {
+            final File tmpYamlFile = File.createTempFile("openshift-resource-",".yaml");
+            Files.write(tmpYamlFile.toPath(), yamlString.getBytes("UTF-8"));
+            final String output = openShiftBinaryClient().execute("create", "-f", tmpYamlFile.getAbsolutePath());
+            logger.info("Yaml resources from string was created by oc client. Output = {}", output);
+        } catch (IOException e) {
+            throw new RuntimeException("Error creating resource from string", e);
+        }
+    }
+
+    @Override
     public void createResourcesFromYamlAsAdmin(String yamlUrl) {
         final String output = openShiftBinaryClientAsAdmin().execute("create", "-f", yamlUrl);
         logger.info("Yaml resources from file {} were created by oc client. Output = {}", yamlUrl, output);
@@ -167,18 +195,25 @@ public class ProjectImpl implements Project {
         }
     }
 
-    private synchronized OpenShiftBinary openShiftBinaryClient() {
-        OpenShiftBinary oc = OpenShifts.masterBinary(this.getName());
-        oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftUserName(),
-                 OpenShiftConstants.getOpenShiftPassword());
-        return oc;
+    private OpenShiftBinary openShiftBinaryClient() {
+        Optional<OpenShiftBinary> oc;
+        synchronized (ProjectImpl.class) {
+            oc = Optional.of(OpenShifts.masterBinary(this.getName()));
+            oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftUserName(),
+                           OpenShiftConstants.getOpenShiftPassword());
+        }
+        return oc.orElseThrow(RuntimeException::new);
     }
 
-    private synchronized OpenShiftBinary openShiftBinaryClientAsAdmin() {
-        OpenShiftBinary oc = OpenShifts.masterBinary(this.getName());
-        oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
-                 OpenShiftConstants.getOpenShiftAdminPassword());
-        return oc;
+    private OpenShiftBinary openShiftBinaryClientAsAdmin() {
+        Optional<OpenShiftBinary> oc;
+        synchronized (ProjectImpl.class) {
+            oc = Optional.of(OpenShifts.masterBinary(this.getName()));
+            oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
+                           OpenShiftConstants.getOpenShiftAdminPassword());
+        }
+
+        return oc.orElseThrow(RuntimeException::new);
     }
 
     @Override
