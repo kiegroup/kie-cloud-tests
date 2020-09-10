@@ -15,8 +15,6 @@
 
 package org.kie.cloud.plugin;
 
-import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
-
 import java.io.File;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -27,6 +25,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
+
+import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
 
 @Mojo( name = "undeploy" )
 public class Undeploy extends AbstractMojo {

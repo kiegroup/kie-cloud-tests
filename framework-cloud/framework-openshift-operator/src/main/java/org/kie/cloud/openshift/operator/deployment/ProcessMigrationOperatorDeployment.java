@@ -15,7 +15,6 @@
 
 package org.kie.cloud.openshift.operator.deployment;
 
-
 import org.kie.cloud.openshift.deployment.ProcessMigrationDeploymentImpl;
 import org.kie.cloud.openshift.deployment.RouterUtil;
 import org.kie.cloud.openshift.resource.Project;

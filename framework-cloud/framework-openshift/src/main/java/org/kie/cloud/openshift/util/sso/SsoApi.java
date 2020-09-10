@@ -16,7 +16,6 @@
 
 package org.kie.cloud.openshift.util.sso;
 
-
 import java.util.Collections;
 import java.util.List;
 

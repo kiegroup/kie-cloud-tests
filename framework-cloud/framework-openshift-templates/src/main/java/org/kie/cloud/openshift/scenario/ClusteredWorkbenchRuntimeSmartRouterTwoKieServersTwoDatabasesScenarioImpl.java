@@ -216,5 +216,5 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 }

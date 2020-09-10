@@ -141,5 +141,5 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioImpl ext
     @Override
     public SsoDeployment getSsoDeployment() {
         return null;
-	}
+    }
 }

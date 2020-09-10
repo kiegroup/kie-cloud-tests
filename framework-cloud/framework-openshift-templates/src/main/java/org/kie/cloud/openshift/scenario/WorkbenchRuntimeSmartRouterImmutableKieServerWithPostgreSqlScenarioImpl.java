@@ -164,7 +164,7 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerWithPostgreSqlScenario
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 
     @Override
     public GitProvider getGitProvider() {

@@ -30,7 +30,6 @@ import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.hacep.core.InfraFactory;
 import org.kie.hacep.sample.kjar.StockTickEvent;
-import org.kie.remote.CommonConfig;
 import org.kie.remote.RemoteFactHandle;
 import org.kie.remote.RemoteKieSession;
 import org.kie.remote.TopicsConfig;

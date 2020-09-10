@@ -117,7 +117,7 @@ public class ImmutableKieServerScenarioImpl extends KieCommonScenario<ImmutableK
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 
     @Override
     public GitProvider getGitProvider() {

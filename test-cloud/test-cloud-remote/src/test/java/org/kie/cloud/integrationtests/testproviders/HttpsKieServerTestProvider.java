@@ -19,7 +19,6 @@ package org.kie.cloud.integrationtests.testproviders;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -61,7 +60,7 @@ public class HttpsKieServerTestProvider {
 
     /**
      * Create provider instance
-     * 
+     *
      * @return provider instance
      */
     public static HttpsKieServerTestProvider create() {
@@ -70,9 +69,9 @@ public class HttpsKieServerTestProvider {
 
     /**
      * Create provider instance and init it with given environment
-     * 
+     *
      * @param environment if not null, initialize this provider with the environment
-     * 
+     *
      * @return provider instance
      */
     public static HttpsKieServerTestProvider create(DeploymentScenario<?> deploymentScenario) {

@@ -15,7 +15,6 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
-import org.kie.cloud.openshift.settings.builder.AbstractLdapSettingsBuilder;
 import org.kie.cloud.openshift.settings.LdapSettingsImpl;
 
 public class LdapSettingsBuilderImpl extends AbstractLdapSettingsBuilder {

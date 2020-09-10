@@ -15,8 +15,6 @@
 package org.kie.cloud.api.scenario;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.DeploymentTimeoutException;
