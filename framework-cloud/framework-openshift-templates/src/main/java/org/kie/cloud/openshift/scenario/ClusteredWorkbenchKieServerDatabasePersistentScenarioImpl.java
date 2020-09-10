@@ -97,6 +97,9 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends K
             gitProvider = Git.createProvider(project, request.getGitSettings());
         }
 
+        // Workaround for RHPAM-2919
+        envVariables.put(OpenShiftTemplateConstants.BUSINESS_CENTRAL_CONTAINER_REPLICAS, "1");
+
         logger.info("Processing template and creating resources from " + OpenShiftTemplate.CLUSTERED_WORKBENCH_KIE_SERVER_DATABASE_PERSISTENT.getTemplateUrl().toString());
         envVariables.put(OpenShiftTemplateConstants.IMAGE_STREAM_NAMESPACE, project.getName());
         envVariables.put(OpenShiftTemplateConstants.AMQ_IMAGE_STREAM_NAMESPACE, project.getName());
