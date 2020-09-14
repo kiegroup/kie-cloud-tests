@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.kie.cloud.api.scenario.builder.HACepScenarioBuilder;
-
 public interface HACepScenario extends DeploymentScenario<HACepScenario> {
     File getAMQStreamsDirectory();
     File getKafkaKeyStore();

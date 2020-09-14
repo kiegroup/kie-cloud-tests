@@ -61,8 +61,10 @@ public class InstancesLogCollectorRunnable implements Runnable {
                 logger.warn("Log collector Threadpool cannot stop. Force shutdown ...");
                 executorService.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
-                if (!executorService.awaitTermination(waitForCompletionInMs, TimeUnit.MILLISECONDS))
+                if (!executorService.awaitTermination(waitForCompletionInMs, TimeUnit.MILLISECONDS)) {
                     logger.error("Log collector Threadpool did not terminate");
+                }
+
             } else {
                 logger.debug("Log collector Threadpool stopped correctly");
             }

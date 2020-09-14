@@ -131,3 +131,7 @@ mvn clean install -Popenshift -Ddefault.domain.suffix=.<openshift-ip>.nip.io
 Stop MiniShift: `minishift stop`
 
 Delete Minishift VM: `minishift delete`
+
+## How to contribute
+
+The instructions are available in the [contribution guide](https://github.com/kiegroup/kie-cloud-tests/blob/master/CONTRIBUTING.md).

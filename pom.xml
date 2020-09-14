@@ -29,7 +29,7 @@
     <rhba.operator.upgrade.from.version>7.7.1</rhba.operator.upgrade.from.version>
 
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
-    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
 
     <version.org.gitlab>1.2.8</version.org.gitlab>

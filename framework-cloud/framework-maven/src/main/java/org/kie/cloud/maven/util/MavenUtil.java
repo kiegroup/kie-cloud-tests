@@ -15,7 +15,6 @@
 
 package org.kie.cloud.maven.util;
 
-
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;

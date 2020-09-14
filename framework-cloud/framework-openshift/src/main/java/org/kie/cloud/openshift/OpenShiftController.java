@@ -15,13 +15,12 @@
 
 package org.kie.cloud.openshift;
 
-import org.kie.cloud.api.constants.ConfigurationInitializer;
-import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.resource.impl.ProjectImpl;
-
 import cz.xtf.core.config.OpenShiftConfig;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShifts;
+import org.kie.cloud.api.constants.ConfigurationInitializer;
+import org.kie.cloud.openshift.resource.Project;
+import org.kie.cloud.openshift.resource.impl.ProjectImpl;
 
 /**
  * Utility class for access to OpenShift. It provides basic OpenShift client initialization and basic project handling.

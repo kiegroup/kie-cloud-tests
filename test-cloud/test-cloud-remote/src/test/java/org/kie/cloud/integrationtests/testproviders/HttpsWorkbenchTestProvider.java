@@ -18,7 +18,6 @@ package org.kie.cloud.integrationtests.testproviders;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -56,7 +55,7 @@ public class HttpsWorkbenchTestProvider {
 
     /**
      * Create provider instance
-     * 
+     *
      * @return provider instance
      */
     public static HttpsWorkbenchTestProvider create() {
@@ -65,9 +64,9 @@ public class HttpsWorkbenchTestProvider {
 
     /**
      * Create provider instance and init it with given environment
-     * 
+     *
      * @param environment if not null, initialize this provider with the environment
-     * 
+     *
      * @return provider instance
      */
     public static HttpsWorkbenchTestProvider create(DeploymentScenario<?> deploymentScenario) {

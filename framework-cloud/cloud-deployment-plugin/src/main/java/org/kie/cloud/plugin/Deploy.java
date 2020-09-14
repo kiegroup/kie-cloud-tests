@@ -15,13 +15,6 @@
 
 package org.kie.cloud.plugin;
 
-import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_CONTEXT_ROOT;
-import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_IP;
-import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_PASSWORD;
-import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_PORT;
-import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_USERNAME;
-import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -41,6 +34,13 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
+
+import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_CONTEXT_ROOT;
+import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_IP;
+import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_PASSWORD;
+import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_PORT;
+import static org.kie.cloud.plugin.Constants.BUILD_PROPERTIES_WORKBENCH_USERNAME;
+import static org.kie.cloud.plugin.Constants.PROPERTY_FILE_PATH;
 
 @Mojo(name = "deploy")
 public class Deploy extends AbstractMojo {

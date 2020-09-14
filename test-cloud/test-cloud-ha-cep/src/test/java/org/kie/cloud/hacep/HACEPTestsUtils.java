@@ -15,15 +15,15 @@
 
 package org.kie.cloud.hacep;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.Pod;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.remote.CommonConfig;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 public class HACEPTestsUtils {
 

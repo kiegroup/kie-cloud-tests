@@ -178,7 +178,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioImpl extends O
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-	}
+    }
 
     @Override
     public GitProvider getGitProvider() {

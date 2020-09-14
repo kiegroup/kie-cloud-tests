@@ -15,9 +15,6 @@
 
 package org.kie.cloud.plugin;
 
-import static org.kie.cloud.plugin.Constants.CLOUD_API_IMPLEMENTATION_PROPERTY;
-import static org.kie.cloud.plugin.Constants.NAMESPACE_PROPERTY;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,6 +23,9 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.kie.cloud.api.scenario.DeploymentScenario;
+
+import static org.kie.cloud.plugin.Constants.CLOUD_API_IMPLEMENTATION_PROPERTY;
+import static org.kie.cloud.plugin.Constants.NAMESPACE_PROPERTY;
 
 public class CloudDeploymentPluginConfiguration {
 
