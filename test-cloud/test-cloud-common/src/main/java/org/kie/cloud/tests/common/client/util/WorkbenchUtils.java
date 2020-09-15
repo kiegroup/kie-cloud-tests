@@ -19,8 +19,12 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.WaiterException;
 import org.guvnor.rest.client.CloneProjectRequest;
+import org.guvnor.rest.client.ProjectResponse;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
@@ -33,9 +37,14 @@ import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.wb.test.rest.client.ClientRequestTimedOutException;
 import org.kie.wb.test.rest.client.WorkbenchClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkbenchUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkbenchUtils.class);
 
     private static final String SPACE_NAME = "mySpace";
 
@@ -54,7 +63,21 @@ public class WorkbenchUtils {
 
         WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
         workbenchClient.createSpace(SPACE_NAME, workbenchDeployment.getUsername());
-        workbenchClient.cloneRepository(SPACE_NAME, cloneProjectRequest);
+        try {
+            workbenchClient.cloneRepository(SPACE_NAME, cloneProjectRequest);
+        } catch (ClientRequestTimedOutException ex) {
+            logger.warn("Caught exception during cloning repository to the Workbench. Waiting for 5 minutes to see if the project was created.", ex);
+            try {
+                new SimpleWaiter(() -> workbenchClient.getProjects(SPACE_NAME).stream().map(ProjectResponse::getName)
+                                                      .anyMatch(projectName::equals)).reason("Waiting for " + projectName + " to be cloned into Workbench")
+                                                                                     .timeout(TimeUnit.MINUTES, 5)
+                                                                                     .interval(TimeUnit.SECONDS, 10)
+                                                                                     .waitFor();
+                logger.info("Container after cloning timeout found");
+            } catch (WaiterException e) {
+                throw new RuntimeException("Timeout while cloning project "+projectName+" to the Workbench application.", e);
+            }
+        }
         workbenchClient.deployProject(SPACE_NAME, projectName);
     }
 

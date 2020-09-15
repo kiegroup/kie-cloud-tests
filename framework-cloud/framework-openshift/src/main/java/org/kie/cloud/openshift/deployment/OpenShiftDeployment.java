@@ -176,6 +176,35 @@ public abstract class OpenShiftDeployment implements Deployment {
         waitUntilAllPodsAreRunning(expectedPods);
     }
 
+    protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods, long timeout) {
+        waitUntilAllPodsAreReady(expectedPods, timeout);
+        waitUntilAllPodsAreRunning(expectedPods, timeout);
+    }
+
+    protected void waitUntilAllPodsAreReady(int expectedPods, long timeout) {
+        try {
+            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
+                                                          .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
+                                                          .timeout(timeout)
+                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become ready.")
+                                                          .waitFor());
+        } catch (AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
+        }
+    }
+
+    protected void waitUntilAllPodsAreRunning(int expectedPods, long timeout) {
+        try {
+            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
+                                                          .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
+                                                          .timeout(timeout)
+                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
+                                                          .waitFor());
+        } catch (AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
+        }
+    }
+
     protected void waitUntilAllPodsAreReady(int expectedPods) {
         try {
             OpenShiftCaller.repeatableCall(() -> openShift.waiters()

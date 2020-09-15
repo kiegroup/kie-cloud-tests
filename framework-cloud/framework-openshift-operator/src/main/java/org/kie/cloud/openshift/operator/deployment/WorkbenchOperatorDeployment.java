@@ -56,7 +56,8 @@ public class WorkbenchOperatorDeployment extends WorkbenchDeploymentImpl {
                                    .map(applied -> applied.getObjects().getConsole().getReplicas())
                                    .orElseGet(() -> getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas());
 
-        waitUntilAllPodsAreReadyAndRunning(replicas);
+        // tmp try to use larger timeout - 20 min
+        waitUntilAllPodsAreReadyAndRunning(replicas, 20 * 60 * 1000L);
         if (replicas > 0) {
             getInsecureUrl().ifPresent(RouterUtil::waitForRouter);
             getSecureUrl().ifPresent(RouterUtil::waitForRouter);
