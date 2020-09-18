@@ -25,7 +25,7 @@
   <properties>
     <rhba.images.version.prefix>78</rhba.images.version.prefix>
     <rhba.images.branch>master</rhba.images.branch>
-    <rhba.operator.branch>master</rhba.operator.branch>
+    <rhba.operator.branch>release-v7.8.x</rhba.operator.branch>
     <rhba.operator.upgrade.from.version>7.7.1</rhba.operator.upgrade.from.version>
 
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
