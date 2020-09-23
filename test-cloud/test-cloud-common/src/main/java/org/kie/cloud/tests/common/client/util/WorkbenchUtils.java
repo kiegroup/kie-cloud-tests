@@ -21,10 +21,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.NotFoundException;
+
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.WaiterException;
 import org.guvnor.rest.client.CloneProjectRequest;
 import org.guvnor.rest.client.ProjectResponse;
+import org.guvnor.rest.client.Space;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.git.GitProvider;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
@@ -51,18 +54,89 @@ public class WorkbenchUtils {
     private static final Duration WAIT_STEP = Duration.ofSeconds(1);
     private static final Duration MAX_WAIT_DURATION = Duration.ofSeconds(15);
 
-    public static void deployProjectToWorkbench(String repositoryName, KieDeploymentScenario<?> deploymentScenario, String projectName) {
+    public static void deployProjectToWorkbench(String repositoryName,
+                                                KieDeploymentScenario<?> deploymentScenario,
+                                                String projectName) {
         GitProvider gitProvider = deploymentScenario.getGitProvider();
         WorkbenchDeployment workbenchDeployment = deploymentScenario.getWorkbenchDeployments().get(0);
 
         deployProjectToWorkbench(gitProvider.getRepositoryUrl(repositoryName), workbenchDeployment, projectName);
     }
 
-    public static void deployProjectToWorkbench(String repositoryUrl, WorkbenchDeployment workbenchDeployment, String projectName) {
+    public static void deployProjectToWorkbench(String repositoryUrl,
+                                                WorkbenchDeployment workbenchDeployment,
+                                                String projectName) {
         CloneProjectRequest cloneProjectRequest = createCloneProjectRequest(repositoryUrl, projectName);
 
         WorkbenchClient workbenchClient = WorkbenchClientProvider.getWorkbenchClient(workbenchDeployment);
         workbenchClient.createSpace(SPACE_NAME, workbenchDeployment.getUsername());
+        // TODO as this workaroudn to let the tests passed is too complicated, we should also open a ticket for indexing fix in OCP
+        // TODO adjust all catch parts and make them clean!!
+        for (int tries = 0; tries < 5; tries++) {
+            try {
+                logger.info("Cloning project. Try: " + tries);
+                workbenchClient.cloneRepository(SPACE_NAME, cloneProjectRequest);
+                logger.info("Project was cloned to the workbench after " + tries + 1 + " attempts.");
+                break;
+            } catch (ClientRequestTimedOutException ex) {
+                logger.warn("Caught exception during cloning repository to the Workbench. Waiting for 5 minutes to see if the project was created.",
+                            ex);
+                try {
+                    new SimpleWaiter(() -> workbenchClient.getProjects(SPACE_NAME).stream().map(
+                                                                                                ProjectResponse::getName)
+                                                          .anyMatch(projectName::equals)).reason("Waiting for "
+                                                                  + projectName + " to be cloned into Workbench")
+                                                                                         .timeout(TimeUnit.MINUTES, 2)
+                                                                                         .interval(TimeUnit.SECONDS, 5)
+                                                                                         .waitFor();
+                    logger.info("Container after cloning timeout found");
+                } catch (NotFoundException e) {
+                    // thrown when workbench client throws 404 try to search for all spaces
+                    boolean wbcliWorks = false;
+                    for (int i = 0; i < 10; i++) {
+                        try {
+                            if (workbenchClient.getSpaces().stream().map(Space::getName).anyMatch(SPACE_NAME::equals)) {
+                                logger.debug("Container URL works...");
+                                wbcliWorks = true;
+                                break;
+                            } else {
+                                logger.warn("Container URL works, but space was not found.");
+                                try {
+                                    Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+                                } catch (InterruptedException e1) {
+                                    // TODO Auto-generated catch block
+                                    e1.printStackTrace();
+                                }
+                                //continue; - remove this redundant jump
+                            }
+                        } catch (NotFoundException ee) {
+                            logger.debug("Container URL do not work. Waiting for half a minute.");
+                            try {
+                                Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+                            } catch (InterruptedException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                            //continue; - remove this redundant jump
+                        }
+                    }
+                    if (wbcliWorks) {
+                        logger.info("After few retries Workbench client works. NotFoundException can be ignored.");
+                        //continue; - remove this redundant jump
+                    } else {
+                        throw new RuntimeException("Workbench client does not works", e);
+                    }
+                } catch (WaiterException e) {
+                    if (tries < 4) {
+                        logger.warn("Timeout while cloning project " + projectName + " to the Workbench application.", e);
+                    } else {
+                        throw new RuntimeException("Timeout while cloning project " + projectName + " to the Workbench application.", e);
+                    }
+                }
+            }
+        }
+
+/*
         try {
             workbenchClient.cloneRepository(SPACE_NAME, cloneProjectRequest);
         } catch (ClientRequestTimedOutException ex) {
@@ -77,7 +151,7 @@ public class WorkbenchUtils {
             } catch (WaiterException e) {
                 throw new RuntimeException("Timeout while cloning project "+projectName+" to the Workbench application.", e);
             }
-        }
+        }*/
         workbenchClient.deployProject(SPACE_NAME, projectName);
     }
 
