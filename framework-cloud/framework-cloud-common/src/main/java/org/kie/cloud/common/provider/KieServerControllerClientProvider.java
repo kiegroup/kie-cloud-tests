@@ -44,7 +44,7 @@ public class KieServerControllerClientProvider {
      * Wait until server templates are created in controller.
      */
     public static void waitForServerTemplateCreation(WorkbenchDeployment workbenchDeployment, int numberOfServerTemplates) {
-        Instant timeoutTime = Instant.now().plusSeconds(120);
+        Instant timeoutTime = Instant.now().plusSeconds(300); //increased timeout as some scenarios failed after 120 seconds
         while (Instant.now().isBefore(timeoutTime)) {
 
             ServerTemplateList serverTemplates = getKieServerControllerClient(workbenchDeployment).listServerTemplates();
@@ -61,7 +61,7 @@ public class KieServerControllerClientProvider {
         }
         ServerTemplateList serverTemplates = getKieServerControllerClient(workbenchDeployment).listServerTemplates();
         String templates = Arrays.stream(serverTemplates.getServerTemplates()).map(ServerTemplateKey::getId).collect(Collectors.joining(", "));
-        throw new RuntimeException("Timeout while waiting for 120 seconds for server template creation. Expected " + numberOfServerTemplates + " templates (" + serverTemplates.getServerTemplates()
+        throw new RuntimeException("Timeout while waiting for 300 seconds for server template creation. Expected " + numberOfServerTemplates + " templates (" + serverTemplates.getServerTemplates()
                 + "), but got these templates: " + templates);
     }
 }
