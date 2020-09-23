@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import cz.xtf.builder.builders.ImageStreamBuilder;
 import cz.xtf.builder.builders.ImageStreamBuilder.TagReferencePolicyType;
 import cz.xtf.builder.builders.SecretBuilder;
+import cz.xtf.core.http.HttpsException;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
@@ -206,11 +207,20 @@ public class ProjectImpl implements Project {
     }
 
     private OpenShiftBinary openShiftBinaryClientAsAdmin() {
-        Optional<OpenShiftBinary> oc;
+        Optional<OpenShiftBinary> oc = Optional.empty();
         synchronized (ProjectImpl.class) {
-            oc = Optional.of(OpenShifts.masterBinary(this.getName()));
-            oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
-                           OpenShiftConstants.getOpenShiftAdminPassword());
+            logger.debug("Try to get master binary few times as OpenShifts sometimes throws Socket exception for Connection reset");
+            for (int attempt = 0; attempt < 5; attempt++) {
+                try {
+                    oc = Optional.of(OpenShifts.masterBinary(this.getName()));
+                    oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
+                                   OpenShiftConstants.getOpenShiftAdminPassword());
+                    break;
+                } catch (HttpsException ex) {
+                    logger.warn("Was caught exception from OpenShifts on " + attempt
+                            + " attempt. Trying to get master binaries again.", ex);
+                }
+            }
         }
 
         return oc.orElseThrow(RuntimeException::new);
