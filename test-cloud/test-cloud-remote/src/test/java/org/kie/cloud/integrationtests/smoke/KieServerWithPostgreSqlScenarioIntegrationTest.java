@@ -20,9 +20,11 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
+import org.kie.cloud.integrationtests.runners.SmokeTestRunner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
@@ -31,6 +33,7 @@ import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
 @Category(Smoke.class)
+@RunWith(SmokeTestRunner.class)
 public class KieServerWithPostgreSqlScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static KieServerWithDatabaseScenario deploymentScenario;

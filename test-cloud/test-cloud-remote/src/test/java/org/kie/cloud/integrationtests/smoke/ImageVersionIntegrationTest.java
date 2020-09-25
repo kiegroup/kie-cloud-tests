@@ -15,8 +15,6 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,10 +27,12 @@ import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
+import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.time.TimeUtils;
-import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.server.client.KieServicesClient;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Category(Smoke.class)
 public class ImageVersionIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {

@@ -19,10 +19,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
+import org.kie.cloud.integrationtests.runners.SmokeTestRunner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
@@ -34,6 +36,7 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 @Category(Smoke.class)
+@RunWith(SmokeTestRunner.class)
 public class KieServerWithExternalDatabaseIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static KieServerWithExternalDatabaseScenario deploymentScenario;

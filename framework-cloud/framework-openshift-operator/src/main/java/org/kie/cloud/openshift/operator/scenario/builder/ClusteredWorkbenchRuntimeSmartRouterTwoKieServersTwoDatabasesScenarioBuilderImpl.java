@@ -72,7 +72,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         });
 
         Server server = new Server();
-        server.setName(OpenShiftConstants.getKieApplicationName() + "-kieserver");
+        server.setName(OpenShiftConstants.getKieApplicationName() + "-kieserver-first");
         server.addEnvs(authenticationEnvVars);
         // TODO: Workaround until Maven repo with released artifacts is implemented
         server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_MODE, "DEVELOPMENT"));
@@ -81,7 +81,7 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         kieApp.getSpec().getObjects().addServer(server);
 
         server = new Server();
-        server.setName(OpenShiftConstants.getKieApplicationName() + "-kieserver-2");
+        server.setName(OpenShiftConstants.getKieApplicationName() + "-kieserver-second");
         server.addEnvs(authenticationEnvVars);
         // TODO: Workaround until Maven repo with released artifacts is implemented
         server.addEnv(new Env(ImageEnvVariables.KIE_SERVER_MODE, "DEVELOPMENT"));

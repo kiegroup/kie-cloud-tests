@@ -22,12 +22,14 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.Smoke;
+import org.kie.cloud.integrationtests.runners.SmokeTestRunner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
@@ -44,6 +46,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
 @Category(Smoke.class)
+@RunWith(SmokeTestRunner.class)
 public class ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerPersistentScenarioIntegrationTest.class.getSimpleName());

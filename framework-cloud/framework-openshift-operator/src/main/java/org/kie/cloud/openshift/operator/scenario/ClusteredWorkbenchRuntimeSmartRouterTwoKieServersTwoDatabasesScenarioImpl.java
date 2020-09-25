@@ -102,10 +102,10 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
         workbenchRuntimeDeployment = createWorkbenchRuntimeDeployment(project);
         smartRouterDeployment = createSmartRouterDeployment(project);
-        kieServerOneDeployment = createKieServerDeployment(project);
-        kieServerTwoDeployment = createKieServerDeployment(project, "-2");
-        databaseOneDeployment = createDatabaseDeployment(project, OpenShiftConstants.getKieApplicationName() + "-kieserver-postgresql");
-        databaseTwoDeployment = createDatabaseDeployment(project, OpenShiftConstants.getKieApplicationName() + "-kieserver-2-postgresql");
+        kieServerOneDeployment = createKieServerDeployment(project, "-first");
+        kieServerTwoDeployment = createKieServerDeployment(project, "-second");
+        databaseOneDeployment = createDatabaseDeployment(project, OpenShiftConstants.getKieApplicationName() + "-kieserver-first-postgresql");
+        databaseTwoDeployment = createDatabaseDeployment(project, OpenShiftConstants.getKieApplicationName() + "-kieserver-second-postgresql");
 
         logger.info("Waiting until all services are created.");
         try {
