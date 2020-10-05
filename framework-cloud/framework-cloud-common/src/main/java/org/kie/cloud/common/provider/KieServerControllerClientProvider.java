@@ -29,22 +29,20 @@ import org.kie.server.controller.client.KieServerControllerClientFactory;
 public class KieServerControllerClientProvider {
 
     public static KieServerControllerClient getKieServerControllerClient(WorkbenchDeployment workbenchDeployment) {
-        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
+        return KieServerControllerClientFactory.newRestClient(workbenchDeployment.getUrl().toString() + "/rest/controller",
                 workbenchDeployment.getUsername(), workbenchDeployment.getPassword());
-        return kieServerControllerClient;
     }
 
     public static KieServerControllerClient getKieServerControllerClient(ControllerDeployment controllerDeployment) {
-        KieServerControllerClient kieServerControllerClient = KieServerControllerClientFactory.newRestClient(controllerDeployment.getUrl().toString() + "/rest/controller",
+        return KieServerControllerClientFactory.newRestClient(controllerDeployment.getUrl().toString() + "/rest/controller",
                 controllerDeployment.getUsername(), controllerDeployment.getPassword());
-        return kieServerControllerClient;
     }
 
     /**
      * Wait until server templates are created in controller.
      */
     public static void waitForServerTemplateCreation(WorkbenchDeployment workbenchDeployment, int numberOfServerTemplates) {
-        Instant timeoutTime = Instant.now().plusSeconds(300); //increased timeout as some scenarios failed after 120 seconds
+        Instant timeoutTime = Instant.now().plusSeconds(300);
         while (Instant.now().isBefore(timeoutTime)) {
 
             ServerTemplateList serverTemplates = getKieServerControllerClient(workbenchDeployment).listServerTemplates();

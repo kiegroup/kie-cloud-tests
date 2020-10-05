@@ -37,4 +37,7 @@ public class OpenShiftResourceConstants {
     public static final long DEPLOYMENT_PODS_TERMINATION_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
     public static final long DEPLOYMENT_NEW_VERSION_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
     public static final long PODS_START_TO_READY_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
+
+    // Operator constants
+    public static final long OPERATOR_START_TO_READY_TIMEOUT = 20 * 60 * 1000L; // 20 minutes
 }

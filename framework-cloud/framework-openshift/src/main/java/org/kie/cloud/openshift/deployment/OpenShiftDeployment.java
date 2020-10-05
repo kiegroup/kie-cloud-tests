@@ -181,6 +181,10 @@ public abstract class OpenShiftDeployment implements Deployment {
         waitUntilAllPodsAreRunning(expectedPods, timeout);
     }
 
+    protected void waitUntilAllPodsAreReady(int expectedPods) {
+        waitUntilAllPodsAreReady(expectedPods, OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT);
+    }
+
     protected void waitUntilAllPodsAreReady(int expectedPods, long timeout) {
         try {
             OpenShiftCaller.repeatableCall(() -> openShift.waiters()
@@ -193,35 +197,15 @@ public abstract class OpenShiftDeployment implements Deployment {
         }
     }
 
+    protected void waitUntilAllPodsAreRunning(int expectedPods) {
+        waitUntilAllPodsAreRunning(expectedPods, OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT);
+    }
+
     protected void waitUntilAllPodsAreRunning(int expectedPods, long timeout) {
         try {
             OpenShiftCaller.repeatableCall(() -> openShift.waiters()
                                                           .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
                                                           .timeout(timeout)
-                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
-                                                          .waitFor());
-        } catch (AssertionError e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
-        }
-    }
-
-    protected void waitUntilAllPodsAreReady(int expectedPods) {
-        try {
-            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
-                                                          .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
-                                                          .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become ready.")
-                                                          .waitFor());
-        } catch (AssertionError e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
-        }
-    }
-
-    protected void waitUntilAllPodsAreRunning(int expectedPods) {
-        try {
-            OpenShiftCaller.repeatableCall(() -> openShift.waiters()
-                                                          .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
-                                                          .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
                                                           .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
                                                           .waitFor());
         } catch (AssertionError e) {

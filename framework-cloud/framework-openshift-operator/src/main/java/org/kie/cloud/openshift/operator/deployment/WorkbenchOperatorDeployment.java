@@ -26,6 +26,8 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.KieAppDoneable;
 import org.kie.cloud.openshift.operator.model.KieAppList;
 import org.kie.cloud.openshift.operator.model.components.Console;
+import org.kie.cloud.openshift.operator.model.components.Status;
+import org.kie.cloud.openshift.resource.OpenShiftResourceConstants;
 import org.kie.cloud.openshift.resource.Project;
 
 public class WorkbenchOperatorDeployment extends WorkbenchDeploymentImpl {
@@ -52,12 +54,11 @@ public class WorkbenchOperatorDeployment extends WorkbenchDeploymentImpl {
         KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
 
         Integer replicas = Optional.ofNullable(kieApp.getStatus())
-                                   .map(status -> status.getApplied())
+                                   .map(Status::getApplied)
                                    .map(applied -> applied.getObjects().getConsole().getReplicas())
                                    .orElseGet(() -> getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas());
 
-        // tmp try to use larger timeout - 20 min
-        waitUntilAllPodsAreReadyAndRunning(replicas, 20 * 60 * 1000L);
+        waitUntilAllPodsAreReadyAndRunning(replicas, OpenShiftResourceConstants.OPERATOR_START_TO_READY_TIMEOUT);
         if (replicas > 0) {
             getInsecureUrl().ifPresent(RouterUtil::waitForRouter);
             getSecureUrl().ifPresent(RouterUtil::waitForRouter);
