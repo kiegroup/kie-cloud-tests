@@ -18,6 +18,7 @@ package org.kie.cloud.openshift;
 import cz.xtf.core.config.OpenShiftConfig;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.openshift.OpenShifts;
+import io.fabric8.openshift.api.model.Route;
 import org.kie.cloud.api.constants.ConfigurationInitializer;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.openshift.resource.impl.ProjectImpl;
@@ -59,6 +60,16 @@ public class OpenShiftController {
      */
     public static OpenShift getOpenShiftAdmin(String projectName) {
         return OpenShifts.admin(projectName);
+    }
+
+    /**
+     * @return Hostname of route pointing to OpenShift image registry
+     */
+    public static String getImageRegistryRouteHostname() {
+        try (OpenShift openShift = getOpenShiftAdmin("openshift-image-registry")) {
+            Route route = openShift.getRoute("default-route");
+            return route.getSpec().getHost();
+        }
     }
 
     /**

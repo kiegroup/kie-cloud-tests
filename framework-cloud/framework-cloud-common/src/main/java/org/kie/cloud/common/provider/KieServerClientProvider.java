@@ -48,22 +48,31 @@ import org.kie.server.client.UserTaskServicesClient;
 public class KieServerClientProvider {
 
     private static final long KIE_SERVER_TIMEOUT = 300_000L;
+    private static final String DEFAULT_KIE_SERVER_PATH = "/services/rest/server";
 
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment) {
         return getKieServerClient(kieServerDeployment, KIE_SERVER_TIMEOUT);
     }
 
+    public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, String kieServerPath) {
+        return getKieServerClient(kieServerDeployment, new HashSet<>(), kieServerPath, KIE_SERVER_TIMEOUT);
+    }
+
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, long clientTimeout) {
-        return getKieServerClient(kieServerDeployment, new HashSet<>(), clientTimeout);
+        return getKieServerClient(kieServerDeployment, new HashSet<>(), DEFAULT_KIE_SERVER_PATH, clientTimeout);
     }
 
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, Set<Class<?>> extraClasses) {
-        return getKieServerClient(kieServerDeployment, extraClasses, KIE_SERVER_TIMEOUT);
+        return getKieServerClient(kieServerDeployment, extraClasses, DEFAULT_KIE_SERVER_PATH, KIE_SERVER_TIMEOUT);
     }
 
     public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, Set<Class<?>> extraClasses, long clientTimeout) {
+        return getKieServerClient(kieServerDeployment, extraClasses, DEFAULT_KIE_SERVER_PATH, clientTimeout);
+    }
+
+    public static KieServicesClient getKieServerClient(KieServerDeployment kieServerDeployment, Set<Class<?>> extraClasses, String kieServerPath, long clientTimeout) {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(
-                kieServerDeployment.getUrl().toString() + "/services/rest/server", kieServerDeployment.getUsername(),
+                kieServerDeployment.getUrl().toString() + kieServerPath, kieServerDeployment.getUsername(),
                 kieServerDeployment.getPassword(), clientTimeout);
         configuration.addExtraClasses(extraClasses);
         KieServicesClient kieServerClient = KieServicesFactory.newKieServicesClient(configuration);
