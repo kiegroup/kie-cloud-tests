@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.cloud</groupId>
+    <artifactId>test-cloud-springboot</artifactId>
+    <version>7.48.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>test-cloud-springboot-suite</artifactId>
+
+  <name>KIE :: Cloud :: Tests :: SpringBoot :: SpringBoot Test Suite</name>
+  <description>Test suite checking SpringBoot image creation and usage.</description>
+
+  <properties>
+    <skipTests>true</skipTests>
+    <kjar.local.maven.repository>${project.build.directory}/root/opt/m2/repo</kjar.local.maven.repository>
+    <dockerfile.location>${project.build.directory}</dockerfile.location>
+    <docker.root.directory>${project.build.directory}/root</docker.root.directory>
+    <container.engine>docker</container.engine>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.kie.cloud</groupId>
+      <artifactId>framework-openshift</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-integ-tests-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <!-- Copy common resources -->
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-image-filesystem</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>testResources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${docker.root.directory}</outputDirectory>
+              <resources>
+                <testResource>
+                  <directory>src/test/resources/image-filesystem</directory>
+                  <filtering>false</filtering>
+                </testResource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-dockerfile</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>testResources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${dockerfile.location}</outputDirectory>
+              <resources>
+                <testResource>
+                  <directory>src/test/resources/dockerfile</directory>
+                  <filtering>false</filtering>
+                </testResource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-springboot-app</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.kie.cloud</groupId>
+                  <artifactId>test-cloud-springboot-sample</artifactId>
+                  <version>${project.version}</version>
+                  <outputDirectory>${docker.root.directory}/opt/spring-service</outputDirectory>
+                  <destFileName>business-application-service-1.0-SNAPSHOT.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>        
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <trimStackTrace>false</trimStackTrace>
+          <systemProperties>
+            <dockerfile.location>${dockerfile.location}</dockerfile.location>
+            <container.engine>${container.engine}</container.engine>
+            <!-- Use settings.xml pointing to SpringBoot folder structure as local repository. -->
+            <kie.server.testing.kjars.build.settings.xml>${project.build.testOutputDirectory}/settings.xml</kie.server.testing.kjars.build.settings.xml>
+          </systemProperties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>springboot</id>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+  </profiles>
+</project>

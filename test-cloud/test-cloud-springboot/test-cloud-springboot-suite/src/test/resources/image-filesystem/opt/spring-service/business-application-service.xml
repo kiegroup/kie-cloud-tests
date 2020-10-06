@@ -1,0 +1,42 @@
+<kie-server-state>
+ <controllers/>
+ <configuration/>
+ <containers>
+   <container>
+     <containerId>definition-project</containerId>
+     <releaseId>
+       <groupId>org.kie.server.testing</groupId>
+       <artifactId>definition-project</artifactId>
+       <version>1.0.0.Final</version>
+     </releaseId>
+     <status>STARTED</status>
+     <scanner>
+       <status>STOPPED</status>
+     </scanner>
+     <configItems>
+       <config-item>
+         <name>KBase</name>
+         <value></value>
+         <type>BPM</type>
+       </config-item>
+       <config-item>
+         <name>KSession</name>
+         <value></value>
+         <type>BPM</type>
+       </config-item>
+       <config-item>
+         <name>MergeMode</name>
+         <value>MERGE_COLLECTIONS</value>
+         <type>BPM</type>
+       </config-item>
+       <config-item>
+         <name>RuntimeStrategy</name>
+         <value>PER_PROCESS_INSTANCE</value>
+         <type>BPM</type>
+       </config-item>
+     </configItems>
+     <messages/>
+   </container>
+ </containers>
+</kie-server-state>
+

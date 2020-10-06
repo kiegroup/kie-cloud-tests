@@ -104,11 +104,24 @@
     <module>test-cloud-optaweb</module>
     <module>test-cloud-performance</module>
     <module>test-cloud-ha-cep</module>
+    <module>test-cloud-springboot</module>
   </modules>
 
   <build>
     <pluginManagement>
       <plugins>
+        <!-- XTF use tmp folder as temp folder, need to be deleted too when rerunning tests. -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <configuration>
+            <filesets>
+              <fileset>
+                <directory>${project.basedir}/tmp</directory>
+              </fileset>
+            </filesets>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>properties-maven-plugin</artifactId>
