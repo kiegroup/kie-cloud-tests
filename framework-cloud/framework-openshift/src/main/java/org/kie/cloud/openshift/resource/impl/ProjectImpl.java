@@ -207,23 +207,25 @@ public class ProjectImpl implements Project {
     }
 
     private OpenShiftBinary openShiftBinaryClientAsAdmin() {
-        Optional<OpenShiftBinary> oc = Optional.empty();
         synchronized (ProjectImpl.class) {
-            logger.debug("Try to get master binary few times as OpenShifts sometimes throws Socket exception for Connection reset");
-            for (int attempt = 0; attempt < 5; attempt++) {
-                try {
-                    oc = Optional.of(OpenShifts.masterBinary(this.getName()));
-                    oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
-                                   OpenShiftConstants.getOpenShiftAdminPassword());
-                    break;
-                } catch (HttpsException ex) {
-                    logger.warn("Was caught exception from OpenShifts on " + attempt
-                            + " attempt. Trying to get master binaries again.", ex);
-                }
+            OpenShiftBinary oc = getMasterBinary();
+            oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
+                     OpenShiftConstants.getOpenShiftAdminPassword());
+            return oc;
+        }
+    }
+
+    private OpenShiftBinary getMasterBinary() {
+        logger.debug("Try to get master binary few times as OpenShifts sometimes throws Socket exception for Connection reset");
+        for (int attempt = 0; attempt < 5; attempt++) {
+            try {
+                return OpenShifts.masterBinary(this.getName());
+            } catch (HttpsException ex) {
+                logger.warn("Was caught exception from OpenShifts on " + attempt +
+                            " attempt. Trying to get master binaries again.", ex);
             }
         }
-
-        return oc.orElseThrow(RuntimeException::new);
+        throw new RuntimeException("Failed to get OpenShift binary client as admin");
     }
 
     @Override

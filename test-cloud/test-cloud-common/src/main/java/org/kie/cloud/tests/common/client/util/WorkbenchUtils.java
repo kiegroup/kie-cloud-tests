@@ -123,7 +123,7 @@ public class WorkbenchUtils {
             }
         }
         if (workbenchWorks) {
-            logger.info("After few retries Workbench client works. NotFoundException can be ignored.");
+            logger.info("Workbench client works. NotFoundException can be ignored.");
         } else {
             throw new RuntimeException("Workbench client does not works", originalException);
         }
@@ -142,8 +142,8 @@ public class WorkbenchUtils {
         try {
             Thread.sleep(TimeUnit.SECONDS.toMillis(30));
         } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            Thread.currentThread().interrupt();
+            logger.error("Interrupted while waiting.", e1);
         }
     }
 
