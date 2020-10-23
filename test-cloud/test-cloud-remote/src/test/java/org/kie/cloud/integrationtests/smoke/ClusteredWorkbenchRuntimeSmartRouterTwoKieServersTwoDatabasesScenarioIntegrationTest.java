@@ -15,16 +15,11 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
-import java.time.Duration;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenario;
-import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.MonitoringK8sFs;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
@@ -36,14 +31,7 @@ import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.SmartRouterTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
-import org.kie.cloud.tests.common.AutoScalerDeployment;
 import org.kie.cloud.tests.common.ScenarioDeployer;
-import org.kie.cloud.tests.common.client.util.Kjar;
-import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
-import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.KieServerInfo;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.controller.client.KieServerControllerClient;
 
 @Category({Smoke.class, JBPMOnly.class, MonitoringK8sFs.class})
 public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioIntegrationTest extends AbstractCloudIntegrationTest {
@@ -56,10 +44,6 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
     private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
     private static SmartRouterTestProvider smartRouterTestProvider;
-
-    private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
-    private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
-    private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -77,24 +61,6 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
         smartRouterTestProvider = SmartRouterTestProvider.create(deploymentScenario);
 
-        // Workaround to speed test execution.
-        // Create all containers while Kie servers are turned off to avoid expensive respins.
-        KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
-
-        for (KieServerDeployment kieServerDeployment : deploymentScenario.getKieServerDeployments()) {
-            KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
-            KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-
-            kieServerDeployment.setRouterTimeout(Duration.ofMinutes(3));
-            AutoScalerDeployment.on(kieServerDeployment, () -> {
-                WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
-                WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
-                                                 KieContainerStatus.STARTED);
-                WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT,
-                                                 KieContainerStatus.STARTED);
-            });
-        }
-
     }
 
     @AfterClass
@@ -104,21 +70,21 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
 
     @Test
     public void testRulesFromMavenRepo() {
-        fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerOneDeployment(), HELLO_RULES_CONTAINER_ID);
-        fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerTwoDeployment(), HELLO_RULES_CONTAINER_ID);
+        fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerOneDeployment());
+        fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
-        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerOneDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
-        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerTwoDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
+        processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerOneDeployment());
+        processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test
     public void testSolverFromMavenRepo() throws Exception {
-        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerOneDeployment(), CLOUDBALANCE_CONTAINER_ID);
-        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerTwoDeployment(), CLOUDBALANCE_CONTAINER_ID);
+        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerOneDeployment());
+        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerTwoDeployment());
     }
 
     @Test

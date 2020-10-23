@@ -82,7 +82,7 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
 
     @Test
     public void testWorkbenchControllerPersistence() {
-        persistenceTestProvider.testControllerPersistence(deploymentScenario);
+        persistenceTestProvider.testControllerPersistence(deploymentScenario, Kjar.HELLO_RULES_SNAPSHOT);
     }
 
     @Test

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.cloud.utils;
+package org.kie.cloud.common.util;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +59,15 @@ public class AwaitilityUtils {
     }
 
     /**
+     * Wait until a condition is satisfied.
+     *
+     * @param asserts custom assertions that the instance must satisfy.
+     */
+    public static final void untilAsserted(Runnable condition) {
+        awaits().untilAsserted(condition::run);
+    }
+
+    /**
      * Wait until the supplier returns an instance that satisfies the asserts.
      *
      * @param supplier method to return the instance.
@@ -83,6 +92,8 @@ public class AwaitilityUtils {
     private static final ConditionFactory awaits() {
         return Awaitility.await()
                          .pollInterval(5, TimeUnit.SECONDS)
-                         .atMost(3, TimeUnit.MINUTES);
+                         .atMost(3, TimeUnit.MINUTES)
+                         .catchUncaughtExceptions()
+                         .ignoreExceptions();
     }
 }

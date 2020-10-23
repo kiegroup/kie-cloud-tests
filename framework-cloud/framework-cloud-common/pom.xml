@@ -89,6 +89,18 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
+    <!-- Awaitility -->
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>compile</scope>
+    </dependency>
 
     <!-- Logging -->
     <dependency>

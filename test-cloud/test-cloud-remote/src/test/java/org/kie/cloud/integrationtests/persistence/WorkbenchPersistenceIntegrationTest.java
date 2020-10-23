@@ -39,17 +39,15 @@ import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.WorkbenchClientProvider;
+import org.kie.cloud.common.util.AwaitilityUtils;
 import org.kie.cloud.git.GitUtils;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
-import org.kie.cloud.utils.AwaitilityUtils;
-import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServiceResponse.ResponseType;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.KieServerControllerClient;
@@ -92,7 +90,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
                     .withGitSettings(gitSettings)
                     .build();
 
-            scenarios.add(new Object[] { "Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario });
+            scenarios.add(new Object[]{"Workbench + KIE Server - Persistent", workbenchKieServerPersistentScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Workbench + KIE Server - Persistent is skipped.", ex);
         }
@@ -101,7 +99,7 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
             ClusteredWorkbenchKieServerDatabasePersistentScenario clusteredWorkbenchKieServerDatabasePersistentScenario = deploymentScenarioFactory.getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
                     .withGitSettings(gitSettings)
                     .build();
-                scenarios.add(new Object[]{"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario});
+            scenarios.add(new Object[]{"Clustered Workbench + KIE Server + Database - Persistent", clusteredWorkbenchKieServerDatabasePersistentScenario});
         } catch (UnsupportedOperationException ex) {
             logger.info("Clustered Workbench + KIE Server + Database is skipped.", ex);
         }
@@ -160,10 +158,11 @@ public class WorkbenchPersistenceIntegrationTest extends AbstractMethodIsolatedC
 
         KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployments().get(0), CONTAINER_ID);
 
-        ServiceResponse<KieContainerResourceList> containersResponse = kieServerClient.listContainers();
-        assertThat(containersResponse.getType()).isEqualTo(ResponseType.SUCCESS);
-        assertThat(containersResponse.getResult().getContainers()).hasSize(1);
-        assertThat(containersResponse.getResult().getContainers().get(0).getContainerId()).isEqualTo(CONTAINER_ID);
+        AwaitilityUtils.untilAsserted(kieServerClient::listContainers, containersResponse -> {
+            assertThat(containersResponse.getType()).isEqualTo(ResponseType.SUCCESS);
+            assertThat(containersResponse.getResult().getContainers()).hasSize(1);
+            assertThat(containersResponse.getResult().getContainers().get(0).getContainerId()).isEqualTo(CONTAINER_ID);
+        });
     }
 
     private void verifyOneServerTemplate() {

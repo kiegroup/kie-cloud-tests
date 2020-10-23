@@ -86,13 +86,13 @@ public class HttpsKieServerTestProvider {
         KjarDeployer.create(Kjar.HELLO_RULES_SNAPSHOT).deploy(deploymentScenario.getMavenRepositoryDeployment());
     }
 
+    @SuppressWarnings("unchecked")
     public void testKieServerInfo(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
-            HttpResponseParser responseAndCode;
             String url = serverInforRequestUrl(kieServerDeployment, ssoScenario);
 
             logger.debug("Test Kie Server info on url {}", url);
-            responseAndCode = Http.get(url)
+            HttpResponseParser responseAndCode = Http.get(url)
                     .basicAuth(kieServerDeployment.getUsername(), kieServerDeployment.getPassword())
                     .preemptiveAuth()
                     .trustAll()

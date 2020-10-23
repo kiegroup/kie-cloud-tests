@@ -29,6 +29,7 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServ
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.cloud.common.util.AwaitilityUtils;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.MonitoringK8sFs;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
@@ -46,7 +47,6 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
-import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
@@ -186,9 +186,9 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
         assertThat(containersSpec.iterator().next().getId()).isEqualTo(containerId);
     }
 
-    private void verifyServerTemplateContainsKieServers(String serverTemplate, int numberOfKieServers) {
-        Collection<ServerInstanceKey> kieServers = kieControllerClient.getServerTemplate(serverTemplate).getServerInstanceKeys();
-        assertThat(kieServers).hasSize(numberOfKieServers);
+    private void verifyServerTemplateContainsKieServers(String serverTemplateName, int numberOfKieServers) {
+        AwaitilityUtils.untilAsserted(() -> kieControllerClient.getServerTemplate(serverTemplateName),
+                                      serverTemplate -> assertThat(serverTemplate.getServerInstanceKeys()).hasSize(numberOfKieServers));
     }
 
     private void scaleKieServerTo(int count) {

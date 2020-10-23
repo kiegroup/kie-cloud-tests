@@ -28,6 +28,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
+import org.kie.cloud.common.util.AwaitilityUtils;
 import org.kie.cloud.tests.common.client.util.KieServerUtils;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
@@ -110,7 +111,7 @@ public class SmartRouterTestProvider {
 
             ProcessServicesClient processServicesClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
             for (int i = 0; i < PROCESS_NUMBER; i++) {
-                processServicesClient.startProcess(containerId, Constants.ProcessId.LOG);
+                AwaitilityUtils.untilIsNotNull(() -> processServicesClient.startProcess(containerId, Constants.ProcessId.LOG));
             }
 
             assertLogMessages(kieServerDeploymentOne);
@@ -159,9 +160,7 @@ public class SmartRouterTestProvider {
 
             deployProject(kieServerDeploymentOne, kieServerClientOne, containerIdUpdated, containerAlias, Kjar.DEFINITION_101_SNAPSHOT);
 
-            for (int i = 0; i < RETRIES_NUMBER; i++) {
-                verifyProcessAvailableInContainer(smartRouterClient, containerIdUpdated, Constants.ProcessId.UPDATED_USERTASK);
-            }
+            verifyProcessAvailableInContainer(smartRouterClient, containerIdUpdated, Constants.ProcessId.UPDATED_USERTASK);
         } finally {
             KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeploymentOne, containerId);
             KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeploymentOne, containerIdUpdated);
@@ -208,7 +207,6 @@ public class SmartRouterTestProvider {
 
     private void verifyProcessAvailableInContainer(KieServicesClient kieServerClient, String containerId, String processId) {
         ProcessServicesClient processClient = kieServerClient.getServicesClient(ProcessServicesClient.class);
-        Long pId = processClient.startProcess(containerId, processId);
-        assertThat(pId).isNotNull();
+        AwaitilityUtils.untilIsNotNull(() -> processClient.startProcess(containerId, processId));
     }
 }
