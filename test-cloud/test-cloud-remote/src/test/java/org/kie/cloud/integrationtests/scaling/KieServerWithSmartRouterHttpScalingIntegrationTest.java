@@ -27,13 +27,13 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeSmartRouterTwoKieServ
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.common.provider.SmartRouterAdminClientProvider;
+import org.kie.cloud.common.util.AwaitilityUtils;
 import org.kie.cloud.integrationtests.category.MonitoringK8sFs;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.SmartRouterUtils;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
-import org.kie.cloud.utils.AwaitilityUtils;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;

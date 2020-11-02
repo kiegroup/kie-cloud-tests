@@ -21,11 +21,10 @@ import org.kie.wb.test.rest.client.WorkbenchClient;
 
 public class WorkbenchClientProvider {
 
-    private static final Integer DEFAULT_TIMEOUT_IN_SEC = 120;
+    private static final Integer DEFAULT_TIMEOUT_IN_SEC = 240;
 
     public static WorkbenchClient getWorkbenchClient(WorkbenchDeployment workbenchDeployment) {
-        WorkbenchClient workbenchClient = RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(),
+        return RestWorkbenchClient.createWorkbenchClient(workbenchDeployment.getUrl().toString(),
                 workbenchDeployment.getUsername(), workbenchDeployment.getPassword(), DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC, DEFAULT_TIMEOUT_IN_SEC);
-        return workbenchClient;
     }
 }

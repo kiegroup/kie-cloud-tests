@@ -24,7 +24,7 @@ import org.kie.server.router.Configuration;
 public class SmartRouterUtils {
 
     private static final Duration WAIT_STEP = Duration.ofSeconds(1);
-    private static final Duration MAX_WAIT_DURATION = Duration.ofSeconds(15);
+    private static final Duration MAX_WAIT_DURATION = Duration.ofSeconds(60);
 
     public static void waitForContainerStart(KieServerRouterClient smartRouterAdminClient, String containerId) {
         TimeUtils.wait(MAX_WAIT_DURATION, WAIT_STEP, () -> {

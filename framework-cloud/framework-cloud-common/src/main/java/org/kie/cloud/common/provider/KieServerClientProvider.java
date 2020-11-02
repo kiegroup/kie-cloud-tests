@@ -17,7 +17,6 @@ package org.kie.cloud.common.provider;
 
 import java.net.URL;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
+import org.kie.cloud.common.util.AwaitilityUtils;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -44,6 +44,8 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.SolverServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+
+import static org.junit.Assert.assertEquals;
 
 public class KieServerClientProvider {
 
@@ -179,23 +181,11 @@ public class KieServerClientProvider {
     }
 
     public static void waitForContainerStart(KieServerDeployment kieServerDeployment, String containerId) {
-        KieServicesClient kieServerClient = getKieServerClient(kieServerDeployment);
-
-        Instant timeoutTime = Instant.now().plusSeconds(30);
-        while (Instant.now().isBefore(timeoutTime)) {
-
-            ServiceResponse<KieContainerResource> containerInfo = kieServerClient.getContainerInfo(containerId);
-            boolean responseSuccess = containerInfo.getType().equals(ServiceResponse.ResponseType.SUCCESS);
-            if(responseSuccess && containerInfo.getResult().getStatus().equals(KieContainerStatus.STARTED)) {
-                return;
-            }
-
-            try {
-                Thread.sleep(200L);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for pod to be ready.", e);
-            }
-        }
+        AwaitilityUtils.untilAsserted(() -> {
+            KieServicesClient client = getKieServerClient(kieServerDeployment);
+            ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(containerId);
+            assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+            assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+        });
     }
 }
