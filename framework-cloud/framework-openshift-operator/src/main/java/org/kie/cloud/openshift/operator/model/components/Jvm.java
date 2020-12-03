@@ -25,6 +25,7 @@ public class Jvm {
 
     private Integer javaInitialMemRatio;
     private Integer javaMaxMemRatio;
+    private Integer gcMaxMetaspaceSize;
 
     public Integer getJavaInitialMemRatio() {
         return javaInitialMemRatio;
@@ -40,5 +41,13 @@ public class Jvm {
 
     public void setJavaMaxMemRatio(Integer javaMaxMemRatio) {
         this.javaMaxMemRatio = javaMaxMemRatio;
+    }
+
+    public Integer getGcMaxMetaspaceSize() {
+        return gcMaxMetaspaceSize;
+    }
+
+    public void setGcMaxMetaspaceSize(Integer gcMaxMetaspaceSize) {
+        this.gcMaxMetaspaceSize = gcMaxMetaspaceSize;
     }
 }
