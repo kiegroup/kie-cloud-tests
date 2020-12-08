@@ -70,6 +70,9 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
         CommonConfig commonConfig = new CommonConfig();
         commonConfig.setAdminUser(DeploymentConstants.getAppUser());
         commonConfig.setAdminPassword(DeploymentConstants.getAppPassword());
+        commonConfig.setAmqClusterPassword("amqClusterPassword");
+        commonConfig.setAmqPassword("amqPassword");
+
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
