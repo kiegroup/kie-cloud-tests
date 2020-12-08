@@ -120,9 +120,10 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         String kieServerIdLabel = "services.server.kie.org/kie-server-id";
         String kieServerId = kieServerConfigMap.getMetadata().getLabels().get(kieServerIdLabel);
         String rolloutInProgressConfigMapName = "kieserver-rollout-in-progress-" + kieServerId;
-        //kieServerConfigMap.getMetadata().
 
-        for (int i = 0; i < 5; i++) {
+        // Workaround for https://issues.redhat.com/browse/RHPAM-3333
+        int attempts = 5;
+        for (int i = 0; i < attempts; i++) {
             try {
                 waitForRolloutStart(rolloutInProgressConfigMapName);
                 waitForRolloutFinish(rolloutInProgressConfigMapName);
@@ -131,15 +132,15 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
                 logger.warn("Waiter exception during waiting for rollout. Will delete all instance and try to update config map again", ex);
                 deleteInstances();
                 waitForScale();
-                String rolloutFlag = "services.server.kie.org/openshift-startup-strategy.rolloutRequired";//: 'true'
+                String rolloutFlag = "services.server.kie.org/openshift-startup-strategy.rolloutRequired";
                 kieServerConfigMap.getMetadata().getAnnotations().remove(rolloutFlag);
                 createKieServerConfigMap(kieServerConfigMap);
                 kieServerConfigMap.getMetadata().getAnnotations().put(rolloutFlag, "true");
                 createKieServerConfigMap(kieServerConfigMap);
             }
         }
-        logger.error("Waiter rollout still failing");
-        throw new RuntimeException("Waiter rollout still failing");
+        logger.error("Waiter rollout still failing after " + attempts + " attempts.");
+        throw new RuntimeException("Waiter rollout still failing after " + attempts + " attempts.");
     }
 
     /**
