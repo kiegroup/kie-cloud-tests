@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.WaiterException;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.openshift.resource.Project;
@@ -120,8 +121,26 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         String kieServerId = kieServerConfigMap.getMetadata().getLabels().get(kieServerIdLabel);
         String rolloutInProgressConfigMapName = "kieserver-rollout-in-progress-" + kieServerId;
 
-        waitForRolloutStart(rolloutInProgressConfigMapName);
-        waitForRolloutFinish(rolloutInProgressConfigMapName);
+        // Workaround for https://issues.redhat.com/browse/RHPAM-3333
+        int attempts = 5;
+        for (int i = 0; i < attempts; i++) {
+            try {
+                waitForRolloutStart(rolloutInProgressConfigMapName);
+                waitForRolloutFinish(rolloutInProgressConfigMapName);
+                return;
+            } catch (WaiterException ex) {
+                logger.warn("Waiter exception during waiting for rollout. Will delete all instance and try to update config map again", ex);
+                deleteInstances();
+                waitForScale();
+                String rolloutFlag = "services.server.kie.org/openshift-startup-strategy.rolloutRequired";
+                kieServerConfigMap.getMetadata().getAnnotations().remove(rolloutFlag);
+                createKieServerConfigMap(kieServerConfigMap);
+                kieServerConfigMap.getMetadata().getAnnotations().put(rolloutFlag, "true");
+                createKieServerConfigMap(kieServerConfigMap);
+            }
+        }
+        logger.error("Waiter rollout still failing after " + attempts + " attempts.");
+        throw new RuntimeException("Waiter rollout still failing after " + attempts + " attempts.");
     }
 
     /**
@@ -159,5 +178,9 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         return getOpenShift().getConfigMaps().stream().filter(cm -> !cm.getMetadata().getOwnerReferences().isEmpty())
                                                       .filter(cm -> cm.getMetadata().getOwnerReferences().get(0).getName().equals(getServiceName()))
                                                       .findAny();
+    }
+
+    private void createKieServerConfigMap(ConfigMap cm) {
+        getOpenShift().configMaps().createOrReplace(cm);
     }
 }
