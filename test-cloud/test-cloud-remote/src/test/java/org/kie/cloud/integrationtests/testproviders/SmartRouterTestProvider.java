@@ -115,8 +115,20 @@ public class SmartRouterTestProvider {
 
             assertLogMessages(kieServerDeploymentOne);
             assertLogMessages(kieServerDeploymentTwo);
-        } finally {
+        } catch (Exception e) {
             KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentOne, () -> kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId));
+            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentTwo, () -> kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId));
+            throw e;
+        }
+        // Make sure that Smart router works when one container is stopped
+        try {
+            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentOne, () -> kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId));
+
+            ProcessServicesClient processServicesClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
+            for (int i = 0; i < PROCESS_NUMBER; i++) {
+                processServicesClient.startProcess(containerId, Constants.ProcessId.LOG);
+            }
+        } finally {
             KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentTwo, () -> kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId));
         }
     }
