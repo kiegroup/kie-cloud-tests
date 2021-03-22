@@ -39,12 +39,12 @@ public class SmartRouterOperatorDeployment extends SmartRouterDeploymentImpl {
 
     @Override
     public void scale(int instances) {
-        if (isReady()) {
-            KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
-            SmartRouter smartRouter = kieApp.getSpec().getObjects().getSmartRouter();
-            smartRouter.setReplicas(instances);
-            kieAppClient.createOrReplace(kieApp);
-        }
+        KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
+        SmartRouter smartRouter = kieApp.getSpec().getObjects().getSmartRouter();
+        smartRouter.setReplicas(instances);
+        kieAppClient.createOrReplace(kieApp);
+
+        waitUntilAllPodsAreReadyAndRunning(instances);
     }
 
     @Override

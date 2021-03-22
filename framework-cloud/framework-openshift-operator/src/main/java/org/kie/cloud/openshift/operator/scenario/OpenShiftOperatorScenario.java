@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.operator.scenario;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import cz.xtf.core.openshift.OpenShiftBinary;
@@ -153,11 +154,17 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         project.getOpenShift().apps().deployments().create(deployment);
 
         // wait until operator is ready
-        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", OPERATOR_DEPLOYMENT_NAME).waitFor();
+        project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", OPERATOR_DEPLOYMENT_NAME)
+                .interval(TimeUnit.SECONDS, 5)
+                .timeout(TimeUnit.MINUTES, 10)
+                .waitFor();
 
         if (!OpenShiftOperatorConstants.skipKieOperatorConsoleCheck()) {
             // wait until operator console is ready
-            project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "console-cr-form").waitFor();
+            project.getOpenShift().waiters().areExactlyNPodsRunning(1, "name", "console-cr-form")
+                    .interval(TimeUnit.SECONDS, 5)
+                    .timeout(TimeUnit.MINUTES, 10)
+                    .waitFor();
         }
     }
 

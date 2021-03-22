@@ -27,6 +27,7 @@ import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
@@ -121,6 +122,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
     }
 
     @Test
+    @Category(OperatorNotSupported.class)
     public void testDeployContainerFromWorkbench() {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),
