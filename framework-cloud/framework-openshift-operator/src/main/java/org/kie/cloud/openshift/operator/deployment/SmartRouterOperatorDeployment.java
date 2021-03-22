@@ -44,6 +44,8 @@ public class SmartRouterOperatorDeployment extends SmartRouterDeploymentImpl {
             SmartRouter smartRouter = kieApp.getSpec().getObjects().getSmartRouter();
             smartRouter.setReplicas(instances);
             kieAppClient.createOrReplace(kieApp);
+
+            waitUntilAllPodsAreReadyAndRunning(instances);
         }
     }
 

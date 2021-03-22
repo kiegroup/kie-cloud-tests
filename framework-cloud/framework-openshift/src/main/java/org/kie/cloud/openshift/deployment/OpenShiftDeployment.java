@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.waiting.SimpleWaiter;
+import cz.xtf.core.waiting.WaiterException;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
@@ -161,8 +163,8 @@ public abstract class OpenShiftDeployment implements Deployment {
                                                                                       .reason("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag)
                                                                                       .waitFor();
 
-        } catch (AssertionError e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
+        } catch (WaiterException | AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + getDeploymentConfigName() + " to be ready.", e);
         }
     }
 
@@ -177,14 +179,17 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     protected void waitUntilAllPodsAreReady(int expectedPods) {
+        Instant startOfWaitLoop = Instant.now();
         try {
             OpenShiftCaller.repeatableCall(() -> openShift.waiters()
                                                           .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
                                                           .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
                                                           .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become ready.")
                                                           .waitFor());
-        } catch (AssertionError e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods to be ready.");
+            logger.info("Waiter done after {}  seconds.", Duration.between(startOfWaitLoop, Instant.now()).getSeconds());
+        } catch (WaiterException | AssertionError e) {
+            logger.warn("Waiter throw exception after {} seconds.", Duration.between(startOfWaitLoop, Instant.now()).getSeconds());
+            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + getDeploymentConfigName() + " to be ready.", e);
         }
     }
 
@@ -195,8 +200,8 @@ public abstract class OpenShiftDeployment implements Deployment {
                                                           .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
                                                           .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
                                                           .waitFor());
-        } catch (AssertionError e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods to start.");
+        } catch (WaiterException | AssertionError e) {
+            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + getDeploymentConfigName() + " to start.", e);
         }
     }
 

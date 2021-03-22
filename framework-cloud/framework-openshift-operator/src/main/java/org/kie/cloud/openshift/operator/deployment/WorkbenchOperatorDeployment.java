@@ -44,6 +44,8 @@ public class WorkbenchOperatorDeployment extends WorkbenchDeploymentImpl {
             Console console = kieApp.getSpec().getObjects().getConsole();
             console.setReplicas(instances);
             kieAppClient.createOrReplace(kieApp);
+
+            waitUntilAllPodsAreReadyAndRunning(instances);
         }
     }
 
