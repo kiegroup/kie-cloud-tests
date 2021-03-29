@@ -39,12 +39,12 @@ public class WorkbenchRuntimeOperatorDeployment extends WorkbenchRuntimeDeployme
 
     @Override
     public void scale(int instances) {
-        if (isReady()) {
-            KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
-            Console console = kieApp.getSpec().getObjects().getConsole();
-            console.setReplicas(instances);
-            kieAppClient.createOrReplace(kieApp);
-        }
+        KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
+        Console console = kieApp.getSpec().getObjects().getConsole();
+        console.setReplicas(instances);
+        kieAppClient.createOrReplace(kieApp);
+
+        waitUntilAllPodsAreReadyAndRunning(instances);
     }
 
     @Override
