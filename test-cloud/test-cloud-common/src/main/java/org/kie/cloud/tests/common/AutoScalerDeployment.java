@@ -31,7 +31,7 @@ public class AutoScalerDeployment {
         
         action.run();
         
-        deployment.scale(originalInstances);
+        deployment.scale(originalInstances != 0 ? originalInstances : 1);
         deployment.waitForScale();
     }
 

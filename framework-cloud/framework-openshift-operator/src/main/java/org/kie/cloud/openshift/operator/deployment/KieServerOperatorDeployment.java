@@ -42,17 +42,17 @@ public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
 
     @Override
     public void scale(int instances) {
-        if (isReady()) {
-            KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
+        KieApp kieApp = kieAppClient.withName(OpenShiftConstants.getKieApplicationName()).get();
 
-            Spec appliedSpec = kieApp.getStatus().getApplied();
-            Server server = getAssociatedServerObject(appliedSpec);
-            server.setReplicas(instances);
+        Spec appliedSpec = kieApp.getStatus().getApplied();
+        Server server = getAssociatedServerObject(appliedSpec);
+        server.setReplicas(instances);
 
-            // Update current spec
-            kieApp.setSpec(appliedSpec);
-            kieAppClient.createOrReplace(kieApp);
-        }
+        // Update current spec
+        kieApp.setSpec(appliedSpec);
+        kieAppClient.createOrReplace(kieApp);
+
+        waitUntilAllPodsAreReadyAndRunning(instances);
     }
 
     @Override
