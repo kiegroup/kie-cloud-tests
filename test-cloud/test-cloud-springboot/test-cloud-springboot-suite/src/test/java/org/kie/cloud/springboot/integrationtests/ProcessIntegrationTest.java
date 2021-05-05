@@ -70,6 +70,7 @@ public class ProcessIntegrationTest {
 
             // Push image to registry
             if ("docker".equals(containerEngine)) {
+                loginToInternalDockerRegistry(executor);
                 executionSuccessful = executor.executeProcessCommand(String.format("docker push %s", APPLICATION_IMAGE_TAG));
             } else {
                 executionSuccessful = executor.executeProcessCommand(String.format("%s push %s --tls-verify=false", containerEngine, APPLICATION_IMAGE_TAG));
@@ -77,6 +78,19 @@ public class ProcessIntegrationTest {
             if (!executionSuccessful) {
                 throw new RuntimeException("Error while pushing image " + APPLICATION_IMAGE_TAG);
             }
+        }
+    }
+
+    private static void loginToInternalDockerRegistry(ProcessExecutor executor) {
+        logger.info("Creating temporary project, so we can get token through OpenShiftBinary client.");
+        Project tmpProject = OpenShiftController.createProject("tmp-project-"+UUID.randomUUID().toString().substring(0, 4));
+        try {
+            String username = tmpProject.runOcCommandAsAdmin("whoami").trim();
+            String password = tmpProject.runOcCommandAsAdmin("whoami", "--show-token").trim();
+
+            executor.executeProcessCommand(String.format("docker login -u %s -p %s %s", username, password , OpenShiftController.getImageRegistryRouteHostname()));
+        } finally {
+            tmpProject.delete();
         }
     }
 
