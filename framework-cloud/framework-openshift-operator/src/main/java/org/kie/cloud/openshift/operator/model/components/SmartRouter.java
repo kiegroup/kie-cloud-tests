@@ -31,6 +31,7 @@ public class SmartRouter {
     private List<Env> env = new ArrayList<>();
     private String keystoreSecret;
     private Resources resources;
+    private Jvm jvm;
 
     public Integer getReplicas() {
         return replicas;
@@ -70,5 +71,13 @@ public class SmartRouter {
 
     public void setResources(Resources resources) {
         this.resources = resources;
+    }
+
+    public Jvm getJvm() {
+        return jvm;
+    }
+
+    public void setJvm(Jvm jvm) {
+        this.jvm = jvm;
     }
 }
