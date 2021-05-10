@@ -52,7 +52,6 @@ import org.kie.cloud.openshift.prometheus.servicemonitor.components.Endpoint;
 import org.kie.cloud.openshift.prometheus.servicemonitor.components.Selector;
 import org.kie.cloud.openshift.prometheus.servicemonitor.components.Spec;
 import org.kie.cloud.openshift.resource.Project;
-import org.kie.cloud.openshift.util.operator.OperatorDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +102,10 @@ public class PrometheusDeployer {
     }
 
     public static void undeployOperator(Project project) {
-        OperatorDeployer.undeploy(project, PROMETHEUS_OPERATOR_NAME);
+        // Operator deployer is skipped as it tries to remove object that does not exists in OCP 4.6+.
+        // Also Operator is installed as Deployment and it does not make sense to remove it like this.
+        // It would be good to clean up OperatorDeployer and remove it if it is not needed anymore. 
+        // OperatorDeployer.undeploy(project, PROMETHEUS_OPERATOR_NAME);
     }
 
     private static String versioned(String url) {
