@@ -16,7 +16,7 @@
 package org.kie.cloud.strimzi;
 
 import cz.xtf.core.openshift.OpenShifts;
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
+import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinition;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.kie.cloud.openshift.resource.Project;
