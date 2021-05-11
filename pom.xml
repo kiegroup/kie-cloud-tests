@@ -40,7 +40,7 @@
     <version.jgit>4.11.0.201803080745-r</version.jgit>
 
     <version.cz.xtf>0.21</version.cz.xtf>
-    <version.kubernetes-client>4.6.4</version.kubernetes-client>
+    <version.kubernetes-client>4.13.3</version.kubernetes-client> <!-- fabric8 dependency version depends on version.cz.xtf used (same as version.openshift-client in xtf) -->
     <version.rx-java>1.3.8</version.rx-java> <!-- rxjava dependency version depends on version.cz.xtf used -->
     <version.rx-java-string>1.1.1</version.rx-java-string> <!-- rxjava-string dependency version depends on version.cz.xtf used -->
     <version.org.keycloak>4.8.3.Final</version.org.keycloak>
