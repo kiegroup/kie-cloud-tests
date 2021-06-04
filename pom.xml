@@ -35,7 +35,7 @@
     <version.org.gitlab>1.2.8</version.org.gitlab>
     <version.org.eclipse.mylyn.github>2.1.5</version.org.eclipse.mylyn.github>
     <version.http.core>4.4.9</version.http.core>
-    <version.http.client>4.5.5</version.http.client>
+    <version.http.client>4.5.13</version.http.client>
     <version.ant.compress>1.5</version.ant.compress>
     <version.jgit>4.11.0.201803080745-r</version.jgit>
 
