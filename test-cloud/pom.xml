@@ -28,6 +28,7 @@
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <cloud.properties.location/> <!-- Needs to be defined for proper test run. -->
+    <nexus.mirror.image.stream/> <!-- If Docker pull request is not set, it needs to be defined for proper test run, to avoid to many request limit for docker hub. -->
 
     <!-- Values of these properties are used to select property file with template urls from framework-openshift resources -->
     <template.project/> <!-- valid values: jbpm, drools-->
@@ -76,7 +77,6 @@
 
     <!-- Location for custom Kie application templates. Can be used to point tests to the location containing templates to be used for tests. -->
     <kie.app.template.url/>
-
 
     <!-- SSL configuration -->
     <certificate.dir>${project.build.testOutputDirectory}/certificate</certificate.dir>
@@ -332,6 +332,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <openshift.admin.password>${openshift.admin.password}</openshift.admin.password>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <cloud.properties.location>${cloud.properties.location}</cloud.properties.location>
+              <nexus.mirror.image.stream>${nexus.mirror.image.stream}</nexus.mirror.image.stream>
               <template.project>${template.project}</template.project>
               <db.hostname>${db.hostname}</db.hostname>
               <db.port>${db.port}</db.port>
