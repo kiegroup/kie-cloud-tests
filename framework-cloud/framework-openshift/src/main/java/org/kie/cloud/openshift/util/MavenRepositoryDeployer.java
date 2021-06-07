@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.util;
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
+import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.MavenNexusRepositoryDeploymentImpl;
 import org.kie.cloud.openshift.resource.Project;
 import org.slf4j.Logger;
@@ -48,7 +49,20 @@ public class MavenRepositoryDeployer {
 
         // Login is part of binary retrieval
         OpenShiftBinary masterBinary = OpenShifts.masterBinary(project.getName());
-        masterBinary.execute("new-app", "sonatype/nexus", "-l", "deploymentConfig=maven-nexus");
+
+        String nexusMirrorImageStream = OpenShiftConstants.getNexusMirrorImageStream();
+        if (nexusMirrorImageStream != null) {
+            logger.info("Mirrored Nexus docker image is provided.");
+            logger.info("Creating image streams from %s", nexusMirrorImageStream);
+            project.createResourcesFromYamlAsAdmin(nexusMirrorImageStream);
+            logger.info("Creating new app from image stream.");
+            masterBinary.execute("new-app", "nexus", "-l", "deploymentConfig=maven-nexus");
+        } else {
+            logger.info("Mirrored Nexus docker image is not provided.");
+            logger.info("Creating new app from docker image.");
+            masterBinary.execute("new-app", "sonatype/nexus", "-l", "deploymentConfig=maven-nexus");
+        }
+
         masterBinary.execute("expose", "service", "nexus");
     }
 }

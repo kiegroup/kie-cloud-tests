@@ -62,6 +62,11 @@ public class OpenShiftConstants implements Constants {
     public static final String KIE_IMAGE_STREAMS = "kie.image.streams";
 
     /**
+     * URL pointing to OpenShift resource file containing image stream with mirrored Nexus image (from docker hub).
+     */
+    public static final String NEXUS_MIRROR_IMAGE_STREAM = "nexus.mirror.image.stream";
+
+    /**
      * URL pointing to OpenShift template file containing Workbench and Kie server.
      */
     public static final String KIE_APP_TEMPLATE_WORKBENCH_KIE_SERVER = "kie.app.template.workbench.kie-server";
@@ -202,6 +207,10 @@ public class OpenShiftConstants implements Constants {
 
     public static String getKieImageStreams() {
         return System.getProperty(KIE_IMAGE_STREAMS);
+    }
+
+    public static String getNexusMirrorImageStream() {
+        return System.getProperty(NEXUS_MIRROR_IMAGE_STREAM);
     }
 
     public static String getSsoImageStreams() {
