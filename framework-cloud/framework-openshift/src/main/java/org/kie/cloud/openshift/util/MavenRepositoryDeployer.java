@@ -51,7 +51,7 @@ public class MavenRepositoryDeployer {
         OpenShiftBinary masterBinary = OpenShifts.masterBinary(project.getName());
 
         String nexusMirrorImageStream = OpenShiftConstants.getNexusMirrorImageStream();
-        if (nexusMirrorImageStream != null) {
+        if (nexusMirrorImageStream != null && !nexusMirrorImageStream.isEmpty()) {
             logger.info("Mirrored Nexus docker image is provided.");
             logger.info("Creating image streams from %s", nexusMirrorImageStream);
             project.createResourcesFromYamlAsAdmin(nexusMirrorImageStream);
