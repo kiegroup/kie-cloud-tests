@@ -15,8 +15,13 @@
  */
 package org.kie.cloud.openshift.util;
 
+import java.util.concurrent.TimeUnit;
+
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
+import cz.xtf.core.waiting.SimpleWaiter;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.MavenNexusRepositoryDeploymentImpl;
@@ -53,10 +58,22 @@ public class MavenRepositoryDeployer {
         String nexusMirrorImageStream = OpenShiftConstants.getNexusMirrorImageStream();
         if (nexusMirrorImageStream != null && !nexusMirrorImageStream.isEmpty()) {
             logger.info("Mirrored Nexus docker image is provided.");
-            logger.info("Creating image streams from %s", nexusMirrorImageStream);
+            logger.info("Creating image streams from {}", nexusMirrorImageStream);
             project.createResourcesFromYamlAsAdmin(nexusMirrorImageStream);
+            new SimpleWaiter(() -> isImageStreamCreated(project, "nexus-mirror"))
+                        .timeout(TimeUnit.SECONDS, 30)
+                        .reason("Waiting for Nexus mirrored image stream to be created")
+                        .waitFor();
+
+
             logger.info("Creating new app from image stream.");
-            masterBinary.execute("new-app", "nexus", "-l", "deploymentConfig=maven-nexus");
+            
+            logger.info("DEBUG oc version: {}", masterBinary.execute("version"));
+            logger.info("FOR DEBUG: {}", masterBinary.execute("new-app", "--image-stream=nexus-mirror", "--name=nexus", "--allow-missing-imagestream-tags", "-l", "deploymentConfig=maven-nexus", "-o", "yaml"));
+            /*masterBinary.execute("new-app", "nexus", "--name=nexus", "-l", "deploymentConfig=maven-nexus", "-o", "yaml", "|", "oc", "apply", "-f", "-");
+            */
+
+            masterBinary.execute("new-app", "--image-stream=nexus-mirror", "--name=nexus", "--allow-missing-imagestream-tags", "-l", "deploymentConfig=maven-nexus");
         } else {
             logger.info("Mirrored Nexus docker image is not provided.");
             logger.info("Creating new app from docker image.");
@@ -64,5 +81,14 @@ public class MavenRepositoryDeployer {
         }
 
         masterBinary.execute("expose", "service", "nexus");
+    }
+
+    private static boolean isImageStreamCreated(Project project, String name) {
+        return project.getOpenShiftAdmin()
+                  .getImageStreams()
+                  .stream()
+                  .map(ImageStream::getMetadata)
+                  .map(ObjectMeta::getName)
+                  .anyMatch(name::equals);
     }
 }
