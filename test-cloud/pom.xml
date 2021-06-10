@@ -18,7 +18,7 @@
 
   <properties>
     <!-- This version is used by XTF to download appropriate oc client based on OpenShift version. -->
-    <openshift.version>3.11.87</openshift.version>
+    <openshift.version>3.11.439-1</openshift.version>
 
     <openshift.master.url/> <!-- Needs to be defined for proper test run on OpenShift. -->
     <openshift.username>user</openshift.username>
