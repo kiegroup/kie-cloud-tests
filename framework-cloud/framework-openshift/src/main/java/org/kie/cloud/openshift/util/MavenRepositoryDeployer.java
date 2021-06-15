@@ -15,12 +15,16 @@
  */
 package org.kie.cloud.openshift.util;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
 import cz.xtf.core.waiting.SimpleWaiter;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.ImageStream;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
@@ -35,6 +39,9 @@ import org.slf4j.LoggerFactory;
 public class MavenRepositoryDeployer {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenRepositoryDeployer.class);
+
+    private static final String NEXUS_IMAGE_STREAM_NAME = "nexus-mirror";
+    private static final String NEXUS_DEPLOYMENT_NAME = "nexus";
 
     public static MavenRepositoryDeployment deploy(Project project, boolean shouldWait) {
         deployMavenRepository(project);
@@ -60,7 +67,7 @@ public class MavenRepositoryDeployer {
             logger.info("Mirrored Nexus docker image is provided.");
             logger.info("Creating image streams from {}", nexusMirrorImageStream);
             project.createResourcesFromYamlAsAdmin(nexusMirrorImageStream);
-            new SimpleWaiter(() -> isImageStreamCreated(project, "nexus-mirror"))
+            new SimpleWaiter(() -> isImageStreamCreated(project, NEXUS_IMAGE_STREAM_NAME))
                         .timeout(TimeUnit.SECONDS, 30)
                         .reason("Waiting for Nexus mirrored image stream to be created")
                         .waitFor();
@@ -69,18 +76,24 @@ public class MavenRepositoryDeployer {
             logger.info("Creating new app from image stream.");
             
             logger.info("DEBUG oc version: {}", masterBinary.execute("version"));
-            logger.info("FOR DEBUG: {}", masterBinary.execute("new-app", "--image-stream=nexus-mirror", "--name=nexus", "--allow-missing-imagestream-tags", "-l", "deploymentConfig=maven-nexus", "-o", "yaml"));
+            logger.info("FOR DEBUG: {}", masterBinary.execute("new-app", "--image-stream="+NEXUS_IMAGE_STREAM_NAME, "--name="+NEXUS_DEPLOYMENT_NAME, "--allow-missing-imagestream-tags", "-l", "deploymentConfig=maven-nexus", "-o", "yaml"));
             /*masterBinary.execute("new-app", "nexus", "--name=nexus", "-l", "deploymentConfig=maven-nexus", "-o", "yaml", "|", "oc", "apply", "-f", "-");
             */
 
-            masterBinary.execute("new-app", "--image-stream=nexus-mirror", "--name=nexus", "--allow-missing-imagestream-tags", "-l", "deploymentConfig=maven-nexus");
+            masterBinary.execute("new-app", "--image-stream="+NEXUS_IMAGE_STREAM_NAME, "--name="+NEXUS_DEPLOYMENT_NAME, "--allow-missing-imagestream-tags", "-l", "deploymentConfig=maven-nexus");
+
+            logger.info("Wait and check if {} service is created, if not create one.", NEXUS_DEPLOYMENT_NAME);
+            new SimpleWaiter(()->isNexusServiceCreated(project, NEXUS_DEPLOYMENT_NAME))
+                        .timeout(TimeUnit.SECONDS, 30)
+                        .onTimeout(()->createNexusService(project))
+                        .waitFor();
         } else {
             logger.info("Mirrored Nexus docker image is not provided.");
             logger.info("Creating new app from docker image.");
             masterBinary.execute("new-app", "sonatype/nexus", "-l", "deploymentConfig=maven-nexus");
         }
 
-        masterBinary.execute("expose", "service", "nexus");
+        masterBinary.execute("expose", "service", NEXUS_DEPLOYMENT_NAME);
     }
 
     private static boolean isImageStreamCreated(Project project, String name) {
@@ -90,5 +103,40 @@ public class MavenRepositoryDeployer {
                   .map(ImageStream::getMetadata)
                   .map(ObjectMeta::getName)
                   .anyMatch(name::equals);
+    }
+
+    private static boolean isNexusServiceCreated(Project project, String name) {
+        return project.getOpenShiftAdmin()
+                    .getServices()
+                    .stream()
+                    .map(Service::getMetadata)
+                    .map(ObjectMeta::getName)
+                    .anyMatch(name::equals);
+    }
+
+    private static void createNexusService(Project project) {
+        boolean isNexusPodAvailable = project.getOpenShiftAdmin()
+                                             .getPods()
+                                             .stream()
+                                             .map(Pod::getMetadata)
+                                             .map(ObjectMeta::getName)
+                                             .filter(name->!name.endsWith("deploy"))
+                                             .anyMatch(NEXUS_DEPLOYMENT_NAME::contains);
+        if (isNexusPodAvailable) {
+            project.createResourcesFromYaml(getNexusService().toString());
+        } else {
+            throw new RuntimeException("Nexus pods is not available in project "+ project.getName());
+        }
+
+
+    }
+
+    private static final String NEXUS_SERVICE = "/deployments/nexusService.yaml";
+    private static URL getNexusService() {
+        try {
+            return new URL("file://" + MavenRepositoryDeployer.class.getResource(NEXUS_SERVICE).getFile());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Wrong Nexus service file location", e);
+        }
     }
 }
