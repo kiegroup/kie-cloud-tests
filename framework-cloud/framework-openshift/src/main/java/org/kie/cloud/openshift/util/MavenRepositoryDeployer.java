@@ -17,6 +17,8 @@ package org.kie.cloud.openshift.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import cz.xtf.core.openshift.OpenShiftBinary;
@@ -80,6 +82,8 @@ public class MavenRepositoryDeployer {
             /*masterBinary.execute("new-app", "nexus", "--name=nexus", "-l", "deploymentConfig=maven-nexus", "-o", "yaml", "|", "oc", "apply", "-f", "-");
             */
 
+            project.processTemplateAndCreateResources(getNexusTemplate(), geNexusProperties());
+/* Create Nexus app using template instead of oc new-app cmd.
             masterBinary.execute("new-app", "--image-stream="+NEXUS_IMAGE_STREAM_NAME, "--name="+NEXUS_DEPLOYMENT_NAME, "--allow-missing-imagestream-tags", "-l", "deploymentConfig=maven-nexus");
 
             logger.info("Wait and check if {} service is created, if not create one.", NEXUS_DEPLOYMENT_NAME);
@@ -87,6 +91,7 @@ public class MavenRepositoryDeployer {
                         .timeout(TimeUnit.SECONDS, 30)
                         .onTimeout(()->createNexusService(project))
                         .waitFor();
+*/
         } else {
             logger.info("Mirrored Nexus docker image is not provided.");
             logger.info("Creating new app from docker image.");
@@ -138,5 +143,21 @@ public class MavenRepositoryDeployer {
         } catch (MalformedURLException e) {
             throw new RuntimeException("Wrong Nexus service file location", e);
         }
+    }
+
+    private static final String NEXUS_TEMPLATE = "/deployments/nexus.yaml";
+
+    private static URL getNexusTemplate() {
+        try {
+            return new URL("file://" + MavenRepositoryDeployer.class.getResource(NEXUS_TEMPLATE).getFile());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Wrong LDAP template location", e);
+        }
+    }
+
+    private static Map<String, String> geNexusProperties() {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("APPLICATION_NAME", NEXUS_DEPLOYMENT_NAME);
+        return properties;
     }
 }

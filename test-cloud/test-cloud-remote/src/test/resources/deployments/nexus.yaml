@@ -1,0 +1,84 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: nexus
+  annotations:
+    name: nexus
+    description: Application template for nexus server
+message: A new nexus server was created
+
+parameters:
+- name: APPLICATION_NAME
+  displayName: Application Name
+  description: The name for the application.
+  required: true
+- name: DEPLOYMENT_CONFIG_NAME
+  displayName: Deployment Config name
+  required: false
+  value: maven-nexus
+objects:
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${DEPLOYMENT_CONFIG_NAME}
+    name: nexus
+  spec:
+    replicas: 1
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${DEPLOYMENT_CONFIG_NAME}
+      deploymentconfig: nexus
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: ${APPLICATION_NAME}
+          deploymentConfig: ${DEPLOYMENT_CONFIG_NAME}
+          deploymentconfig: nexus
+      spec:
+        containers:
+        - image: nexus-mirror:latest
+          name: nexus
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8081
+            protocol: TCP
+          resources: {}
+          volumeMounts:
+          - mountPath: /sonatype-work
+            name: nexus-volume-1
+        volumes:
+        - emptyDir: {}
+          name: nexus-volume-1
+    test: false
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - nexus
+        from:
+          kind: ImageStreamTag
+          name: nexus-mirror:latest
+- kind: Service
+  apiVersion: v1
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${DEPLOYMENT_CONFIG_NAME}
+    name: nexus
+  spec:
+    ports:
+    - name: 8081-tcp
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${DEPLOYMENT_CONFIG_NAME}
+      deploymentconfig: nexus
