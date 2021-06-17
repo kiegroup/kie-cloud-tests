@@ -1,0 +1,80 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: registry
+  annotations:
+    name: registry
+    description: Application template for registry server
+message: A new registry server was created
+
+parameters:
+- name: APPLICATION_NAME
+  displayName: Application Name
+  description: The name for the application.
+  required: true
+objects:
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${APPLICATION_NAME}
+    name: registry
+  spec:
+    replicas: 1
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${APPLICATION_NAME}
+      deploymentconfig: registry
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: ${APPLICATION_NAME}
+          deploymentConfig: ${APPLICATION_NAME}
+          deploymentconfig: registry
+      spec:
+        containers:
+        - image: registry-mirror:2
+          name: registry
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 5000
+            protocol: TCP
+          resources: {}
+          volumeMounts:
+          - mountPath: /var/lib/registry
+            name: registry-volume-1
+        volumes:
+        - emptyDir: {}
+          name: registry-volume-1
+    test: false
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - registry
+        from:
+          kind: ImageStreamTag
+          name: registry-mirror:2
+- kind: Service
+  apiVersion: v1
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${APPLICATION_NAME}
+    name: registry
+  spec:
+    ports:
+    - name: 5000-tcp
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${APPLICATION_NAME}
+      deploymentconfig: registry
