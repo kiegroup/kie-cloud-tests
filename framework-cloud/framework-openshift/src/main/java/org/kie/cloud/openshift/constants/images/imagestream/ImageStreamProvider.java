@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import cz.xtf.core.waiting.SimpleWaiter;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.ObjectReference;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.ImageStreamBuilder;
@@ -63,9 +64,9 @@ public class ImageStreamProvider {
         }
     }
 
-    private static void createImagesFromImageStreamFile(Project project, String kieImageStreams) {
-        logger.info("Creating image streams from " + kieImageStreams);
-        project.createResourcesFromYamlAsAdmin(kieImageStreams);
+    public static void createImagesFromImageStreamFile(Project project, String imageStreams) {
+        logger.info("Creating image streams from {}", imageStreams);
+        project.createResourcesFromYamlAsAdmin(imageStreams);
     }
 
     private static void replaceImagesFromImageStreamTags(Project project) {
@@ -161,5 +162,21 @@ public class ImageStreamProvider {
         // We need to adjust image name from the OSBS build full name to the new naming policy since 7.5.1
         // rhpam-7-rhpam-businesscentral-rhel8 -> rhpam-businesscentral-rhel8
         return imageName.replaceFirst("^rhpam-7-", "");
+    }
+
+    public static void waitForImageStreamCreate(Project project, String name) {
+        new SimpleWaiter(() -> isImageStreamCreated(project, name))
+                .timeout(TimeUnit.SECONDS, 30)
+                .reason("Waiting for " + name + " mirrored image stream to be created")
+                .waitFor();
+    }
+
+    public static boolean isImageStreamCreated(Project project, String name) {
+        return project.getOpenShiftAdmin()
+                  .getImageStreams()
+                  .stream()
+                  .map(ImageStream::getMetadata)
+                  .map(ObjectMeta::getName)
+                  .anyMatch(name::equals);
     }
 }
