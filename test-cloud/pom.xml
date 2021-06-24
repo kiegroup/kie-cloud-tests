@@ -18,7 +18,7 @@
 
   <properties>
     <!-- This version is used by XTF to download appropriate oc client based on OpenShift version. -->
-    <openshift.version>3.11.87</openshift.version>
+    <openshift.version>3.11.439-1</openshift.version>
 
     <openshift.master.url/> <!-- Needs to be defined for proper test run on OpenShift. -->
     <openshift.username>user</openshift.username>
@@ -29,6 +29,7 @@
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <cloud.properties.location/> <!-- Needs to be defined for proper test run. -->
     <nexus.mirror.image.stream/> <!-- If Docker pull request is not set, it needs to be defined for proper test run, to avoid to many request limit for docker hub. -->
+    <registry.mirror.image.stream/> <!-- If Docker pull request is not set, it needs to be defined for proper test run, to avoid to many request limit for docker hub. -->
 
     <!-- Values of these properties are used to select property file with template urls from framework-openshift resources -->
     <template.project/> <!-- valid values: jbpm, drools-->
@@ -333,6 +334,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <cloud.properties.location>${cloud.properties.location}</cloud.properties.location>
               <nexus.mirror.image.stream>${nexus.mirror.image.stream}</nexus.mirror.image.stream>
+              <registry.mirror.image.stream>${registry.mirror.image.stream}</registry.mirror.image.stream>
               <template.project>${template.project}</template.project>
               <db.hostname>${db.hostname}</db.hostname>
               <db.port>${db.port}</db.port>
@@ -524,7 +526,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
       <id>openshift-operator</id>
       <properties>
         <operator.excluded.group>org.kie.cloud.integrationtests.category.OperatorNotSupported</operator.excluded.group>
-
+        <!--<openshift.version>4.6</openshift.version>-->
         <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
         <xtf.openshift.admin.token/>
         <xtf.openshift.master.token/>
