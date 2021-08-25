@@ -23,8 +23,8 @@ import java.util.stream.Stream;
 
 import cz.xtf.core.openshift.OpenShiftBinary;
 import cz.xtf.core.openshift.OpenShifts;
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
-import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
@@ -41,8 +41,6 @@ import org.kie.cloud.openshift.deployment.external.ExternalDeployment;
 import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorConstants;
 import org.kie.cloud.openshift.operator.deployment.external.ExternalDeploymentOperator;
 import org.kie.cloud.openshift.operator.model.KieApp;
-import org.kie.cloud.openshift.operator.model.KieAppDoneable;
-import org.kie.cloud.openshift.operator.model.KieAppList;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.Server;
@@ -122,7 +120,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     private void createClusterRoleInProject(Project project) {
         logger.info("Creating cluster role in project '" + getNamespace() + "' from " + OpenShiftResource.CLUSTER_ROLE.getResourceUrl().toString());
         ClusterRole role = project.getOpenShiftAdmin().rbac().clusterRoles().load(OpenShiftResource.CLUSTER_ROLE.getResourceUrl()).get();
-        project.getOpenShiftAdmin().rbac().clusterRoles().inNamespace(getNamespace()).createOrReplace(role);
+        project.getOpenShiftAdmin().inNamespace(getNamespace()).rbac().clusterRoles().createOrReplace(role);
     }
 
     private void createClusterRoleBindingsInProject(Project project) {
@@ -131,7 +129,7 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
         roleBinding.getMetadata().setName(OPERATOR_DEPLOYMENT_NAME + getNamespace());
         roleBinding.getMetadata().setNamespace(getNamespace());
         roleBinding.getSubjects().forEach(subject -> subject.setNamespace(getNamespace()));
-        project.getOpenShiftAdmin().rbac().clusterRoleBindings().inNamespace(getNamespace()).create(roleBinding);
+        project.getOpenShiftAdmin().inNamespace(getNamespace()).rbac().clusterRoleBindings().create(roleBinding);
     }
 
     private void deleteClusterRoleBindingsInProject(Project project) {
@@ -191,9 +189,14 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
     /**
      * @return OpenShift client which is aware of KieApp custom resource.
      */
-    protected NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> getKieAppClient() {
-        CustomResourceDefinition customResourceDefinition = OpenShifts.admin().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
-        return OpenShifts.admin().customResources(customResourceDefinition, KieApp.class, KieAppList.class, KieAppDoneable.class).inNamespace(getNamespace());
+    protected NonNamespaceOperation<KieApp, KubernetesResourceList<KieApp>, Resource<KieApp>> getKieAppClient() {
+        //CustomResourceDefinition customResourceDefinition = OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
+        
+        //CustomResourceDefinitionContext.fromCrd(customResourceDefinition);
+
+        //CustomResourceDefinitionContext crdcontext = new CustomResourceDefinitionContext().fromCrd(customResourceDefinition);
+
+        return OpenShifts.admin().customResources(KieApp.class).inNamespace(getNamespace());
     }
 
     @Override

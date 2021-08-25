@@ -16,7 +16,10 @@
 package org.kie.cloud.openshift.operator.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Version;
 import org.kie.cloud.openshift.operator.model.components.Spec;
 import org.kie.cloud.openshift.operator.model.components.Status;
 
@@ -24,7 +27,9 @@ import org.kie.cloud.openshift.operator.model.components.Status;
  * Custom resource representation used by Fabric8 OpenShift client.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class KieApp extends CustomResource {
+@Group("app.kiegroup.org")
+@Version("v2")
+public class KieApp extends CustomResource implements Namespaced {
 
     private static final long serialVersionUID = -7608178420952152353L;
 
