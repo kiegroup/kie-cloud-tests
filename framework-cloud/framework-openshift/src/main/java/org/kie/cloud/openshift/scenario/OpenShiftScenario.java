@@ -30,6 +30,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.SecretBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.MavenRepositoryDeployment;
@@ -273,13 +275,15 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
 
         logger.info("Creating generally used secret from " + OpenShiftConstants.getTrustedKeystoreFile());
         try {
-            project.getOpenShift().secrets().createOrReplaceWithNew()
-                   .withNewMetadata()
-                   .withName(OpenShiftConstants.getKieApplicationSecretName())
-                   .withNamespace(project.getName())
-                   .endMetadata()
-                   .addToData("keystore.jks", Base64.encodeBase64String(Files.readAllBytes(Paths.get(OpenShiftConstants.getTrustedKeystoreFile()))))
-                   .done();
+            Secret secret = new SecretBuilder()
+                    .withNewMetadata()
+                        .withName(OpenShiftConstants.getKieApplicationSecretName())
+                        .withNamespace(project.getName())
+                        .endMetadata()
+                    .addToData("keystore.jks", Base64.encodeBase64String(Files.readAllBytes(Paths.get(OpenShiftConstants.getTrustedKeystoreFile()))))
+                    .build();
+
+            project.getOpenShift().secrets().createOrReplace(secret);
         } catch (IOException e) {
             throw new RuntimeException("Error loading the secret", e);
         }

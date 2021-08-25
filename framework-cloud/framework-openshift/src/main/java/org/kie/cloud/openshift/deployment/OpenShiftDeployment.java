@@ -38,8 +38,10 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.ImageStreamTag;
 import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.RouteBuilder;
 import io.fabric8.openshift.api.model.RouteList;
 import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.Deployment;
@@ -212,11 +214,7 @@ public abstract class OpenShiftDeployment implements Deployment {
             openShift
                      .routes()
                      .withName(r.getMetadata().getName())
-                     .edit()
-                     .editMetadata()
-                     .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds() + "s")
-                     .endMetadata()
-                     .done();
+                     .edit(route->new RouteBuilder(route).editMetadata().addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT, timeoutValue.getSeconds() + "s").endMetadata().build());
         }
     }
 
@@ -227,11 +225,7 @@ public abstract class OpenShiftDeployment implements Deployment {
             openShift
                      .routes()
                      .withName(r.getMetadata().getName())
-                     .edit()
-                     .editMetadata()
-                     .removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT)
-                     .endMetadata()
-                     .done();
+                     .edit(route -> new RouteBuilder(route).editMetadata().removeFromAnnotations(OpenShiftConstants.HAPROXY_ROUTER_TIMEOUT).endMetadata().build());
         }
     }
 
@@ -242,11 +236,7 @@ public abstract class OpenShiftDeployment implements Deployment {
             openShift
                      .routes()
                      .withName(r.getMetadata().getName())
-                     .edit()
-                     .editMetadata()
-                     .addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_BALANCE, balance)
-                     .endMetadata()
-                     .done();
+                     .edit(route->new RouteBuilder(route).editMetadata().addToAnnotations(OpenShiftConstants.HAPROXY_ROUTER_BALANCE, balance).endMetadata().build());
         }
     }
 
@@ -255,8 +245,7 @@ public abstract class OpenShiftDeployment implements Deployment {
         openShift
                  .deploymentConfigs()
                  .withName(getDeploymentConfigName())
-                 .edit()
-                 .editOrNewSpec()
+                 .edit(dc -> new DeploymentConfigBuilder(dc).editOrNewSpec()
                  .editTemplate()
                  .editOrNewSpec()
                  .editContainer(0)
@@ -268,7 +257,7 @@ public abstract class OpenShiftDeployment implements Deployment {
                  .endSpec()
                  .endTemplate()
                  .endSpec()
-                 .done();
+                 .build());
     }
 
     protected Optional<URL> getHttpRouteUrl(String serviceName) {

@@ -19,23 +19,22 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.RouterUtil;
 import org.kie.cloud.openshift.operator.model.KieApp;
-import org.kie.cloud.openshift.operator.model.KieAppDoneable;
-import org.kie.cloud.openshift.operator.model.KieAppList;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.Spec;
 import org.kie.cloud.openshift.resource.Project;
 
 public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
 
-    private NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> kieAppClient;
+    private NonNamespaceOperation<KieApp, KubernetesResourceList<KieApp>, Resource<KieApp>> kieAppClient;
 
-    public KieServerOperatorDeployment(Project project, NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> kieAppClient) {
+    public KieServerOperatorDeployment(Project project, NonNamespaceOperation<KieApp, KubernetesResourceList<KieApp>, Resource<KieApp>> kieAppClient) {
         super(project);
         this.kieAppClient = kieAppClient;
     }

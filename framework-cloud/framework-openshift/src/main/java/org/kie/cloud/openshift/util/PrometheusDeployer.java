@@ -32,9 +32,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import cz.xtf.builder.builders.SecretBuilder;
 import cz.xtf.core.openshift.OpenShifts;
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
-import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinition;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
@@ -44,8 +44,6 @@ import org.kie.cloud.api.deployment.PrometheusDeployment;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.PrometheusDeploymentImpl;
 import org.kie.cloud.openshift.prometheus.servicemonitor.ServiceMonitor;
-import org.kie.cloud.openshift.prometheus.servicemonitor.ServiceMonitorDoneable;
-import org.kie.cloud.openshift.prometheus.servicemonitor.ServiceMonitorList;
 import org.kie.cloud.openshift.prometheus.servicemonitor.components.AuthOption;
 import org.kie.cloud.openshift.prometheus.servicemonitor.components.BasicAuth;
 import org.kie.cloud.openshift.prometheus.servicemonitor.components.Endpoint;
@@ -191,9 +189,11 @@ public class PrometheusDeployer {
     }
 
     private static void createServiceMonitorCustomResource(Project project) {
-        CustomResourceDefinition customResourceDefinition = OpenShifts.admin().customResourceDefinitions().withName("servicemonitors.monitoring.coreos.com").get();
-        NonNamespaceOperation<ServiceMonitor, ServiceMonitorList, ServiceMonitorDoneable, Resource<ServiceMonitor, ServiceMonitorDoneable>> serviceMonitorClient = OpenShifts.admin().customResources(customResourceDefinition, ServiceMonitor.class, ServiceMonitorList.class, ServiceMonitorDoneable.class).inNamespace(project.getName());
-       
+        //CustomResourceDefinition customResourceDefinition = OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName("servicemonitors.monitoring.coreos.com").get();
+        NonNamespaceOperation<ServiceMonitor, KubernetesResourceList<ServiceMonitor>, Resource<ServiceMonitor>> serviceMonitorClient = OpenShifts.admin().customResources(ServiceMonitor.class).inNamespace(project.getName());
+        
+        //CustomResourceDefinition customResourceDefinition = OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName("servicemonitors.monitoring.coreos.com").get();
+
         AuthOption username = new AuthOption();
         username.setName(METRIC_SECRET_NAME);
         username.setKey(METRIC_SECRET_USERNAME_KEY);
