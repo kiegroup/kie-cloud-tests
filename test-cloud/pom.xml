@@ -25,6 +25,7 @@
     <openshift.password>redhat</openshift.password>
     <openshift.admin.username>admin</openshift.admin.username>
     <openshift.admin.password>admin</openshift.admin.password>
+    <kubernetes.auth.tryServiceAccount>false</kubernetes.auth.tryServiceAccount>
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <cloud.properties.location/> <!-- Needs to be defined for proper test run. -->
@@ -331,6 +332,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <openshift.password>${openshift.password}</openshift.password>
               <openshift.admin.username>${openshift.admin.username}</openshift.admin.username>
               <openshift.admin.password>${openshift.admin.password}</openshift.admin.password>
+              <kubernetes.auth.tryServiceAccount>${kubernetes.auth.tryServiceAccount}</kubernetes.auth.tryServiceAccount>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <cloud.properties.location>${cloud.properties.location}</cloud.properties.location>
               <nexus.mirror.image.stream>${nexus.mirror.image.stream}</nexus.mirror.image.stream>
