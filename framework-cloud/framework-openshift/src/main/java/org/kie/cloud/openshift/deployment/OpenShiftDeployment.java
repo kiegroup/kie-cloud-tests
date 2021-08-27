@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import cz.xtf.core.openshift.OpenShift;
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.WaiterException;
-import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
@@ -340,8 +339,9 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     private void deleteInstance(Instance instance) {
-        Pod pod = openShift.getPod(instance.getName());
-        openShift.deletePod(pod);
+        //Pod pod = openShift.getPod(instance.getName());
+        //openShift.deletePod(pod);
+        openShift.pods().inNamespace(project.getName()).withName(instance.getName()).withGracePeriod(0).delete();
     }
 
     private Map<String, Quantity> transformMap(Map<String, String> x) {
