@@ -16,16 +16,12 @@
 package org.kie.cloud.strimzi;
 
 import cz.xtf.core.openshift.OpenShifts;
-import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinition;
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.kie.cloud.openshift.resource.Project;
 import org.kie.cloud.strimzi.resources.KafkaCluster;
-import org.kie.cloud.strimzi.resources.KafkaClusterDoneable;
-import org.kie.cloud.strimzi.resources.KafkaClusterList;
 import org.kie.cloud.strimzi.resources.KafkaTopic;
-import org.kie.cloud.strimzi.resources.KafkaTopicDoneable;
-import org.kie.cloud.strimzi.resources.KafkaTopicList;
 
 public class StrimziOperator {
 
@@ -34,19 +30,20 @@ public class StrimziOperator {
 
     private Project project;
 
-    NonNamespaceOperation<KafkaCluster, KafkaClusterList, KafkaClusterDoneable, Resource<KafkaCluster, KafkaClusterDoneable>> kafkaClusterClient;
-    NonNamespaceOperation<KafkaTopic, KafkaTopicList, KafkaTopicDoneable, Resource<KafkaTopic, KafkaTopicDoneable>> kafkaTopicClient;
+    NonNamespaceOperation<KafkaCluster, KubernetesResourceList<KafkaCluster>,  Resource<KafkaCluster>> kafkaClusterClient;
+    NonNamespaceOperation<KafkaTopic, KubernetesResourceList<KafkaTopic>,  Resource<KafkaTopic>> kafkaTopicClient;
+  //NonNamespaceOperation<ServiceMonitor, KubernetesResourceList<ServiceMonitor>, Resource<ServiceMonitor>> serviceMonitorClient
 
     public StrimziOperator(final Project project) {
         this.project = project;
 
-        CustomResourceDefinition customResourceKafkaDefinition =
-                OpenShifts.admin().customResourceDefinitions().withName(KAFKA_RESOURCE_DEFINITION).get();
-        kafkaClusterClient = OpenShifts.admin().customResources(customResourceKafkaDefinition, KafkaCluster.class, KafkaClusterList.class, KafkaClusterDoneable.class).inNamespace(project.getName());
+        //CustomResourceDefinition customResourceKafkaDefinition =
+          //      OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName(KAFKA_RESOURCE_DEFINITION).get();
+        kafkaClusterClient = OpenShifts.admin().customResources(KafkaCluster.class).inNamespace(project.getName());
 
-        CustomResourceDefinition customResourceTopicDefinition =
-                OpenShifts.admin().customResourceDefinitions().withName(TOPIC_RESOURCE_DEFINITION).get();
-        kafkaTopicClient = OpenShifts.admin().customResources(customResourceTopicDefinition, KafkaTopic.class, KafkaTopicList.class, KafkaTopicDoneable.class).inNamespace(project.getName());
+        //CustomResourceDefinition customResourceTopicDefinition =
+          //       OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName(TOPIC_RESOURCE_DEFINITION).get();
+        kafkaTopicClient = OpenShifts.admin().customResources(KafkaTopic.class).inNamespace(project.getName());
     }
 
     public void createCluster(final KafkaCluster kafkaCluster) {

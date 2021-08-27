@@ -21,10 +21,6 @@ import io.fabric8.kubernetes.client.CustomResource;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class KafkaCluster extends CustomResource {
 
-    public KafkaCluster() {
-        super("Kafka");
-    }
-
     private KafkaClusterSpec spec;
 
     public KafkaClusterSpec getSpec() {

@@ -17,22 +17,21 @@ package org.kie.cloud.openshift.operator.deployment;
 
 import java.util.Optional;
 
+import io.fabric8.kubernetes.api.model.KubernetesResourceList;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.RouterUtil;
 import org.kie.cloud.openshift.deployment.WorkbenchRuntimeDeploymentImpl;
 import org.kie.cloud.openshift.operator.model.KieApp;
-import org.kie.cloud.openshift.operator.model.KieAppDoneable;
-import org.kie.cloud.openshift.operator.model.KieAppList;
 import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.resource.Project;
 
 public class WorkbenchRuntimeOperatorDeployment extends WorkbenchRuntimeDeploymentImpl {
 
-    private NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> kieAppClient;
+    private NonNamespaceOperation<KieApp, KubernetesResourceList<KieApp>, Resource<KieApp>> kieAppClient;
 
-    public WorkbenchRuntimeOperatorDeployment(Project project, NonNamespaceOperation<KieApp, KieAppList, KieAppDoneable, Resource<KieApp, KieAppDoneable>> kieAppClient) {
+    public WorkbenchRuntimeOperatorDeployment(Project project, NonNamespaceOperation<KieApp, KubernetesResourceList<KieApp>, Resource<KieApp>> kieAppClient) {
         super(project);
         this.kieAppClient = kieAppClient;
     }
