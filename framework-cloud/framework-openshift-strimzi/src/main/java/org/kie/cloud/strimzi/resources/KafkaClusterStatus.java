@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 JBoss by Red Hat.
+ * Copyright 2021 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,25 @@
 
 package org.kie.cloud.strimzi.resources;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.fabric8.kubernetes.api.model.Namespaced;
-import io.fabric8.kubernetes.client.CustomResource;
-import io.fabric8.kubernetes.model.annotation.Group;
-import io.fabric8.kubernetes.model.annotation.Version;
+public class KafkaClusterStatus {
+    
+    private KafkaCondition[] conditions;
+    private String clusterId;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-@Group("kafka.strimzi.io")
-@Version("v1beta2")
-public class KafkaTopic extends CustomResource<KafkaTopicSpec, KafkaTopicStatus> implements Namespaced {
+    public KafkaCondition[] getConditions() {
+        return conditions;
+    }
 
-    public static final String CLUSTER_LABEL = "strimzi.io/cluster";
+    public void setConditions(KafkaCondition[] conditions) {
+        this.conditions = conditions;
+    }
+
+    public String getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(String clusterId) {
+        this.clusterId = clusterId;
+    }
 
 }

@@ -25,7 +25,7 @@
     <openshift.password>redhat</openshift.password>
     <openshift.admin.username>admin</openshift.admin.username>
     <openshift.admin.password>admin</openshift.admin.password>
-    <kubernetes.auth.tryServiceAccount>false</kubernetes.auth.tryServiceAccount>
+    <kubernetes.auth.tryServiceAccount>false</kubernetes.auth.tryServiceAccount> <!-- Fabric8 systen property to dsiabled tryServiceAccount, when this is enabled, then test log is flooded by warning messages. -->
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
     <cloud.properties.location/> <!-- Needs to be defined for proper test run. -->

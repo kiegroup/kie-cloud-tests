@@ -339,8 +339,6 @@ public abstract class OpenShiftDeployment implements Deployment {
     }
 
     private void deleteInstance(Instance instance) {
-        //Pod pod = openShift.getPod(instance.getName());
-        //openShift.deletePod(pod);
         openShift.pods().inNamespace(project.getName()).withName(instance.getName()).withGracePeriod(0).delete();
     }
 

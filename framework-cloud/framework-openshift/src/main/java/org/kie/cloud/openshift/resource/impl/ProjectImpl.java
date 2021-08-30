@@ -84,7 +84,6 @@ public class ProjectImpl implements Project {
     @Override
     public void delete() {
         openShift.projects().withName(projectName).delete();
-        //openShift.deleteProject();
     }
 
     @Override

@@ -190,12 +190,6 @@ public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>>
      * @return OpenShift client which is aware of KieApp custom resource.
      */
     protected NonNamespaceOperation<KieApp, KubernetesResourceList<KieApp>, Resource<KieApp>> getKieAppClient() {
-        //CustomResourceDefinition customResourceDefinition = OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName("kieapps.app.kiegroup.org").get();
-        
-        //CustomResourceDefinitionContext.fromCrd(customResourceDefinition);
-
-        //CustomResourceDefinitionContext crdcontext = new CustomResourceDefinitionContext().fromCrd(customResourceDefinition);
-
         return OpenShifts.admin().customResources(KieApp.class).inNamespace(getNamespace());
     }
 

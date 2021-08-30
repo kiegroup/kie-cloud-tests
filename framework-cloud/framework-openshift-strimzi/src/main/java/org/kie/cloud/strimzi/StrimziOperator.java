@@ -25,24 +25,12 @@ import org.kie.cloud.strimzi.resources.KafkaTopic;
 
 public class StrimziOperator {
 
-    private static final String KAFKA_RESOURCE_DEFINITION = "kafkas.kafka.strimzi.io";
-    private static final String TOPIC_RESOURCE_DEFINITION = "kafkatopics.kafka.strimzi.io";
-
-    private Project project;
-
     NonNamespaceOperation<KafkaCluster, KubernetesResourceList<KafkaCluster>,  Resource<KafkaCluster>> kafkaClusterClient;
     NonNamespaceOperation<KafkaTopic, KubernetesResourceList<KafkaTopic>,  Resource<KafkaTopic>> kafkaTopicClient;
-  //NonNamespaceOperation<ServiceMonitor, KubernetesResourceList<ServiceMonitor>, Resource<ServiceMonitor>> serviceMonitorClient
 
     public StrimziOperator(final Project project) {
-        this.project = project;
-
-        //CustomResourceDefinition customResourceKafkaDefinition =
-          //      OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName(KAFKA_RESOURCE_DEFINITION).get();
         kafkaClusterClient = OpenShifts.admin().customResources(KafkaCluster.class).inNamespace(project.getName());
 
-        //CustomResourceDefinition customResourceTopicDefinition =
-          //       OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName(TOPIC_RESOURCE_DEFINITION).get();
         kafkaTopicClient = OpenShifts.admin().customResources(KafkaTopic.class).inNamespace(project.getName());
     }
 

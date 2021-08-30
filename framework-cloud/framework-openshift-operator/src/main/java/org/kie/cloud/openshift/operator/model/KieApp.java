@@ -29,26 +29,8 @@ import org.kie.cloud.openshift.operator.model.components.Status;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Group("app.kiegroup.org")
 @Version("v2")
-public class KieApp extends CustomResource implements Namespaced {
+public class KieApp extends CustomResource<Spec, Status> implements Namespaced {
 
     private static final long serialVersionUID = -7608178420952152353L;
 
-    private Spec spec = new Spec();
-    private Status status;
-
-    public Spec getSpec() {
-        return spec;
-    }
-
-    public void setSpec(Spec spec) {
-        this.spec = spec;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 }

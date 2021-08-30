@@ -189,10 +189,7 @@ public class PrometheusDeployer {
     }
 
     private static void createServiceMonitorCustomResource(Project project) {
-        //CustomResourceDefinition customResourceDefinition = OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName("servicemonitors.monitoring.coreos.com").get();
         NonNamespaceOperation<ServiceMonitor, KubernetesResourceList<ServiceMonitor>, Resource<ServiceMonitor>> serviceMonitorClient = OpenShifts.admin().customResources(ServiceMonitor.class).inNamespace(project.getName());
-        
-        //CustomResourceDefinition customResourceDefinition = OpenShifts.admin().apiextensions().v1().customResourceDefinitions().withName("servicemonitors.monitoring.coreos.com").get();
 
         AuthOption username = new AuthOption();
         username.setName(METRIC_SECRET_NAME);
