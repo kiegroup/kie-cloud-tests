@@ -17,20 +17,16 @@
 package org.kie.cloud.strimzi.resources;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Version;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class KafkaTopic extends CustomResource {
+@Group("kafka.strimzi.io")
+@Version("v1beta2")
+public class KafkaTopic extends CustomResource<KafkaTopicSpec, KafkaTopicStatus> implements Namespaced {
 
     public static final String CLUSTER_LABEL = "strimzi.io/cluster";
 
-    private KafkaTopicSpec spec;
-
-    public KafkaTopicSpec getSpec() {
-        return spec;
-    }
-
-    public void setSpec(KafkaTopicSpec spec) {
-        this.spec = spec;
-    }
 }

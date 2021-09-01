@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.SecretBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.openshift.resource.Project;
@@ -29,16 +31,17 @@ public class AmqSecretDeployer {
 
     public static void create(Project project) {
         try {
-            project.getOpenShift().secrets().createOrReplaceWithNew()
-            .withNewMetadata()
-                .withName("amq-app-secret")
-                .withNamespace(project.getName())
-            .endMetadata()
-            .addToData("broker.ks", 
-                    Base64.encodeBase64String(Files.readAllBytes(Paths.get(DeploymentConstants.getCertificateDir()+"/broker.ks")))) //TODO replace with constants
-            .addToData("broker.ts", 
-                    Base64.encodeBase64String(Files.readAllBytes(Paths.get(DeploymentConstants.getCertificateDir()+"/broker.ts")))) //TODO replace with constants
-            .done();
+            Secret amqAppSecret = new SecretBuilder()
+                    .withNewMetadata()
+                        .withName("amq-app-secret")
+                        .withNamespace(project.getName())
+                        .endMetadata()
+                    .addToData("broker.ks", 
+                            Base64.encodeBase64String(Files.readAllBytes(Paths.get(DeploymentConstants.getCertificateDir()+"/broker.ks")))) //TODO replace with constants
+                    .addToData("broker.ts", 
+                            Base64.encodeBase64String(Files.readAllBytes(Paths.get(DeploymentConstants.getCertificateDir()+"/broker.ts")))) //TODO replace with constants
+                    .build();
+            project.getOpenShift().secrets().createOrReplace(amqAppSecret);
         } catch (IOException ex) {
             throw new RuntimeException("Exception cat during creating AMQ secret." , ex);
         }
