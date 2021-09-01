@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.SupplierWaiter;
 import cz.xtf.core.waiting.WaiterException;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.kie.cloud.api.deployment.ControllerDeployment;
 import org.kie.cloud.api.deployment.Deployment;
@@ -198,17 +199,17 @@ public class ClusteredWorkbenchKieServerPersistentScenarioImpl extends OpenShift
     private String upgradeOperatorToLatestVersion() {
         String latestImage = getLatestOperatorVersion();
 
-        project.getOpenShift().apps().deployments().withName(OPERATOR_DEPLOYMENT_NAME).edit()
+        project.getOpenShift().apps().deployments().withName(OPERATOR_DEPLOYMENT_NAME).edit(deployment-> new DeploymentBuilder(deployment)
                  .editSpec()
                      .editTemplate()
                          .editSpec()
                              .editFirstContainer()
-                                 .withNewImage(latestImage)
+                                 .withImage(latestImage)
                              .endContainer()
                          .endSpec()
                      .endTemplate()
                  .endSpec()
-                 .done();
+                 .build());
 
         return StringUtils.substringAfterLast(latestImage, ":");
     }
