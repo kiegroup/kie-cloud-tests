@@ -61,6 +61,9 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
     public void testDependencies() {
         List<String> instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());
         OpenShiftBinary oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
+        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
+        String dependencies = oc.execute(args);
+        System.out.println(dependencies);
     }
 
 }
