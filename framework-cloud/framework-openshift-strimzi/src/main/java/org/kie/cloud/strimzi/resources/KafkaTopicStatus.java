@@ -1,8 +1,9 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,12 +16,25 @@
 
 package org.kie.cloud.strimzi.resources;
 
-import io.fabric8.kubernetes.api.builder.Function;
-import io.fabric8.kubernetes.client.CustomResourceDoneable;
+public class KafkaTopicStatus {
 
-public class KafkaClusterDoneable extends CustomResourceDoneable<KafkaCluster> {
+    private KafkaCondition[] conditions;
+    private String topicName;
 
-    public KafkaClusterDoneable(KafkaCluster resource, Function<KafkaCluster, KafkaCluster> function) {
-        super(resource, function);
+    public KafkaCondition[] getConditions() {
+        return conditions;
     }
+
+    public void setConditions(KafkaCondition[] conditions) {
+        this.conditions = conditions;
+    }
+
+    public String getTopicName() {
+        return topicName;
+    }
+
+    public void setTopicName(String topicName) {
+        this.topicName = topicName;
+    }
+
 }

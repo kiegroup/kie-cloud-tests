@@ -17,7 +17,6 @@ package org.kie.cloud.openshift.util;
 
 import java.io.ByteArrayOutputStream;
 
-import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
@@ -25,7 +24,7 @@ import io.fabric8.kubernetes.client.dsl.internal.ExecWebSocketListener;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 
 public class CommandUtil {
-    public static CommandExecutionResult runCommandImpl(PodResource<Pod, DoneablePod> pod, String... command) {
+    public static CommandExecutionResult runCommandImpl(PodResource<Pod> pod, String... command) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ByteArrayOutputStream error = new ByteArrayOutputStream();
 
