@@ -31,12 +31,10 @@ import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.client.KieServicesClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerDependenciesIntegrationTest.class);
+    //private static final Logger logger = LoggerFactory.getLogger(KieServerDependenciesIntegrationTest.class);
 
     private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
     
