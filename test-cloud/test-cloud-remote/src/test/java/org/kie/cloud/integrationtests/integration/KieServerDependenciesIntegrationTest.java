@@ -27,7 +27,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
-import org.kie.cloud.api.scenario.KieServerWithExternalDatabaseScenario;
+import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.client.KieServicesClient;
@@ -40,7 +40,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
     
-    private KieServerWithExternalDatabaseScenario kieServerScenario = deploymentScenarioFactory.getKieServerWithExternalDatabaseScenarioBuilder().build();
+    private KieServerWithDatabaseScenario kieServerScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder().build();
 
     private KieServicesClient kieServicesClient;
 
