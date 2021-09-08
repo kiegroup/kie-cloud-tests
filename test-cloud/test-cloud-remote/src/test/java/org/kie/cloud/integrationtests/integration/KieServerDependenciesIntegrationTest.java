@@ -40,7 +40,9 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
     
-    private KieServerWithDatabaseScenario kieServerScenario;
+    private KieServerWithDatabaseScenario kieServerScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
+                                                            .withInternalMavenRepo(false)
+                                                            .build();
 
     private KieServicesClient kieServicesClient;
 
@@ -53,9 +55,6 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     @Before
     public void setUp() {
-        kieServerScenario = deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
-                    .withInternalMavenRepo(false)
-                    .build();
         kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
         kieServicesClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
     }
