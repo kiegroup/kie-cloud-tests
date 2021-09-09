@@ -15,7 +15,9 @@
 
 package org.kie.cloud.strimzi.resources;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class KafkaClusterBuilder {
@@ -66,11 +68,25 @@ public class KafkaClusterBuilder {
 
         final KafkaClusterSpec kafkaClusterSpec = new KafkaClusterSpec();
         kafkaClusterSpec.getKafka().put("replicas", kafkaReplicas);
-        final Map<String, Object> externalListeners = new HashMap<>();
-        externalListeners.put("type", "route");
-        final Map<String, Object> listeners = new HashMap<>();
-        listeners.put("plain", new HashMap<String, Object>());
-        listeners.put("external", externalListeners);
+        final List<Object> listeners = new ArrayList<Object>();
+        final Map<String, Object> plainListener = new HashMap<>();
+        plainListener.put("name", "plain");
+        plainListener.put("port", 9092);
+        plainListener.put("tls", false);
+        plainListener.put("type", "internal");
+        listeners.add(plainListener);
+        final Map<String, Object> tlsListener = new HashMap<>();
+        tlsListener.put("name", "tls");
+        tlsListener.put("port", 9093);
+        tlsListener.put("tls", true);
+        tlsListener.put("type", "internal");
+        listeners.add(tlsListener);
+        final Map<String, Object> externalListener = new HashMap<>();
+        externalListener.put("name", "external");
+        externalListener.put("port", 9094);
+        externalListener.put("tls", true);
+        externalListener.put("type", "route");
+        listeners.add(externalListener);
         kafkaClusterSpec.getKafka().put("listeners", listeners);
         kafkaClusterSpec.getKafka().put("config", kafkaConfig);
         if (persistent == true) {
