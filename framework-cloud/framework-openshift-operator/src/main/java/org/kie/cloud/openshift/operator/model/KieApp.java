@@ -33,4 +33,13 @@ public class KieApp extends CustomResource<Spec, Status> implements Namespaced {
 
     private static final long serialVersionUID = -7608178420952152353L;
 
+    @Override
+    protected Spec initSpec() {
+        return new Spec();
+    }
+
+    @Override
+    protected Status initStatus() {
+        return new Status();
+    }
 }
