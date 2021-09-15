@@ -32,4 +32,13 @@ import io.fabric8.kubernetes.model.annotation.Version;
 @Singular("kafka")
 public class KafkaCluster extends CustomResource<KafkaClusterSpec, KafkaClusterStatus> implements Namespaced {
 
+    @Override
+    protected KafkaClusterSpec initSpec() {
+        return new KafkaClusterSpec();
+    }
+
+    @Override
+    protected KafkaClusterStatus initStatus() {
+        return new KafkaClusterStatus();
+    }
 }
