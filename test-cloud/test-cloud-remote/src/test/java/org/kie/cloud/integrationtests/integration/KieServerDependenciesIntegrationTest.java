@@ -45,7 +45,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     @Override
     protected KieServerWithDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getKieServerWithPostgreSqlScenarioBuilder()
+        return this.deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
                                         .withInternalMavenRepo(false)
                                         .build();
     }
