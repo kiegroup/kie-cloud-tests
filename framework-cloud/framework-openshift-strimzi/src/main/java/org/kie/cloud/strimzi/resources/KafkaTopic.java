@@ -29,4 +29,13 @@ public class KafkaTopic extends CustomResource<KafkaTopicSpec, KafkaTopicStatus>
 
     public static final String CLUSTER_LABEL = "strimzi.io/cluster";
 
+    @Override
+    protected KafkaTopicSpec initSpec() {
+        return new KafkaTopicSpec();
+    }
+
+    @Override
+    protected KafkaTopicStatus initStatus() {
+        return new KafkaTopicStatus();
+    }
 }
