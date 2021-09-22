@@ -161,7 +161,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
         }
 
         logger.info("Waiting for Database deployment to become ready.");
-        databaseDeployment.waitForScale();
+        //databaseDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
