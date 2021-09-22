@@ -152,7 +152,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
         logger.info("Waiting until all services are created.");
         try {
             new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
-            new SimpleWaiter(() -> databaseDeployment.isReady()).reason("Waiting for Database service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
+            //new SimpleWaiter(() -> databaseDeployment.isReady()).reason("Waiting for Database service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
             if(request.isDeployProcessMigration()) {
                 new SimpleWaiter(processMigrationDeployment::isReady).reason("Waiting for Process Migration service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
             }
