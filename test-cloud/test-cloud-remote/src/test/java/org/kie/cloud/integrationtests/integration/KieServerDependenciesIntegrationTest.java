@@ -33,6 +33,8 @@ import org.kie.server.client.KieServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerWithDatabaseScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerDependenciesIntegrationTest.class);
@@ -57,12 +59,12 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
     }
 
     @Test
-    public void testDependencies() {
+    public void testDependenciesExist() {
         List<String> instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());
         OpenShiftBinary oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
         String dependencies = oc.execute(args);
-        logger.info("Found in dependencies: " + dependencies);
+        assertThat(dependencies).isNotEmpty();
     }
 
 }
