@@ -26,7 +26,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
+import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.client.KieServicesClient;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerWithDatabaseScenario> {
+public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerScenario> {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerDependenciesIntegrationTest.class);
 
@@ -46,8 +46,8 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
     private KieServerDeployment kieServerDeployment;
 
     @Override
-    protected KieServerWithDatabaseScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getKieServerWithMySqlScenarioBuilder()
+    protected KieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
+        return deploymentScenarioFactory.getKieServerScenarioBuilder()
                                         .withInternalMavenRepo(false)
                                         .build();
     }

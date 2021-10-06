@@ -16,7 +16,7 @@ package org.kie.cloud.openshift.operator.scenario.builder;
 
 public class KieServerWithMySqlScenarioBuilderImpl extends AbstractKieServerWithDatabaseScenarioBuilder {
 
-    private static final String MYSQL_TYPE = "h2";
+    private static final String MYSQL_TYPE = "mysql";
 
     @Override
     protected String getDatabaseType() {

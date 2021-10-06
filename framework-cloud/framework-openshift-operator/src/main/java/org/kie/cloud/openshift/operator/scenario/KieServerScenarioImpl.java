@@ -25,15 +25,13 @@ import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.SupplierWaiter;
 import cz.xtf.core.waiting.WaiterException;
 import org.kie.cloud.api.deployment.ControllerDeployment;
-import org.kie.cloud.api.deployment.DatabaseDeployment;
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.ProcessMigrationDeployment;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
 import org.kie.cloud.api.deployment.SsoDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
-import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
+import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
 import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
@@ -49,7 +47,7 @@ import org.kie.cloud.openshift.util.SsoDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario<KieServerWithDatabaseScenario> implements KieServerWithDatabaseScenario {
+public class KieServerScenarioImpl extends OpenShiftOperatorScenario<KieServerScenario> implements KieServerScenario {
 
     private KieServerDeploymentImpl kieServerDeployment;
     private DatabaseDeploymentImpl databaseDeployment;
@@ -59,7 +57,7 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerWithDatabaseScenarioImpl.class);
 
-    public KieServerWithDatabaseScenarioImpl(KieApp kieApp, ScenarioRequest request) {
+    public KieServerScenarioImpl(KieApp kieApp, ScenarioRequest request) {
         super(kieApp);
         this.request = request;
     }
@@ -99,16 +97,6 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
     @Override
     public SsoDeployment getSsoDeployment() {
         return ssoDeployment;
-    }
-
-    @Override
-    public DatabaseDeployment getDatabaseDeployment() {
-        return databaseDeployment;
-    }
-
-    @Override
-    public ProcessMigrationDeployment getProcessMigrationDeployment() {
-        return processMigrationDeployment;
     }
 
     @Override
@@ -152,7 +140,6 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
         logger.info("Waiting until all services are created.");
         try {
             new SimpleWaiter(() -> kieServerDeployment.isReady()).reason("Waiting for Kie server service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
-            new SimpleWaiter(() -> databaseDeployment.isReady()).reason("Waiting for Database service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
             if(request.isDeployProcessMigration()) {
                 new SimpleWaiter(processMigrationDeployment::isReady).reason("Waiting for Process Migration service to be created.").timeout(TimeUnit.MINUTES, 1).waitFor();
             }
@@ -161,7 +148,6 @@ public class KieServerWithDatabaseScenarioImpl extends OpenShiftOperatorScenario
         }
 
         logger.info("Waiting for Database deployment to become ready.");
-        databaseDeployment.waitForScale();
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
