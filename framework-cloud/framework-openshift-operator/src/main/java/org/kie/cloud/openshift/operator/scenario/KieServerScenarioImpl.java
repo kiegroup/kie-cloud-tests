@@ -55,7 +55,7 @@ public class KieServerScenarioImpl extends OpenShiftOperatorScenario<KieServerSc
     private ScenarioRequest request;
     private SsoDeployment ssoDeployment;
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerWithDatabaseScenarioImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(KieServerScenarioImpl.class);
 
     public KieServerScenarioImpl(KieApp kieApp, ScenarioRequest request) {
         super(kieApp);
@@ -146,8 +146,6 @@ public class KieServerScenarioImpl extends OpenShiftOperatorScenario<KieServerSc
         } catch (WaiterException e) {
             throw new RuntimeException("Timeout while deploying application.", e);
         }
-
-        logger.info("Waiting for Database deployment to become ready.");
 
         logger.info("Waiting for Kie server deployment to become ready.");
         kieServerDeployment.waitForScale();
