@@ -173,10 +173,9 @@
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
-        <groupId>org.drools</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>process-migration-service</artifactId>
         <version>${version.org.kie}</version>
-        <classifier>classes</classifier>
       </dependency>
       <dependency>
         <groupId>org.kie</groupId>
