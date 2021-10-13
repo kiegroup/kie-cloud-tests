@@ -43,7 +43,13 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     private KieServicesClient kieServicesClient;
 
-    private KieServerDeployment kieServerDeployment;
+    private KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
+
+    List<String> instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());
+        
+    OpenShiftBinary oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
+
+    private String dependencies;
 
     @Override
     protected KieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
@@ -54,18 +60,22 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     @Before
     public void setUp() {
-        kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
         kieServicesClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
+        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
+        dependencies = oc.execute(args);
+        logger.info("Found following dependencies: " + dependencies);
     }
 
     @Test
     public void testDependenciesExist() {
-        List<String> instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());
-        OpenShiftBinary oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
-        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
-        String dependencies = oc.execute(args);
-        logger.info("Found following dependencies: " + dependencies);
-        logger.info("Container info:" + kieServicesClient.getContainerInfo(CONTAINER_ID).toString());
         assertThat(dependencies).isNotEmpty();
+    }
+
+    @Test
+    public void testJBPMClustering() {
+        assertThat(dependencies.split("")).contains("jbpm-clustering");
+        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-clustering"};
+        String dependencyName = oc.execute(args);
+        logger.info("jbmp-clustering folder contents: " + dependencyName);
     }
 }
