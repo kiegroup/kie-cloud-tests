@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.openshift.constants.OpenShiftConstants;
-import org.kie.cloud.openshift.deployment.DatabaseDeploymentImpl;
 import org.kie.cloud.openshift.deployment.KieServerDeploymentImpl;
 import org.kie.cloud.openshift.deployment.ProcessMigrationDeploymentImpl;
 import org.kie.cloud.openshift.operator.deployment.KieServerOperatorDeployment;
@@ -50,7 +49,6 @@ import org.slf4j.LoggerFactory;
 public class KieServerScenarioImpl extends OpenShiftOperatorScenario<KieServerScenario> implements KieServerScenario {
 
     private KieServerDeploymentImpl kieServerDeployment;
-    private DatabaseDeploymentImpl databaseDeployment;
     private ProcessMigrationDeploymentImpl processMigrationDeployment;
     private ScenarioRequest request;
     private SsoDeployment ssoDeployment;
@@ -69,7 +67,7 @@ public class KieServerScenarioImpl extends OpenShiftOperatorScenario<KieServerSc
 
     @Override
     public List<Deployment> getDeployments() {
-        List<Deployment> deployments = new ArrayList<>(Arrays.asList(kieServerDeployment, ssoDeployment, databaseDeployment, processMigrationDeployment));
+        List<Deployment> deployments = new ArrayList<>(Arrays.asList(kieServerDeployment, ssoDeployment, processMigrationDeployment));
         deployments.removeAll(Collections.singleton(null));
         return deployments;
     }
@@ -130,8 +128,6 @@ public class KieServerScenarioImpl extends OpenShiftOperatorScenario<KieServerSc
         kieServerDeployment = new KieServerOperatorDeployment(project, getKieAppClient());
         kieServerDeployment.setUsername(DeploymentConstants.getAppUser());
         kieServerDeployment.setPassword(DeploymentConstants.getAppPassword());
-
-        databaseDeployment = new DatabaseDeploymentImpl(project);
 
         if(request.isDeployProcessMigration()) {
             processMigrationDeployment = new ProcessMigrationOperatorDeployment(project);

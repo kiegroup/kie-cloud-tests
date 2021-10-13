@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 JBoss by Red Hat.
+ * Copyright 2021 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
         String dependencies = oc.execute(args);
         logger.info("Found following dependencies: " + dependencies);
+        logger.info("Container info:" + kieServicesClient.getContainerInfo(CONTAINER_ID).toString());
         assertThat(dependencies).isNotEmpty();
     }
-
 }
