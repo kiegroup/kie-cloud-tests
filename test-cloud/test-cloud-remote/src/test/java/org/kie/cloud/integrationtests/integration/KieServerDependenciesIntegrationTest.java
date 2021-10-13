@@ -43,11 +43,11 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     private KieServicesClient kieServicesClient;
 
-    private KieServerDeployment kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
+    private KieServerDeployment kieServerDeployment;
 
-    List<String> instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());
-        
-    OpenShiftBinary oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
+    private List<String> instanceNames;
+
+    private OpenShiftBinary oc;
 
     private String dependencies;
 
@@ -61,6 +61,9 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
     @Before
     public void setUp() {
         kieServicesClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
+        kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
+        instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());      
+        oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
         dependencies = oc.execute(args);
         logger.info("Found following dependencies: " + dependencies);
@@ -77,5 +80,6 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-clustering"};
         String dependencyName = oc.execute(args);
         logger.info("jbmp-clustering folder contents: " + dependencyName);
+
     }
 }
