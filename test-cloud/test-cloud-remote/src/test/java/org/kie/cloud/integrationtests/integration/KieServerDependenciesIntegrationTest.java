@@ -77,7 +77,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     @Test
     public void testJBPMClustering() {
-        assertThat(dependencies.trim().split(" ")).contains("jbpm-clustering");
+        assertThat(dependencies).contains("jbpm-clustering");
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-clustering"};
         String dependencyName = oc.execute(args).trim();
         logger.info("jbmp-clustering folder contents: " + dependencyName);
@@ -86,7 +86,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     @Test
     public void testJBPMKafka() {
-        assertThat(dependencies.trim().split(" ")).contains("jbpm-kafka");
+        assertThat(dependencies).contains("jbpm-kafka");
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-kafka"};
         String dependencyName = oc.execute(args).trim();
         logger.info("jbmp-kafka folder contents: " + dependencyName);
