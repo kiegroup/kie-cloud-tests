@@ -76,7 +76,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     @Test
     public void testJBPMClustering() {
-        assertThat(dependencies.split(" ")).contains("jbpm-clustering");
+        assertThat(dependencies.trim().split(" ")).contains("jbpm-clustering");
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-clustering"};
         String dependencyName = oc.execute(args);
         logger.info("jbmp-clustering folder contents: " + dependencyName);
