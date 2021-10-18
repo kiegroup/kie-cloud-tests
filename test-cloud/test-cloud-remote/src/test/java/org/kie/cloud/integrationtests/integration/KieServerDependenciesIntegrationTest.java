@@ -26,6 +26,7 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
@@ -78,8 +79,18 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
     public void testJBPMClustering() {
         assertThat(dependencies.trim().split(" ")).contains("jbpm-clustering");
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-clustering"};
-        String dependencyName = oc.execute(args);
+        String dependencyName = oc.execute(args).trim();
         logger.info("jbmp-clustering folder contents: " + dependencyName);
-
+        assertThat(dependencyName).isEqualTo("kie-server-services-jbpm-cluster-" + DeploymentConstants.getKieArtifactVersion() + ".jar");
     }
+
+    @Test
+    public void testJBPMKafka() {
+        assertThat(dependencies.trim().split(" ")).contains("jbpm-kafka");
+        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-kafka"};
+        String dependencyName = oc.execute(args).trim();
+        logger.info("jbmp-kafka folder contents: " + dependencyName);
+        assertThat(dependencyName).isEqualTo("jbpm-event-emitters-kafka-" + DeploymentConstants.getKieArtifactVersion() + ".jar");
+    }
+
 }
