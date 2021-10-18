@@ -27,7 +27,6 @@ import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
 import org.kie.cloud.api.deployment.Instance;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.scenario.KieServerScenario;
-import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.client.KieServicesClient;
 import org.slf4j.Logger;
@@ -60,7 +59,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
 
     @Before
     public void setUp() {
-        kieServicesClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
+        //kieServicesClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
         instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());      
         oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
