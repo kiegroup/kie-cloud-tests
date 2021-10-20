@@ -80,7 +80,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
         assertThat(dependencies).contains("jbpm-clustering");
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-clustering"};
         String dependencyName = oc.execute(args).trim();
-        logger.info("jbmp-clustering folder contents: " + dependencyName);
+        logger.info("jbpm-clustering folder contents: " + dependencyName);
         assertThat(dependencyName).isEqualTo("kie-server-services-jbpm-cluster-" + DeploymentConstants.getKieArtifactVersion() + ".jar");
     }
 
@@ -89,7 +89,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
         assertThat(dependencies).contains("jbpm-kafka");
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-kafka"};
         String dependencyName = oc.execute(args).trim();
-        logger.info("jbmp-kafka folder contents: " + dependencyName);
+        logger.info("jbpm-kafka folder contents: " + dependencyName);
         assertThat(dependencyName).isEqualTo("jbpm-event-emitters-kafka-" + DeploymentConstants.getKieArtifactVersion() + ".jar");
     }
 
