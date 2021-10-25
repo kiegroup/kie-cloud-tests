@@ -48,11 +48,18 @@ public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrati
     @Before
     public void setUp() {
         deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+        logger.info("Deployment scneario factory var: " + deploymentScenarioFactory);
         deploymentScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
                 .withInternalMavenRepo(false)
                 .build();
+        logger.info("Deployment scenario var: " + deploymentScenario);
         kieServerDeployment = deploymentScenario.getKieServerDeployment();
-        instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());      
+        logger.info("kie server deployment var: " + kieServerDeployment);
+        instanceNames = kieServerDeployment
+                .getInstances()
+                .stream()
+                .map(Instance::getName)
+                .collect(Collectors.toList());      
         oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
         dependencies = oc.execute(args);
