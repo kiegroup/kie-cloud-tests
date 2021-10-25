@@ -29,18 +29,22 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.common.provider.KieServerClientProvider;
-import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.server.client.KieServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieServerScenario> {
+public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerDependenciesIntegrationTest.class);
 
     private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+
+    private KieServerScenario deploymentScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
+            .withInternalMavenRepo(false)
+            .build();
 
     private KieServicesClient kieServicesClient;
 
@@ -51,13 +55,6 @@ public class KieServerDependenciesIntegrationTest extends AbstractMethodIsolated
     private OpenShiftBinary oc;
 
     private String dependencies;
-
-    @Override
-    protected KieServerScenario createDeploymentScenario(DeploymentScenarioBuilderFactory deploymentScenarioFactory) {
-        return deploymentScenarioFactory.getKieServerScenarioBuilder()
-                                        .withInternalMavenRepo(false)
-                                        .build();
-    }
 
     @Before
     public void setUp() {
