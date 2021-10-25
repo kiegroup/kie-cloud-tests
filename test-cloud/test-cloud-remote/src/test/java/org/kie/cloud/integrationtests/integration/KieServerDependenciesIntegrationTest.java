@@ -38,24 +38,20 @@ public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrati
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerDependenciesIntegrationTest.class);
 
-    private DeploymentScenarioBuilderFactory deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-
-    private KieServerScenario deploymentScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
-            .withInternalMavenRepo(false)
-            .build();
-
+    private DeploymentScenarioBuilderFactory deploymentScenarioFactory;
+    private KieServerScenario deploymentScenario;
     private KieServerDeployment kieServerDeployment;
-
     private List<String> instanceNames;
-
     private OpenShiftBinary oc;
-
     private String dependencies;
 
     @Before
     public void setUp() {
+        deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
+        deploymentScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
+                .withInternalMavenRepo(false)
+                .build();
         kieServerDeployment = deploymentScenario.getKieServerDeployment();
-        logger.info("Kie server deployment var:  " + kieServerDeployment.toString());
         instanceNames = kieServerDeployment.getInstances().stream().map(Instance::getName).collect(Collectors.toList());      
         oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
         String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
