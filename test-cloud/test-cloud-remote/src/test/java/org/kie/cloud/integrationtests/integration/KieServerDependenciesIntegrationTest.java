@@ -29,6 +29,7 @@ import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerScenario;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
+import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrati
                 .withInternalMavenRepo(false)
                 .build();
         logger.info("Deployment scenario var: " + deploymentScenario);
+        ScenarioDeployer.deployScenario(deploymentScenario);
         kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
         logger.info("kie server deployment var: " + kieServerDeployment);
         instanceNames = kieServerDeployment
