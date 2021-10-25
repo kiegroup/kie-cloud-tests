@@ -53,7 +53,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrati
                 .withInternalMavenRepo(false)
                 .build();
         logger.info("Deployment scenario var: " + deploymentScenario);
-        kieServerDeployment = deploymentScenario.getKieServerDeployment();
+        kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
         logger.info("kie server deployment var: " + kieServerDeployment);
         instanceNames = kieServerDeployment
                 .getInstances()
