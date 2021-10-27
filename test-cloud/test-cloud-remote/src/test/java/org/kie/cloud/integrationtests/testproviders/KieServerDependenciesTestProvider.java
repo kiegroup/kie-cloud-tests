@@ -16,9 +16,7 @@
 
 package org.kie.cloud.integrationtests.testproviders;
 
-
 import java.util.List;
-
 import java.util.Objects;
 import java.util.stream.Collectors;
 
