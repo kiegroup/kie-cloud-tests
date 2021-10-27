@@ -15,25 +15,17 @@
  */
 package org.kie.cloud.integrationtests.integration;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import cz.xtf.core.openshift.OpenShiftBinary;
-import cz.xtf.core.openshift.OpenShifts;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactoryLoader;
-import org.kie.cloud.api.deployment.Instance;
-import org.kie.cloud.api.deployment.KieServerDeployment;
-import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerScenario;
+import org.kie.cloud.integrationtests.testproviders.KieServerDependenciesTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrationTest {
 
@@ -41,54 +33,33 @@ public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrati
 
     private DeploymentScenarioBuilderFactory deploymentScenarioFactory;
     private KieServerScenario deploymentScenario;
-    private KieServerDeployment kieServerDeployment;
-    private List<String> instanceNames;
-    private OpenShiftBinary oc;
-    private String dependencies;
+    private KieServerDependenciesTestProvider provider;
 
     @Before
     public void setUp() {
         deploymentScenarioFactory = DeploymentScenarioBuilderFactoryLoader.getInstance();
-        logger.info("Deployment scneario factory var: " + deploymentScenarioFactory);
         deploymentScenario = deploymentScenarioFactory.getKieServerScenarioBuilder()
                 .withInternalMavenRepo(false)
                 .build();
-        logger.info("Deployment scenario var: " + deploymentScenario);
         ScenarioDeployer.deployScenario(deploymentScenario);
-        kieServerDeployment = deploymentScenario.getKieServerDeployments().get(0);
-        logger.info("kie server deployment var: " + kieServerDeployment);
-        instanceNames = kieServerDeployment
-                .getInstances()
-                .stream()
-                .map(Instance::getName)
-                .collect(Collectors.toList());      
-        oc = OpenShifts.masterBinary(deploymentScenario.getNamespace());
-        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies"};
-        dependencies = oc.execute(args);
-        logger.info("Found following dependencies: " + dependencies);
+        provider = KieServerDependenciesTestProvider.create();
     }
 
     @Test
     public void testDependenciesExist() {
-        assertThat(dependencies).isNotEmpty();
+        provider.testDependenciesFolderNotEmpty(deploymentScenario);
     }
 
     @Test
     public void testJBPMClustering() {
-        assertThat(dependencies).contains("jbpm-clustering");
-        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-clustering"};
-        String dependencyName = oc.execute(args).trim();
-        logger.info("jbpm-clustering folder contents: " + dependencyName);
-        assertThat(dependencyName).isEqualTo("kie-server-services-jbpm-cluster-" + DeploymentConstants.getKieArtifactVersion() + ".jar");
+        provider.testClusterDependencyExists(deploymentScenario);
+        provider.testClusterDependencyVersion(deploymentScenario);
     }
 
     @Test
     public void testJBPMKafka() {
-        assertThat(dependencies).contains("jbpm-kafka");
-        String[] args = {"rsh", instanceNames.get(0), "ls", "/opt/kie/dependencies/jbpm-kafka"};
-        String dependencyName = oc.execute(args).trim();
-        logger.info("jbpm-kafka folder contents: " + dependencyName);
-        assertThat(dependencyName).isEqualTo("jbpm-event-emitters-kafka-" + DeploymentConstants.getKieArtifactVersion() + ".jar");
+        provider.testKafkaDependencyExists(deploymentScenario);
+        provider.testKafkaDependencyVersion(deploymentScenario);
     }
 
 }
