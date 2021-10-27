@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.integrationtests.integration;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -32,7 +33,7 @@ public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrati
     private static final Logger logger = LoggerFactory.getLogger(KieServerDependenciesIntegrationTest.class);
 
     private DeploymentScenarioBuilderFactory deploymentScenarioFactory;
-    private KieServerScenario deploymentScenario;
+    private static KieServerScenario deploymentScenario;
     private KieServerDependenciesTestProvider provider;
 
     @Before
@@ -43,6 +44,11 @@ public class KieServerDependenciesIntegrationTest extends AbstractCloudIntegrati
                 .build();
         ScenarioDeployer.deployScenario(deploymentScenario);
         provider = KieServerDependenciesTestProvider.create();
+    }
+
+    @After
+    public static void cleanEnvironment() {
+        ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     @Test
