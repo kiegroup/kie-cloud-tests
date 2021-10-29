@@ -1,5 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.0
-RUN microdnf install --nodocs java-1.8.0-openjdk-headless && microdnf clean all
+FROM registry.access.redhat.com/ubi8/openjdk-11:latest
 ENV M2_HOME=/opt/m2 GC_MAX_METASPACE_SIZE=512
 COPY root /
 EXPOSE 8080
