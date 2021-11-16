@@ -67,7 +67,8 @@ public class HACEPLeaderElectionIntegrationTest extends AbstractMethodIsolatedCl
         try (Project project = new ProjectImpl(deploymentScenario.getNamespace())) {
             final String oldLeaderName = HACEPTestsUtils.leaderPodName(project);
             final Pod oldLeader = HACEPTestsUtils.leaderPod(project);
-            project.getOpenShift().deletePod(oldLeader);
+            project.getOpenShift().pods().inNamespace(project.getName())
+                    .withName(oldLeader.getMetadata().getName()).withGracePeriod(0).delete();
 
             deploymentScenario.getDeployments().get(0).waitForScale();
 
