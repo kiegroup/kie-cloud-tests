@@ -69,7 +69,8 @@ public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudInt
             Assertions.assertThat(factCount).isEqualTo(numberOfFacts);
 
             final Pod leaderPod = HACEPTestsUtils.leaderPod(project);
-            project.getOpenShift().deletePod(leaderPod);
+            project.getOpenShift().pods().inNamespace(project.getName())
+                    .withName(leaderPod.getMetadata().getName()).withGracePeriod(0).delete();
             deploymentScenario.getDeployments().get(0).waitForScale();
 
             factCountFuture = producer.getFactCount();
@@ -98,7 +99,8 @@ public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudInt
             fireAllRulesFuture.get();
 
             final Pod leaderPod = HACEPTestsUtils.leaderPod(project);
-            project.getOpenShift().deletePod(leaderPod);
+            project.getOpenShift().pods().inNamespace(project.getName())
+                    .withName(leaderPod.getMetadata().getName()).withGracePeriod(0).delete();
             deploymentScenario.getDeployments().get(0).waitForScale();
 
             final CompletableFuture<StockTickEvent> factFuture = producer.getObject(factHandle);
@@ -133,7 +135,8 @@ public class HACEPFailoverIntegrationTest extends AbstractMethodIsolatedCloudInt
                     .stream()
                     .map(instance -> instance.getName())
                     .map(podName -> project.getOpenShift().getPod(podName))
-                    .forEach(pod -> project.getOpenShift().deletePod(pod));
+                    .forEach(pod -> project.getOpenShift().pods().inNamespace(project.getName())
+                            .withName(pod.getMetadata().getName()).withGracePeriod(0).delete());
             deploymentScenario.getDeployments().get(0).waitForScale();
 
             CompletableFuture<Long> factCountFuture = producer.getFactCount();
