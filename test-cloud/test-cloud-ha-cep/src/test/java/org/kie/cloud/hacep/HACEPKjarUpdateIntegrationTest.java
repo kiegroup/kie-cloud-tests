@@ -154,7 +154,8 @@ public class HACEPKjarUpdateIntegrationTest extends AbstractMethodIsolatedCloudI
             Assertions.assertThat(updateKjarResult).isTrue();
 
             final Pod leaderPod = HACEPTestsUtils.leaderPod(project);
-            project.getOpenShift().deletePod(leaderPod);
+            project.getOpenShift().pods().inNamespace(project.getName())
+                    .withName(leaderPod.getMetadata().getName()).withGracePeriod(0).delete();
             deploymentScenario.getDeployments().get(0).waitForScale();
 
             final RemoteFactHandle<Map<String, String>> factHandle = producer.insert(new HashMap<>());
