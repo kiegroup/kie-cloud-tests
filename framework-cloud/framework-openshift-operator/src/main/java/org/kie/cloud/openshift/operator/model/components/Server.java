@@ -39,6 +39,9 @@ public class Server {
     private Jms jms;
     private Database database;
     private Jvm jvm;
+    private Boolean persistRepos;
+    private String serversKiePvSize;
+    private String serversM2PvSize;
 
     public String getName() {
         return name;
@@ -143,4 +146,27 @@ public class Server {
         this.routeHostname = routeHostname;
     }
 
+    public void setPersistRepos(Boolean persistRepos) {
+        this.persistRepos = persistRepos;
+    }
+
+    public Boolean getPersistRepos() {
+        return persistRepos;
+    }
+
+    public void setServersKiePvSize(String serversKiePvSize) {
+        this.serversKiePvSize = serversKiePvSize;
+    }
+
+    public String getServersKiePvSize() {
+        return serversKiePvSize;
+    }
+
+    public void setServersM2PvSize(String serversM2PvSize) {
+        this.serversM2PvSize = serversM2PvSize;
+    }
+
+    public String getServersM2PvSize() {
+        return serversM2PvSize;
+    }
 }

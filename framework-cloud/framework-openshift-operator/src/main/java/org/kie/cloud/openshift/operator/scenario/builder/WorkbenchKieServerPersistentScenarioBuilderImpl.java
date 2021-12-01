@@ -187,4 +187,14 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
     public WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override 
+    public WorkbenchKieServerPersistentScenarioBuilder withReposPersistence() {
+        for (Server server : kieApp.getSpec().getObjects().getServers()) {
+            server.setPersistRepos(true);
+            server.setServersKiePvSize("1Gi");
+            server.setServersM2PvSize("1Gi");
+        }
+        return this;
+    }
 }

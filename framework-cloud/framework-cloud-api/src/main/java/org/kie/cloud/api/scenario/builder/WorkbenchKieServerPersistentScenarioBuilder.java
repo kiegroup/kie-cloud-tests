@@ -109,4 +109,10 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
      */
     WorkbenchKieServerPersistentScenarioBuilder usePublicIpAddress();
 
+    /**
+     * Persists the maven repositories of KieServers in PVs
+     * @return Builder with Kie server repositories persistence.
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withReposPersistence();
+
 }
