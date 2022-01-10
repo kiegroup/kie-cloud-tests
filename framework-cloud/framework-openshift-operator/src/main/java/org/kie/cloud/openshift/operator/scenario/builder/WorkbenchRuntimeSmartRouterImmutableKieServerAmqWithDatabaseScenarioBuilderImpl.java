@@ -147,19 +147,29 @@ public class WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenari
         return this;
     }
 
+    private boolean kieServerHostnameSet = false;
+
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withHttpKieServerHostname(String hostname) {
+        checkHttpKieServerRouteConfig(kieServerHostnameSet, kieApp);
+
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+            server.setRouteHostname(hostname);
         }
+
+        kieServerHostnameSet = true;
         return this;
     }
 
     @Override
     public WorkbenchRuntimeSmartRouterImmutableKieServerAmqWithDatabaseScenarioBuilder withHttpsKieServerHostname(String hostname) {
+        checkHttpsKieServerRouteConfig(kieServerHostnameSet, kieApp);
+
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+            server.setRouteHostname(hostname);
         }
+
+        kieServerHostnameSet = true;
         return this;
     }
 
