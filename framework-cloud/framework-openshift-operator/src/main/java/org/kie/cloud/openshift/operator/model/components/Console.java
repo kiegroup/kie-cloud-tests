@@ -33,6 +33,7 @@ public class Console {
     private SsoClient ssoClient;
     private Resources resources;
     private Jvm jvm;
+    private DataGridAuth dataGridAuth;
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -89,4 +90,13 @@ public class Console {
     public void setJvm(Jvm jvm) {
         this.jvm = jvm;
     }
+
+    public DataGridAuth getDataGridAuth() {
+        return dataGridAuth;
+    }
+    
+    public void setDataGridAuth(DataGridAuth dataGridAuth) {
+        this.dataGridAuth = dataGridAuth;
+    }
+    
 }
