@@ -143,39 +143,68 @@ public class ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenar
         return this;
     }
 
+    private boolean kieServerHostnameSetOne = false;
+    private boolean kieServerHostnameSetTwo = false;
+
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer1Hostname(String hostname) {
-        kieApp.getSpec().getObjects().getServers()[0].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+        checkHttpKieServerRouteConfig(kieServerHostnameSetOne, kieApp);
+
+        kieApp.getSpec().getObjects().getServers()[0].setRouteHostname(hostname);
+
+        kieServerHostnameSetOne = true;
         return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpKieServer2Hostname(String hostname) {
-        kieApp.getSpec().getObjects().getServers()[1].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+        checkHttpKieServerRouteConfig(kieServerHostnameSetTwo, kieApp);
+
+        kieApp.getSpec().getObjects().getServers()[1].setRouteHostname(hostname);
+        
+        kieServerHostnameSetTwo = true;
         return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer1Hostname(String hostname) {
-        kieApp.getSpec().getObjects().getServers()[0].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+        checkHttpsKieServerRouteConfig(kieServerHostnameSetOne, kieApp);
+
+        kieApp.getSpec().getObjects().getServers()[0].setRouteHostname(hostname);
+
+        kieServerHostnameSetOne = true;
         return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsKieServer2Hostname(String hostname) {
-        kieApp.getSpec().getObjects().getServers()[1].addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+        checkHttpsKieServerRouteConfig(kieServerHostnameSetTwo, kieApp);
+
+        kieApp.getSpec().getObjects().getServers()[1].setRouteHostname(hostname);
+        
+        kieServerHostnameSetTwo = true;
         return this;
     }
 
+    private boolean workbenchHostnameSet = false;
+
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
-        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+        checkHttpWorkbenchRouteConfig(workbenchHostnameSet, kieApp);
+        
+        kieApp.getSpec().getObjects().getConsole().setRouteHostname(hostname);
+
+        workbenchHostnameSet = true;
         return this;
     }
 
     @Override
     public ClusteredWorkbenchRuntimeSmartRouterTwoKieServersTwoDatabasesScenarioBuilder withHttpWorkbenchHostname(String hostname) {
-        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+        checkHttpsWorkbenchRouteConfig(workbenchHostnameSet, kieApp);
+        
+        kieApp.getSpec().getObjects().getConsole().setRouteHostname(hostname);
+
+        workbenchHostnameSet = true;
         return this;
     }
 

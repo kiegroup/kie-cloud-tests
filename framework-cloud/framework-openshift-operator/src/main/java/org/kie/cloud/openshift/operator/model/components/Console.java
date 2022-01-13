@@ -33,6 +33,7 @@ public class Console {
     private SsoClient ssoClient;
     private Resources resources;
     private Jvm jvm;
+    private String routeHostname;
     private DataGridAuth dataGridAuth;
 
     public void addEnv(Env env) {
@@ -89,6 +90,14 @@ public class Console {
 
     public void setJvm(Jvm jvm) {
         this.jvm = jvm;
+    }
+    
+    public String getRouteHostname() {
+        return routeHostname;
+    }
+    
+    public void setRouteHostname(String routeHostname) {
+        this.routeHostname = routeHostname;
     }
 
     public DataGridAuth getDataGridAuth() {
