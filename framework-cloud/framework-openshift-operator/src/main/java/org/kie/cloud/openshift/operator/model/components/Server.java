@@ -34,6 +34,7 @@ public class Server {
     private Integer replicas;
     private SsoClient ssoClient;
     private Resources resources;
+    private String routeHostname;
     private Build build;
     private Jms jms;
     private Database database;
@@ -133,4 +134,13 @@ public class Server {
     public void setJvm(Jvm jvm) {
         this.jvm = jvm;
     }
+        
+    public String getRouteHostname() {
+        return routeHostname;
+    }
+    
+    public void setRouteHostname(String routeHostname) {
+        this.routeHostname = routeHostname;
+    }
+
 }

@@ -30,10 +30,12 @@ public class CommonConfig {
     private String applicationName;
     private String controllerPassword;
     private String dbPassword;
+    private Boolean disableSsl;
     private String imageTag;
     private String keyStorePassword;
     private String mavenPassword;
     private String serverPassword;
+    private StartupStrategy startupStrategy;
     private String version;
 
     public String getAdminUser() {
@@ -64,6 +66,10 @@ public class CommonConfig {
         return dbPassword;
     }
 
+    public Boolean getDisableSsl() {
+        return disableSsl;
+    }
+
     public String getImageTag() {
         return imageTag;
     }
@@ -78,6 +84,10 @@ public class CommonConfig {
 
     public String getServerPassword() {
         return serverPassword;
+    }
+
+    public StartupStrategy getStartupStrategy() {
+        return startupStrategy;
     }
 
     public String getVersion() {
@@ -112,6 +122,10 @@ public class CommonConfig {
         this.dbPassword = dbPassword;
     }
 
+    public void setDisableSsl(Boolean disableSsl) {
+        this.disableSsl = disableSsl;
+    }
+
     public void setImageTag(String imageTag) {
         this.imageTag = imageTag;
     }
@@ -126,6 +140,10 @@ public class CommonConfig {
 
     public void setServerPassword(String serverPassword) {
         this.serverPassword = serverPassword;
+    }
+
+    public void setStartupStrategy(StartupStrategy startupStrategy) {
+        this.startupStrategy = startupStrategy;
     }
 
     public void setVersion(String version) {

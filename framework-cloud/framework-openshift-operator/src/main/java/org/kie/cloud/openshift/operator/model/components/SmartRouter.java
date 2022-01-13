@@ -32,6 +32,7 @@ public class SmartRouter {
     private String keystoreSecret;
     private Resources resources;
     private Jvm jvm;
+    private String routeHostname;
 
     public Integer getReplicas() {
         return replicas;
@@ -79,5 +80,13 @@ public class SmartRouter {
 
     public void setJvm(Jvm jvm) {
         this.jvm = jvm;
+    }
+
+    public String getRouteHostname() {
+        return routeHostname;
+    }
+    
+    public void setRouteHostname(String routeHostname) {
+        this.routeHostname = routeHostname;
     }
 }

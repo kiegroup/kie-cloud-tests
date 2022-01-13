@@ -119,31 +119,51 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         return this;
     }
 
+    private boolean workbenchHostnameSet = false;
+
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withHttpWorkbenchHostname(String hostname) {
-        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+        checkHttpWorkbenchRouteConfig(workbenchHostnameSet, kieApp);
+        
+        kieApp.getSpec().getObjects().getConsole().setRouteHostname(hostname);
+
+        workbenchHostnameSet = true;
         return this;
     }
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withHttpsWorkbenchHostname(String hostname) {
-        kieApp.getSpec().getObjects().getConsole().addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+        checkHttpsWorkbenchRouteConfig(workbenchHostnameSet, kieApp);
+        
+        kieApp.getSpec().getObjects().getConsole().setRouteHostname(hostname);
+
+        workbenchHostnameSet = true;
         return this;
     }
 
+    private boolean kieServerHostnameSet = false;
+
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withHttpKieServerHostname(String hostname) {
+        checkHttpKieServerRouteConfig(kieServerHostnameSet, kieApp);
+
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTP, hostname));
+            server.setRouteHostname(hostname);
         }
+
+        kieServerHostnameSet = true;
         return this;
     }
 
     @Override
     public WorkbenchKieServerPersistentScenarioBuilder withHttpsKieServerHostname(String hostname) {
+        checkHttpsKieServerRouteConfig(kieServerHostnameSet, kieApp);
+
         for (Server server : kieApp.getSpec().getObjects().getServers()) {
-            server.addEnv(new Env(ImageEnvVariables.HOSTNAME_HTTPS, hostname));
+            server.setRouteHostname(hostname);
         }
+
+        kieServerHostnameSet = true;
         return this;
     }
 
