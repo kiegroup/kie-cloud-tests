@@ -34,6 +34,7 @@ public class Console {
     private Resources resources;
     private Jvm jvm;
     private String routeHostname;
+    private DataGridAuth dataGridAuth;
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -99,5 +100,12 @@ public class Console {
         this.routeHostname = routeHostname;
     }
 
+    public DataGridAuth getDataGridAuth() {
+        return dataGridAuth;
+    }
+    
+    public void setDataGridAuth(DataGridAuth dataGridAuth) {
+        this.dataGridAuth = dataGridAuth;
+    }
     
 }
