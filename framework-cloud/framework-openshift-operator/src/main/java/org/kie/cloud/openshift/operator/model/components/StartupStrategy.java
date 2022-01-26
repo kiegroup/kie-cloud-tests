@@ -41,6 +41,4 @@ public class StartupStrategy {
     public void setStrategyName(String strategyName) {
         this.strategyName = strategyName;
     }
-
-    
 }

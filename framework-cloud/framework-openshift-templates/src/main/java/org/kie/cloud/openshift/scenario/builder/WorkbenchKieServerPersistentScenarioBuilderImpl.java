@@ -115,4 +115,9 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         envVariables.put(OpenShiftTemplateConstants.GIT_HOOKS_DIR, dir);
         return this;
     }
+
+    @Override 
+    public WorkbenchKieServerPersistentScenarioBuilder withReposPersistence() {
+        throw new UnsupportedOperationException("Not supported with templates.");
+    }
 }
