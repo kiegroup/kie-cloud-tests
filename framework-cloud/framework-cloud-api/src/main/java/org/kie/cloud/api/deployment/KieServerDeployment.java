@@ -53,6 +53,14 @@ public interface KieServerDeployment extends Deployment {
     String getUsername();
 
     /**
+     * Set Kie Server user name. This will override Kie Server username 
+     * set by property org.kie.server.user
+     *
+     * @param username Kie Server user name
+     */
+    void setUsername(String username);
+
+    /**
      * Get Kie Server user password. Kie Server password is set by property
      * org.kie.server.pwd
      *

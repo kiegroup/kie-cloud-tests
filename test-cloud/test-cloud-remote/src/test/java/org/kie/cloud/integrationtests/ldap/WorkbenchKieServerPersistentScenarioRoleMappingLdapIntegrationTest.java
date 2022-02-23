@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 JBoss by Red Hat.
+ * Copyright 2022 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kie.cloud.integrationtests.ldap;
 
 import java.time.Duration;
@@ -23,20 +24,18 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
+import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
-import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.TemplateNotSupported;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
-import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
-import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.AutoScalerDeployment;
 import org.kie.cloud.tests.common.ScenarioDeployer;
@@ -48,24 +47,22 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-@Category(Baseline.class)
-public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
+@Category(TemplateNotSupported.class)
+public class WorkbenchKieServerPersistentScenarioRoleMappingLdapIntegrationTest  extends AbstractCloudIntegrationTest {
 
-    private static final String REPOSITORY_NAME = generateNameWithPrefix(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(WorkbenchKieServerPersistentScenarioRoleMappingLdapIntegrationTest.class.getSimpleName());
 
     private static WorkbenchKieServerScenario deploymentScenario;
 
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
     private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
-    private static PersistenceTestProvider persistenceTestProvider;
-    private static ProjectBuilderTestProvider projectBuilderTestProvider;
 
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
-    private static final String CLOUDBALANCE_CONTAINER_ID = "cloudbalance";
+
+    private static final String TEST_APP_USER = "test-"+DeploymentConstants.getAppUser();
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -81,28 +78,31 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
                 .withLdapRolesCtxDn(LdapSettingsConstants.ROLES_CTX_DN)
                 .withLdapRoleFilter(LdapSettingsConstants.ROLE_FILTER)
                 .withLdapRoleRecursion(LdapSettingsConstants.ROLE_RECURSION)
+                .withLdapDefaultRole(LdapSettingsConstants.DEFAULT_ROLE)
                 .build();
 
         deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
                                   .withLdap(ldapSettings)
+                                  .withRoleMapper(LdapSettingsConstants.ROLE_MAPPING, true, true)
                                   .withInternalMavenRepo()
                                   .withGitSettings(GitSettings.fromProperties()
                                                               .withRepository(REPOSITORY_NAME,
-                                                                              WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getResource(
+                                                              WorkbenchKieServerPersistentScenarioRoleMappingLdapIntegrationTest.class.getResource(
                                                                                                                                       PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
                                   .build();
         deploymentScenario
-                  .setLogFolderName(WorkbenchKieServerPersistentScenarioLdapIntegrationTest.class.getSimpleName());
+                  .setLogFolderName(WorkbenchKieServerPersistentScenarioRoleMappingLdapIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
+
+        // Change user in deployment scenario to use the one with mapped roles
+        deploymentScenario.getKieServerDeployment().setUsername(TEST_APP_USER);
+        deploymentScenario.getWorkbenchDeployment().setUsername(TEST_APP_USER);
 
         // Setup test providers
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
         processTestProvider = ProcessTestProvider.create(deploymentScenario);
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
         httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
         httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
-        persistenceTestProvider = PersistenceTestProvider.create();
-        projectBuilderTestProvider = ProjectBuilderTestProvider.create();
 
         // Workaround to speed test execution.
         // Create all containers while Kie servers are turned off to avoid expensive respins.
@@ -116,7 +116,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
                                              KieContainerStatus.STARTED);
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
         });
     }
 
@@ -125,31 +124,16 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
-    @Test
-    public void testWorkbenchControllerPersistence() {
-        persistenceTestProvider.testControllerPersistence(deploymentScenario);
-    }
 
     @Test
     @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
-        processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
-    }
-
-    @Test
-    public void testCreateAndDeployProject() {
-        projectBuilderTestProvider.testCreateAndDeployProject(deploymentScenario.getWorkbenchDeployment(),
-                                                              deploymentScenario.getKieServerDeployment());
+        processTestProvider.testExecuteProcessWithSignal(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
     }
 
     @Test
     public void testRulesFromMavenRepo() {
         fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
-    }
-
-    @Test
-    public void testSolverFromMavenRepo() throws Exception {
-        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
 
     @Test
