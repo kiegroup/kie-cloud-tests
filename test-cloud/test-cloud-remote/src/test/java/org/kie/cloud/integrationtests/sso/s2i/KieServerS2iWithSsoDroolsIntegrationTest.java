@@ -88,7 +88,6 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
                                                                                                        .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                                        .withDroolsServerFilterClasses(false)
                                                                                                        .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                                                                                                       .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                                                                                                        .deploySso()
                                                                                                        .build();
             scenarios.add(new Object[] { "Immutable KIE Server Database S2I", immutableKieServerWithDatabaseScenario });
@@ -103,7 +102,6 @@ public class KieServerS2iWithSsoDroolsIntegrationTest extends AbstractMethodIsol
                                                                                            .withSourceLocation(REPO_BRANCH, DEPLOYED_KJAR.getArtifactName())
                                                                                            .withDroolsServerFilterClasses(false)
                                                                                            .withHttpKieServerHostname(RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
-                                                                                           .withHttpsKieServerHostname(SECURED_URL_PREFIX + RANDOM_URL_PREFIX + KIE_SERVER_HOSTNAME)
                                                                                            .deploySso()
                                                                                            .build();
             scenarios.add(new Object[] { "Immutable KIE Server S2I", immutableKieServerScenario });
