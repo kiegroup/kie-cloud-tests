@@ -93,6 +93,22 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
     WorkbenchKieServerPersistentScenarioBuilder withLdap(LdapSettings ldapSettings);
 
     /**
+     * Return setup builder with additional configuration for RoleMapper. 
+     * This can be used to mapped custom roles from ldap to roles needed 
+     * for Kie Server or Workbench.
+     *
+     * @param rolesProperties When present, the RoleMapping will be 
+     *  configured to use the provided properties file or roles with the 
+     * following pattern 'role=role1;another-role=role2'. 
+     * @param rolesKeepMapped When set to 'true' the mapped roles will 
+     *  retain all roles, that have defined mappings.
+     * @param rolesKeepNonMapped When set to 'true' the mapped roles will
+     *  retain all roles, that have no defined mappings.
+     * @return Builder with configured role mapper.
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withRoleMapper(String rolesProperties, Boolean rolesKeepMapped, Boolean rolesKeepNonMapped);
+
+    /**
      * Return setup builder with configured Git hooks dir.
      *
      * @param dir GIT_HOOKS_DIR

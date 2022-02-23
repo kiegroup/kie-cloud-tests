@@ -81,6 +81,55 @@ objects:
       ou: admins@example.com
       member:uid=${LDAP_USER_NAME},ou=people,dc=example,dc=com
       EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: uid=test-${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      objectClass: top
+      objectClass: uidObject
+      objectClass: person
+      objectClass: inetOrgPerson
+      uid: test-${LDAP_USER_NAME}
+      cn: test-${LDAP_USER_NAME}
+      sn: test-${LDAP_USER_NAME}
+      userPassword: ${LDAP_USER_PWD}
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn:cn=test-kie-server,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: test-kie-server
+      description: Kie Server group
+      ou: test-kie-server@example.com
+      member:uid=test-${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: cn=test-rest-all,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: test-rest-all
+      description: Rest All group
+      ou: test-restall@example.com
+      member:uid=test-${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: cn=test-admin,ou=roles,dc=example,dc=com
+      objectclass: groupOfNames
+      objectClass: top
+      cn: test-admin
+      description: Admin group
+      ou: test-admins@example.com
+      member:uid=test-${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      EOF
+      ldapadd -h ldap-${APPLICATION_NAME} -p 30389 -x -D cn=Manager,dc=example,dc=com -w admin << EOF
+      dn: uid=default-${LDAP_USER_NAME},ou=people,dc=example,dc=com
+      objectClass: top
+      objectClass: uidObject
+      objectClass: person
+      objectClass: inetOrgPerson
+      uid: default-${LDAP_USER_NAME}
+      cn: default-${LDAP_USER_NAME}
+      sn: default-${LDAP_USER_NAME}
+      userPassword: ${LDAP_USER_PWD}
+      EOF
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:

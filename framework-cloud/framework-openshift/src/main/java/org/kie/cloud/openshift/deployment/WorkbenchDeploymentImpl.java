@@ -64,10 +64,12 @@ public class WorkbenchDeploymentImpl extends OpenShiftDeployment implements Work
         return webSocketUri;
     }
 
-    @Override public String getUsername() {
+    @Override 
+    public String getUsername() {
         return username;
     }
 
+    @Override 
     public void setUsername(String username) {
         this.username = username;
     }

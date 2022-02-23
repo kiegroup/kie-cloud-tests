@@ -115,4 +115,9 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         envVariables.put(OpenShiftTemplateConstants.GIT_HOOKS_DIR, dir);
         return this;
     }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withRoleMapper(String rolesProperties, Boolean rolesKeepMapped, Boolean rolesKeepNonMapped) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 }

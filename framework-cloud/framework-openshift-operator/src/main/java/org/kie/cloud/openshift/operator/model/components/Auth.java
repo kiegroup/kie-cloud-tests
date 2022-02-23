@@ -25,6 +25,7 @@ public class Auth {
 
     private Sso sso;
     private Ldap ldap;
+    private RoleMapper roleMapper;
 
     public Sso getSso() {
         return sso;
@@ -42,4 +43,11 @@ public class Auth {
         this.ldap = ldap;
     }
 
+    public RoleMapper getRoleMapper() {
+        return roleMapper;
+    }
+
+    public void setRoleMapper(RoleMapper roleMapper) {
+        this.roleMapper = roleMapper;
+    }
 }

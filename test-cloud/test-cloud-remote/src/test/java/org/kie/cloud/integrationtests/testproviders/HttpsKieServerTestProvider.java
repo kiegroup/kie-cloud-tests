@@ -89,7 +89,7 @@ public class HttpsKieServerTestProvider {
     public void testKieServerInfo(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
             HttpResponseParser responseAndCode;
-            String url = serverInforRequestUrl(kieServerDeployment, ssoScenario);
+            String url = serverInfoRequestUrl(kieServerDeployment, ssoScenario);
 
             logger.debug("Test Kie Server info on url {}", url);
             responseAndCode = Http.get(url)
@@ -159,7 +159,7 @@ public class HttpsKieServerTestProvider {
         }
     }
 
-    private String serverInforRequestUrl(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
+    private String serverInfoRequestUrl(KieServerDeployment kieServerDeployment, boolean ssoScenario) {
         try {
             if (ssoScenario) {
                 return createSSOEnvVariable(kieServerDeployment.getSecureUrl().get().toString()) + "/" + KIE_SERVER_INFO_REST_REQUEST_URL;
