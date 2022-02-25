@@ -66,10 +66,12 @@ public class KieServerDeploymentImpl extends OpenShiftDeployment implements KieS
         return secureUrl;
     }
 
-    @Override public String getUsername() {
+    @Override
+    public String getUsername() {
         return username;
     }
 
+    @Override 
     public void setUsername(String username) {
         this.username = username;
     }

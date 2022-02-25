@@ -20,7 +20,7 @@ public class LdapSettingsConstants {
     public static final String BIND_DN = "cn=Manager,dc=example,dc=com";
     public static final String BIND_CREDENTIAL = "admin";
     public static final String BASE_CTX_DN = "ou=people,dc=example,dc=com";
-    public static final String BASE_FILTER = "(uid={0})";
+    public static final String BASE_FILTER = "uid";
     public static final String SEARCH_SCOPE = "SUBTREE_SCOPE";
     public static final Long SEARCH_TIME_LIMIT = 10000L;
     public static final String ROLE_ATTRIBUTE_ID = "cn";
@@ -28,4 +28,7 @@ public class LdapSettingsConstants {
     public static final String ROLE_FILTER = "(member={1})";
     public static final Long ROLE_RECURSION = 1L;
     public static final String DEFAULT_ROLE = "guest";
+    public static final String KIE_SERVER_DEFAULT_ROLE = "kie-server";
+
+    public static final String ROLE_MAPPING = "test-admin=admin;test-kie-server=kie-server;test-rest-all=rest-all";
 }

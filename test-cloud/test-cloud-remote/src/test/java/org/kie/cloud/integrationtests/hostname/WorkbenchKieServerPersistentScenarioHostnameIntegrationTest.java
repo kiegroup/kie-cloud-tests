@@ -14,6 +14,7 @@ import cz.xtf.client.HttpResponseParser;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.kie.cloud.api.DeploymentScenarioBuilderFactory;
@@ -23,6 +24,7 @@ import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieDeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
+import org.kie.cloud.integrationtests.category.TemplateNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+@Category(TemplateNotSupported.class)
 @RunWith(Parameterized.class)
 public class WorkbenchKieServerPersistentScenarioHostnameIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<KieDeploymentScenario<?>> {
     
@@ -99,7 +102,7 @@ public class WorkbenchKieServerPersistentScenarioHostnameIntegrationTest extends
     }
 
     @Test
-    public void dummyTest() {
+    public void simplyConfiguredCustomHostnameTest() {
         SoftAssertions softly = new SoftAssertions();
         if(disabledSsl) {
             softly.assertThat(workbenchDeployment.getInsecureUrl()).as("Workbench insecure URL").isNotEmpty().get().extracting(URL::getProtocol).isEqualTo("http");

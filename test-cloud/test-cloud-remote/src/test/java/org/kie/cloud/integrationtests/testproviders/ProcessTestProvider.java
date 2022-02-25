@@ -85,6 +85,11 @@ public class ProcessTestProvider {
         testExecuteProcessWithSignal(processClient, containerId);
     }
 
+    public void testExecuteProcessWithSignal(KieServerDeployment kieServerDeployment, String containerId) {
+        ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(kieServerDeployment);
+        testExecuteProcessWithSignal(processClient, containerId);
+    }
+
     public void testExecuteProcesses(SmartRouterDeployment smartRouterDeployment, KieServerDeployment kieServerDeployment, String containerId) {
         KieServicesClient smartRouterClient = KieServerClientProvider.getSmartRouterClient(smartRouterDeployment, kieServerDeployment.getUsername(), kieServerDeployment.getPassword());
         ProcessServicesClient processClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
