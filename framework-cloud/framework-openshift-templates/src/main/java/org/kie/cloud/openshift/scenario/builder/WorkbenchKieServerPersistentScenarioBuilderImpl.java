@@ -116,8 +116,14 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         return this;
     }
 
+
     @Override 
     public WorkbenchKieServerPersistentScenarioBuilder withReposPersistence() {
+        throw new UnsupportedOperationException("Not supported with templates.");
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withRoleMapper(String rolesProperties, Boolean rolesKeepMapped, Boolean rolesKeepNonMapped) {
         throw new UnsupportedOperationException("Not supported with templates.");
     }
 }

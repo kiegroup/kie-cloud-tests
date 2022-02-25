@@ -35,6 +35,7 @@ import org.kie.cloud.openshift.operator.model.components.Console;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Ldap;
+import org.kie.cloud.openshift.operator.model.components.RoleMapper;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.SsoClient;
 import org.kie.cloud.openshift.operator.scenario.WorkbenchKieServerPersistentScenarioImpl;
@@ -171,9 +172,32 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
     public WorkbenchKieServerPersistentScenarioBuilder withLdap(LdapSettings ldapSettings) {
         setAsyncExternalDeployment(ExternalDeploymentID.LDAP);
         Ldap ldap = LdapSettingsMapper.toLdapModel(ldapSettings);
-        Auth auth = new Auth();
-        auth.setLdap(ldap);
-        kieApp.getSpec().setAuth(auth);
+
+        if (kieApp.getSpec().getAuth() != null) {
+            kieApp.getSpec().getAuth().setLdap(ldap);
+        } else {
+            Auth auth = new Auth();
+            auth.setLdap(ldap);
+            kieApp.getSpec().setAuth(auth);
+        }
+        
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withRoleMapper(String rolesProperties, Boolean rolesKeepMapped,  Boolean rolesKeepNonMapped) {
+        RoleMapper roleMapper = new RoleMapper();
+        roleMapper.setRolesProperties(rolesProperties);
+        roleMapper.setRolesKeepMapped(rolesKeepMapped);
+        roleMapper.setRolesKeepNonMapped(rolesKeepNonMapped);
+        if (kieApp.getSpec().getAuth() != null) {
+            kieApp.getSpec().getAuth().setRoleMapper(roleMapper);
+        } else {
+            Auth auth = new Auth();
+            auth.setRoleMapper(roleMapper);
+            kieApp.getSpec().setAuth(auth);
+        }
+
         return this;
     }
 

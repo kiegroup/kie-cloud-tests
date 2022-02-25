@@ -61,6 +61,15 @@ public interface WorkbenchDeployment extends Deployment {
     String getUsername();
 
     /**
+     * Set Kie Workbench user name. This will override Workbench username 
+     * set by env. variable org.kie.server.user
+     * 
+     * @param username Workbench user name
+     * @return
+     */
+    void setUsername(String username);
+
+    /**
      * Get Kie Workbench user password. Workbench password is set by env.
      * variable org.kie.workbench.user
      *
