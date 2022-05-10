@@ -23,10 +23,10 @@
   </modules>
 
   <properties>
-    <rhba.images.version.prefix>712</rhba.images.version.prefix>
-    <rhba.images.branch>main</rhba.images.branch>
-    <rhba.operator.branch>main</rhba.operator.branch>
-    <rhba.operator.upgrade.from.version>7.11.1</rhba.operator.upgrade.from.version>
+    <rhba.images.version.prefix>713</rhba.images.version.prefix>
+    <rhba.images.branch>7.13.x</rhba.images.branch>
+    <rhba.operator.branch>release-v7.13.x</rhba.operator.branch>
+    <rhba.operator.upgrade.from.version>7.12.1</rhba.operator.upgrade.from.version>
 
     <findbugs.failOnViolation>true</findbugs.failOnViolation>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
