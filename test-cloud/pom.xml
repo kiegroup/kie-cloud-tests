@@ -46,7 +46,7 @@
     <sso.service.password>serviceUser1!</sso.service.password>
     
     <!-- Properties to configure Prometheus -->
-    <prometheus.version>v0.38.1</prometheus.version>
+    <prometheus.version>v0.55.0</prometheus.version>
 
     <kie.app.name>myapp</kie.app.name>
 
