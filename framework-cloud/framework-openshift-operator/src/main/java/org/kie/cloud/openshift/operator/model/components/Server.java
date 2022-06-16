@@ -42,6 +42,7 @@ public class Server {
     private Boolean persistRepos;
     private String serversKiePvSize;
     private String serversM2PvSize;
+    private TerminationRoute terminationRoute;
 
     public String getName() {
         return name;
@@ -168,5 +169,13 @@ public class Server {
 
     public String getServersM2PvSize() {
         return serversM2PvSize;
+    }
+
+    public TerminationRoute getTerminationRoute() {
+        return terminationRoute;
+    }
+
+    public void setTerminationRoute(TerminationRoute terminationRoute) {
+        this.terminationRoute = terminationRoute;
     }
 }

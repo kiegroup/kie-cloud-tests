@@ -45,6 +45,7 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.Server;
 import org.kie.cloud.openshift.operator.model.components.Sso;
+import org.kie.cloud.openshift.operator.model.components.TerminationRoute;
 import org.kie.cloud.openshift.scenario.ScenarioRequest;
 import org.kie.cloud.openshift.util.Git;
 import org.kie.cloud.openshift.util.SsoDeployer;
@@ -83,6 +84,22 @@ public class WorkbenchKieServerPersistentScenarioImpl extends OpenShiftOperatorS
             Auth auth = new Auth();
             auth.setSso(sso);
             kieApp.getSpec().setAuth(auth);
+        }
+
+        if (request.isDeploySecretAdminCredentials()) {
+            kieApp.getSpec().getCommonConfig().setSecretAdminCredentials(DeploymentConstants.getAppCredentialsSecretName());
+            kieApp.getSpec().getCommonConfig().setAdminUser(null);
+            kieApp.getSpec().getCommonConfig().setAdminPassword(null);
+        }
+
+        if (request.isEnableEdgeTermination()) {
+            TerminationRoute terminationRoute = new TerminationRoute();
+            terminationRoute.setEnableEdge(true);
+
+            kieApp.getSpec().getObjects().getConsole().setTerminationRoute(terminationRoute);
+            for (Server server : kieApp.getSpec().getObjects().getServers()) {
+                server.setTerminationRoute(terminationRoute);
+            }
         }
 
         if (request.getGitSettings() != null) {

@@ -131,4 +131,21 @@ public interface WorkbenchKieServerPersistentScenarioBuilder extends DeploymentS
      */
     WorkbenchKieServerPersistentScenarioBuilder withReposPersistence();
 
+    /**
+     * Admin user is stored in secret and deployments using this secret instead of
+     * properties with name and password. Only for Operator.
+     * 
+     * @return Builder with configured secret admin credentials.
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withSecretAdminCredentials();
+
+    /**
+     * Routes are having enable TLS Edge termination. If this is enabled, routes are
+     * encrypted to OCP Router and then in OCP network the communication is not
+     * encrypted. Only for Operator.
+     * 
+     * @return Builder with configured edge termination
+     */
+    WorkbenchKieServerPersistentScenarioBuilder withEnabledEdgeTermination();
+
 }

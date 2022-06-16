@@ -23,6 +23,8 @@ public class ScenarioRequest {
     private boolean deployPrometheus = false;
     private boolean upgrade = false;
     private boolean deployProcessMigration = false;
+    private boolean deploySecretAdminCredentials = false;
+    private boolean enableEdgeTermination = false;
 
     public boolean isDeploySso() {
         return deploySso;
@@ -42,6 +44,14 @@ public class ScenarioRequest {
 
     public boolean isDeployProcessMigration() {
         return deployProcessMigration;
+    }
+
+    public boolean isDeploySecretAdminCredentials() {
+        return deploySecretAdminCredentials;
+    }
+
+    public boolean isEnableEdgeTermination() {
+        return enableEdgeTermination;
     }
 
     public ScenarioRequest enableDeploySso() {
@@ -66,6 +76,16 @@ public class ScenarioRequest {
 
     public ScenarioRequest enableDeployProcessMigration() {
         this.deployProcessMigration = true;
+        return this;
+    }
+
+    public ScenarioRequest enableDeploySecretAdminCredentials() {
+        this.deploySecretAdminCredentials = true;
+        return this;
+    }
+
+    public ScenarioRequest enableEdgeTermination() {
+        this.enableEdgeTermination = true;
         return this;
     }
 
