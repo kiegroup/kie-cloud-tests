@@ -36,6 +36,7 @@ public class CommonConfig {
     private String mavenPassword;
     private String serverPassword;
     private StartupStrategy startupStrategy;
+    private String secretAdminCredentials;
     private String version;
 
     public String getAdminUser() {
@@ -148,5 +149,13 @@ public class CommonConfig {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getSecretAdminCredentials() {
+        return secretAdminCredentials;
+    }
+
+    public void setSecretAdminCredentials(String secretAdminCredentials) {
+        this.secretAdminCredentials = secretAdminCredentials;
     }
 }
