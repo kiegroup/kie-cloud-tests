@@ -15,9 +15,6 @@
  */
 package org.kie.cloud.openshift.operator.scenario.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.WorkbenchKieServerPersistentScenario;
 import org.kie.cloud.api.scenario.builder.WorkbenchKieServerPersistentScenarioBuilder;
@@ -48,10 +45,6 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
     private final ScenarioRequest request = new ScenarioRequest();
 
     public WorkbenchKieServerPersistentScenarioBuilderImpl() {
-        List<Env> authenticationEnvVars = new ArrayList<>();
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_USER, DeploymentConstants.getAppUser()));
-        authenticationEnvVars.add(new Env(ImageEnvVariables.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword()));
-
         kieApp.getMetadata().setName(OpenShiftConstants.getKieApplicationName());
         kieApp.getSpec().setEnvironment(OpenShiftOperatorEnvironments.AUTHORING);
         kieApp.getSpec().setUseImageTags(true);
@@ -69,11 +62,9 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
-        server.addEnvs(authenticationEnvVars);
         kieApp.getSpec().getObjects().addServer(server);
 
         Console console = new Console();
-        console.addEnvs(authenticationEnvVars);
         kieApp.getSpec().getObjects().setConsole(console);
     }
 
@@ -219,6 +210,18 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
             server.setServersKiePvSize("1Gi");
             server.setServersM2PvSize("1Gi");
         }
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withSecretAdminCredentials() {
+        request.enableDeploySecretAdminCredentials();
+        return this;
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withEnabledEdgeTermination() {
+        request.enableEdgeTermination();
         return this;
     }
 }

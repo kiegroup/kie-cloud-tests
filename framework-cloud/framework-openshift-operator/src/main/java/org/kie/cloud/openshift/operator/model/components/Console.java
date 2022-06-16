@@ -35,6 +35,7 @@ public class Console {
     private Jvm jvm;
     private String routeHostname;
     private DataGridAuth dataGridAuth;
+    private TerminationRoute terminationRoute;
 
     public void addEnv(Env env) {
         this.env.add(env);
@@ -106,6 +107,14 @@ public class Console {
     
     public void setDataGridAuth(DataGridAuth dataGridAuth) {
         this.dataGridAuth = dataGridAuth;
+    }
+
+    public TerminationRoute getTerminationRoute() {
+        return terminationRoute;
+    }
+
+    public void setTerminationRoute(TerminationRoute terminationRoute) {
+        this.terminationRoute = terminationRoute;
     }
     
 }
