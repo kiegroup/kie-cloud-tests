@@ -48,7 +48,7 @@ public class EventsRecorder {
         writer.append("MESSAGE");
         writer.append('\n');
 
-        for (Event event : project.getOpenShift().v1().events().list().getItems()) {
+        for (Event event : project.getOpenShiftAdmin().v1().events().list().getItems()) {
             writer.append(event.getLastTimestamp());
             writer.append('\t');
             writer.append(event.getFirstTimestamp());
