@@ -69,7 +69,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
                     .withInternalMavenRepo()
                     .withGitSettings(GitSettings.fromProperties()
                                                 .withRepository(REPOSITORY_NAME,
-                                                                ClusteredWorkbenchKieServerDatabasePersistentScenario.class.getResource(
+                                                ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest.class.getResource(
                                                                                                                       PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
                     .build();
         } catch (UnsupportedOperationException ex) {
