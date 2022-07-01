@@ -70,11 +70,14 @@ public class ImageVersionIntegrationTest extends AbstractMethodIsolatedCloudInte
     private String getImageVersion(Deployment deployment) {
         CommandExecutionResult checkVersionCommand = deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH);
 
-        TimeUtils.wait(Duration.ofMinutes(90), Duration.ofSeconds(10), () -> {
-            String output =deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH).getOutput();
-            logger.info("Try to get output from kie-app: " + output);
-            return output.contains(KIE_VERSION);
-        });
+        if (!checkVersionCommand.getOutput().contains(KIE_VERSION)) {
+            TimeUtils.wait(Duration.ofMinutes(90), Duration.ofSeconds(10), () -> {
+                String output = deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH).getOutput();
+                logger.info("Try to get output from kie-app: " + output);
+                return output.contains(KIE_VERSION);
+            });
+            checkVersionCommand = deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH);
+        }
         //TimeUtils.wait(Duration.ofMinutes(90), Duration.ofSeconds(10), () -> checkVersionCommand.getOutput().contains(KIE_VERSION));
 
         return getArtifactVersion(checkVersionCommand.getOutput());
