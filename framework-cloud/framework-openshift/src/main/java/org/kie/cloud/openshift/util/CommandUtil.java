@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
-import io.fabric8.kubernetes.client.dsl.internal.ExecWebSocketListener;
 import org.kie.cloud.api.deployment.CommandExecutionResult;
 
 public class CommandUtil {
@@ -28,7 +27,7 @@ public class CommandUtil {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ByteArrayOutputStream error = new ByteArrayOutputStream();
 
-        try (ExecWatch execWatch = pod.writingOutput(output).writingError(error).exec(command)) {
+        try (ExecWatch execWatch = pod.writingOutput(output).writingError(error).withTTY().exec(command)) {
 
             waitUntilCommandIsFinished(execWatch);
 
@@ -41,8 +40,17 @@ public class CommandUtil {
     }
 
     private static void waitUntilCommandIsFinished(ExecWatch execWatch) {
+        // instead using waitUntilReady wait for 10 seconds
+        try {
+            Thread.sleep(10 * 1000L);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        /* waitUntilReady removed from fabric8 client
         if (execWatch instanceof ExecWebSocketListener) {
             ((ExecWebSocketListener) execWatch).waitUntilReady();
         }
+        */
     }
 }
