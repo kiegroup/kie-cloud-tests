@@ -293,7 +293,9 @@ public abstract class OpenShiftScenario<T extends DeploymentScenario<T>> impleme
         logger.info("Creating user secret '{}'", DeploymentConstants.getAppCredentialsSecretName());
         Map<String, String> data = new HashMap<>();
         data.put(OpenShiftConstants.KIE_ADMIN_USER, DeploymentConstants.getAppUser());
+        data.put("username", DeploymentConstants.getAppUser());
         data.put(OpenShiftConstants.KIE_ADMIN_PWD, DeploymentConstants.getAppPassword());
+        data.put("password", DeploymentConstants.getAppPassword());
 
         project.createSecret(DeploymentConstants.getAppCredentialsSecretName(), data);
     }

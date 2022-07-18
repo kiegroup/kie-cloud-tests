@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2022 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,19 @@
  * limitations under the License.
 */
 
-package org.kie.cloud.integrationtests.smoke;
-
-import java.time.Duration;
+package org.kie.cloud.integrationtests.terminationroute;
 
 import org.junit.AfterClass;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
+import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.OperatorNotSupported;
-import org.kie.cloud.integrationtests.category.Smoke;
+import org.kie.cloud.integrationtests.category.TemplateNotSupported;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
-import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
@@ -44,17 +39,16 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
-@Category({Smoke.class, JBPMOnly.class})
-public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest extends AbstractCloudIntegrationTest {
+@Category(TemplateNotSupported.class)
+public class WorkbenchKieServerPersistentWithEnabledEdgeScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
-    private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest.class.getSimpleName());
+    private static final String REPOSITORY_NAME = generateNameWithPrefix(WorkbenchKieServerPersistentWithEnabledEdgeScenarioIntegrationTest.class.getSimpleName());
 
-    private static ClusteredWorkbenchKieServerDatabasePersistentScenario deploymentScenario;
+    private static WorkbenchKieServerScenario deploymentScenario;
 
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
     private static OptaplannerTestProvider optaplannerTestProvider;
-    private static HttpsKieServerTestProvider httpsKieServerTestProvider;
     private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
 
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
@@ -63,26 +57,21 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
 
     @BeforeClass
     public static void initializeDeployment() {
-        try {
-            deploymentScenario = deploymentScenarioFactory
-                    .getClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder()
-                    .withInternalMavenRepo()
-                    .withGitSettings(GitSettings.fromProperties()
-                                                .withRepository(REPOSITORY_NAME,
-                                                ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest.class.getResource(
-                                                                                                                      PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
-                    .build();
-        } catch (UnsupportedOperationException ex) {
-            Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
-        }
-        deploymentScenario.setLogFolderName(ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTest.class.getSimpleName());
+        deploymentScenario = deploymentScenarioFactory.getWorkbenchKieServerPersistentScenarioBuilder()
+                .withInternalMavenRepo()
+                .withEnabledEdgeTermination()
+                .withGitSettings(GitSettings.fromProperties()
+                                 .withRepository(REPOSITORY_NAME,
+                                 WorkbenchKieServerPersistentWithEnabledEdgeScenarioIntegrationTest.class.getResource(
+                                                                                                     PROJECT_SOURCE_FOLDER + "/" + Kjar.HELLO_RULES.getArtifactName()).getFile()))
+                .build();
+        deploymentScenario.setLogFolderName(WorkbenchKieServerPersistentWithEnabledEdgeScenarioIntegrationTest.class.getSimpleName());
         ScenarioDeployer.deployScenario(deploymentScenario);
 
         // Setup test providers
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
         processTestProvider = ProcessTestProvider.create(deploymentScenario);
         optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
-        httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
         httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
 
         // Workaround to speed test execution.
@@ -91,7 +80,6 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
         KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
 
-        deploymentScenario.getKieServerDeployment().setRouterTimeout(Duration.ofMinutes(3));
         AutoScalerDeployment.on(deploymentScenario.getKieServerDeployment(), () -> {
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
             WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
@@ -122,23 +110,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioIntegrationTes
     }
 
     @Test
-    @Category(OperatorNotSupported.class)
-    public void testDeployContainerFromWorkbench() {
-        fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
-                                                                  deploymentScenario.getKieServerDeployment(),
-                                                                  deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));
-    }
-
-    @Test
-    public void testKieServerHttps() {
-        httpsKieServerTestProvider.testKieServerInfo(deploymentScenario.getKieServerDeployment(), false);
-        // Skipped as the check is too time consuming, the HTTPS functionality is verified by testKieServerInfo()
-        // HttpsKieServerTestProvider.testDeployContainer(deploymentScenario.getKieServerDeployment(), false);
-    }
-
-    @Test
     public void testWorkbenchHttps() {
         httpsWorkbenchTestProvider.testLoginScreen(deploymentScenario.getWorkbenchDeployment(), false);
-        httpsWorkbenchTestProvider.testControllerOperations(deploymentScenario.getWorkbenchDeployment(), false);
     }
 }

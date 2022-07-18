@@ -126,4 +126,14 @@ public class WorkbenchKieServerPersistentScenarioBuilderImpl extends AbstractOpe
     public WorkbenchKieServerPersistentScenarioBuilder withRoleMapper(String rolesProperties, Boolean rolesKeepMapped, Boolean rolesKeepNonMapped) {
         throw new UnsupportedOperationException("Not supported with templates.");
     }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withSecretAdminCredentials() {
+        throw new UnsupportedOperationException("Not supported with templates.");
+    }
+
+    @Override
+    public WorkbenchKieServerPersistentScenarioBuilder withEnabledEdgeTermination() {
+        throw new UnsupportedOperationException("Not supported with templates.");
+    }
 }
