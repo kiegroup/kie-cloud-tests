@@ -31,6 +31,7 @@ import org.kie.cloud.openshift.operator.constants.OpenShiftOperatorEnvironments;
 import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
+import org.kie.cloud.openshift.operator.model.components.DataGridAuth;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Server;
@@ -68,6 +69,8 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
         CommonConfig commonConfig = new CommonConfig();
         commonConfig.setAdminUser(DeploymentConstants.getAppUser());
         commonConfig.setAdminPassword(DeploymentConstants.getAppPassword());
+        commonConfig.setAmqClusterPassword("amqClusterPassword");
+        commonConfig.setAmqPassword("amqPassword");
         kieApp.getSpec().setCommonConfig(commonConfig);
 
         Server server = new Server();
@@ -79,6 +82,10 @@ public class ClusteredWorkbenchKieServerPersistentScenarioBuilderImpl extends Ab
 
         Console console = new Console();
         console.addEnvs(authenticationEnvVars);
+        DataGridAuth dataGridAuth = new DataGridAuth();
+        dataGridAuth.setUsername("datagridUser");
+        dataGridAuth.setPassword("datagridPassword");
+        console.setDataGridAuth(dataGridAuth);
         kieApp.getSpec().getObjects().setConsole(console);
     }
 
