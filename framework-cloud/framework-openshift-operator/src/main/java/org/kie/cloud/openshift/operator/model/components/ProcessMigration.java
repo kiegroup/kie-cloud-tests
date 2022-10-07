@@ -26,6 +26,7 @@ public class ProcessMigration {
     private String image;
     private String imageTag;
     private Database database;
+    private Jvm jvm;
 
     public String getImage() {
         return image;
@@ -49,5 +50,13 @@ public class ProcessMigration {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public Jvm getJvm() {
+        return jvm;
+    }
+
+    public void setJvm(Jvm jvm) {
+        this.jvm = jvm;
     }
 }
