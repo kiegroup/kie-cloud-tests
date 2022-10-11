@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class OpenShiftOperatorScenario<T extends DeploymentScenario<T>> extends OpenShiftScenario<T> {
 
-    protected static final String OPERATOR_DEPLOYMENT_NAME = "business-automation-operator";
+    protected static final String OPERATOR_DEPLOYMENT_NAME = "bamoe-business-automation-operator";
 
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftOperatorScenario.class);
 
