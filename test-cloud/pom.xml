@@ -501,7 +501,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
     <profile>
       <id>openshift</id>
       <properties>
-        <template.excluded.group>org.kie.cloud.integrationtests.category.TemplateNotSupported</template.excluded.group>
+        <template.excluded.group>org.kie.cloud.integrationtests.category.TemplateNotSupported,org.kie.cloud.integrationtests.category.Optaplanner</template.excluded.group>
       </properties>
       <dependencies>
         <dependency>
@@ -527,7 +527,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
     <profile>
       <id>openshift-operator</id>
       <properties>
-        <operator.excluded.group>org.kie.cloud.integrationtests.category.OperatorNotSupported</operator.excluded.group>
+        <operator.excluded.group>org.kie.cloud.integrationtests.category.OperatorNotSupported,org.kie.cloud.integrationtests.category.Optaplanner</operator.excluded.group>
         <openshift.version>4.6</openshift.version>
         <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
         <xtf.openshift.admin.token/>
