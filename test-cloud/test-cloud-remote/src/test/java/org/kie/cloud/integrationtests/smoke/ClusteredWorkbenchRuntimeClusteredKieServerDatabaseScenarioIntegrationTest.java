@@ -26,6 +26,7 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeClusteredKieServerDat
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
@@ -107,6 +108,7 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
     }
 
     @Test
+    @Category(Optaplanner.class)
     public void testSolverFromMavenRepo() throws Exception {
         optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }

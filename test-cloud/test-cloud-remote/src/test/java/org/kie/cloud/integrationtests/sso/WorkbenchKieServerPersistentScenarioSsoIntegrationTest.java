@@ -25,6 +25,7 @@ import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
@@ -103,6 +104,7 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
     }
 
     @Test
+    @Category(Optaplanner.class)
     public void testSolverFromMavenRepo() {
         optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }

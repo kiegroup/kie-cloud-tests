@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
@@ -90,6 +91,7 @@ public class KieServerWithMySqlLdapIntegrationTest extends AbstractCloudIntegrat
     }
 
     @Test
+    @Category(Optaplanner.class)
     public void testSolverFromMavenRepo() {
         optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
