@@ -24,6 +24,7 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentS
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
@@ -106,6 +107,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
     }
 
     @Test
+    @Category(Optaplanner.class)
     public void testSolverFromMavenRepo() {
         optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }

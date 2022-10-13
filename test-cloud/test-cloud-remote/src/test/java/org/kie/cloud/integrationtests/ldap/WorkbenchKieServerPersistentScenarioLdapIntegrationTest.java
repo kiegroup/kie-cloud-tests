@@ -30,6 +30,7 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
+import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
@@ -148,6 +149,7 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     }
 
     @Test
+    @Category(Optaplanner.class)
     public void testSolverFromMavenRepo() throws Exception {
         optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
