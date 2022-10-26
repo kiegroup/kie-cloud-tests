@@ -32,6 +32,7 @@ import org.kie.cloud.openshift.operator.model.KieApp;
 import org.kie.cloud.openshift.operator.model.components.Auth;
 import org.kie.cloud.openshift.operator.model.components.CommonConfig;
 import org.kie.cloud.openshift.operator.model.components.Console;
+import org.kie.cloud.openshift.operator.model.components.DataGridAuth;
 import org.kie.cloud.openshift.operator.model.components.Env;
 import org.kie.cloud.openshift.operator.model.components.ImageRegistry;
 import org.kie.cloud.openshift.operator.model.components.Ldap;
@@ -84,6 +85,10 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
         Console console = new Console();
         console.addEnvs(authenticationEnvVars);
+        DataGridAuth dataGridAuth = new DataGridAuth();
+        dataGridAuth.setUsername("datagridUser");
+        dataGridAuth.setPassword("datagridPassword");
+        console.setDataGridAuth(dataGridAuth);
         kieApp.getSpec().getObjects().setConsole(console);
     }
 
