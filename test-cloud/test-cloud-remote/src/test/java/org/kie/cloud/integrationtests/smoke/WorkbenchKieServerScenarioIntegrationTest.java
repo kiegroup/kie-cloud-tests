@@ -19,6 +19,7 @@ import java.time.Duration;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
@@ -111,6 +112,7 @@ public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudInte
     }
 
     @Test
+    @Ignore
     public void testDeployContainerFromWorkbench() {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),

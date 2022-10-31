@@ -55,7 +55,7 @@ public class ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilderImpl ex
 
     @Override
     public ClusteredWorkbenchKieServerDatabasePersistentScenarioBuilder withInternalMavenRepo() {
-        setAsyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
+        setSyncExternalDeployment(ExternalDeploymentID.MAVEN_REPOSITORY);
         return this;
     }
 

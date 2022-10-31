@@ -31,11 +31,15 @@ import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
 import org.kie.cloud.tests.common.time.TimeUtils;
 import org.kie.server.client.KieServicesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Category(Smoke.class)
 public class ImageVersionIntegrationTest extends AbstractMethodIsolatedCloudIntegrationTest<WorkbenchKieServerScenario> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageVersionIntegrationTest.class);
 
     private static final String KIE_VERSION = DeploymentConstants.getKieArtifactVersion();
     private static final String KIE_API_ARTIFACT_NAME = "kie-api";
@@ -66,7 +70,15 @@ public class ImageVersionIntegrationTest extends AbstractMethodIsolatedCloudInte
     private String getImageVersion(Deployment deployment) {
         CommandExecutionResult checkVersionCommand = deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH);
 
-        TimeUtils.wait(Duration.ofSeconds(10), Duration.ofSeconds(1), () -> checkVersionCommand.getOutput().contains(KIE_VERSION));
+        if (!checkVersionCommand.getOutput().contains(KIE_VERSION)) {
+            TimeUtils.wait(Duration.ofMinutes(90), Duration.ofSeconds(10), () -> {
+                String output = deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH).getOutput();
+                logger.info("Try to get output from kie-app: " + output);
+                return output.contains(KIE_VERSION);
+            });
+            checkVersionCommand = deployment.getInstances().get(0).runCommand("grep", "-r", KIE_API_ARTIFACT_NAME, DEPLOYMENT_PATH);
+        }
+        //TimeUtils.wait(Duration.ofMinutes(90), Duration.ofSeconds(10), () -> checkVersionCommand.getOutput().contains(KIE_VERSION));
 
         return getArtifactVersion(checkVersionCommand.getOutput());
     }

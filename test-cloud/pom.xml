@@ -18,7 +18,7 @@
 
   <properties>
     <!-- This version is used by XTF to download appropriate oc client based on OpenShift version. -->
-    <openshift.version>3.11.439-1</openshift.version>
+    <openshift.version>3.11.374</openshift.version> <!-- tmp debug note: change because of the newer version of xtf -->
 
     <openshift.master.url/> <!-- Needs to be defined for proper test run on OpenShift. -->
     <openshift.username>user</openshift.username>
@@ -528,7 +528,7 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
       <id>openshift-operator</id>
       <properties>
         <operator.excluded.group>org.kie.cloud.integrationtests.category.OperatorNotSupported</operator.excluded.group>
-        <!--<openshift.version>4.6</openshift.version>-->
+        <openshift.version>4.6</openshift.version>
         <!-- Use token for OpenShift 4.x authentication until https://github.com/fabric8io/kubernetes-client/issues/1505 is fixed. -->
         <xtf.openshift.admin.token/>
         <xtf.openshift.master.token/>
