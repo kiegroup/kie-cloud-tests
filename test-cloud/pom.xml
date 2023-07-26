@@ -100,6 +100,8 @@
     <kie.image.tag.workbench.indexing/>
 
     <kie.image.registry.custom/>
+
+    <print.test.constants.disabled/>
   </properties>
 
   <modules>
@@ -576,6 +578,27 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
                 <threadCountClasses>3</threadCountClasses>
                 <threadCountSuites>2</threadCountSuites>
                 <perCoreThreadCount>false</perCoreThreadCount>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>interop</id>
+      <properties>
+        <print.test.constants.disabled>true</print.test.constants.disabled>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemProperties>
+                  <print.test.constants.disabled>${print.test.constants.disabled}</print.test.constants.disabled>
+                </systemProperties>
               </configuration>
             </plugin>
           </plugins>
