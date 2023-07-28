@@ -298,7 +298,6 @@ public class OpenShiftConstants implements Constants {
         System.setProperty(OpenShiftConfig.OPENSHIFT_MASTER_PASSWORD, getOpenShiftPassword());
         System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_USERNAME, getOpenShiftAdminUserName() != null ? getOpenShiftAdminUserName() : getOpenShiftUserName());
         System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_PASSWORD, getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
-        // todo add token here
         if (isOpenShiftTokenSet()) {
             System.setProperty(OpenShiftConfig.OPENSHIFT_MASTER_TOKEN, getOpenShiftToken());
         }
