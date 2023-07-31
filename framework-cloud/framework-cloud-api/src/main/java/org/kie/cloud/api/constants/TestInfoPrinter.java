@@ -26,8 +26,15 @@ import org.slf4j.LoggerFactory;
 public class TestInfoPrinter {
 
     private static final Logger logger = LoggerFactory.getLogger(TestInfoPrinter.class);
+    public static final String PRINT_TEST_CONSTANTS_DISABLED = "print.test.constants.disabled";
 
     public static void printTestConstants() {
+        if (System.getProperty(PRINT_TEST_CONSTANTS_DISABLED) != null
+                && Boolean.valueOf(System.getProperty(PRINT_TEST_CONSTANTS_DISABLED)).equals(Boolean.TRUE)) {
+            logger.info("Initializing Constants print is disabled.");
+            return;
+        }
+
         logger.info("--------- Initializing Constants ----------");
 
         ServiceLoader<Constants> serviceLoader = ServiceLoader.load(Constants.class);

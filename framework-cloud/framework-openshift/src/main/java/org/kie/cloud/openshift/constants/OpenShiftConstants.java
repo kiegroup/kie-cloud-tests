@@ -26,8 +26,10 @@ public class OpenShiftConstants implements Constants {
     public static final String OPENSHIFT_URL = "openshift.master.url";
     public static final String OPENSHIFT_USER = "openshift.username";
     public static final String OPENSHIFT_PASSWORD = "openshift.password";
+    public static final String OPENSHIFT_TOKEN = "openshift.token";
     public static final String OPENSHIFT_ADMIN_USER = "openshift.admin.username";
     public static final String OPENSHIFT_ADMIN_PASSWORD = "openshift.admin.password";
+    public static final String OPENSHIFT_ADMIN_TOKEN = "openshift.admin.token";
     public static final String OPENSHIFT_VERSION = "openshift.version";
 
     /**
@@ -190,12 +192,28 @@ public class OpenShiftConstants implements Constants {
         return System.getProperty(OPENSHIFT_PASSWORD);
     }
 
+    public static String getOpenShiftToken() {
+        return System.getProperty(OPENSHIFT_TOKEN);
+    }
+
+    public static boolean isOpenShiftTokenSet() {
+        return getOpenShiftToken() != null && !getOpenShiftToken().isEmpty();
+    }
+
     public static String getOpenShiftAdminUserName() {
         return System.getProperty(OPENSHIFT_ADMIN_USER);
     }
 
     public static String getOpenShiftAdminPassword() {
         return System.getProperty(OPENSHIFT_ADMIN_PASSWORD);
+    }
+
+    public static String getOpenShiftAdminToken() {
+        return System.getProperty(OPENSHIFT_ADMIN_TOKEN);
+    }
+
+    public static boolean isOpenShiftAdminTokenSet() {
+        return getOpenShiftAdminToken() != null && !getOpenShiftAdminToken().isEmpty();
     }
 
     public static String getOpenShiftVersion() {
@@ -280,6 +298,12 @@ public class OpenShiftConstants implements Constants {
         System.setProperty(OpenShiftConfig.OPENSHIFT_MASTER_PASSWORD, getOpenShiftPassword());
         System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_USERNAME, getOpenShiftAdminUserName() != null ? getOpenShiftAdminUserName() : getOpenShiftUserName());
         System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_PASSWORD, getOpenShiftAdminPassword() != null ? getOpenShiftAdminPassword() : getOpenShiftPassword());
+        if (isOpenShiftTokenSet()) {
+            System.setProperty(OpenShiftConfig.OPENSHIFT_MASTER_TOKEN, getOpenShiftToken());
+        }
+        if (isOpenShiftTokenSet() || isOpenShiftAdminTokenSet()) {
+            System.setProperty(OpenShiftConfig.OPENSHIFT_ADMIN_TOKEN, getOpenShiftAdminToken() != null ? getOpenShiftAdminToken() : getOpenShiftToken());
+        }
         System.setProperty(OpenShiftConfig.OPENSHIFT_VERSION, getOpenShiftVersion());
         System.setProperty(OpenShiftConfig.OPENSHIFT_NAMESPACE, "openshift");
     }
