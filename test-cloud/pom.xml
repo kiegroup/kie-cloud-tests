@@ -23,8 +23,10 @@
     <openshift.master.url/> <!-- Needs to be defined for proper test run on OpenShift. -->
     <openshift.username>user</openshift.username>
     <openshift.password>redhat</openshift.password>
+    <openshift.token/> <!-- Can be used as alternative to password. -->
     <openshift.admin.username>admin</openshift.admin.username>
     <openshift.admin.password>admin</openshift.admin.password>
+    <openshift.admin.token/> <!-- Can be used as alternative to password. -->
     <kubernetes.auth.tryServiceAccount>false</kubernetes.auth.tryServiceAccount> <!-- Fabric8 systen property to dsiabled tryServiceAccount, when this is enabled, then test log is flooded by warning messages. -->
 
     <kie.image.streams/> <!-- Needs to be defined for proper test run. -->
@@ -98,6 +100,8 @@
     <kie.image.tag.workbench.indexing/>
 
     <kie.image.registry.custom/>
+
+    <print.test.constants.disabled/>
   </properties>
 
   <modules>
@@ -330,8 +334,10 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
               <openshift.master.url>${openshift.master.url}</openshift.master.url>
               <openshift.username>${openshift.username}</openshift.username>
               <openshift.password>${openshift.password}</openshift.password>
+              <openshift.token>${openshift.token}</openshift.token>
               <openshift.admin.username>${openshift.admin.username}</openshift.admin.username>
               <openshift.admin.password>${openshift.admin.password}</openshift.admin.password>
+              <openshift.admin.token>${openshift.admin.token}</openshift.admin.token>
               <kubernetes.auth.tryServiceAccount>${kubernetes.auth.tryServiceAccount}</kubernetes.auth.tryServiceAccount>
               <kie.image.streams>${kie.image.streams}</kie.image.streams>
               <cloud.properties.location>${cloud.properties.location}</cloud.properties.location>
@@ -572,6 +578,27 @@ $ keytool -import -trustcacerts -alias name -keypass pass -storepass pass -keyst
                 <threadCountClasses>3</threadCountClasses>
                 <threadCountSuites>2</threadCountSuites>
                 <perCoreThreadCount>false</perCoreThreadCount>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>interop</id>
+      <properties>
+        <print.test.constants.disabled>true</print.test.constants.disabled>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemProperties>
+                  <print.test.constants.disabled>${print.test.constants.disabled}</print.test.constants.disabled>
+                </systemProperties>
               </configuration>
             </plugin>
           </plugins>
