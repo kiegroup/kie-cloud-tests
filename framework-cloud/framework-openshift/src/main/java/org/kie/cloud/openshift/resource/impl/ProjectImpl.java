@@ -200,8 +200,13 @@ public class ProjectImpl implements Project {
         Optional<OpenShiftBinary> oc;
         synchronized (ProjectImpl.class) {
             oc = Optional.of(OpenShifts.masterBinary(this.getName()));
-            oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftUserName(),
+            if (OpenShiftConstants.isOpenShiftTokenSet()) {
+                oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftToken());
+            }
+            else {
+                oc.get().login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftUserName(),
                            OpenShiftConstants.getOpenShiftPassword());
+            }
         }
         return oc.orElseThrow(RuntimeException::new);
     }
@@ -209,8 +214,12 @@ public class ProjectImpl implements Project {
     private OpenShiftBinary openShiftBinaryClientAsAdmin() {
         synchronized (ProjectImpl.class) {
             OpenShiftBinary oc = getMasterBinary();
-            oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
+            if (OpenShiftConstants.isOpenShiftAdminTokenSet()) {
+                oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminToken());
+            } else {
+                oc.login(OpenShiftConstants.getOpenShiftUrl(), OpenShiftConstants.getOpenShiftAdminUserName(),
                      OpenShiftConstants.getOpenShiftAdminPassword());
+            }
             return oc;
         }
     }
