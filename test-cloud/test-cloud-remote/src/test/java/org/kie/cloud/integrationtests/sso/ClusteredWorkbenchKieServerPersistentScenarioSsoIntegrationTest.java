@@ -26,9 +26,7 @@ import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentScenario;
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
@@ -43,7 +41,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
 
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
     private static ProjectBuilderTestProvider projectBuilderTestProvider;
 
     private static final String SECURED_URL_PREFIX = "secured-";
@@ -91,7 +88,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
         // Setup test providers
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
         processTestProvider = ProcessTestProvider.create(deploymentScenario);
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
         projectBuilderTestProvider = ProjectBuilderTestProvider.create();
     }
 
@@ -115,12 +111,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioSsoIntegrationTest ext
     @Test
     public void testRulesFromMavenRepo() {
         fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
-    @Category(Optaplanner.class)
-    public void testSolverFromMavenRepo() {
-        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test

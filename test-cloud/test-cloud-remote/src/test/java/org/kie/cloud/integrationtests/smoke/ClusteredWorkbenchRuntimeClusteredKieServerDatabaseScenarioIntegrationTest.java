@@ -26,12 +26,10 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchRuntimeClusteredKieServerDat
 import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.AutoScalerDeployment;
@@ -50,7 +48,6 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
 
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
     private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
 
@@ -73,7 +70,6 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
         // Setup test providers
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
         processTestProvider = ProcessTestProvider.create(deploymentScenario);
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
         httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
         httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
 
@@ -105,12 +101,6 @@ public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrat
     @Test
     public void testProcessFromMavenRepo() {
         processTestProvider.testExecuteProcesses(deploymentScenario.getKieServerDeployment(), DEFINITION_PROJECT_CONTAINER_ID);
-    }
-
-    @Test
-    @Category(Optaplanner.class)
-    public void testSolverFromMavenRepo() throws Exception {
-        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
 
     @Test

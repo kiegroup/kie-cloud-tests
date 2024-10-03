@@ -30,11 +30,9 @@ import org.kie.cloud.common.provider.KieServerClientProvider;
 import org.kie.cloud.common.provider.KieServerControllerClientProvider;
 import org.kie.cloud.integrationtests.category.Baseline;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsWorkbenchTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.PersistenceTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
@@ -58,7 +56,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
 
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
     private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
     private static PersistenceTestProvider persistenceTestProvider;
@@ -99,7 +96,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
         // Setup test providers
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
         processTestProvider = ProcessTestProvider.create(deploymentScenario);
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
         httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
         httpsWorkbenchTestProvider = HttpsWorkbenchTestProvider.create();
         persistenceTestProvider = PersistenceTestProvider.create();
@@ -146,12 +142,6 @@ public class WorkbenchKieServerPersistentScenarioLdapIntegrationTest extends Abs
     @Test
     public void testRulesFromMavenRepo() {
         fireRulesTestProvider.testFireRules(deploymentScenario.getKieServerDeployment(), HELLO_RULES_CONTAINER_ID);
-    }
-
-    @Test
-    @Category(Optaplanner.class)
-    public void testSolverFromMavenRepo() throws Exception {
-        optaplannerTestProvider.testExecuteSolver(deploymentScenario.getKieServerDeployment(), CLOUDBALANCE_CONTAINER_ID);
     }
 
     @Test

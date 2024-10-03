@@ -25,10 +25,8 @@ import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.deployment.constants.DeploymentConstants;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
@@ -39,7 +37,6 @@ public class KieServerWithPostgreSqlSsoIntegrationTest extends AbstractCloudInte
 
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
 
     private static final String SECURED_URL_PREFIX = "secured-";
@@ -65,7 +62,6 @@ public class KieServerWithPostgreSqlSsoIntegrationTest extends AbstractCloudInte
         // Setup test providers
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
         processTestProvider = ProcessTestProvider.create(deploymentScenario);
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
         httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
     }
 
@@ -83,12 +79,6 @@ public class KieServerWithPostgreSqlSsoIntegrationTest extends AbstractCloudInte
     @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
         processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
-    @Category(Optaplanner.class)
-    public void testSolverFromMavenRepo() {
-        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test

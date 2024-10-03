@@ -42,7 +42,6 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
-import org.kie.server.client.SolverServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 
 public class KieServerClientProvider {
@@ -144,7 +143,6 @@ public class KieServerClientProvider {
         List<String> capabilities = Arrays.asList(KieServerConstants.CAPABILITY_BPM,
                 KieServerConstants.CAPABILITY_BPM_UI,
                 KieServerConstants.CAPABILITY_BRM,
-                KieServerConstants.CAPABILITY_BRP,
                 KieServerConstants.CAPABILITY_CASE,
                 KieServerConstants.CAPABILITY_DMN);
         configuration.setCapabilities(capabilities);
@@ -179,14 +177,6 @@ public class KieServerClientProvider {
     public static RuleServicesClient getRuleJmsClient(KieServicesClient kieServerJmsClient) {
         return kieServerJmsClient.getServicesClient(RuleServicesClient.class);
     }
-
-    public static SolverServicesClient getSolverClient(KieServerDeployment kieServerDeployment) {
-        return getKieServerClient(kieServerDeployment).getServicesClient(SolverServicesClient.class);
-    }
-    public static SolverServicesClient getSolverJmsClient(KieServicesClient kieServerJmsClient) {
-        return kieServerJmsClient.getServicesClient(SolverServicesClient.class);
-    }
-
     public static void waitForContainerStart(KieServerDeployment kieServerDeployment, String containerId) {
         KieServicesClient kieServerClient = getKieServerClient(kieServerDeployment);
 

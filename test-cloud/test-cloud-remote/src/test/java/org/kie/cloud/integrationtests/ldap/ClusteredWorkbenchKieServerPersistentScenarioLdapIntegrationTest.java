@@ -24,9 +24,7 @@ import org.kie.cloud.api.scenario.ClusteredWorkbenchKieServerDatabasePersistentS
 import org.kie.cloud.api.settings.GitSettings;
 import org.kie.cloud.api.settings.LdapSettings;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProjectBuilderTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
@@ -43,7 +41,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
     private static ProjectBuilderTestProvider projectBuilderTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
 
     @BeforeClass
     public static void initializeDeployment() {
@@ -81,7 +78,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
         processTestProvider = ProcessTestProvider.create(deploymentScenario);
         projectBuilderTestProvider = ProjectBuilderTestProvider.create();
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
     }
 
     @AfterClass
@@ -104,12 +100,6 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
     @Test
     public void testRulesFromMavenRepo() {
         fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
-    @Category(Optaplanner.class)
-    public void testSolverFromMavenRepo() {
-        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test

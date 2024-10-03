@@ -22,11 +22,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.KieServerWithDatabaseScenario;
 import org.kie.cloud.integrationtests.category.JBPMOnly;
-import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.integrationtests.testproviders.ProcessTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
@@ -38,7 +36,6 @@ public class KieServerWithPostgreSqlScenarioIntegrationTest extends AbstractClou
 
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
 
     @BeforeClass
@@ -53,7 +50,6 @@ public class KieServerWithPostgreSqlScenarioIntegrationTest extends AbstractClou
             // Setup test providers
             fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
             processTestProvider = ProcessTestProvider.create(deploymentScenario);
-            optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
             httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
         } catch (UnsupportedOperationException ex) {
             Assume.assumeFalse(ex.getMessage().startsWith("Not supported"));
@@ -74,12 +70,6 @@ public class KieServerWithPostgreSqlScenarioIntegrationTest extends AbstractClou
     @Category(JBPMOnly.class)
     public void testProcessFromMavenRepo() {
         processTestProvider.testDeployFromKieServerAndExecuteProcesses(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
-    @Category(Optaplanner.class)
-    public void testSolverFromMavenRepo() {
-        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test

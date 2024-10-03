@@ -21,11 +21,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.cloud.api.scenario.KieServerScenario;
-import org.kie.cloud.integrationtests.category.Optaplanner;
 import org.kie.cloud.integrationtests.category.Smoke;
 import org.kie.cloud.integrationtests.testproviders.FireRulesTestProvider;
 import org.kie.cloud.integrationtests.testproviders.HttpsKieServerTestProvider;
-import org.kie.cloud.integrationtests.testproviders.OptaplannerTestProvider;
 import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 
@@ -35,7 +33,6 @@ public class KieServerScenarioIntegrationTest extends AbstractCloudIntegrationTe
     private static KieServerScenario deploymentScenario;
 
     private static FireRulesTestProvider fireRulesTestProvider;
-    private static OptaplannerTestProvider optaplannerTestProvider;
     private static HttpsKieServerTestProvider httpsKieServerTestProvider;
 
     @BeforeClass
@@ -52,7 +49,6 @@ public class KieServerScenarioIntegrationTest extends AbstractCloudIntegrationTe
 
         // Setup test providers
         fireRulesTestProvider = FireRulesTestProvider.create(deploymentScenario);
-        optaplannerTestProvider = OptaplannerTestProvider.create(deploymentScenario);
         httpsKieServerTestProvider = HttpsKieServerTestProvider.create(deploymentScenario);
     }
 
@@ -64,12 +60,6 @@ public class KieServerScenarioIntegrationTest extends AbstractCloudIntegrationTe
     @Test
     public void testRulesFromMavenRepo() {
         fireRulesTestProvider.testDeployFromKieServerAndFireRules(deploymentScenario.getKieServerDeployment());
-    }
-
-    @Test
-    @Category(Optaplanner.class)
-    public void testSolverFromMavenRepo() {
-        optaplannerTestProvider.testDeployFromKieServerAndExecuteSolver(deploymentScenario.getKieServerDeployment());
     }
 
     @Test
