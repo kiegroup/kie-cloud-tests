@@ -74,7 +74,6 @@ public class InstancesLogCollectorRunnable implements Runnable {
             // Preserve interrupt status
             Thread.currentThread().interrupt();
         } finally {
-            executorService.shutdownNow();
             // Finally, flush logs to be sure we have the last state of running pods
             instances.forEach(this::flushInstanceLogs);
         }
