@@ -54,29 +54,8 @@ public class InstancesLogCollectorRunnable implements Runnable {
         List<OpenShiftInstance> instances = new ArrayList<>(observedInstances);
 
         // Stop all collectors
-        executorService.shutdown(); // Disable new tasks from being submitted
-        try {
-            // Wait a while for existing tasks to terminate
-            if (!executorService.awaitTermination(waitForCompletionInMs, TimeUnit.MILLISECONDS)) {
-                logger.warn("Log collector Threadpool cannot stop. Force shutdown ...");
-                executorService.shutdownNow(); // Cancel currently executing tasks
-                // Wait a while for tasks to respond to being cancelled
-                if (!executorService.awaitTermination(waitForCompletionInMs, TimeUnit.MILLISECONDS)) {
-                    logger.error("Log collector Threadpool did not terminate");
-                }
-
-            } else {
-                logger.debug("Log collector Threadpool stopped correctly");
-            }
-        } catch (InterruptedException ie) {
-            // (Re-)Cancel if current thread also interrupted
-            executorService.shutdownNow();
-            // Preserve interrupt status
-            Thread.currentThread().interrupt();
-        } finally {
-            // Finally, flush logs to be sure we have the last state of running pods
-            instances.forEach(this::flushInstanceLogs);
-        }
+        executorService.shutdownNow(); // Disable new tasks from being submitted
+        instances.forEach(this::flushInstanceLogs);
     }
 
     private void observeInstanceLog(OpenShiftInstance instance) {

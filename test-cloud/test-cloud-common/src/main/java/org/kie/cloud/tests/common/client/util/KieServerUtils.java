@@ -79,14 +79,18 @@ public class KieServerUtils {
      */
     public static void waitForContainerRespinAfter(KieServerDeployment kieServer, Runnable action) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<?> waiter = executor.submit(kieServer::waitForContainerRespin);
-
-        action.run();
         try {
-            waiter.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error waiting for container respin", e);
-            throw new WaiterException("Error waiting for container respin");
+            Future<?> waiter = executor.submit(kieServer::waitForContainerRespin);
+
+            action.run();
+            try {
+                waiter.get();
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("Error waiting for container respin", e);
+                throw new WaiterException("Error waiting for container respin");
+            }
+        } finally {
+            executor.shutdownNow();
         }
     }
 

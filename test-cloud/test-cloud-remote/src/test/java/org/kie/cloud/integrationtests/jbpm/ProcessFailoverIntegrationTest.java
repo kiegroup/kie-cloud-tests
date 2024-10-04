@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -138,14 +140,19 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
     }
 
     private void signalStartLongScript(Long pid) {
-        new Thread(() -> {
-            try {
-                ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
-                processClient.signalProcessInstance(CONTAINER_ID, pid, Constants.Signal.SIGNAL_NAME, null);
-            } catch (KieServicesHttpException e) {
-                // Expected
-            }
-        }).start();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            executor.submit(() -> {
+                try {
+                    ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(deploymentScenario.getKieServerDeployment());
+                    processClient.signalProcessInstance(CONTAINER_ID, pid, Constants.Signal.SIGNAL_NAME, null);
+                } catch (KieServicesHttpException e) {
+                    // Expected
+                }
+            });
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     private void assertProcessVariable(Long pid, String variableKey, String expectedValue) {
