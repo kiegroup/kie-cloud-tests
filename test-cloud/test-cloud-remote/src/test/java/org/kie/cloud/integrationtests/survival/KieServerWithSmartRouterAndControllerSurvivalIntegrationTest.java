@@ -15,10 +15,8 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.assertj.core.api.SoftAssertions;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,6 +50,10 @@ import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -94,6 +96,13 @@ public class KieServerWithSmartRouterAndControllerSurvivalIntegrationTest extend
 
         kieServerProcessClient = kieServerClient.getServicesClient(ProcessServicesClient.class);
         smartRouterProcessClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        smartRouterClient.close();
+        kieServerClient.close();
+        kieControllerClient.close();
     }
 
     @AfterClass

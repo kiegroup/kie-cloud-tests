@@ -16,10 +16,6 @@
 
 package org.kie.cloud.integrationtests.testproviders;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
@@ -43,6 +39,11 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,38 +90,46 @@ public class FireRulesTestProvider {
     public void testDeployFromKieServerAndFireRules(KieServerDeployment kieServerDeployment) {
         String containerId = "testFireRules";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
-
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.HELLO_RULES_SNAPSHOT.getGroupId(),
-                                                                                                                                                                 Kjar.HELLO_RULES_SNAPSHOT.getArtifactName(),
-                                                                                                                                                                 Kjar.HELLO_RULES_SNAPSHOT.getVersion())));
-        KieServerAssert.assertSuccess(createContainer);
-        kieServerDeployment.waitForContainerRespin();
-
         try {
-            testFireRules(kieServerDeployment, containerId);
+            ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.HELLO_RULES_SNAPSHOT.getGroupId(),
+                    Kjar.HELLO_RULES_SNAPSHOT.getArtifactName(),
+                    Kjar.HELLO_RULES_SNAPSHOT.getVersion())));
+            KieServerAssert.assertSuccess(createContainer);
+            kieServerDeployment.waitForContainerRespin();
+
+            try {
+                testFireRules(kieServerDeployment, containerId);
+            } finally {
+                KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
+            }
         } finally {
-            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
+            kieServerClient.close();
         }
     }
 
-    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, String gitRepositoryUrl) {
+    public void testDeployFromWorkbenchAndFireRules(WorkbenchDeployment workbenchDeployment, KieServerDeployment kieServerDeployment, String gitRepositoryUrl) throws IOException {
         String containerId = "testDeployFromWorkbenchAndFireRules";
         String containerAlias = "alias-testDeployFromWorkbenchAndFireRules";
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(workbenchDeployment);
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
-        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-
-        WorkbenchUtils.deployProjectToWorkbench(gitRepositoryUrl, workbenchDeployment, Kjar.HELLO_RULES.getArtifactName());
-
-        WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerAlias, Kjar.HELLO_RULES, KieContainerStatus.STARTED);
-
-        KieServerClientProvider.waitForContainerStart(kieServerDeployment, containerId);
-        kieServerDeployment.waitForContainerRespin();
-
         try {
-            testFireRules(kieServerDeployment, containerId);
+            KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
+
+            WorkbenchUtils.deployProjectToWorkbench(gitRepositoryUrl, workbenchDeployment, Kjar.HELLO_RULES.getArtifactName());
+
+            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerAlias, Kjar.HELLO_RULES, KieContainerStatus.STARTED);
+
+            KieServerClientProvider.waitForContainerStart(kieServerDeployment, containerId);
+            kieServerDeployment.waitForContainerRespin();
+
+            try {
+                testFireRules(kieServerDeployment, containerId);
+            } finally {
+                KieServerUtils.waitForContainerRespinAfter(kieServerDeployment, () -> kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId));
+            }
         } finally {
-            KieServerUtils.waitForContainerRespinAfter(kieServerDeployment, () -> kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId));
+            kieServerClient.close();
+            kieControllerClient.close();
         }
     }
 

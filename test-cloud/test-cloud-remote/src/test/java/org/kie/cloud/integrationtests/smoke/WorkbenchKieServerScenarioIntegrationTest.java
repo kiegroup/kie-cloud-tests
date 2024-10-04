@@ -15,8 +15,6 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
-import java.time.Duration;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -39,6 +37,9 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
+
+import java.io.IOException;
+import java.time.Duration;
 
 @Category(Smoke.class)
 public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudIntegrationTest {
@@ -103,7 +104,7 @@ public class WorkbenchKieServerScenarioIntegrationTest extends AbstractCloudInte
 
     @Test
     @Ignore
-    public void testDeployContainerFromWorkbench() {
+    public void testDeployContainerFromWorkbench() throws IOException {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),
                                                                   deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));

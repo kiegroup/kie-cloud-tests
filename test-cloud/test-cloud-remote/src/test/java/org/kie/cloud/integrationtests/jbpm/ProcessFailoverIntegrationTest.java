@@ -15,11 +15,6 @@
  */
 package org.kie.cloud.integrationtests.jbpm;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +41,12 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,8 +87,10 @@ public class ProcessFailoverIntegrationTest extends AbstractMethodIsolatedCloudI
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
         GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
+        kieServerControllerClient.close();
+        kieServicesClient.close();
     }
 
     @Test

@@ -32,6 +32,8 @@ import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.LdapSettingsConstants;
 
+import java.io.IOException;
+
 public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest extends AbstractCloudIntegrationTest {
 
     private static final String REPOSITORY_NAME = generateNameWithPrefix(ClusteredWorkbenchKieServerDatabasePersistentScenario.class.getSimpleName());
@@ -103,7 +105,7 @@ public class ClusteredWorkbenchKieServerPersistentScenarioLdapIntegrationTest ex
     }
 
     @Test
-    public void testDeployContainerFromWorkbench() {
+    public void testDeployContainerFromWorkbench() throws IOException {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),
                                                                   deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));

@@ -38,6 +38,8 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 
+import java.io.IOException;
+
 @Category(TemplateNotSupported.class)
 public class WorkbenchKieServerPersistentWithSecretAdminCredentialsScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
@@ -48,6 +50,9 @@ public class WorkbenchKieServerPersistentWithSecretAdminCredentialsScenarioInteg
     private static FireRulesTestProvider fireRulesTestProvider;
     private static ProcessTestProvider processTestProvider;
     private static HttpsWorkbenchTestProvider httpsWorkbenchTestProvider;
+
+    private static KieServerControllerClient kieServerControllerClient;
+    private static KieServicesClient kieServicesClient;
 
     private static final String HELLO_RULES_CONTAINER_ID = "helloRules";
     private static final String DEFINITION_PROJECT_CONTAINER_ID = "definition-project";
@@ -73,21 +78,23 @@ public class WorkbenchKieServerPersistentWithSecretAdminCredentialsScenarioInteg
 
         // Workaround to speed test execution.
         // Create all containers while Kie servers are turned off to avoid expensive respins.
-        KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
-        KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
-        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
+        kieServerControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
+        kieServicesClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
+        KieServerInfo serverInfo = kieServicesClient.getServerInfo().getResult();
 
         AutoScalerDeployment.on(deploymentScenario.getKieServerDeployment(), () -> {
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
+            WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), HELLO_RULES_CONTAINER_ID, "hello-rules-alias", Kjar.HELLO_RULES_SNAPSHOT, KieContainerStatus.STARTED);
+            WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), DEFINITION_PROJECT_CONTAINER_ID, "definition-project-alias", Kjar.DEFINITION_SNAPSHOT,
                                              KieContainerStatus.STARTED);
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
+            WorkbenchUtils.saveContainerSpec(kieServerControllerClient, serverInfo.getServerId(), serverInfo.getName(), CLOUDBALANCE_CONTAINER_ID, "cloudbalance-alias", Kjar.CLOUD_BALANCE_SNAPSHOT, KieContainerStatus.STARTED);
         });
     }
 
     @AfterClass
-    public static void cleanEnvironment() {
+    public static void cleanEnvironment() throws IOException {
         ScenarioDeployer.undeployScenario(deploymentScenario);
+        kieServerControllerClient.close();
+        kieServicesClient.close();
     }
 
     @Test

@@ -15,9 +15,6 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.kie.cloud.api.deployment.Instance;
@@ -42,6 +39,10 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,7 +86,7 @@ public class SmartRouterTestProvider {
     public void testRouterLoadBalancing(WorkbenchDeployment workbenchDeployment,
                                         SmartRouterDeployment smartRouterDeployment,
                                         KieServerDeployment kieServerDeploymentOne,
-                                        KieServerDeployment kieServerDeploymentTwo) {
+                                        KieServerDeployment kieServerDeploymentTwo) throws IOException {
         String containerId = "testRouterLoadBalancing";
         String containerAlias = "testRouterLoadBalancingAlias";
 
@@ -94,42 +95,48 @@ public class SmartRouterTestProvider {
                                                                                            kieServerDeploymentOne.getUsername(), kieServerDeploymentOne.getPassword());
         KieServicesClient kieServerClientOne = KieServerClientProvider.getKieServerClient(kieServerDeploymentOne);
         KieServicesClient kieServerClientTwo = KieServerClientProvider.getKieServerClient(kieServerDeploymentTwo);
-
         try {
-            deployContainerToServerTemplate(kieServerDeploymentOne, kieServerClientOne.getServerInfo().getResult(), kieControllerClient, containerId, containerAlias);
-            deployContainerToServerTemplate(kieServerDeploymentTwo, kieServerClientTwo.getServerInfo().getResult(), kieControllerClient, containerId, containerAlias);
+            try {
+                deployContainerToServerTemplate(kieServerDeploymentOne, kieServerClientOne.getServerInfo().getResult(), kieControllerClient, containerId, containerAlias);
+                deployContainerToServerTemplate(kieServerDeploymentTwo, kieServerClientTwo.getServerInfo().getResult(), kieControllerClient, containerId, containerAlias);
 
-            ServiceResponse<KieServerInfo> kieServerInfo = smartRouterClient.getServerInfo();
-            List<String> capabilities = kieServerInfo.getResult().getCapabilities();
-            Assertions.assertThat(capabilities).isNotEmpty();
+                ServiceResponse<KieServerInfo> kieServerInfo = smartRouterClient.getServerInfo();
+                List<String> capabilities = kieServerInfo.getResult().getCapabilities();
+                Assertions.assertThat(capabilities).isNotEmpty();
 
-            QueryServicesClient queryServicesClient = smartRouterClient.getServicesClient(QueryServicesClient.class);
-            List<ProcessDefinition> processDefinitions = queryServicesClient.findProcesses(0, 100);
-            assertThat(processDefinitions).isNotNull();
-            assertThat(processDefinitions.stream().anyMatch(p -> p.getId().equals(Constants.ProcessId.LOG)));
+                QueryServicesClient queryServicesClient = smartRouterClient.getServicesClient(QueryServicesClient.class);
+                List<ProcessDefinition> processDefinitions = queryServicesClient.findProcesses(0, 100);
+                assertThat(processDefinitions).isNotNull();
+                assertThat(processDefinitions.stream().anyMatch(p -> p.getId().equals(Constants.ProcessId.LOG)));
 
-            ProcessServicesClient processServicesClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
-            for (int i = 0; i < PROCESS_NUMBER; i++) {
-                processServicesClient.startProcess(containerId, Constants.ProcessId.LOG);
+                ProcessServicesClient processServicesClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
+                for (int i = 0; i < PROCESS_NUMBER; i++) {
+                    processServicesClient.startProcess(containerId, Constants.ProcessId.LOG);
+                }
+
+                assertLogMessages(kieServerDeploymentOne);
+                assertLogMessages(kieServerDeploymentTwo);
+            } catch (Exception e) {
+                KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentOne, () -> kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId));
+                KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentTwo, () -> kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId));
+                throw e;
             }
+            // Make sure that Smart router works when one container is stopped
+            try {
+                KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentOne, () -> kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId));
 
-            assertLogMessages(kieServerDeploymentOne);
-            assertLogMessages(kieServerDeploymentTwo);
-        } catch (Exception e) {
-            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentOne, () -> kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId));
-            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentTwo, () -> kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId));
-            throw e;
-        }
-        // Make sure that Smart router works when one container is stopped
-        try {
-            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentOne, () -> kieControllerClient.deleteContainerSpec(kieServerClientOne.getServerInfo().getResult().getServerId(), containerId));
-
-            ProcessServicesClient processServicesClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
-            for (int i = 0; i < PROCESS_NUMBER; i++) {
-                processServicesClient.startProcess(containerId, Constants.ProcessId.LOG);
+                ProcessServicesClient processServicesClient = smartRouterClient.getServicesClient(ProcessServicesClient.class);
+                for (int i = 0; i < PROCESS_NUMBER; i++) {
+                    processServicesClient.startProcess(containerId, Constants.ProcessId.LOG);
+                }
+            } finally {
+                KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentTwo, () -> kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId));
             }
         } finally {
-            KieServerUtils.waitForContainerRespinAfter(kieServerDeploymentTwo, () -> kieControllerClient.deleteContainerSpec(kieServerClientTwo.getServerInfo().getResult().getServerId(), containerId));
+            kieServerClientTwo.close();
+            kieServerClientOne.close();
+            smartRouterClient.close();
+            kieControllerClient.close();
         }
     }
 

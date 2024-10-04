@@ -15,8 +15,6 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import java.util.Objects;
-
 import org.kie.cloud.api.deployment.Deployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
 import org.kie.cloud.api.scenario.WorkbenchKieServerScenario;
@@ -30,6 +28,9 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.KieServerControllerClient;
+
+import java.io.IOException;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,25 +64,29 @@ public class PersistenceTestProvider {
 
     private void init(DeploymentScenario<?> deploymentScenario) {}
 
-    public void testControllerPersistence(WorkbenchKieServerScenario deploymentScenario) {
+    public void testControllerPersistence(WorkbenchKieServerScenario deploymentScenario) throws IOException {
         String containerId = "testControllerPersistence";
 
         KieServerControllerClient kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchDeployment());
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(deploymentScenario.getKieServerDeployment());
-
-        KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
-        String kieServerId = serverInfo.getServerId();
         try {
-            WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerId, Kjar.DEFINITION, KieContainerStatus.STARTED);
-            KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), containerId);
+            KieServerInfo serverInfo = kieServerClient.getServerInfo().getResult();
+            String kieServerId = serverInfo.getServerId();
+            try {
+                WorkbenchUtils.saveContainerSpec(kieControllerClient, serverInfo.getServerId(), serverInfo.getName(), containerId, containerId, Kjar.DEFINITION, KieContainerStatus.STARTED);
+                KieServerClientProvider.waitForContainerStart(deploymentScenario.getKieServerDeployment(), containerId);
 
-            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerId, containerId);
+                verifyOneServerTemplateWithContainer(kieControllerClient, kieServerId, containerId);
 
-            scaleToZeroAndBackToOne(deploymentScenario.getWorkbenchDeployment());
+                scaleToZeroAndBackToOne(deploymentScenario.getWorkbenchDeployment());
 
-            verifyOneServerTemplateWithContainer(kieControllerClient, kieServerId, containerId);
+                verifyOneServerTemplateWithContainer(kieControllerClient, kieServerId, containerId);
+            } finally {
+                kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
+            }
         } finally {
-            kieControllerClient.deleteContainerSpec(serverInfo.getServerId(), containerId);
+            kieServerClient.close();
+            kieControllerClient.close();
         }
     }
 

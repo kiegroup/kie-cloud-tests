@@ -15,16 +15,6 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.SSLHandshakeException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-
 import org.apache.http.conn.ConnectTimeoutException;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
@@ -56,6 +46,16 @@ import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLHandshakeException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -93,8 +93,10 @@ public class KieServerWithWorkbenchSurvivalIntegrationTest extends AbstractMetho
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
         GitUtils.deleteGitRepository(REPOSITORY_NAME, deploymentScenario);
+        kieServicesClient.close();
+        kieServerControllerClient.close();
     }
 
     @Test

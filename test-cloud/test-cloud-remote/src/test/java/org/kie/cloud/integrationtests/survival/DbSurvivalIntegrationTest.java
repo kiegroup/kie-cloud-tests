@@ -15,12 +15,7 @@
  */
 package org.kie.cloud.integrationtests.survival;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -47,6 +42,12 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -110,6 +111,11 @@ public class DbSurvivalIntegrationTest extends AbstractMethodIsolatedCloudIntegr
         KieServerUtils.waitForContainerRespinAfter(deploymentScenario.getKieServerDeployment(),
                                                    () -> kieServicesClient.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, new ReleaseId(PROJECT_GROUP_ID, DEFINITION_PROJECT_SNAPSHOT_NAME,
                                                                                                                                                               DEFINITION_PROJECT_SNAPSHOT_VERSION))));
+    }
+
+    @After
+    public void tearDown() {
+        kieServicesClient.close();
     }
 
     @Test

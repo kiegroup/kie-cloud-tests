@@ -15,10 +15,7 @@
 
 package org.kie.cloud.integrationtests.jbpm;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -33,6 +30,7 @@ import org.kie.cloud.integrationtests.category.JBPMOnly;
 import org.kie.cloud.integrationtests.category.MonitoringK8sFs;
 import org.kie.cloud.integrationtests.category.OperatorNotSupported;
 import org.kie.cloud.tests.common.AbstractMethodIsolatedCloudIntegrationTest;
+import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 import org.kie.cloud.tests.common.client.util.WorkbenchUtils;
 import org.kie.cloud.tests.common.time.Constants;
@@ -44,6 +42,11 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,6 +72,12 @@ public class TimerIntegrationTest extends AbstractMethodIsolatedCloudIntegration
         KjarDeployer.create(DEPLOYED_KJAR).deploy(deploymentScenario.getMavenRepositoryDeployment());
 
         kieControllerClient = KieServerControllerClientProvider.getKieServerControllerClient(deploymentScenario.getWorkbenchRuntimeDeployment());
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        kieControllerClient.close();
+        ScenarioDeployer.undeployScenario(deploymentScenario);
     }
 
     @Test

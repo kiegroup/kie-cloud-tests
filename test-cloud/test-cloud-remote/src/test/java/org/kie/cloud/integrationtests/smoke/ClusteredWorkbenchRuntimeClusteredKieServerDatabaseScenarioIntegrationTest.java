@@ -15,8 +15,6 @@
 
 package org.kie.cloud.integrationtests.smoke;
 
-import java.time.Duration;
-
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
@@ -40,6 +38,8 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
+
+import java.time.Duration;
 
 @Category({Smoke.class, JBPMOnly.class})
 public class ClusteredWorkbenchRuntimeClusteredKieServerDatabaseScenarioIntegrationTest extends AbstractCloudIntegrationTest {

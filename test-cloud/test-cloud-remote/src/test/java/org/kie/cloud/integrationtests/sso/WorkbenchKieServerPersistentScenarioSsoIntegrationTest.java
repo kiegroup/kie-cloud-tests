@@ -35,6 +35,8 @@ import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 
+import java.io.IOException;
+
 @Category(Baseline.class)
 public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends AbstractCloudIntegrationTest {
 
@@ -78,7 +80,7 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
     }
 
     @Test
-    public void testWorkbenchControllerPersistence() {
+    public void testWorkbenchControllerPersistence() throws IOException {
         persistenceTestProvider.testControllerPersistence(deploymentScenario);
     }
 
@@ -100,7 +102,7 @@ public class WorkbenchKieServerPersistentScenarioSsoIntegrationTest extends Abst
     }
 
     @Test
-    public void testDeployContainerFromWorkbench() {
+    public void testDeployContainerFromWorkbench() throws IOException {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),
                                                                   deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));

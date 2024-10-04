@@ -16,8 +16,6 @@
 
 package org.kie.cloud.integrationtests.ldap;
 
-import java.time.Duration;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,6 +44,9 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.controller.client.KieServerControllerClient;
+
+import java.io.IOException;
+import java.time.Duration;
 
 @Category(TemplateNotSupported.class)
 public class WorkbenchKieServerPersistentScenarioRoleMappingLdapIntegrationTest  extends AbstractCloudIntegrationTest {
@@ -137,7 +138,7 @@ public class WorkbenchKieServerPersistentScenarioRoleMappingLdapIntegrationTest 
     }
 
     @Test
-    public void testDeployContainerFromWorkbench() {
+    public void testDeployContainerFromWorkbench() throws IOException {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),
                                                                   deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));

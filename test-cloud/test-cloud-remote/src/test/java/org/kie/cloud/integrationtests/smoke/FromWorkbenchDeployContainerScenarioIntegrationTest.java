@@ -27,6 +27,8 @@ import org.kie.cloud.tests.common.AbstractCloudIntegrationTest;
 import org.kie.cloud.tests.common.ScenarioDeployer;
 import org.kie.cloud.tests.common.client.util.Kjar;
 
+import java.io.IOException;
+
 @Category(Smoke.class)
 public class FromWorkbenchDeployContainerScenarioIntegrationTest extends AbstractCloudIntegrationTest {
 
@@ -58,7 +60,7 @@ public class FromWorkbenchDeployContainerScenarioIntegrationTest extends Abstrac
     }
 
     @Test
-    public void testDeployContainerFromWorkbench() {
+    public void testDeployContainerFromWorkbench() throws IOException {
         fireRulesTestProvider.testDeployFromWorkbenchAndFireRules(deploymentScenario.getWorkbenchDeployment(),
                                                                   deploymentScenario.getKieServerDeployment(),
                                                                   deploymentScenario.getGitProvider().getRepositoryUrl(REPOSITORY_NAME));

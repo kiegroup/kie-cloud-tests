@@ -14,9 +14,6 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.KjarDeployer;
 import org.kie.cloud.api.deployment.SmartRouterDeployment;
@@ -34,6 +31,9 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
+
+import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.atIndex;
@@ -102,19 +102,22 @@ public class ProcessTestProvider {
     private void testDeployFromKieServerAndExecuteProcessWithUserTask(KieServerDeployment kieServerDeployment) {
         String containerId = "testProcessWithUserTask";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
-
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getArtifactName(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getVersion())));
-        KieServerAssert.assertSuccess(createContainer);
-        kieServerDeployment.waitForContainerRespin();
-
-        ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(kieServerDeployment);
-        UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(kieServerDeployment);
         try {
-            testExecuteProcessWithUserTask(processClient, taskClient, containerId);
+            ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
+                    Kjar.DEFINITION_SNAPSHOT.getArtifactName(),
+                    Kjar.DEFINITION_SNAPSHOT.getVersion())));
+            KieServerAssert.assertSuccess(createContainer);
+            kieServerDeployment.waitForContainerRespin();
+
+            ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(kieServerDeployment);
+            UserTaskServicesClient taskClient = KieServerClientProvider.getTaskClient(kieServerDeployment);
+            try {
+                testExecuteProcessWithUserTask(processClient, taskClient, containerId);
+            } finally {
+                KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
+            }
         } finally {
-            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
+            kieServerClient.close();
         }
     }
 
@@ -138,17 +141,20 @@ public class ProcessTestProvider {
         String containerId = "testProcessWithSignal";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
         ProcessServicesClient processClient = KieServerClientProvider.getProcessClient(kieServerDeployment);
-
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getArtifactName(),
-                                                                                                                                                                 Kjar.DEFINITION_SNAPSHOT.getVersion())));
-        KieServerAssert.assertSuccess(createContainer);
-        kieServerDeployment.waitForContainerRespin();
-
         try {
-            testExecuteProcessWithSignal(processClient, containerId);
+            ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId, new KieContainerResource(containerId, new ReleaseId(Kjar.DEFINITION_SNAPSHOT.getGroupId(),
+                    Kjar.DEFINITION_SNAPSHOT.getArtifactName(),
+                    Kjar.DEFINITION_SNAPSHOT.getVersion())));
+            KieServerAssert.assertSuccess(createContainer);
+            kieServerDeployment.waitForContainerRespin();
+
+            try {
+                testExecuteProcessWithSignal(processClient, containerId);
+            } finally {
+                KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
+            }
         } finally {
-            KieServerUtils.waitForContainerRespinAfterDisposeContainer(kieServerDeployment, containerId);
+            kieServerClient.close();
         }
     }
 

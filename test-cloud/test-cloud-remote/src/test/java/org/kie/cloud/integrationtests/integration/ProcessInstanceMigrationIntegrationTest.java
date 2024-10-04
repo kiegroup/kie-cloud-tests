@@ -14,20 +14,6 @@
  */
 package org.kie.cloud.integrationtests.integration;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -42,6 +28,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -68,6 +55,19 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 @Category({JBPMOnly.class, TemplateNotSupported.class})
 @RunWith(Parameterized.class)
@@ -141,6 +141,12 @@ public class ProcessInstanceMigrationIntegrationTest extends AbstractMethodIsola
 
         kieServerId = kieServicesClient.getServerInfo().getResult().getServerId();
         client = HttpClientBuilder.create().setDefaultCredentialsProvider(getBasicAuth()).build();
+    }
+
+    @After
+    public void tearDown() {
+        kieServicesClient.close();
+        client.getConnectionManager().shutdown();
     }
 
     @Test

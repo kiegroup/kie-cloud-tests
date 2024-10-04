@@ -14,8 +14,6 @@
  */
 package org.kie.cloud.integrationtests.testproviders;
 
-import java.util.Objects;
-
 import org.kie.cloud.api.deployment.KieServerDeployment;
 import org.kie.cloud.api.deployment.WorkbenchDeployment;
 import org.kie.cloud.api.scenario.DeploymentScenario;
@@ -27,6 +25,8 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.wb.test.rest.client.WorkbenchClient;
+
+import java.util.Objects;
 
 public class ProjectBuilderTestProvider {
 
@@ -73,12 +73,15 @@ public class ProjectBuilderTestProvider {
 
         String containerId = "testBuildProject-id";
         KieServicesClient kieServerClient = KieServerClientProvider.getKieServerClient(kieServerDeployment);
-
-        ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId,
-                                                                                                new KieContainerResource(containerId, new ReleaseId(
-                                                                                                                                                    workbenchClient.getSpace(spaceName).getDefaultGroupId(), projectName,
-                                                                                                                                                    projectVersion)));
-        KieServerAssert.assertSuccess(createContainer);
-        kieServerDeployment.waitForContainerRespin();
+        try {
+            ServiceResponse<KieContainerResource> createContainer = kieServerClient.createContainer(containerId,
+                    new KieContainerResource(containerId, new ReleaseId(
+                            workbenchClient.getSpace(spaceName).getDefaultGroupId(), projectName,
+                            projectVersion)));
+            KieServerAssert.assertSuccess(createContainer);
+            kieServerDeployment.waitForContainerRespin();
+        } finally {
+            kieServerClient.close();
+        }
     }
 }
