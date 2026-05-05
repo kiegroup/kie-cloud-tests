@@ -61,7 +61,7 @@ public class KieServerOperatorDeployment extends KieServerDeploymentImpl {
         Integer replicas = Optional.ofNullable(kieApp.getStatus())
                                    .map(status -> status.getApplied())
                                    .map(applied -> getAssociatedServerObject(applied).getReplicas())
-                                   .orElseGet(() -> getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas());
+                                   .orElseGet(() -> getReplicas());
 
         waitUntilAllPodsAreReadyAndRunning(replicas);
         if (replicas > 0) {

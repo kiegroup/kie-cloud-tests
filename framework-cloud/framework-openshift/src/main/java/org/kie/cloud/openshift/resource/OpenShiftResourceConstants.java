@@ -28,6 +28,10 @@ public class OpenShiftResourceConstants {
     public static final String DEPLOYMENT_TRIGGER_CONFIG_CHANGE = "ConfigChange";
     public static final long DEPLOYMENT_CONFIG_CREATION_TIMEOUT = 60 * 1000L; // 1 minute
     public static final String DEPLOYMENT_CONFIG_LABEL = "deploymentconfig";
+    
+    // Deployment constants (for apps/v1 Deployment API)
+    public static final String DEPLOYMENT_LABEL = "app";
+    public static final long DEPLOYMENT_CREATION_TIMEOUT = 60 * 1000L; // 1 minute
 
     // Route constants
     public static final String ROUTE_REDIRECT_COMPONENT_TYPE = "Service";

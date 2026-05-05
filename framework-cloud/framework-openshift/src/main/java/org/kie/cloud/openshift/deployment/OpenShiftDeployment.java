@@ -113,15 +113,27 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void scale(int instances) {
-        openShift.deploymentConfigs().inNamespace(getNamespace()).withName(getDeploymentConfigName()).scale(instances, true);
+        if (usesDeploymentAPI()) {
+            openShift.apps().deployments()
+                .inNamespace(getNamespace())
+                .withName(getServiceName())
+                .scale(instances, true);
+        } else {
+            openShift.deploymentConfigs().inNamespace(getNamespace()).withName(getDeploymentConfigName()).scale(instances, true);
+        }
     }
 
     @Override
     public boolean isReady() {
         try {
             Service service = openShift.getService(getServiceName());
-            DeploymentConfig deploymentConfig = openShift.getDeploymentConfig(getDeploymentConfigName());
-            return service != null && deploymentConfig != null;
+            if (usesDeploymentAPI()) {
+                io.fabric8.kubernetes.api.model.apps.Deployment deployment = deployment();
+                return service != null && deployment != null;
+            } else {
+                DeploymentConfig deploymentConfig = openShift.getDeploymentConfig(getDeploymentConfigName());
+                return service != null && deploymentConfig != null;
+            }
         } catch (Exception e) {
             return false;
         }
@@ -130,13 +142,15 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public List<Instance> getInstances() {
         if (isReady() && getReplicas() > 0) {
-            String deploymentConfigName = getDeploymentConfigName();
+            Map.Entry<String, String> podLabel = getPodSelectorLabel();
+            String labelKey = podLabel.getKey();
+            String labelValue = podLabel.getValue();
 
             return OpenShiftCaller.repeatableCall(() -> openShift.getPods()
                                                                  .stream()
                                                                  .filter(pod -> {
-                                                                     String podsDeploymentConfigName = pod.getMetadata().getLabels().get(OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL);
-                                                                     return deploymentConfigName.equals(podsDeploymentConfigName);
+                                                                     String podLabelValue = pod.getMetadata().getLabels().get(labelKey);
+                                                                     return labelValue.equals(podLabelValue);
                                                                  })
                                                                  .map(pod -> OpenshiftInstanceUtil.createInstance(openShift, getNamespace(), pod))
                                                                  .collect(toList()));
@@ -158,20 +172,31 @@ public abstract class OpenShiftDeployment implements Deployment {
     @Override
     public void waitForVersionTag(String versionTag) {
         try {
-            Supplier<Boolean> checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> checkImageVersion(c.getImage(), versionTag));
+            Supplier<Boolean> checkNewVersionTag;
+            if (usesDeploymentAPI()) {
+                checkNewVersionTag = () -> deployment().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> checkImageVersion(c.getImage(), versionTag));
+            } else {
+                checkNewVersionTag = () -> deploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream().anyMatch(c -> checkImageVersion(c.getImage(), versionTag));
+            }
 
             new SimpleWaiter(() -> OpenShiftCaller.repeatableCall(checkNewVersionTag)).timeout(OpenShiftResourceConstants.DEPLOYMENT_NEW_VERSION_TIMEOUT)
-                                                                                      .reason("The deployment " + getDeploymentConfigName() + " was not restarted using the version tag " + versionTag)
+                                                                                      .reason("The deployment " + getServiceName() + " was not restarted using the version tag " + versionTag)
                                                                                       .waitFor();
 
         } catch (WaiterException | AssertionError e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + getDeploymentConfigName() + " to be ready.", e);
+            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + getServiceName() + " to be ready.", e);
         }
     }
 
     @Override
     public int getReplicas() {
-        return deploymentConfig().getSpec().getReplicas().intValue();
+        if (usesDeploymentAPI()) {
+            io.fabric8.kubernetes.api.model.apps.Deployment dep = deployment();
+            return dep != null && dep.getSpec() != null && dep.getSpec().getReplicas() != null
+                ? dep.getSpec().getReplicas().intValue() : 0;
+        } else {
+            return deploymentConfig().getSpec().getReplicas().intValue();
+        }
     }
 
     protected void waitUntilAllPodsAreReadyAndRunning(int expectedPods) {
@@ -181,28 +206,36 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     protected void waitUntilAllPodsAreReady(int expectedPods) {
         Instant startOfWaitLoop = Instant.now();
+        Map.Entry<String, String> podLabel = getPodSelectorLabel();
+        String labelKey = podLabel.getKey();
+        String labelValue = podLabel.getValue();
+        
         try {
             OpenShiftCaller.repeatableCall(() -> openShift.waiters()
-                                                          .areExactlyNPodsReady(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
+                                                          .areExactlyNPodsReady(expectedPods, labelKey, labelValue)
                                                           .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become ready.")
+                                                          .reason("Waiting for " + expectedPods + " pods of " + labelValue + " to become ready.")
                                                           .waitFor());
             logger.info("Waiter done after {}  seconds.", Duration.between(startOfWaitLoop, Instant.now()).getSeconds());
         } catch (WaiterException | AssertionError e) {
             logger.warn("Waiter throw exception after {} seconds.", Duration.between(startOfWaitLoop, Instant.now()).getSeconds());
-            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + getDeploymentConfigName() + " to be ready.", e);
+            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + labelValue + " to be ready.", e);
         }
     }
 
     protected void waitUntilAllPodsAreRunning(int expectedPods) {
+        Map.Entry<String, String> podLabel = getPodSelectorLabel();
+        String labelKey = podLabel.getKey();
+        String labelValue = podLabel.getValue();
+        
         try {
             OpenShiftCaller.repeatableCall(() -> openShift.waiters()
-                                                          .areExactlyNPodsRunning(expectedPods, OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, getDeploymentConfigName())
+                                                          .areExactlyNPodsRunning(expectedPods, labelKey, labelValue)
                                                           .timeout(OpenShiftResourceConstants.PODS_START_TO_READY_TIMEOUT)
-                                                          .reason("Waiting for " + expectedPods + " pods of deployment config " + getDeploymentConfigName() + " to become runnning.")
+                                                          .reason("Waiting for " + expectedPods + " pods of " + labelValue + " to become running.")
                                                           .waitFor());
         } catch (WaiterException | AssertionError e) {
-            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + getDeploymentConfigName() + " to start.", e);
+            throw new DeploymentTimeoutException("Timeout while waiting for pods of " + labelValue + " to start.", e);
         }
     }
 
@@ -241,22 +274,43 @@ public abstract class OpenShiftDeployment implements Deployment {
 
     @Override
     public void setResources(Map<String, String> requests, Map<String, String> limits) {
-        openShift
-                 .deploymentConfigs()
-                 .withName(getDeploymentConfigName())
-                 .edit(dc -> new DeploymentConfigBuilder(dc).editOrNewSpec()
-                 .editTemplate()
-                 .editOrNewSpec()
-                 .editContainer(0)
-                 .editResources()
-                 .addToRequests(transformMap(requests))
-                 .addToLimits(transformMap(limits))
-                 .endResources()
-                 .endContainer()
-                 .endSpec()
-                 .endTemplate()
-                 .endSpec()
-                 .build());
+        if (usesDeploymentAPI()) {
+            openShift.apps()
+                     .deployments()
+                     .inNamespace(getNamespace())
+                     .withName(getServiceName())
+                     .edit(d -> new io.fabric8.kubernetes.api.model.apps.DeploymentBuilder(d)
+                     .editOrNewSpec()
+                     .editTemplate()
+                     .editOrNewSpec()
+                     .editContainer(0)
+                     .editResources()
+                     .addToRequests(transformMap(requests))
+                     .addToLimits(transformMap(limits))
+                     .endResources()
+                     .endContainer()
+                     .endSpec()
+                     .endTemplate()
+                     .endSpec()
+                     .build());
+        } else {
+            openShift
+                     .deploymentConfigs()
+                     .withName(getDeploymentConfigName())
+                     .edit(dc -> new DeploymentConfigBuilder(dc).editOrNewSpec()
+                     .editTemplate()
+                     .editOrNewSpec()
+                     .editContainer(0)
+                     .editResources()
+                     .addToRequests(transformMap(requests))
+                     .addToLimits(transformMap(limits))
+                     .endResources()
+                     .endContainer()
+                     .endSpec()
+                     .endTemplate()
+                     .endSpec()
+                     .build());
+        }
     }
 
     protected Optional<URL> getHttpRouteUrl(String serviceName) {
@@ -281,6 +335,64 @@ public abstract class OpenShiftDeployment implements Deployment {
     private DeploymentConfig deploymentConfig() {
         return openShift.getDeploymentConfig(getDeploymentConfigName());
     }
+    /**
+     * Helper method to get the Kubernetes Deployment resource.
+     * @return Deployment resource or null if not found
+     */
+    private io.fabric8.kubernetes.api.model.apps.Deployment deployment() {
+        return openShift.apps().deployments()
+            .inNamespace(getNamespace())
+            .withName(getServiceName())
+            .get();
+    }
+
+    /**
+     * Checks if this deployment uses the Kubernetes Deployment API instead of DeploymentConfig.
+     * @return true if Deployment API is used, false if DeploymentConfig API is used
+     */
+    protected boolean usesDeploymentAPI() {
+        return deployment() != null;
+    }
+    /**
+     * Gets the appropriate label key and value for pod selection based on deployment type.
+     * For Deployment API: Uses labels from .spec.selector.matchLabels (dynamically detected)
+     * For DeploymentConfig API: Uses "deploymentconfig" label
+     * This follows Red Hat's guide for DeploymentConfig to Deployment migration.
+     * @return Map.Entry with label key and value
+     */
+    protected Map.Entry<String, String> getPodSelectorLabel() {
+        if (usesDeploymentAPI()) {
+            io.fabric8.kubernetes.api.model.apps.Deployment dep = deployment();
+            if (dep != null && dep.getSpec() != null && 
+                dep.getSpec().getSelector() != null &&
+                dep.getSpec().getSelector().getMatchLabels() != null) {
+                Map<String, String> matchLabels = dep.getSpec().getSelector().getMatchLabels();
+                // Prefer "app" label if available (common convention)
+                if (matchLabels.containsKey(OpenShiftResourceConstants.DEPLOYMENT_LABEL)) {
+                    return new java.util.AbstractMap.SimpleEntry<>(
+                        OpenShiftResourceConstants.DEPLOYMENT_LABEL, 
+                        matchLabels.get(OpenShiftResourceConstants.DEPLOYMENT_LABEL)
+                    );
+                }
+                // Otherwise return the first available label from matchLabels
+                Map.Entry<String, String> firstLabel = matchLabels.entrySet().iterator().next();
+                return firstLabel;
+            }
+            // Fallback to default "app" label with service name
+            return new java.util.AbstractMap.SimpleEntry<>(
+                OpenShiftResourceConstants.DEPLOYMENT_LABEL, 
+                getServiceName()
+            );
+        } else {
+            // DeploymentConfig uses "deploymentconfig" label
+            return new java.util.AbstractMap.SimpleEntry<>(
+                OpenShiftResourceConstants.DEPLOYMENT_CONFIG_LABEL, 
+                getDeploymentConfigName()
+            );
+        }
+    }
+
+
 
     private Optional<String> getRoute(Protocol protocol, String serviceName) {
         Service service = openShift.getService(serviceName);
