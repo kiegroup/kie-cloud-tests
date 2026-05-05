@@ -55,7 +55,7 @@ public class SmartRouterOperatorDeployment extends SmartRouterDeploymentImpl {
         Integer replicas = Optional.ofNullable(kieApp.getStatus())
                                    .map(status -> status.getApplied())
                                    .map(applied -> applied.getObjects().getSmartRouter().getReplicas())
-                                   .orElseGet(() -> getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas());
+                                   .orElseGet(() -> getReplicas());
 
         waitUntilAllPodsAreReadyAndRunning(replicas);
         if (replicas > 0) {

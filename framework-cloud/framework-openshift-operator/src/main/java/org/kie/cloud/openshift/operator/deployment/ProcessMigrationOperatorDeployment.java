@@ -32,7 +32,7 @@ public class ProcessMigrationOperatorDeployment extends ProcessMigrationDeployme
 
     @Override
     public void waitForScale() {
-        Integer replicas = getOpenShift().getDeploymentConfig(getServiceName()).getSpec().getReplicas();
+        Integer replicas = getReplicas();
 
         waitUntilAllPodsAreReadyAndRunning(replicas);
         if (replicas > 0) {
