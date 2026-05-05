@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-parent</artifactId>
-    <version>7.67.2.Final-redhat-00046</version>
+    <version>7.67.2-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie.cloud</groupId>
@@ -50,8 +50,8 @@
     <version.org.apache.maven.shared>1.5</version.org.apache.maven.shared>
     <version.org.apache.maven.failsafe>2.21.0</version.org.apache.maven.failsafe>
     <version.org.codehaus.mojo.keytool>1.5</version.org.codehaus.mojo.keytool>
-    <version.org.yaml.snakeyaml>1.33</version.org.yaml.snakeyaml> <!-- Needs to stay in 1.33 fro 2.0 there is NoSuchMethodError for kubernetes client -->
-    <kie.artifact.version>7.67.2.Final-redhat-00046</kie.artifact.version>
+    <version.org.yaml.snakeyaml>1.33</version.org.yaml.snakeyaml> 
+    <kie.artifact.version>7.67.2.Final-redhat-00046</kie.artifact.version><!-- Needs to stay in 1.33 fro 2.0 there is NoSuchMethodError for kubernetes client -->
   </properties>
 
   <repositories>
